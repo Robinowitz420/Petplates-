@@ -3,10 +3,43 @@
 import { useUser } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
+// Assuming you need this import for the Link component you used in the original code
+import Link from 'next/link'; 
 
-// ... existing imports ...
+// -------------------------------------------------------------------------
+// THIS IS THE MAIN PAGE COMPONENT - IT MUST BE MARKED 'export default'
+// -------------------------------------------------------------------------
 
-// Add this component inside your recipe page, after the recipe data is loaded:
+// Define the types for the properties (props) the page expects from Next.js
+interface RecipePageProps {
+  params: {
+    id: string; // The dynamic part of the URL (e.g., '123')
+  };
+}
+
+export default function RecipePage({ params }: RecipePageProps) {
+  const { id } = params;
+
+  // Placeholder logic for fetching the recipe details
+  // You would replace this with actual data fetching later
+  const recipeNamePlaceholder = `Recipe ID: ${id}`; 
+
+  return (
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-4">Viewing {recipeNamePlaceholder}</h1>
+      <p>This is where the full recipe details will eventually load.</p>
+      
+      {/* This uses the component you provided */}
+      <div className="mt-4">
+        <SaveToProfileButton recipeId={id} recipeName={recipeNamePlaceholder} />
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------------------
+// THIS IS THE 'SaveToProfileButton' COMPONENT LOGIC YOU PROVIDED
+// -------------------------------------------------------------------------
 
 function SaveToProfileButton({ recipeId, recipeName }: { recipeId: string; recipeName: string }) {
   const { user } = useUser();

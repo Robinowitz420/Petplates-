@@ -79,7 +79,7 @@ export default function ProfileSelector() {
     });
   };
 
-  const toggleHealthConcern = (concern) => {
+  const toggleHealthConcern = (concern: string) => {
     if (concern === 'none') {
       setFormData({ ...formData, healthConcerns: ['none'] });
     } else {
@@ -120,8 +120,8 @@ export default function ProfileSelector() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pets.map((pet) => {
-            const Icon = petIcons[pet.type];
-            return (
+            const Icon = petIcons[pet.type as keyof typeof petIcons];
+             return (
               <button
                 key={pet.id}
                 onClick={() => setSelectedPet(pet.id)}
@@ -231,7 +231,7 @@ export default function ProfileSelector() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="">Choose a breed</option>
-                      {breedsByType[formData.type].map((breed) => (
+                      {breedsByType[formData.type as keyof typeof breedsByType].map((breed) => (
                         <option key={breed} value={breed.toLowerCase().replace(' ', '-')}>
                           {breed}
                         </option>
