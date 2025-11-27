@@ -97,9 +97,9 @@ export default function CategoryPage() {
                     >
                       <option value="">All Breeds</option>
                       {categoryBreeds.map((breed) => (
-                        <option key={breed} value={breed}>
-                          {breed}
-                            </option>
+                        <option key={breed.id} value={breed.id}>
+                          {breed.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -116,14 +116,14 @@ export default function CategoryPage() {
                     >
                       <option value="">All Ages</option>
                       {ageGroups.map((age) => (
-                        <option key={age.value} value={age.value}>
-                          {age.label}
+                        <option key={age} value={age}>
+                          {age}
                         </option>
                       ))}
                     </select>
                     {selectedAge && (
                       <p className="text-xs text-gray-500 mt-1">
-                        {ageGroups.find(a => a.value === selectedAge)?.label}
+                        {selectedAge.charAt(0).toUpperCase() + selectedAge.slice(1)} Adult
                       </p>
                     )}
                   </div>
@@ -140,8 +140,8 @@ export default function CategoryPage() {
                     >
                       <option value="">Select Concern</option>
                       {healthConcerns.map((concern) => (
-                        <option key={concern} value={concern}>
-                          {concern}
+                        <option key={concern.id} value={concern.id}>
+                          {concern.name}
                         </option>
                       ))}
                     </select>
@@ -181,42 +181,54 @@ export default function CategoryPage() {
                   Nutritional Guidelines
                 </h3>
                 <div className="space-y-3 text-sm">
-                  <div>
-                    <span className="font-semibold text-gray-700">Protein:</span>
-                    <span className="text-gray-600 ml-2">
-                      {nutritionalInfo.protein.min}-{nutritionalInfo.protein.max}{nutritionalInfo.protein.unit}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Fat:</span>
-                    <span className="text-gray-600 ml-2">
-                      {nutritionalInfo.fat.min}-{nutritionalInfo.fat.max}{nutritionalInfo.fat.unit}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Fiber:</span>
-                    <span className="text-gray-600 ml-2">
-                      {nutritionalInfo.fiber.min}-{nutritionalInfo.fiber.max}{nutritionalInfo.fiber.unit}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Calcium:</span>
-                    <span className="text-gray-600 ml-2">
-                      {nutritionalInfo.calcium.min}-{nutritionalInfo.calcium.max}{nutritionalInfo.calcium.unit}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Calories:</span>
-                    <span className="text-gray-600 ml-2">
-                      {nutritionalInfo.calories.min}-{nutritionalInfo.calories.max} {nutritionalInfo.calories.unit}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Key Vitamins:</span>
-                    <span className="text-gray-600 ml-2">
-                      {nutritionalInfo.vitamins.join(', ')}
-                    </span>
-                  </div>
+                  {nutritionalInfo.protein && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Protein:</span>
+                      <span className="text-gray-600 ml-2">
+                        {nutritionalInfo.protein.min}-{nutritionalInfo.protein.max}{nutritionalInfo.protein.unit}
+                      </span>
+                    </div>
+                  )}
+                  {nutritionalInfo.fat && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Fat:</span>
+                      <span className="text-gray-600 ml-2">
+                        {nutritionalInfo.fat.min}-{nutritionalInfo.fat.max}{nutritionalInfo.fat.unit}
+                      </span>
+                    </div>
+                  )}
+                  {nutritionalInfo.fiber && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Fiber:</span>
+                      <span className="text-gray-600 ml-2">
+                        {nutritionalInfo.fiber.min}-{nutritionalInfo.fiber.max}{nutritionalInfo.fiber.unit}
+                      </span>
+                    </div>
+                  )}
+                  {nutritionalInfo.calcium && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Calcium:</span>
+                      <span className="text-gray-600 ml-2">
+                        {nutritionalInfo.calcium.min}-{nutritionalInfo.calcium.max}{nutritionalInfo.calcium.unit}
+                      </span>
+                    </div>
+                  )}
+                  {nutritionalInfo.calories && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Calories:</span>
+                      <span className="text-gray-600 ml-2">
+                        {nutritionalInfo.calories.min}-{nutritionalInfo.calories.max} {nutritionalInfo.calories.unit}
+                      </span>
+                    </div>
+                  )}
+                  {nutritionalInfo.vitamins && (
+                    <div>
+                      <span className="font-semibold text-gray-700">Key Vitamins:</span>
+                      <span className="text-gray-600 ml-2">
+                        {nutritionalInfo.vitamins.join(', ')}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <p className="text-xs text-gray-500 mt-4">
                   Based on AAFCO and WSAVA guidelines

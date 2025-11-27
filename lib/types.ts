@@ -2,9 +2,18 @@
 
 export type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 export type Species = Extract<PetCategory, 'dogs' | 'cats'>;
-export type Breed = string;
+export interface Breed {
+  id: string;
+  name: string;
+  category: string;
+}
 export type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
-export type HealthConcern = string;
+export interface HealthConcern {
+  id: string;
+  name: string;
+  description: string;
+  dietaryAdjustments: string[];
+}
 
 export interface NutritionalRequirement {
   caloriesPerKg?: number;
@@ -13,6 +22,8 @@ export interface NutritionalRequirement {
   fiber?: { min: number; max?: number; unit: string };
   calcium?: { min: number; max?: number; unit: string };
   phosphorus?: { min: number; max?: number; unit: string };
+  calories?: { min: number; max?: number; unit: string };
+  vitamins?: string[];
   notes?: string[];
 }
 
