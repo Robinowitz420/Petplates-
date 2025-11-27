@@ -99,7 +99,7 @@ export default function CategoryPage() {
                       {categoryBreeds.map((breed) => (
                         <option key={breed} value={breed}>
                           {breed}
-                        </option>
+                            </option>
                       ))}
                     </select>
                   </div>
