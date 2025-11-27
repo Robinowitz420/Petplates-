@@ -11,6 +11,8 @@ interface VettedProduct {
   chewyLink?: string;
   // Specialty vendor link (raw food, subscription services)
   specialtyLink?: string;
+  // Primary purchase link (usually Amazon)
+  purchaseLink?: string;
   // A short note explaining *why* this product was chosen (for the user)
   vetNote: string;
   // Category for shopping list grouping
