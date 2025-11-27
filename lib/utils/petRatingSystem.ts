@@ -116,10 +116,16 @@ function enrichRecipeFromIngredients(recipe: any): {
   };
 }
 
+interface RatingFactor {
+  score: number;
+  weight: number;
+  reason: string;
+}
+
 export interface CompatibilityRating {
   overallScore: number;
   compatibility: 'excellent' | 'good' | 'fair' | 'poor';
-  breakdown: any;
+  breakdown: Record<string, RatingFactor>;
   warnings: string[];
   strengths: string[];
   recommendations: string[];
