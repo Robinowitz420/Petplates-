@@ -7,7 +7,10 @@ export interface Breed {
   name: string;
   category: string;
 }
-export type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
+export interface AgeGroup {
+  value: string;
+  label: string;
+}
 export interface HealthConcern {
   id: string;
   name: string;

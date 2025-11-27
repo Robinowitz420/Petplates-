@@ -58,7 +58,12 @@ export const pocketPetTypes: Breed[] = [
   { id: 'rat', name: 'Rat', category: 'pocket-pets' },
 ];
 
-export const ageGroups: AgeGroup[] = ['baby', 'young', 'adult', 'senior'];
+export const ageGroups: AgeGroup[] = [
+  { value: 'baby', label: 'Baby' },
+  { value: 'young', label: 'Young' },
+  { value: 'adult', label: 'Adult' },
+  { value: 'senior', label: 'Senior' },
+];
 
 export const healthConcerns: HealthConcern[] = [
   {

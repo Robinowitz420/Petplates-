@@ -116,14 +116,14 @@ export default function CategoryPage() {
                     >
                       <option value="">All Ages</option>
                       {ageGroups.map((age) => (
-                        <option key={age} value={age}>
-                          {age}
+                        <option key={age.value} value={age.value}>
+                          {age.label}
                         </option>
                       ))}
                     </select>
                     {selectedAge && (
                       <p className="text-xs text-gray-500 mt-1">
-                        {selectedAge.charAt(0).toUpperCase() + selectedAge.slice(1)} Adult
+                        {ageGroups.find(a => a.value === selectedAge)?.label}
                       </p>
                     )}
                   </div>
