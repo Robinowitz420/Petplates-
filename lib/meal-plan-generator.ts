@@ -64,17 +64,17 @@ export const generateWeeklyMealPlan = (profile: PetProfile): Recipe[] => {
   if (filteredRecipes.length === 0) {
     console.warn(`No recipes found for the selected profile: ${profile.category} - ${profile.ageGroup}. Returning placeholders.`);
     // Return a plan of placeholders if no recipes are found
-    const placeholderRecipe: Recipe = { 
-        id: 'none', 
-        name: 'No Recipe Found', 
-        category: profile.category, 
-        ageGroup: ['adult'], 
-        healthConcerns: [], 
-        description: '', 
-        ingredients: [], 
-        imageNum: 0, 
-        tags: ['error'], 
-        rating: 0, 
+    const placeholderRecipe: Recipe = {
+        id: 'none',
+        name: 'No Recipe Found',
+        category: profile.category,
+        ageGroup: ['adult'],
+        healthConcerns: [],
+        description: '',
+        ingredients: [],
+        instructions: [],
+        tags: ['error'],
+        rating: 0,
         reviews: 0,
         prepTime: '0 min',
         cookTime: '0 min',
