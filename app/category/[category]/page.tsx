@@ -123,7 +123,7 @@ export default function CategoryPage() {
                     </select>
                     {selectedAge && (
                       <p className="text-xs text-gray-500 mt-1">
-                        {ageGroups.find(a => a.id === selectedAge)?.description}
+                        {ageGroups.find(a => a.value === selectedAge)?.label}
                       </p>
                     )}
                   </div>
@@ -140,8 +140,8 @@ export default function CategoryPage() {
                     >
                       <option value="">Select Concern</option>
                       {healthConcerns.map((concern) => (
-                        <option key={concern.id} value={concern.id}>
-                          {concern.name}
+                        <option key={concern} value={concern}>
+                          {concern}
                         </option>
                       ))}
                     </select>
