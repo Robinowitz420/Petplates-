@@ -11,7 +11,6 @@ import {
   Award,
   TrendingUp,
 } from 'lucide-react';
-import AddPetModal from '@/components/AddPetModal';
 import PetVillageWidget from '@/components/PetVillageWidget';
 import { getRandomName, getPrimaryName, formatNames, type Pet } from '@/lib/utils/petUtils';
 
@@ -561,15 +560,6 @@ export default function MyPetsPage() {
         )}
       </div>
 
-      <AddPetModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingPet(null);
-        }}
-        onSubmit={handleAddPet}
-        editingPet={editingPet}
-      />
 
     </div>
   );
