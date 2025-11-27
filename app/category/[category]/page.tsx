@@ -97,8 +97,8 @@ export default function CategoryPage() {
                     >
                       <option value="">All Breeds</option>
                       {categoryBreeds.map((breed) => (
-                        <option key={breed.id} value={breed.id}>
-                          {breed.name}
+                        <option key={breed} value={breed}>
+                          {breed}
                         </option>
                       ))}
                     </select>
@@ -116,8 +116,8 @@ export default function CategoryPage() {
                     >
                       <option value="">All Ages</option>
                       {ageGroups.map((age) => (
-                        <option key={age.id} value={age.id}>
-                          {age.name}
+                        <option key={age.value} value={age.value}>
+                          {age.label}
                         </option>
                       ))}
                     </select>
