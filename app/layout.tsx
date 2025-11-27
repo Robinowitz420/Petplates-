@@ -8,7 +8,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PetPlates - Personalized Pet Meal Prep",
+  title: "ThePetPantry - Personalized Pet Meal Prep",
   description: "AAFCO & WSAVA compliant recipes for dogs, cats, birds, reptiles, and pocket pets",
 };
 

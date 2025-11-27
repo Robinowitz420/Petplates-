@@ -1,0 +1,89 @@
+{
+  "ingredients": [
+    "pumpkin"
+  ],
+  "nutritionalInfo": [],
+  "healthRecommendations": [
+    {
+      "text": "Add your shop to Store Locator",
+      "category": "general-health",
+      "source": "avian-veterinary"
+    }
+  ],
+  "preparationMethods": [],
+  "veterinaryInsights": [
+    {
+      "text": "Veterinary Resources",
+      "type": "avian-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Veterinary Resources"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Lafeber will be closed on Thursday, November 27th and Friday, November 28th 2025. We will return on Monday, December 1st.\nCaring and working for the health of animals\nLafeber Company was built by a father-son team of veterinarians with a shared love of animals and a special passion for birds. Our manufacturing facility has always been located on the Lafeber family farmland, and all of our products are mixed, formed, and packaged under one roof.\nLearn more about us",
+      "type": "avian-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Lafeber will be closed on Thursday, November 27th and Friday, November 28th 2025",
+          "We will return on Monday, December 1st",
+          "Caring and working for the health of animals\nLafeber Company was built by a father-son team of veterinarians with a shared love of animals and a special passion for birds",
+          "Our manufacturing facility has always been located on the Lafeber family farmland, and all of our products are mixed, formed, and packaged under one roof",
+          "Learn more about us"
+        ],
+        "keywords": [
+          "fat",
+          "health"
+        ],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Lafeber will be closed on Thursday, November 27th and Friday, November 28th 2025. We will return on Monday, December 1st.\nCaring and working for the health of animals\nLafeber Company was built by a father-son team of veterinarians with a shared love of animals and a special passion for birds. Our manufacturing facility has always been located on the Lafeber family farmland, and all of our products are mixed, formed, and packaged under one roof.\nLearn more about us",
+      "type": "avian-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Lafeber will be closed on Thursday, November 27th and Friday, November 28th 2025",
+          "We will return on Monday, December 1st",
+          "Caring and working for the health of animals\nLafeber Company was built by a father-son team of veterinarians with a shared love of animals and a special passion for birds",
+          "Our manufacturing facility has always been located on the Lafeber family farmland, and all of our products are mixed, formed, and packaged under one roof",
+          "Learn more about us"
+        ],
+        "keywords": [
+          "fat",
+          "health"
+        ],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [],
+  "source": "https://lafeber.com/",
+  "type": "avian-veterinary",
+  "category": "birds",
+  "credibility": 9
+}

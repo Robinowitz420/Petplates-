@@ -1,0 +1,30 @@
+{
+  "name": "pet-ingredient-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for pet food ingredients and regulatory guidelines",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "scrape:amazon": "ts-node src/scripts/scrapeAmazon.ts",
+    "scrape:regulatory": "ts-node src/scripts/scrapeRegulatory.ts",
+    "analyze": "ts-node src/scripts/analyzeIngredient.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer": "^24.31.0",
+    "cheerio": "^1.1.2",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

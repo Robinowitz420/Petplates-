@@ -32,13 +32,36 @@ export default function MealPlansPage() {
       price: 89.99,
       savings: 'Save $92',
       features: [
-        'Variety of recipes',
+        'Variety of meals',
         'All ingredients included',
         'Portion controlled',
         'Delivery schedule',
         'Flexible menu changes',
         'Cancel anytime',
       ],
+    },
+  ];
+  const whyCards = [
+    {
+      id: 'standards',
+      title: 'AAFCO Approved',
+      subtitle: 'All meals meet or exceed AAFCO + WSAVA nutritional standards',
+      hover:
+        'AAFCO = Association of American Feed Control Officials. WSAVA = World Small Animal Veterinary Association. We follow both so every bowl stays complete and balanced.',
+    },
+    {
+      id: 'ordering',
+      title: 'Easy Ordering',
+      subtitle: 'Get every ingredient delivered or buy them with one click online',
+      hover:
+        'Order from Major Pet Retailers, Chewy, Petco, Walmart, plus fresh options like Ollie, The Farmer’s Dog, Butternut Box, HolistaPet, and affiliate networks (Skimlinks, Rakuten, CJ, ShareASale).',
+    },
+    {
+      id: 'mealprep',
+      title: 'Why Meal Prep?',
+      subtitle: 'Fresh prep beats whatever comes in a bag—every single time.',
+      hover:
+        'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs—not generic kibble. Pet Plates knows species, age, size, and health concerns, then auto-adjusts portions and links the exact products you can buy today.',
     },
   ];
 
@@ -187,7 +210,7 @@ export default function MealPlansPage() {
             Ready to Get Started?
           </h2>
           <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Complete your pet's profile to receive a personalized meal plan with recipes tailored to their needs
+            Complete your pet's profile to receive a personalized meal plan with meals tailored to their needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -198,49 +221,35 @@ export default function MealPlansPage() {
               Customize My Plan
             </Link>
             <Link
-              href="/recipes"
+              href="/profile"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-600 transition-colors border-2 border-white"
             >
-              Browse Recipes
+              My Pets
             </Link>
           </div>
         </div>
 
-        {/* Features */}
+        {/* Why Pet Plates */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check size={32} className="text-primary-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              AAFCO Approved
-            </h3>
-            <p className="text-gray-600">
-              All meals meet or exceed AAFCO and WSAVA nutritional standards
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ShoppingCart size={32} className="text-primary-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Easy Ordering
-            </h3>
-            <p className="text-gray-600">
-              Get all ingredients delivered or buy them with one click on Amazon
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar size={32} className="text-primary-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Flexible Plans
-            </h3>
-            <p className="text-gray-600">
-              Pause, modify, or cancel anytime. No commitments or hidden fees
-            </p>
-          </div>
+          {whyCards.map((card) => {
+            const Icon =
+              card.id === 'standards' ? Check : card.id === 'ordering' ? ShoppingCart : Calendar;
+            return (
+              <div
+                key={card.id}
+                className="relative group text-center bg-white rounded-xl shadow p-8 overflow-hidden"
+              >
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon size={32} className="text-primary-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{card.title}</h3>
+                <p className="text-gray-600">{card.subtitle}</p>
+                <div className="absolute inset-0 bg-white/95 px-4 py-6 text-sm text-gray-700 flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
+                  <p className="leading-relaxed">{card.hover}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

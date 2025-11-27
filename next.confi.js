@@ -1,8 +1,11 @@
-/** @type {import('next').NextConfig} */
+// next.config.js
 const nextConfig = {
-  output: 'export', // Makes the app export as static HTML/CSS/JS
-  basePath: '/ROBINOWITZ420.GITHUB.IO', // Must match your repository name exactly
+  output: 'export',
+  basePath: '/ROBINOWITZ420.GITHUB.IO',
   assetPrefix: '/ROBINOWITZ420.GITHUB.IO/',
+  env: {
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  },
 };
 
 module.exports = nextConfig;

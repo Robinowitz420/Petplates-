@@ -1,8 +1,8 @@
-# PetPlates Project Summary
+# ThePetPantry Project Summary
 
 ## What Has Been Built
 
-A complete, production-ready website for PetPlates - a personalized pet meal prep platform covering all major pet categories: Dogs, Cats, Birds, Reptiles, and Pocket Pets.
+A complete, production-ready website for ThePetPantry - a personalized pet meal prep platform covering all major pet categories: Dogs, Cats, Birds, Reptiles, and Pocket Pets.
 
 ## Technology Stack
 
@@ -228,7 +228,7 @@ All pages are fully responsive:
 
 ### Installation
 ```bash
-cd pet_plates_meal_platform
+cd the-pet-pantry
 npm install
 ```
 
@@ -257,7 +257,7 @@ The site can be deployed to:
 ## File Structure Summary
 
 ```
-pet_plates_meal_platform/
+the-pet-pantry/
 ├── app/                          # Next.js pages
 │   ├── page.tsx                  # Homepage
 │   ├── layout.tsx                # Root layout with nav/footer

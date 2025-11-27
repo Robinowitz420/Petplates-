@@ -1,0 +1,53 @@
+{
+  "ingredients": [],
+  "nutritionalInfo": [],
+  "healthRecommendations": [],
+  "preparationMethods": [],
+  "veterinaryInsights": [
+    {
+      "text": "Events & Courses\n\t\t\t\t\n\t\t\t\t\n\t\t\t\n\t\t\t\tWSAVA Partners with ESAVA for the First Kahun Congress & Expo in Cairo – 5–6 May 2026\t\t\t\n\t\t\n\t\t\t\t\n\t\t\tThe Egyptian Small Animal Veterinary Association (ESAVA), a proud WSAVA member association, will host its first Kahun Congress & Expo in Cairo, Egypt on 5–6 May 2026. WSAVA is delighted to support our Egyptian member association in this milestone event as an Official Education Partner.\n\t\t\n\t\t\t\t\t\n\t\t\n\t\t\n\t\t\tRead More »",
+      "type": "international-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Events & Courses\n\t\t\t\t\n\t\t\t\t\n\t\t\t\n\t\t\t\tWSAVA Partners with ESAVA for the First Kahun Congress & Expo in Cairo – 5–6 May 2026\t\t\t\n\t\t\n\t\t\t\t\n\t\t\tThe Egyptian Small Animal Veterinary Association (ESAVA), a proud WSAVA member association, will host its first Kahun Congress & Expo in Cairo, Egypt on 5–6 May 2026",
+          "WSAVA is delighted to support our Egyptian member association in this milestone event as an Official Education Partner",
+          "Read More »"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Congress\n\t\t\t\t\n\t\t\t\t\n\t\t\t\n\t\t\t\tBidding Now Open to Host WSAVA World Congress (2028–2031)\t\t\t\n\t\t\n\t\t\t\t\n\t\t\tBidding is now open to host one of the upcoming WSAVA World Congresses (2028–2031)!\nMember associations are invited to submit an Expression of Interest to host this flagship global event and help bring world-class veterinary education and collaboration to their region.\n\t\t\n\t\t\t\t\t\n\t\t\n\t\t\n\t\t\tRead More »",
+      "type": "international-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Congress\n\t\t\t\t\n\t\t\t\t\n\t\t\t\n\t\t\t\tBidding Now Open to Host WSAVA World Congress (2028–2031)\t\t\t\n\t\t\n\t\t\t\t\n\t\t\tBidding is now open to host one of the upcoming WSAVA World Congresses (2028–2031)",
+          "Member associations are invited to submit an Expression of Interest to host this flagship global event and help bring world-class veterinary education and collaboration to their region",
+          "Read More »"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [],
+  "source": "https://wsava.org/",
+  "type": "international-veterinary",
+  "category": "dogs-cats",
+  "credibility": 9
+}

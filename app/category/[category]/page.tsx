@@ -256,10 +256,10 @@ export default function CategoryPage() {
                   Try adjusting your filters or browse all recipes
                 </p>
                 <Link
-                  href="/recipes"
+                  href="/profile"
                   className="inline-block px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Browse All Recipes
+                  Go to My Pets
                 </Link>
               </div>
             )}

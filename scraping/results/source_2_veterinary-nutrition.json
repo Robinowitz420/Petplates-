@@ -1,0 +1,54 @@
+{
+  "ingredients": [
+    "supplement",
+    "nutrient"
+  ],
+  "nutritionalInfo": [],
+  "healthRecommendations": [],
+  "preparationMethods": [],
+  "veterinaryInsights": [
+    {
+      "text": "A powerful recipe generator for veterinarians and dog & cat lovers to find the perfect proportions\n        of meat, veggies and more — tailored to your companion’s needs.",
+      "type": "veterinary-nutrition",
+      "credibility": 10,
+      "nlpAnalysis": {
+        "sentences": [
+          "A powerful recipe generator for veterinarians and dog & cat lovers to find the perfect proportions\n        of meat, veggies and more — tailored to your companion’s needs"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Board-Certified Veterinary Nutritionist® approved",
+      "type": "veterinary-nutrition",
+      "credibility": 10,
+      "nlpAnalysis": {
+        "sentences": [
+          "Board-Certified Veterinary Nutritionist® approved"
+        ],
+        "keywords": [
+          "nutrition"
+        ],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [],
+  "source": "https://balanceit.com/",
+  "type": "veterinary-nutrition",
+  "category": "dogs-cats",
+  "credibility": 10
+}

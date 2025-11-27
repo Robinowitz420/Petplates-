@@ -43,7 +43,7 @@ export default function SubscribePage() {
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Subscribe to PetPlates
+            Subscribe to ThePetPantry
           </h1>
           <p className="text-xl text-primary-100">
             Get exclusive recipes, nutrition tips, and special offers
@@ -147,7 +147,7 @@ export default function SubscribePage() {
         {/* Social Proof */}
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-4">
-            Join <strong>10,000+</strong> pet parents who trust PetPlates
+            Join <strong>10,000+</strong> pet parents who trust ThePetPantry
           </p>
           <div className="flex justify-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (

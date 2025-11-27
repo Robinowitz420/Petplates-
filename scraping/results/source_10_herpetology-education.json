@@ -1,0 +1,120 @@
+{
+  "ingredients": [],
+  "nutritionalInfo": [],
+  "healthRecommendations": [],
+  "preparationMethods": [],
+  "veterinaryInsights": [
+    {
+      "text": "Events and activities to kick-start your curiosity      \n      \n\nFamily-friendly programs, 21+ evenings, and DIY science for all\n    \n                \n              \n      \nTHURSDAYS | 6-10 P.M. | 21+\n    \n          \n        NightLife      \n      \n\nWonder what our animals get up to once the sun goes down? Find out at the Academy's weekly event that illuminates the unusual intersection of art and science.\n\n Brighten Up\n    \n                \n              \n      \nNOW BOOKING\n    \n          \n        Family sleepovers      \n      \n\nTreat your family to an unforgettable overnight at the museum. Includes an action-packed evening, yummy snacks, next-day admission, parking, and more.Dream On1  \n\n\n  \n    \n    \n          \n        Exhibits and shows for explorers of all ages      \n      \n\nSee what's on\n    \n                \n              \n      \n\n    \n                \n      \n      \nOPEN DAILY\n    \n          \n        See the BigPicture      \n      \n\nNature is always ready for its close-up. Be amazed by award-winning images of captivating creatures and luscious landscapes in this year's BigPicture exhibition.Zoom In\n    \n                \n              \n      \nOPEN DAILY\n    \n          \n        Twilight Zone      \n      \n\nCandy colors. Ingenious adaptations. Extreme conditions. Meet the unusual animals of deep reefs—including some species that have yet to be described.Go Deep1  \n\n\n  \n    \n    \n          \n        World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature. Your donation will help us put down roots—and connect you with a community centered around environmental action.Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it.Become a Member1  \n\n\n  \n    3Purple",
+      "type": "herpetology-education",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "Events and activities to kick-start your curiosity      \n      \n\nFamily-friendly programs, 21+ evenings, and DIY science for all\n    \n                \n              \n      \nTHURSDAYS | 6-10 P",
+          "| 21+\n    \n          \n        NightLife      \n      \n\nWonder what our animals get up to once the sun goes down",
+          "Find out at the Academy's weekly event that illuminates the unusual intersection of art and science",
+          "Brighten Up\n    \n                \n              \n      \nNOW BOOKING\n    \n          \n        Family sleepovers      \n      \n\nTreat your family to an unforgettable overnight at the museum",
+          "Includes an action-packed evening, yummy snacks, next-day admission, parking, and more",
+          "Dream On1  \n\n\n  \n    \n    \n          \n        Exhibits and shows for explorers of all ages      \n      \n\nSee what's on\n    \n                \n              \n      \n\n    \n                \n      \n      \nOPEN DAILY\n    \n          \n        See the BigPicture      \n      \n\nNature is always ready for its close-up",
+          "Be amazed by award-winning images of captivating creatures and luscious landscapes in this year's BigPicture exhibition",
+          "Zoom In\n    \n                \n              \n      \nOPEN DAILY\n    \n          \n        Twilight Zone      \n      \n\nCandy colors",
+          "Ingenious adaptations",
+          "Extreme conditions",
+          "Meet the unusual animals of deep reefs—including some species that have yet to be described",
+          "Go Deep1  \n\n\n  \n    \n    \n          \n        World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature",
+          "Your donation will help us put down roots—and connect you with a community centered around environmental action",
+          "Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it",
+          "Become a Member1  \n\n\n  \n    3Purple"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature. Your donation will help us put down roots—and connect you with a community centered around environmental action.Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it.Become a Member1",
+      "type": "herpetology-education",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature",
+          "Your donation will help us put down roots—and connect you with a community centered around environmental action",
+          "Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it",
+          "Become a Member1"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [
+    {
+      "text": "Events and activities to kick-start your curiosity      \n      \n\nFamily-friendly programs, 21+ evenings, and DIY science for all\n    \n                \n              \n      \nTHURSDAYS | 6-10 P.M. | 21+\n    \n          \n        NightLife      \n      \n\nWonder what our animals get up to once the sun goes down? Find out at the Academy's weekly event that illuminates the unusual intersection of art and science.\n\n Brighten Up\n    \n                \n              \n      \nNOW BOOKING\n    \n          \n        Family sleepovers      \n      \n\nTreat your family to an unforgettable overnight at the museum. Includes an action-packed evening, yummy snacks, next-day admission, parking, and more.Dream On1  \n\n\n  \n    \n    \n          \n        Exhibits and shows for explorers of all ages      \n      \n\nSee what's on\n    \n                \n              \n      \n\n    \n                \n      \n      \nOPEN DAILY\n    \n          \n        See the BigPicture      \n      \n\nNature is always ready for its close-up. Be amazed by award-winning images of captivating creatures and luscious landscapes in this year's BigPicture exhibition.Zoom In\n    \n                \n              \n      \nOPEN DAILY\n    \n          \n        Twilight Zone      \n      \n\nCandy colors. Ingenious adaptations. Extreme conditions. Meet the unusual animals of deep reefs—including some species that have yet to be described.Go Deep1  \n\n\n  \n    \n    \n          \n        World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature. Your donation will help us put down roots—and connect you with a community centered around environmental action.Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it.Become a Member1  \n\n\n  \n    3Purple",
+      "source": "https://www.calacademy.org/",
+      "category": "reptiles",
+      "nlpAnalysis": {
+        "sentences": [
+          "Events and activities to kick-start your curiosity      \n      \n\nFamily-friendly programs, 21+ evenings, and DIY science for all\n    \n                \n              \n      \nTHURSDAYS | 6-10 P",
+          "| 21+\n    \n          \n        NightLife      \n      \n\nWonder what our animals get up to once the sun goes down",
+          "Find out at the Academy's weekly event that illuminates the unusual intersection of art and science",
+          "Brighten Up\n    \n                \n              \n      \nNOW BOOKING\n    \n          \n        Family sleepovers      \n      \n\nTreat your family to an unforgettable overnight at the museum",
+          "Includes an action-packed evening, yummy snacks, next-day admission, parking, and more",
+          "Dream On1  \n\n\n  \n    \n    \n          \n        Exhibits and shows for explorers of all ages      \n      \n\nSee what's on\n    \n                \n              \n      \n\n    \n                \n      \n      \nOPEN DAILY\n    \n          \n        See the BigPicture      \n      \n\nNature is always ready for its close-up",
+          "Be amazed by award-winning images of captivating creatures and luscious landscapes in this year's BigPicture exhibition",
+          "Zoom In\n    \n                \n              \n      \nOPEN DAILY\n    \n          \n        Twilight Zone      \n      \n\nCandy colors",
+          "Ingenious adaptations",
+          "Extreme conditions",
+          "Meet the unusual animals of deep reefs—including some species that have yet to be described",
+          "Go Deep1  \n\n\n  \n    \n    \n          \n        World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature",
+          "Your donation will help us put down roots—and connect you with a community centered around environmental action",
+          "Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it",
+          "Become a Member1  \n\n\n  \n    3Purple"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature. Your donation will help us put down roots—and connect you with a community centered around environmental action.Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it.Become a Member1",
+      "source": "https://www.calacademy.org/",
+      "category": "reptiles",
+      "nlpAnalysis": {
+        "sentences": [
+          "World-changing science starts here      \n      \n\nSupport our work\n    \n                \n              \n      \nBECOME A FOUNDING SUPPORTER\n    \n          \n        Join the Regeneration Circle      \n      \n\nWe’re growing a movement for nature",
+          "Your donation will help us put down roots—and connect you with a community centered around environmental action",
+          "Donate Now\n    \n                \n              \n      \nMEMBERSHIPS START AT $99\n    \n          \n        Join, renew, or donate      \n      \n\nKeep up with your favorite creatures by visiting for free all year long—and support our research, education, and access initiatives while you're at it",
+          "Become a Member1"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "source": "https://www.calacademy.org/",
+  "type": "herpetology-education",
+  "category": "reptiles",
+  "credibility": 8
+}

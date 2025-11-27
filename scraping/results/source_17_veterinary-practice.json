@@ -1,0 +1,142 @@
+{
+  "ingredients": [],
+  "nutritionalInfo": [],
+  "healthRecommendations": [
+    {
+      "text": "Join AAHA\n\t\t\t\t\t\t\n\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\tAccredit Your Hospital\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAnimal hospitals around the world earn AAHA accreditation to strengthen their business, advance their team, and provide the best possible care to companion animals.\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tGet Started\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\tJoin as a Veterinary Professional\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tVeterinary professionals spanning a spectrum of roles enjoy exclusive benefits and join a community of dedicated practitioners.\n\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tJoin as an Individual Member",
+      "category": "general-health",
+      "source": "veterinary-practice"
+    }
+  ],
+  "preparationMethods": [],
+  "veterinaryInsights": [
+    {
+      "text": "Join as a Veterinary Professional",
+      "type": "veterinary-practice",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "Join as a Veterinary Professional"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "The American Animal Hospital Association simplifies the journey toward excellence for veterinary practices.",
+      "type": "veterinary-practice",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "The American Animal Hospital Association simplifies the journey toward excellence for veterinary practices"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Beyond the Post: Social Media and Making Strong Recommendations for the Modern Veterinary Team (December Session)",
+      "type": "veterinary-practice",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "Beyond the Post: Social Media and Making Strong Recommendations for the Modern Veterinary Team (December Session)"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "<img src=\"https://www.aaha.org/wp-content/uploads/2024/01/e61d31797a3f22ffefc63775b31ab7b1-1500x1000.jpg\" alt=\"\">\n\t\t\t\t\n\t\n\n\t\t\t\n\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\tMember Benefits\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tAdvance Your Practice and Your Career with AAHA\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\tBecome a member to benefit from:\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\t\t\tIndustry-Leading Guidelines\n\t\t\t\t\t\t\t\t\t\t\tVeterinary Medicine Resources\n\t\t\t\t\t\t\t\t\t\t\tLearning Opportunities\n\t\t\t\t\t\t\t\t\t\t\tSavings Programs\n\t\t\t\t\t\t\t\t\t\t\tCommunity Connections\n\t\t\t\t\t\t\n\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\tJoin as an IndividualJoin as a Hospital",
+      "type": "veterinary-practice",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "<img src=\"https://www",
+          "org/wp-content/uploads/2024/01/e61d31797a3f22ffefc63775b31ab7b1-1500x1000",
+          "jpg\" alt=\"\">\n\t\t\t\t\n\t\n\n\t\t\t\n\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\tMember Benefits\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tAdvance Your Practice and Your Career with AAHA\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\tBecome a member to benefit from:\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\t\t\tIndustry-Leading Guidelines\n\t\t\t\t\t\t\t\t\t\t\tVeterinary Medicine Resources\n\t\t\t\t\t\t\t\t\t\t\tLearning Opportunities\n\t\t\t\t\t\t\t\t\t\t\tSavings Programs\n\t\t\t\t\t\t\t\t\t\t\tCommunity Connections\n\t\t\t\t\t\t\n\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\tJoin as an IndividualJoin as a Hospital"
+        ],
+        "keywords": [],
+        "relationships": [
+          {
+            "subject": "member",
+            "object": "advance",
+            "type": "benefit",
+            "context": "g\" alt=\"\">\n\t\t\t\t\n\t\n\n\t\t\t\n\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\tMember Benefits\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tAdvance Your Practice and Your Career with AAHA\n\t\t\t\n\t\t\t\t\t"
+          }
+        ],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "<img src=\"https://www.aaha.org/wp-content/uploads/2024/01/59adf39731a7e6227c16340c046f5d89-1-e1713806343488-1500x1000.jpg\" alt=\"\">\n\t\t\t\t\n\t\n\n\t\t\t\n\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tYour Pet Deserves the Best\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\tAAHA-accredited veterinary practices deliver the highest quality care for your pet.  Additionally, you can trust that our pet parent resources will teach you how to keep your pet healthy.\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\t\t\tExplore Pet Parent Resources\n\t\t\t\t\t\t\t\t\t\t\tSubscribe to the Your Pet Newsletter\n\t\t\t\t\t\t\t\t\t\t\tLearn Why Accreditation Matters\n\t\t\t\t\t\t\n\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\tFind an Accredited Animal Hospital",
+      "type": "veterinary-practice",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "<img src=\"https://www",
+          "org/wp-content/uploads/2024/01/59adf39731a7e6227c16340c046f5d89-1-e1713806343488-1500x1000",
+          "jpg\" alt=\"\">\n\t\t\t\t\n\t\n\n\t\t\t\n\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tYour Pet Deserves the Best\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\tAAHA-accredited veterinary practices deliver the highest quality care for your pet",
+          "Additionally, you can trust that our pet parent resources will teach you how to keep your pet healthy",
+          "Explore Pet Parent Resources\n\t\t\t\t\t\t\t\t\t\t\tSubscribe to the Your Pet Newsletter\n\t\t\t\t\t\t\t\t\t\t\tLearn Why Accreditation Matters\n\t\t\t\t\t\t\n\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\tFind an Accredited Animal Hospital"
+        ],
+        "keywords": [
+          "health"
+        ],
+        "relationships": [],
+        "sentiment": 1,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Dec 06, 2025\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tBeyond the Post: Social Media and Making Strong Recommendations for the Modern Veterinary Team (December Session)\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\tWebinarContinuing Education",
+      "type": "veterinary-practice",
+      "credibility": 8,
+      "nlpAnalysis": {
+        "sentences": [
+          "Dec 06, 2025\n\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\tBeyond the Post: Social Media and Making Strong Recommendations for the Modern Veterinary Team (December Session)\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\n\t\t\t\n\t\t\tWebinarContinuing Education"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [],
+  "source": "https://www.aaha.org/",
+  "type": "veterinary-practice",
+  "category": "dogs-cats",
+  "credibility": 8
+}

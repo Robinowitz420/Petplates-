@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="text-2xl font-bold mb-4">🐾 PetPlates</div>
+            <div className="text-2xl font-bold mb-4">🐾 ThePetPantry</div>
             <p className="text-gray-400">
               Fresh, personalized meal prep for all your pets. Based on AAFCO and WSAVA guidelines.
             </p>
@@ -24,8 +24,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/recipes" className="text-gray-400 hover:text-white transition-colors">
-                  Recipes
+                <Link href="/profile" className="text-gray-400 hover:text-white transition-colors">
+                  My Pets
                 </Link>
               </li>
               <li>
@@ -103,7 +103,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>
-            &copy; {new Date().getFullYear()} PetPlates. All rights reserved. 
+            &copy; {new Date().getFullYear()} ThePetPantry. All rights reserved.
             Nutritional guidelines based on AAFCO and WSAVA standards.
           </p>
         </div>
