@@ -60167,8 +60167,8 @@ export const recipes: Recipe[] = [
       "omega-3",
       "cat-approved"
     ],
-    imageUrl: "/images/AAGRBT0C7xk_1763846334317.png",    images: {      card: {        url: "/assets/images/animals/dog/dog-recipe-300x192.png",        width: 300,        height: 192,        alt: "Ground Navy Herb-Infused Mix - dogs recipe"      }    },
-    "images": {
+    imageUrl: "/images/AAGRBT0C7xk_1763846334317.png",
+    images: {
       "thumbnail": {
         "url": "/images/AAGRBT0C7xk_1763846334317-thumbnail.jpg",
         "width": 150,
