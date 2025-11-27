@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Check, Calendar, ShoppingCart, ArrowRight } from 'lucide-react';
 import { useUser, SignOutButton } from '@clerk/nextjs'; 
