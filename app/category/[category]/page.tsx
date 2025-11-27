@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, Filter } from 'lucide-react';
 import { breeds, ageGroups, healthConcerns } from '@/lib/data/pets';
-import { getRecipesByFilters } from '@/lib/data/recipes-complete';
+import { recipes } from '@/lib/data/recipes-complete';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
 import RecipeCard from '@/components/RecipeCard';
 import { PetCategory, Breed, AgeGroup, HealthConcern } from '@/lib/types';
@@ -20,12 +20,7 @@ export default function CategoryPage() {
   const [showFilters, setShowFilters] = useState(true);
 
   const categoryBreeds = breeds[category] || [];
-  const filteredRecipes = getRecipesByFilters(
-    category,
-    selectedBreed || undefined,
-    selectedAge || undefined,
-    selectedHealth || undefined
-  );
+  const filteredRecipes = recipes.filter(r => r.category === category);
 
   const categoryNames: Record<PetCategory, string> = {
     dogs: 'Dogs',

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Star, Users, Heart, ChefHat, Clock, ThumbsUp } from 'lucide-react';
