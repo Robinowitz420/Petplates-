@@ -15,7 +15,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center space-x-2">
             <ChefHat className="h-8 w-8 text-primary-600" />
-            <span className="text-2xl font-bold text-gray-900">ThePetPantry</span>
+            <span className="text-2xl font-bold text-gray-900">Paw & Plate</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
