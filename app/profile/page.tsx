@@ -214,7 +214,16 @@ export default function MyPetsPage() {
   }, [userId, pets]);
 
   // Calculate user contributions
-  const userContributions = useMemo(() => {
+  const [userContributions, setUserContributions] = useState({
+    recipesRated: 0,
+    reviewsWritten: 0,
+    modificationsShared: 0,
+    helpfulVotes: 0
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     let recipesRated = 0;
     let reviewsWritten = 0;
     let modificationsShared = 0;
@@ -248,7 +257,7 @@ export default function MyPetsPage() {
       }
     }
 
-    return { recipesRated, reviewsWritten, modificationsShared, helpfulVotes };
+    setUserContributions({ recipesRated, reviewsWritten, modificationsShared, helpfulVotes });
   }, [userId]);
 
   // Calculate user level and badges
