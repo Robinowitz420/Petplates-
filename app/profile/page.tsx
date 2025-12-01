@@ -236,13 +236,19 @@ export default function MyPetsPage() {
     });
   }, [userId]);
 
-  // Calculate user contributions - disabled to prevent infinite re-renders
-  const [userContributions, setUserContributions] = useState({
+  // Calculate user contributions - TEMPORARILY DISABLED to prevent infinite re-renders
+  // const [userContributions, setUserContributions] = useState({
+  //   recipesRated: 0,
+  //   reviewsWritten: 0,
+  //   modificationsShared: 0,
+  //   helpfulVotes: 0
+  // });
+  const userContributions = {
     recipesRated: 0,
     reviewsWritten: 0,
     modificationsShared: 0,
     helpfulVotes: 0
-  });
+  };
 
   // Calculate user level and badges
   const userLevel = useMemo(() => {
