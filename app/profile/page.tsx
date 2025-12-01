@@ -194,9 +194,9 @@ export default function MyPetsPage() {
 
   // Load pets and expose user id for other pages (recipe detail, etc.)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    localStorage.setItem('last_user_id', userId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('last_user_id', userId);
+    }
     setPets(getPetsFromLocalStorage(userId));
   }, [userId]);
 
