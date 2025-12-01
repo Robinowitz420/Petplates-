@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import {
   ChefHat,
   Plus,
@@ -172,6 +173,24 @@ export default function MyPetsPage() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-6">
+        <div className="max-w-6xl mx-auto px-3">
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading your pets...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Load pets and expose user id for other pages (recipe detail, etc.)
   useEffect(() => {
