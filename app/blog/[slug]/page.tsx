@@ -177,7 +177,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     date: '2024-11-20',
     readTime: '8 min read',
     category: 'Nutrition',
-    image: '/images/blog/dog-food-guide.jpg',
+    image: '/IMAGES FOR SITE/Dogo.jpg',
     tags: ['homemade dog food', 'nutrition', 'recipes', 'veterinary advice']
   };
 

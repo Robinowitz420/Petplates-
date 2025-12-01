@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ChefHat,
@@ -231,7 +231,7 @@ export default function MyPetsPage() {
   const handleDeletePet = useCallback((petId: string) => {
     setPets(prevPets => prevPets.filter(p => p.id !== petId));
     savePetsToLocalStorage(userId, pets.filter(p => p.id !== petId));
-  }, [userId, pets]);
+  }, [userId]);
 
   // Calculate user contributions - disabled to prevent infinite re-renders
   const [userContributions, setUserContributions] = useState({
