@@ -229,8 +229,11 @@ export default function MyPetsPage() {
   }, []);
 
   const handleDeletePet = useCallback((petId: string) => {
-    setPets(prevPets => prevPets.filter(p => p.id !== petId));
-    savePetsToLocalStorage(userId, pets.filter(p => p.id !== petId));
+    setPets(prevPets => {
+      const updatedPets = prevPets.filter(p => p.id !== petId);
+      savePetsToLocalStorage(userId, updatedPets);
+      return updatedPets;
+    });
   }, [userId]);
 
   // Calculate user contributions - disabled to prevent infinite re-renders
