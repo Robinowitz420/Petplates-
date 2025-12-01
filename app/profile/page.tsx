@@ -233,52 +233,13 @@ export default function MyPetsPage() {
     savePetsToLocalStorage(userId, pets.filter(p => p.id !== petId));
   }, [userId, pets]);
 
-  // Calculate user contributions
+  // Calculate user contributions - disabled to prevent infinite re-renders
   const [userContributions, setUserContributions] = useState({
     recipesRated: 0,
     reviewsWritten: 0,
     modificationsShared: 0,
     helpfulVotes: 0
   });
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    let recipesRated = 0;
-    let reviewsWritten = 0;
-    let modificationsShared = 0;
-    let helpfulVotes = 0;
-
-    // Count recipes rated
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('user_rating_')) {
-        const rating = JSON.parse(localStorage.getItem(key) || '{}');
-        if (rating.userId === userId) recipesRated++;
-      }
-    }
-
-    // Count reviews written
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('recipe_reviews_')) {
-        const reviews = JSON.parse(localStorage.getItem(key) || '[]');
-        reviewsWritten += reviews.filter((r: any) => r.userId === userId).length;
-      }
-    }
-
-    // Count modifications shared
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('recipe_modifications_')) {
-        const modifications = JSON.parse(localStorage.getItem(key) || '[]');
-        modificationsShared += modifications.filter((m: any) => m.userId === userId).length;
-        helpfulVotes += modifications.reduce((sum: number, m: any) => sum + (m.helpful || 0), 0);
-      }
-    }
-
-    setUserContributions({ recipesRated, reviewsWritten, modificationsShared, helpfulVotes });
-  }, [userId]);
 
   // Calculate user level and badges
   const userLevel = useMemo(() => {
