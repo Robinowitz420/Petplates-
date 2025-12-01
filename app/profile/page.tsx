@@ -148,15 +148,16 @@ const PET_ICON_MAP: Record<PetCategory, string> = {
 
 const getPetIcon = (type: PetCategory, breed: string = '', size: number = 24, className = '') => {
   let emoji = PET_ICON_MAP[type] || '🐾';
-  if (type === 'pocket-pets') {
-    if (breed.toLowerCase().includes('hamster')) emoji = '🐹';
-    else if (breed.toLowerCase().includes('gerbil')) emoji = '🐹'; // No gerbil emoji, use hamster
-    else if (breed.toLowerCase().includes('guinea pig')) emoji = '🐹';
-    else if (breed.toLowerCase().includes('rat')) emoji = '🐭';
-    else if (breed.toLowerCase().includes('mouse')) emoji = '🐭';
-    else if (breed.toLowerCase().includes('chinchilla')) emoji = '🐹';
-    else if (breed.toLowerCase().includes('hedgehog')) emoji = '🦔';
-    else if (breed.toLowerCase().includes('ferret')) emoji = '🦦'; // Closest
+  if (type === 'pocket-pets' && breed) {
+    const breedLower = breed.toLowerCase();
+    if (breedLower.includes('hamster')) emoji = '🐹';
+    else if (breedLower.includes('gerbil')) emoji = '🐹'; // No gerbil emoji, use hamster
+    else if (breedLower.includes('guinea pig')) emoji = '🐹';
+    else if (breedLower.includes('rat')) emoji = '🐭';
+    else if (breedLower.includes('mouse')) emoji = '🐭';
+    else if (breedLower.includes('chinchilla')) emoji = '🐹';
+    else if (breedLower.includes('hedgehog')) emoji = '🦔';
+    else if (breedLower.includes('ferret')) emoji = '🦦'; // Closest
     // Default to rabbit
   }
   return <span className={className} style={{ fontSize: `${size}px` }}>{emoji}</span>;
@@ -288,39 +289,50 @@ export default function MyPetsPage() {
     return { level: 'Newcomer', color: 'bg-gray-100 text-gray-800', icon: '🌱' };
   }, [userContributions]);
 
-  const PetCard: React.FC<{ pet: Pet }> = ({ pet }) => (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-all hover:shadow-lg">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center mr-3 shadow-inner border-2 border-primary-200 overflow-hidden">
-            {pet.image ? (
-              <img
-                src={pet.image}
-                alt={getRandomName(pet.names)}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-primary-100 text-primary-600 flex items-center justify-center">
-                {getPetIcon(pet.type as PetCategory, pet.breed, 24, 'text-primary-600')}
-              </div>
-            )}
-          </div>
-          <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900">
-              {getRandomName(pet.names)}
-            </h3>
-          </div>
-        </div>
-        <button
-          onClick={() => handleEditPet(pet)}
-          className="btn btn-ghost btn-icon-sm"
-          title={`Edit ${getRandomName(pet.names)}`}
-        >
-          <Edit size={16} />
-        </button>
-      </div>
+  const PetCard: React.FC<{ pet: Pet }> = ({ pet }) => {
+    // Defensive checks for pet data
+    if (!pet || !pet.id) {
+      console.error('Invalid pet data:', pet);
+      return null;
+    }
 
-      <div className="flex gap-4 mb-4">
+    const petName = getRandomName(pet.names || []);
+    const petType = pet.type as PetCategory;
+    const petBreed = pet.breed || '';
+
+    return (
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-all hover:shadow-lg">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mr-3 shadow-inner border-2 border-primary-200 overflow-hidden">
+              {pet.image ? (
+                <img
+                  src={pet.image}
+                  alt={petName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-primary-100 text-primary-600 flex items-center justify-center">
+                  {getPetIcon(petType, petBreed, 24, 'text-primary-600')}
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900">
+                {petName}
+              </h3>
+            </div>
+          </div>
+          <button
+            onClick={() => handleEditPet(pet)}
+            className="btn btn-ghost btn-icon-sm"
+            title={`Edit ${petName}`}
+          >
+            <Edit size={16} />
+          </button>
+        </div>
+
+        <div className="flex gap-4 mb-4">
         {/* Pet Information - Compact Vertical Layout */}
         <div className="flex-1 space-y-2">
           <div className="flex items-center text-sm">
@@ -362,7 +374,7 @@ export default function MyPetsPage() {
                 }
                 return Math.abs(hash);
               };
-              return hashCode(pet.id) % 25;
+              return hashCode(pet.id || 'default') % 25;
             }, [pet.id])}
             className="w-48 h-48 scale-75 origin-top-left"
           />
