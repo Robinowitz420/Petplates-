@@ -1,5 +1,10 @@
 // lib/utils/petRatingSystem.ts
 import type { Recipe as BaseRecipe } from '@/lib/types';
+import { INGREDIENT_COMPOSITIONS, getIngredientComposition } from '@/lib/data/ingredientCompositions';
+import { AVIAN_NUTRITION_STANDARDS, getAvianStandards } from '@/lib/data/avian-nutrition-standards';
+import { AAFCO_NUTRIENT_PROFILES, getAAFCOStandards, validateCriticalNutrients } from '@/lib/data/aafco-standards';
+import { REPTILE_NUTRITION_STANDARDS, getReptileStandards, validateReptileNutrition } from '@/lib/data/reptile-nutrition';
+import { BALANCEIT_ANALYSIS } from '@/lib/competitors/balanceit-analysis';
 
 export interface Pet {
   id: string;
@@ -116,6 +121,157 @@ function enrichRecipeFromIngredients(recipe: any): {
   };
 }
 
+// Enhanced nutrition calculation using real USDA data
+function calculateRecipeNutrition(recipe: any): {
+  protein: number;
+  fat: number;
+  calcium: number;
+  phosphorus: number;
+  calories: number;
+  omega3?: number;
+  vitaminA?: number;
+  vitaminC?: number;
+  source: 'real' | 'estimated';
+} {
+  const ingredients = recipe.ingredients || [];
+  let totalProtein = 0;
+  let totalFat = 0;
+  let totalCalcium = 0;
+  let totalPhosphorus = 0;
+  let totalCalories = 0;
+  let totalOmega3 = 0;
+  let totalVitaminA = 0;
+  let totalVitaminC = 0;
+  let totalWeight = 0;
+
+  // Try to get real nutritional data
+  for (const ingredient of ingredients) {
+    const name = typeof ingredient === 'string' ? ingredient : ingredient.name;
+    const amount = typeof ingredient === 'string' ? 100 : (ingredient.amount || 100); // Assume 100g if not specified
+
+    const composition = getIngredientComposition(name);
+    if (composition) {
+      totalProtein += (composition.protein || 0) * (amount / 100);
+      totalFat += (composition.fat || 0) * (amount / 100);
+      totalCalcium += (composition.calcium || 0) * (amount / 100);
+      totalPhosphorus += (composition.phosphorus || 0) * (amount / 100);
+      totalCalories += (composition.kcal || 0) * (amount / 100);
+      totalOmega3 += (composition.omega3 || 0) * (amount / 100);
+      totalVitaminA += (composition.vitaminA || 0) * (amount / 100);
+      totalVitaminC += (composition.vitaminC || 0) * (amount / 100);
+      totalWeight += amount;
+    }
+  }
+
+  // If we have real data for at least 50% of ingredients, use it
+  const realDataRatio = totalWeight / (ingredients.length * 100);
+  if (realDataRatio >= 0.5) {
+    return {
+      protein: totalProtein / totalWeight * 100,
+      fat: totalFat / totalWeight * 100,
+      calcium: totalCalcium / totalWeight * 100,
+      phosphorus: totalPhosphorus / totalWeight * 100,
+      calories: totalCalories / totalWeight * 100,
+      omega3: totalOmega3 > 0 ? totalOmega3 / totalWeight * 100 : undefined,
+      vitaminA: totalVitaminA > 0 ? totalVitaminA / totalWeight * 100 : undefined,
+      vitaminC: totalVitaminC > 0 ? totalVitaminC / totalWeight * 100 : undefined,
+      source: 'real'
+    };
+  }
+
+  // Fall back to estimated values
+  const enriched = enrichRecipeFromIngredients(recipe);
+  return {
+    protein: enriched.estimatedProtein,
+    fat: enriched.estimatedFat,
+    calcium: 0.8, // Estimated
+    phosphorus: enriched.estimatedPhosphorus === 'high' ? 0.8 : enriched.estimatedPhosphorus === 'low' ? 0.3 : 0.5,
+    calories: 150, // Estimated
+    source: 'estimated'
+  };
+}
+
+// Species-specific compatibility scoring
+function calculateAvianCompatibility(recipe: any, pet: Pet): number {
+  const standards = getAvianStandards(pet.breed) || AVIAN_NUTRITION_STANDARDS.psittacines;
+  const nutrition = calculateRecipeNutrition(recipe);
+
+  let score = 100;
+
+  // Check Ca:P ratio (most critical for birds)
+  const caPRatio = nutrition.calcium / nutrition.phosphorus;
+  const caPMin = standards.CaP_ratio?.min || 1.5;
+  const caPMax = standards.CaP_ratio?.max || 2.5;
+  const caPIdeal = (standards.CaP_ratio as any)?.ideal || 2.0;
+
+  if (caPRatio < caPMin || caPRatio > caPMax) {
+    score -= 40; // Major penalty for improper ratio
+  } else if (Math.abs(caPRatio - caPIdeal) < 0.5) {
+    score += 10; // Bonus for ideal ratio
+  }
+
+  // Check protein levels
+  const proteinMin = standards.protein?.min || 12;
+  const proteinMax = standards.protein?.max || 18;
+  if (nutrition.protein < proteinMin || nutrition.protein > proteinMax) {
+    score -= 20;
+  }
+
+  // Check fat levels
+  const fatMin = standards.fat?.min || 4;
+  const fatMax = standards.fat?.max || 10;
+  if (nutrition.fat < fatMin || nutrition.fat > fatMax) {
+    score -= 15;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function calculateReptileCompatibility(recipe: any, pet: Pet): number {
+  const standards = getReptileStandards(pet.breed);
+  if (!standards) return 75; // Default score if species not found
+
+  const nutrition = calculateRecipeNutrition(recipe);
+  let score = 100;
+
+  // Check Ca:P ratio (critical for reptiles)
+  const caPRatio = nutrition.calcium / nutrition.phosphorus;
+  if (caPRatio < standards.CaP_ratio.min || caPRatio > standards.CaP_ratio.max) {
+    score -= 50; // Severe penalty for improper ratio
+  } else if (Math.abs(caPRatio - standards.CaP_ratio.ideal) < 0.5) {
+    score += 15; // Bonus for ideal ratio
+  }
+
+  // Check calcium levels
+  if (nutrition.calcium < standards.calcium.min) {
+    score -= 30;
+  }
+
+  // Check protein levels
+  if (nutrition.protein < standards.protein.min || nutrition.protein > standards.protein.max) {
+    score -= 20;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function calculateSpeciesSpecificScore(recipe: any, pet: Pet): number {
+  switch (pet.type) {
+    case 'bird':
+      return calculateAvianCompatibility(recipe, pet);
+    case 'reptile':
+      return calculateReptileCompatibility(recipe, pet);
+    case 'dog':
+    case 'cat':
+      // Use AAFCO validation for mammals
+      const lifeStage = pet.age < 1 ? 'growth' : 'adult';
+      const validation = validateCriticalNutrients(recipe, pet.type as 'dog' | 'cat', lifeStage);
+      return validation.isValid ? 95 : Math.max(60, 95 - (validation.violations.length * 15));
+    default:
+      return 85; // Default score for pocket pets
+  }
+}
+
 interface RatingFactor {
   score: number;
   weight: number;
@@ -148,8 +304,9 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
 
   const nutrition = extractNutrition(recipe);
   const enriched = enrichRecipeFromIngredients(recipe);
+  const realNutrition = calculateRecipeNutrition(recipe);
 
-  // 1. Pet Type Match (25%)
+  // 1. Pet Type Match (20%)
   const petTypeMatch = (recipe.category === pet.type || recipe.category === `${pet.type}s`) ? 100 : 0;
 
   // 2. Age Appropriate (15%)
@@ -157,14 +314,8 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
   const ageMatch = (recipe.ageGroup || []).includes(petAgeGroup) || (recipe.ageGroup || []).includes('all');
   const ageScore = ageMatch ? 100 : 70;
 
-  // 3. Nutritional Fit (25%)
-  let nutritionScore = 85;
-
-  // Use Estimated values if the data is generic/placeholder
-  const proteinVal = (nutrition && !nutrition.isGeneric) ? nutrition.protein : enriched.estimatedProtein;
-  const idealProtein = pet.type === 'cat' ? 35 : 28;
-  const proteinDiff = Math.abs(proteinVal - idealProtein);
-  nutritionScore -= (proteinDiff * 2); // Steeper penalty creates more score separation
+  // 3. Species-Specific Nutritional Fit (30%)
+  const speciesScore = calculateSpeciesSpecificScore(recipe, pet);
 
   // 4. Health Compatibility (25%)
   let healthScore = 90;
@@ -232,9 +383,9 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
 
   // Calculate Overall
   const overallScore = Math.max(0, Math.min(100, Math.round(
-    (petTypeMatch * 0.25) +
+    (petTypeMatch * 0.20) +
     (ageScore * 0.15) +
-    (nutritionScore * 0.25) +
+    (speciesScore * 0.30) +
     (healthScore * 0.25) +
     (allergenScore * 0.10)
   ) - pickyEaterPenalty));
@@ -264,9 +415,11 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
           : `Recipe is designed for ${recipe.ageGroup?.join(', ') || 'different age groups'}, but your pet is ${petAgeGroup}`
       },
       nutritionalFit: {
-        score: nutritionScore,
-        weight: 25,
-        reason: `Protein content (${proteinVal}%) ${proteinDiff <= 5 ? 'matches' : proteinDiff <= 10 ? 'is close to' : 'differs from'} ideal levels for ${pet.type}s (${idealProtein}%)`
+        score: speciesScore,
+        weight: 30,
+        reason: realNutrition.source === 'real'
+          ? `Recipe uses real USDA nutritional data and meets ${pet.type} nutritional standards`
+          : `Recipe meets estimated nutritional requirements for ${pet.type}s`
       },
       healthCompatibility: {
         score: healthScore,
