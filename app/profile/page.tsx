@@ -294,53 +294,53 @@ export default function MyPetsPage() {
         </div>
 
         <div className="flex gap-4 mb-4">
-        {/* Pet Information - Compact Vertical Layout */}
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center text-sm">
-            <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">❤️</span>
-            <span className="text-gray-700 font-medium">
-              {(pet.healthConcerns || []).length > 0
-                ? (pet.healthConcerns || [])[0].replace(/-/g, ' ')
-                : 'No concerns'
-              }
-            </span>
-          </div>
-
-          <div className="flex items-center text-sm">
-            <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">🎂</span>
-            <span className="text-gray-700 font-medium capitalize">{pet.age}</span>
-          </div>
-
-          <div className="flex items-center text-sm">
-            <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">⚖️</span>
-            <span className="text-gray-700 font-medium">{pet.weight || 'Not set'}</span>
-          </div>
-
-          <div className="flex items-center text-sm">
-            <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">🐶</span>
-            <span className="text-gray-700 font-medium">{pet.breed}</span>
-          </div>
-        </div>
-
-        {/* Mini Pet Village Widget */}
-        <div className="flex-shrink-0">
-          <PetVillageWidget
-            initialStreak={useMemo(() => {
-              const hashCode = (str: string) => {
-                let hash = 0;
-                for (let i = 0; i < str.length; i++) {
-                  const char = str.charCodeAt(i);
-                  hash = ((hash << 5) - hash) + char;
-                  hash = hash & hash;
+          {/* Pet Information - Compact Vertical Layout */}
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center text-sm">
+              <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">❤️</span>
+              <span className="text-gray-700 font-medium">
+                {(pet.healthConcerns || []).length > 0
+                  ? (pet.healthConcerns || [])[0].replace(/-/g, ' ')
+                  : 'No concerns'
                 }
-                return Math.abs(hash);
-              };
-              return hashCode(pet.id || 'default') % 25;
-            }, [pet.id])}
-            className="w-48 h-48 scale-75 origin-top-left"
-          />
+              </span>
+            </div>
+
+            <div className="flex items-center text-sm">
+              <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">🎂</span>
+              <span className="text-gray-700 font-medium capitalize">{pet.age}</span>
+            </div>
+
+            <div className="flex items-center text-sm">
+              <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">⚖️</span>
+              <span className="text-gray-700 font-medium">{pet.weight || 'Not set'}</span>
+            </div>
+
+            <div className="flex items-center text-sm">
+              <span className="inline-flex items-center justify-center w-6 h-6 text-primary-600 rounded-full mr-3 text-xs border-2 border-primary-200">🐶</span>
+              <span className="text-gray-700 font-medium">{pet.breed}</span>
+            </div>
+          </div>
+
+          {/* Mini Pet Village Widget */}
+          <div className="flex-shrink-0">
+            <PetVillageWidget
+              initialStreak={useMemo(() => {
+                const hashCode = (str: string) => {
+                  let hash = 0;
+                  for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                  }
+                  return Math.abs(hash);
+                };
+                return hashCode(pet.id || 'default') % 25;
+              }, [pet.id])}
+              className="w-48 h-48 scale-75 origin-top-left"
+            />
+          </div>
         </div>
-      </div>
 
       {(pet.healthConcerns || []).length > 1 && (
         <div className="mb-4">
