@@ -1,0 +1,170 @@
+{
+  "dogs": {
+    "standards": [
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_protein",
+        "unit": "% (dry matter)",
+        "min": 18.0,
+        "max": null,
+        "notes": "AAFCO adult maintenance minimum (DM basis).",
+        "source": "AAFCO Dog Food Nutrient Profiles (Adult Maintenance)."
+      },
+      {
+        "lifeStage": "growth_reproduction",
+        "nutrient": "crude_protein",
+        "unit": "% (dry matter)",
+        "min": 22.5,
+        "max": null,
+        "notes": "AAFCO Growth & Reproduction minimum (DM basis).",
+        "source": "AAFCO Dog Food Nutrient Profiles (Growth & Reproduction)."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_fat",
+        "unit": "% (dry matter)",
+        "min": 5.5,
+        "max": null,
+        "notes": "AAFCO adult maintenance minimum (DM basis).",
+        "source": "AAFCO Dog Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "growth_reproduction",
+        "nutrient": "crude_fat",
+        "unit": "% (dry matter)",
+        "min": 8.5,
+        "max": null,
+        "notes": "AAFCO Growth & Reproduction minimum (DM basis).",
+        "source": "AAFCO Dog Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "calcium",
+        "unit": "% (dry matter)",
+        "min": 0.5,
+        "max": 2.5,
+        "notes": "AAFCO adult maintenance minimum; AAFCO notes upper limits for 'all life stages' and special max for all-life-stages claims.",
+        "source": "AAFCO Dog Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "growth_reproduction",
+        "nutrient": "calcium",
+        "unit": "% (dry matter)",
+        "min": 1.2,
+        "max": 1.8,
+        "notes": "Higher minimum for growth/reproduction; AAFCO suggests max 1.8% DM for all-life stages due to large-breed growth concerns.",
+        "source": "AAFCO Dog Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "phosphorus",
+        "unit": "% (dry matter)",
+        "min": 0.6,
+        "max": 1.6,
+        "notes": "AAFCO minima and maxima guidance (DM basis).",
+        "source": "AAFCO Dog Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "sodium",
+        "unit": "% (dry matter)",
+        "min": 0.08,
+        "max": null,
+        "notes": "AAFCO adult maintenance minimum (DM basis).",
+        "source": "AAFCO Dog Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "calories_per_kg_DM",
+        "unit": "kcal/kg DM",
+        "min": null,
+        "max": null,
+        "notes": "Energy density is product specific; use feeding trials or FEDIAF energy calc. Use NRC for kcal/1000kcal expressions.",
+        "source": "FEDIAF / NRC guidance."
+      }
+    ],
+    "per_1000kcal": [
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_protein_g_per_1000kcal",
+        "value": 45,
+        "notes": "Common per-1000 kcal conversion referenced in industry sources (AAFCO/NRC conversion guidance).",
+        "source": "NRC / AAFCO guidance."
+      }
+    ]
+  },
+  "cats": {
+    "standards": [
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_protein",
+        "unit": "% (dry matter)",
+        "min": 26.0,
+        "max": null,
+        "notes": "AAFCO adult maintenance minimum (DM basis).",
+        "source": "AAFCO Cat Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "growth_reproduction",
+        "nutrient": "crude_protein",
+        "unit": "% (dry matter)",
+        "min": 30.0,
+        "max": null,
+        "notes": "AAFCO Growth & Reproduction minimum for kittens/queen (DM basis).",
+        "source": "AAFCO Cat Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_fat",
+        "unit": "% (dry matter)",
+        "min": 9.0,
+        "max": null,
+        "notes": "AAFCO adult maintenance minimum (DM basis).",
+        "source": "AAFCO Cat Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "taurine",
+        "unit": "mg/kg (as-fed) or g/1000kcal",
+        "min": 0.1,
+        "max": null,
+        "notes": "Taurine is essential for cats; AAFCO and NRC have minimums (engine: flag recipes lacking animal tissue sources).",
+        "source": "AAFCO / NRC / Merck Vet Manual."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "calcium",
+        "unit": "% (dry matter)",
+        "min": 0.6,
+        "max": null,
+        "notes": "Example AAFCO minima for cat maintenance (DM basis); check table for precise values per product form (canned vs dry).",
+        "source": "AAFCO Cat Food Nutrient Profiles."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "phosphorus",
+        "unit": "% (dry matter)",
+        "min": 0.5,
+        "max": null,
+        "notes": "AAFCO minima; verify per product type.",
+        "source": "AAFCO Cat Food Nutrient Profiles."
+      }
+    ],
+    "per_1000kcal": [
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_protein_g_per_1000kcal",
+        "value": 65,
+        "notes": "AAFCO expressed adult cat maintenance as approx. 65 g protein / 1000 kcal ME; NRC provides alternate per-1000kcal figures (see notes).",
+        "source": "AAFCO / NRC / Merck Vet Manual."
+      },
+      {
+        "lifeStage": "adult_maintenance",
+        "nutrient": "crude_protein_g_per_1000kcal_NRC",
+        "value": 40,
+        "notes": "NRC per-1000 kcal guidance differs from AAFCO—keep both in the engine for comparison and conservative scoring.",
+        "source": "NRC Nutrient Requirements of Dogs and Cats (2006)."
+      }
+    ]
+  }
+}

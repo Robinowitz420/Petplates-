@@ -1,0 +1,40 @@
+{
+  "reptiles": {
+    "bearded_dragon": {
+      "ca_p_ratio": { "ideal": 2.0, "min": 1.5, "max": 10.0, "notes": "Per-meal target; increase during breeding; dust insects if insects used." ,
+        "source": ["https://www.thebeardeddragon.org/bearded-dragon/diet/micronutrients/calcium","https://www.merckvetmanual.com/management-and-nutrition/nutrition-exotic-and-zoo-animals/nutrition-in-reptiles"]
+      },
+      "vitamin_d3": { "requires_uvb": true, "notes": "UVB is required for D3 synthesis; dietary D3 alone is often insufficient without UVB exposure." ,
+        "source": ["https://www.merckvetmanual.com/management-and-nutrition/nutrition-exotic-and-zoo-animals/nutrition-in-reptiles"]
+      },
+      "feeding_notes": "Gut-load insects and dust with calcium + D3 for insect meals; prefer vegs with high Ca:P for herbivorous meals."
+    },
+    "iguana": {
+      "ca_p_ratio": { "ideal": 1.8, "min": 1.5, "max": 4.0 },
+      "feeding_notes": "Primarily herbivorous; high-fiber greens and variety; avoid high-oxalate plants."
+    }
+  },
+
+  "pocket_pets": {
+    "guinea_pig": {
+      "vitamin_c_mg_per_day": { "adult": 10, "pregnant_or_stressed": 30, "notes": "Supply via fortified pellets or fresh veg; avoid relying on water supplements." ,
+        "source": ["https://veterinarypartner.vin.com/default.aspx?catId=254109&id=4952750&pid=19239"]
+      },
+      "ca_p_ratio": { "ideal": 1.4, "min": 1.33, "max": 1.5, "notes": "Calcium absorption is high; use timothy hay for adults; avoid alfalfa as main forage." },
+      "fiber_min_percent_DM": 18
+    },
+    "rabbit": {
+      "fiber_min_percent_DM": 18,
+      "ca_p_ratio": { "ideal": 1.4, "min": 1.33, "max": 1.5 },
+      "notes": "Hay-based diet; pellets only as supplement; dental health driven by forage."
+    }
+  },
+
+  "birds": {
+    "parrot_general": {
+      "calcium_notes": "Egg-laying species need higher calcium; dusting and mineral blocks recommended in breeders; captive parrot requirements vary by species.",
+      "vitamin_a_notes": "Vitamin A is species specific; wild-fruit/veg patterns guide supplementation."
+    },
+    "budgie": { "notes": "Seed-only diets are inadequate; pellet + fresh veg strongly recommended." }
+  }
+}

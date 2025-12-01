@@ -1,0 +1,192 @@
+{
+  "chicken_breast_skinless_raw": {
+    "name": "Chicken Breast, skinless raw",
+    "moisture_percent": 74.6,
+    "protein_g_100g": 22.7,
+    "fat_g_100g": 2.6,
+    "fiber_g_100g": 0,
+    "calcium_mg_100g": 11,
+    "phosphorus_mg_100g": 210,
+    "calories_kcal_100g": 102
+  },
+  "brown_rice_cooked": {
+    "name": "Brown Rice, cooked",
+    "moisture_percent": 73.2,
+    "protein_g_100g": 2.3,
+    "fat_g_100g": 0.9,
+    "fiber_g_100g": 1.8,
+    "calcium_mg_100g": 10,
+    "phosphorus_mg_100g": 43,
+    "calories_kcal_100g": 111
+  },
+  "salmon_raw_fillet": {
+    "name": "Salmon, raw fillet",
+    "moisture_percent": 68.0,
+    "protein_g_100g": 20.4,
+    "fat_g_100g": 13.4,
+    "fiber_g_100g": 0,
+    "calcium_mg_100g": 9,
+    "phosphorus_mg_100g": 200,
+    "calories_kcal_100g": 208
+  },
+  "sweet_potato_raw": {
+    "name": "Sweet Potato, raw",
+    "moisture_percent": 77.5,
+    "protein_g_100g": 1.6,
+    "fat_g_100g": 0.1,
+    "fiber_g_100g": 3.0,
+    "calcium_mg_100g": 30,
+    "phosphorus_mg_100g": 47,
+    "calories_kcal_100g": 86
+  },
+  "peas_fresh": {
+    "name": "Green Peas, fresh",
+    "moisture_percent": 79.3,
+    "protein_g_100g": 5.4,
+    "fat_g_100g": 0.4,
+    "fiber_g_100g": 5.1,
+    "calcium_mg_100g": 25,
+    "phosphorus_mg_100g": 108,
+    "calories_kcal_100g": 81
+  },
+  "carrot_raw": {
+    "name": "Carrot, raw",
+    "moisture_percent": 88.3,
+    "protein_g_100g": 0.9,
+    "fat_g_100g": 0.2,
+    "fiber_g_100g": 2.8,
+    "calcium_mg_100g": 33,
+    "phosphorus_mg_100g": 35,
+    "calories_kcal_100g": 41
+  },
+  "spinach_raw": {
+    "name": "Spinach, raw",
+    "moisture_percent": 91.4,
+    "protein_g_100g": 2.9,
+    "fat_g_100g": 0.4,
+    "fiber_g_100g": 2.2,
+    "calcium_mg_100g": 99,
+    "phosphorus_mg_100g": 49,
+    "calories_kcal_100g": 23
+  },
+  "egg_whole_raw": {
+    "name": "Egg, whole, raw",
+    "moisture_percent": 75.8,
+    "protein_g_100g": 12.6,
+    "fat_g_100g": 9.9,
+    "fiber_g_100g": 0,
+    "calcium_mg_100g": 50,
+    "phosphorus_mg_100g": 198,
+    "calories_kcal_100g": 143
+  },
+  "pumpkin_cooked": {
+    "name": "Pumpkin, cooked",
+    "moisture_percent": 92.0,
+    "protein_g_100g": 1.0,
+    "fat_g_100g": 0.1,
+    "fiber_g_100g": 2.9,
+    "calcium_mg_100g": 21,
+    "phosphorus_mg_100g": 44,
+    "calories_kcal_100g": 20
+  },
+  "rice_white_cooked": {
+    "name": "White Rice, cooked",
+    "moisture_percent": 70.0,
+    "protein_g_100g": 2.7,
+    "fat_g_100g": 0.3,
+    "fiber_g_100g": 0.4,
+    "calcium_mg_100g": 10,
+    "phosphorus_mg_100g": 43,
+    "calories_kcal_100g": 130
+  },
+  "oatmeal_raw": {
+    "name": "Oats, rolled, raw",
+    "moisture_percent": 8.0,
+    "protein_g_100g": 16.9,
+    "fat_g_100g": 6.9,
+    "fiber_g_100g": 10.6,
+    "calcium_mg_100g": 54,
+    "phosphorus_mg_100g": 350,
+    "calories_kcal_100g": 389
+  },
+  "salmon_canned_water": {
+    "name": "Salmon, canned in water, drained",
+    "moisture_percent": 75.0,
+    "protein_g_100g": 23.0,
+    "fat_g_100g": 8.0,
+    "fiber_g_100g": 0,
+    "calcium_mg_100g": 20,
+    "phosphorus_mg_100g": 220,
+    "calories_kcal_100g": 160
+  },
+  "turkey_ground_raw": {
+    "name": "Turkey, ground, raw",
+    "moisture_percent": 71.0,
+    "protein_g_100g": 19.9,
+    "fat_g_100g": 8.3,
+    "fiber_g_100g": 0,
+    "calcium_mg_100g": 12,
+    "phosphorus_mg_100g": 190,
+    "calories_kcal_100g": 176
+  },
+  "carrot_cooked": {
+    "name": "Carrot, cooked",
+    "moisture_percent": 88.0,
+    "protein_g_100g": 0.8,
+    "fat_g_100g": 0.2,
+    "fiber_g_100g": 2.5,
+    "calcium_mg_100g": 30,
+    "phosphorus_mg_100g": 33,
+    "calories_kcal_100g": 35
+  },
+  "peas_dry_uncooked": {
+    "name": "Green Peas, dry",
+    "moisture_percent": 14.0,
+    "protein_g_100g": 23.8,
+    "fat_g_100g": 1.2,
+    "fiber_g_100g": 15.6,
+    "calcium_mg_100g": 81,
+    "phosphorus_mg_100g": 400,
+    "calories_kcal_100g": 333
+  },
+  "kale_raw": {
+    "name": "Kale, raw",
+    "moisture_percent": 84.0,
+    "protein_g_100g": 4.3,
+    "fat_g_100g": 0.8,
+    "fiber_g_100g": 2.0,
+    "calcium_mg_100g": 150,
+    "phosphorus_mg_100g": 50,
+    "calories_kcal_100g": 49
+  },
+  "sweet_potato_cooked": {
+    "name": "Sweet Potato, cooked",
+    "moisture_percent": 75.0,
+    "protein_g_100g": 1.5,
+    "fat_g_100g": 0.2,
+    "fiber_g_100g": 2.5,
+    "calcium_mg_100g": 25,
+    "phosphorus_mg_100g": 40,
+    "calories_kcal_100g": 90
+  },
+  "beef_lean_ground_raw": {
+    "name": "Beef, lean ground, raw",
+    "moisture_percent": 61.0,
+    "protein_g_100g": 26.0,
+    "fat_g_100g": 10.0,
+    "fiber_g_100g": 0,
+    "calcium_mg_100g": 18,
+    "phosphorus_mg_100g": 210,
+    "calories_kcal_100g": 217
+  },
+  "carrot_shredded": {
+    "name": "Carrot, shredded raw",
+    "moisture_percent": 88.0,
+    "protein_g_100g": 0.9,
+    "fat_g_100g": 0.2,
+    "fiber_g_100g": 2.9,
+    "calcium_mg_100g": 30,
+    "phosphorus_mg_100g": 35,
+    "calories_kcal_100g": 42
+  }
+}

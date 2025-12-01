@@ -1,0 +1,44 @@
+{
+  "xylitol": {
+    "speciesAffected": ["dogs"],
+    "severity": "critical",
+    "mechanism": "Potent insulin release → hypoglycemia; hepatotoxicity reported",
+    "notes": "Immediate veterinary attention; even small amounts can be fatal in small dogs",
+    "source": ["https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"]
+  },
+  "chocolate": {
+    "speciesAffected": ["dogs", "cats"],
+    "severity": "major",
+    "mechanism": "Methylxanthines (theobromine, caffeine) cause cardiac/neurologic stimulation",
+    "notes": "Severity depends on type (dark > milk) and weight",
+    "source": ["https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"]
+  },
+  "grapes_raisins": {
+    "speciesAffected": ["dogs"],
+    "severity": "critical",
+    "mechanism": "Unknown toxin → acute kidney injury in susceptible dogs",
+    "notes": "Avoid entirely; idiosyncratic toxicity documented",
+    "source": ["https://www.aspca.org/news/official-top-10-toxins-2024"]
+  },
+  "onion_garlic_alliums": {
+    "speciesAffected": ["dogs", "cats", "rabbits"],
+    "severity": "major",
+    "mechanism": "Hemolytic anemia via oxidative damage to RBCs",
+    "notes": "Garlic more potent than onion; cumulative exposure matters",
+    "source": ["https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"]
+  },
+  "avocado": {
+    "speciesAffected": ["birds", "reptiles", "rabbits", "pocket-pets"],
+    "severity": "critical",
+    "mechanism": "Persin toxin: cardiac and respiratory failure in birds and some mammals",
+    "notes": "High risk for birds and some small mammals",
+    "source": ["https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"]
+  },
+  "fireflies": {
+    "speciesAffected": ["reptiles"],
+    "severity": "critical",
+    "mechanism": "Lucibufagins → severe toxicity and death in insectivorous reptiles",
+    "notes": "Never feed fireflies to reptiles",
+    "source": ["https://www.merckvetmanual.com/management-and-nutrition/nutrition-exotic-and-zoo-animals/nutrition-in-reptiles"]
+  }
+}
