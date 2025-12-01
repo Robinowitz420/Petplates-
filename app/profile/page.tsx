@@ -6,9 +6,11 @@ import {
   ChefHat,
   Plus,
   Edit,
+  Trash2,
 } from 'lucide-react';
 import PetVillageWidget from '@/components/PetVillageWidget';
 import { getRandomName, getPrimaryName, formatNames, type Pet } from '@/lib/utils/petUtils';
+import { v4 as uuidv4 } from 'uuid';
 
 // =================================================================
 // 1. TYPES & LOCAL STORAGE FUNCTIONS
@@ -16,7 +18,6 @@ import { getRandomName, getPrimaryName, formatNames, type Pet } from '@/lib/util
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
-
 
 // Simulated user id (replace with Clerk user.id in real auth)
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
@@ -158,6 +159,245 @@ const getPetIcon = (type: PetCategory, breed: string = '', size: number = 24, cl
   return <span className={className} style={{ fontSize: `${size}px` }}>{emoji}</span>;
 };
 
+// =================================================================
+// 4. PET MODAL COMPONENT
+// =================================================================
+
+interface PetModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (pet: any) => void;
+  editingPet: Pet | null;
+}
+
+const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet }) => {
+  const [formData, setFormData] = useState({
+    id: editingPet?.id || uuidv4(),
+    names: editingPet?.names || [''],
+    type: editingPet?.type || 'dogs',
+    breed: editingPet?.breed || '',
+    age: editingPet?.age || 'adult',
+    weight: editingPet?.weight || '',
+    healthConcerns: editingPet?.healthConcerns || [],
+    image: editingPet?.image || '',
+  });
+
+  const [newName, setNewName] = useState('');
+
+  if (!isOpen) return null;
+
+  const handleAddName = () => {
+    if (newName.trim()) {
+      setFormData({
+        ...formData,
+        names: [...formData.names, newName.trim()]
+      });
+      setNewName('');
+    }
+  };
+
+  const handleRemoveName = (index: number) => {
+    setFormData({
+      ...formData,
+      names: formData.names.filter((_, i) => i !== index)
+    });
+  };
+
+  const handleHealthConcernToggle = (concern: string) => {
+    setFormData(prev => ({
+      ...prev,
+      healthConcerns: prev.healthConcerns.includes(concern)
+        ? prev.healthConcerns.filter(c => c !== concern)
+        : [...prev.healthConcerns, concern]
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {editingPet ? 'Edit Pet' : 'Add New Pet'}
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-2xl"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="space-y-6">
+            {/* Pet Names */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pet Names
+              </label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Add a name"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddName}
+                  className="btn btn-secondary"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {formData.names.map((name, index) => (
+                  <div key={index} className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full flex items-center gap-2">
+                    {name}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveName(index)}
+                      className="text-primary-600 hover:text-primary-800"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pet Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pet Type
+              </label>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+                {Object.entries(PET_ICON_MAP).map(([type, emoji]) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setFormData({...formData, type})}
+                    className={`flex flex-col items-center p-3 rounded-lg border-2 ${formData.type === type ? 'border-primary-500 bg-primary-50' : 'border-gray-200'}`}
+                  >
+                    <span className="text-2xl mb-1">{emoji}</span>
+                    <span className="text-sm capitalize">{type.replace('-', ' ')}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Breed */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Breed
+              </label>
+              <select
+                value={formData.breed}
+                onChange={(e) => setFormData({...formData, breed: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="">Select a breed</option>
+                {PET_BREEDS[formData.type as PetCategory]?.map(breed => (
+                  <option key={breed} value={breed}>{breed}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Age */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Age
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {['baby', 'young', 'adult', 'senior'].map(age => (
+                  <button
+                    key={age}
+                    type="button"
+                    onClick={() => setFormData({...formData, age})}
+                    className={`p-3 rounded-lg border-2 capitalize ${formData.age === age ? 'border-primary-500 bg-primary-50' : 'border-gray-200'}`}
+                  >
+                    {age}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Weight */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Weight
+              </label>
+              <input
+                type="text"
+                value={formData.weight}
+                onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                placeholder="e.g., 10 lbs or 4.5 kg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+
+            {/* Health Concerns */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Health Concerns
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {PET_HEALTH_CONCERNS.map(concern => (
+                  <button
+                    key={concern}
+                    type="button"
+                    onClick={() => handleHealthConcernToggle(concern)}
+                    className={`p-2 rounded-lg border ${formData.healthConcerns.includes(concern) ? 'border-red-300 bg-red-50 text-red-800' : 'border-gray-200'}`}
+                  >
+                    {concern}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Image URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Image URL (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.image}
+                onChange={(e) => setFormData({...formData, image: e.target.value})}
+                placeholder="https://example.com/pet-image.jpg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-ghost"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+            >
+              {editingPet ? 'Save Changes' : 'Add Pet'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 // =================================================================
 // 5. MAIN PAGE COMPONENT
@@ -175,19 +415,6 @@ export default function MyPetsPage() {
     setIsClient(true);
   }, []);
 
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-6">
-        <div className="max-w-6xl mx-auto px-3">
-          <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Loading your pets...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Load pets and expose user id for other pages (recipe detail, etc.)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -198,7 +425,11 @@ export default function MyPetsPage() {
 
   const handleAddPet = useCallback(
     (newPet: any) => {
-      const petWithSavedRecipes = { ...newPet, savedRecipes: newPet.savedRecipes || [] };
+      const petWithSavedRecipes = { 
+        ...newPet, 
+        savedRecipes: newPet.savedRecipes || [] 
+      };
+      
       setPets((prevPets) => {
         const isEditing = prevPets.some((p) => p.id === petWithSavedRecipes.id);
         let updatedPets: Pet[];
@@ -224,13 +455,14 @@ export default function MyPetsPage() {
   }, []);
 
   const handleDeletePet = useCallback((petId: string) => {
-    setPets(prevPets => {
-      const updatedPets = prevPets.filter(p => p.id !== petId);
-      savePetsToLocalStorage(userId, updatedPets);
-      return updatedPets;
-    });
+    if (confirm('Are you sure you want to delete this pet?')) {
+      setPets(prevPets => {
+        const updatedPets = prevPets.filter(p => p.id !== petId);
+        savePetsToLocalStorage(userId, updatedPets);
+        return updatedPets;
+      });
+    }
   }, [userId]);
-
 
   const PetCard: React.FC<{ pet: Pet }> = ({ pet }) => {
     // Defensive checks for pet data
@@ -244,7 +476,7 @@ export default function MyPetsPage() {
     const petBreed = pet.breed || '';
 
     return (
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-all hover:shadow-lg">
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-all hover:shadow-lg h-full">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center">
             <div className="w-12 h-12 rounded-full flex items-center justify-center mr-3 shadow-inner border-2 border-primary-200 overflow-hidden">
@@ -264,15 +496,29 @@ export default function MyPetsPage() {
               <h3 className="text-xl font-bold text-gray-900">
                 {petName}
               </h3>
+              {pet.names && pet.names.length > 1 && (
+                <p className="text-sm text-gray-500">
+                  Also known as: {pet.names.slice(1).join(', ')}
+                </p>
+              )}
             </div>
           </div>
-          <button
-            onClick={() => handleEditPet(pet)}
-            className="btn btn-ghost btn-icon-sm"
-            title={`Edit ${petName}`}
-          >
-            <Edit size={16} />
-          </button>
+          <div className="flex gap-1">
+            <button
+              onClick={() => handleEditPet(pet)}
+              className="btn btn-ghost btn-icon-sm"
+              title={`Edit ${petName}`}
+            >
+              <Edit size={16} />
+            </button>
+            <button
+              onClick={() => handleDeletePet(pet.id!)}
+              className="btn btn-ghost btn-icon-sm text-red-500 hover:text-red-700"
+              title={`Delete ${petName}`}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-4 mb-4">
@@ -324,42 +570,56 @@ export default function MyPetsPage() {
           </div>
         </div>
 
-      {(pet.healthConcerns || []).length > 1 && (
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-1">
-            {(pet.healthConcerns || []).slice(1, 3).map((concern, index) => (
-              <span
-                key={index}
-                className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-medium"
-              >
-                {concern.replace(/-/g, ' ')}
-              </span>
-            ))}
-            {(pet.healthConcerns || []).length > 3 && (
-              <span className="text-xs text-gray-500">+{(pet.healthConcerns || []).length - 3}</span>
-            )}
+        {(pet.healthConcerns || []).length > 1 && (
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-1">
+              {(pet.healthConcerns || []).slice(1, 3).map((concern, index) => (
+                <span
+                  key={index}
+                  className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-medium"
+                >
+                  {concern.replace(/-/g, ' ')}
+                </span>
+              ))}
+              {(pet.healthConcerns || []).length > 3 && (
+                <span className="text-xs text-gray-500">+{(pet.healthConcerns || []).length - 3}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-auto pt-3 border-t border-gray-100">
+          <div className="grid grid-cols-2 gap-1.5">
+            <a
+              href={`/profile/pet/${pet.id}`}
+              className="btn btn-success btn-sm btn-full"
+            >
+              Find Meals
+            </a>
+            <a
+              href={`/profile/pet/${pet.id}/saved-recipes`}
+              className="btn btn-warning btn-sm btn-full"
+            >
+              Saved Meals
+            </a>
           </div>
         </div>
-      )}
+      </div>
+    );
+  };
 
-      <div className="mt-auto pt-3 border-t border-gray-100">
-        <div className="grid grid-cols-2 gap-1.5">
-          <a
-            href={`/profile/pet/${pet.id}`}
-            className="btn btn-success btn-sm btn-full"
-          >
-            Find Meals
-          </a>
-          <a
-            href={`/profile/pet/${pet.id}/saved-recipes`}
-            className="btn btn-warning btn-sm btn-full"
-          >
-            Saved Meals
-          </a>
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-6">
+        <div className="max-w-6xl mx-auto px-3">
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading your pets...</p>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -424,16 +684,23 @@ export default function MyPetsPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pets.map((pet) => (
               <PetCard key={pet.id} pet={pet} />
             ))}
           </div>
         )}
 
+        <PetModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingPet(null);
+          }}
+          onSave={handleAddPet}
+          editingPet={editingPet}
+        />
       </div>
-
-
     </div>
   );
 }
