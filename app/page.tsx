@@ -35,7 +35,7 @@ const whyCards = [
     title: 'Why Meal Prep?',
     subtitle: 'Fresh prep beats whatever comes in a bag—every single time.',
     hover:
-      'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs. ThePetPantry knows species, age, size, and health concerns, then auto-adjusts portions and links trusted products you can buy today.',
+      'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs. Paw & Plate knows species, age, size, and health concerns, then auto-adjusts portions and links trusted products you can buy today.',
     icon: Calendar,
   },
 ];
@@ -94,7 +94,7 @@ export default function HomePage() {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <section className="py-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Why ThePetPantry?</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Why Paw & Plate?</h2>
             <WhyUsSection />
           </section>
         </main>

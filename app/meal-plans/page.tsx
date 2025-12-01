@@ -61,7 +61,7 @@ export default function MealPlansPage() {
       title: 'Why Meal Prep?',
       subtitle: 'Fresh prep beats whatever comes in a bag—every single time.',
       hover:
-        'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs—not generic kibble. Pet Plates knows species, age, size, and health concerns, then auto-adjusts portions and links the exact products you can buy today.',
+        'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs—not generic kibble. Paw & Plate knows species, age, size, and health concerns, then auto-adjusts portions and links the exact products you can buy today.',
     },
   ];
 
