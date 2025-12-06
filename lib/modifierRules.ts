@@ -53,12 +53,42 @@ export const healthConcernGuidelines: Record<
   },
   diabetes: {
     focus: 'High protein, very low carbs, consistent calories',
+    avoid: ['high-sugar', 'simple-carbs', 'corn-syrup', 'white-rice'],
+    preferredIngredients: ['lean-protein', 'complex-carbs', 'high-fiber-vegetables'],
+    supplementIdeas: ['chromium', 'alpha-lipoic-acid'],
   },
   hyperthyroidism: {
     focus: 'Controlled iodine + higher calories to offset metabolism',
   },
   pancreatitis: {
     focus: 'Ultra low fat, easily digestible proteins, MCT support',
+    avoid: ['high-fat', 'pork', 'lamb', 'duck', 'fried', 'greasy', 'fatty-cuts'],
+    preferredIngredients: ['lean-turkey', 'white-fish', 'chicken-breast', 'pumpkin'],
+    supplementIdeas: ['digestive-enzymes', 'probiotics'],
+  },
+  'heart-disease': {
+    focus: 'Low sodium, taurine-rich, omega-3 support, controlled calories',
+    avoid: ['high-sodium', 'processed', 'excessive-fat'],
+    preferredIngredients: ['lean-protein', 'omega-3-rich-fish', 'taurine-sources'],
+    supplementIdeas: ['taurine', 'omega-3', 'coenzyme-q10'],
+  },
+  'heart disease': {
+    focus: 'Low sodium, taurine-rich, omega-3 support, controlled calories',
+    avoid: ['high-sodium', 'processed', 'excessive-fat'],
+    preferredIngredients: ['lean-protein', 'omega-3-rich-fish', 'taurine-sources'],
+    supplementIdeas: ['taurine', 'omega-3', 'coenzyme-q10'],
+  },
+  'skin-conditions': {
+    focus: 'Omega-3 rich, quality protein, vitamin E, anti-inflammatory',
+    avoid: ['artificial-colors', 'preservatives', 'low-quality-protein'],
+    preferredIngredients: ['salmon', 'sardines', 'sweet-potato', 'pumpkin'],
+    supplementIdeas: ['omega-3', 'vitamin-e', 'zinc', 'biotin'],
+  },
+  'skin conditions': {
+    focus: 'Omega-3 rich, quality protein, vitamin E, anti-inflammatory',
+    avoid: ['artificial-colors', 'preservatives', 'low-quality-protein'],
+    preferredIngredients: ['salmon', 'sardines', 'sweet-potato', 'pumpkin'],
+    supplementIdeas: ['omega-3', 'vitamin-e', 'zinc', 'biotin'],
   },
   hairball: {
     focus: 'Insoluble & soluble fiber blend + omega oils',
@@ -415,6 +445,259 @@ export const modifierRules: ModifierRule[] = [
     nutritionalTargets: {},
     rationale: 'Fibers plus omegas reduce shedding and lubricate transit.',
     ruleWeight: 10,
+  },
+  {
+    id: 'mod-heart-disease-dog-01',
+    appliesTo: {
+      species: ['dogs'],
+      healthConcerns: ['heart-disease', 'heart disease'],
+    },
+    ingredientChanges: {
+      remove: ['high-sodium', 'processed'],
+      add: [
+        {
+          name: 'Taurine Supplement',
+          amountPer10kg: '500mg',
+          amazonLink: 'https://www.amazon.com/s?k=taurine+supplement+dog',
+          notes: 'Essential amino acid for heart muscle function.',
+        },
+        {
+          name: 'Omega-3 Fish Oil',
+          amountPer10kg: '300mg',
+          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+dog',
+          notes: 'EPA/DHA support cardiovascular health.',
+        },
+        {
+          name: 'Coenzyme Q10',
+          amountPer10kg: '30mg',
+          amazonLink: 'https://www.amazon.com/s?k=coq10+for+dogs',
+          notes: 'Supports heart muscle energy production.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      fatMax: 15,
+      sodiumMax: 0.3,
+    },
+    rationale: 'Low sodium, taurine-rich diet with omega-3 support for cardiac function.',
+    ruleWeight: 18,
+  },
+  {
+    id: 'mod-heart-disease-cat-01',
+    appliesTo: {
+      species: ['cats'],
+      healthConcerns: ['heart-disease', 'heart disease'],
+    },
+    ingredientChanges: {
+      remove: ['high-sodium', 'processed'],
+      add: [
+        {
+          name: 'Taurine Supplement',
+          amountPer10kg: '250mg',
+          amazonLink: 'https://www.amazon.com/s?k=taurine+supplement+cat',
+          notes: 'Critical for feline heart health - cats cannot synthesize taurine.',
+        },
+        {
+          name: 'Omega-3 Fish Oil',
+          amountPer10kg: '200mg',
+          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+cat',
+          notes: 'EPA/DHA for cardiovascular support.',
+        },
+        {
+          name: 'L-Carnitine',
+          amountPer10kg: '250mg',
+          amazonLink: 'https://www.amazon.com/s?k=l-carnitine+for+cats',
+          notes: 'Supports heart muscle metabolism.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      fatMax: 15,
+      sodiumMax: 0.25,
+      proteinMin: 40,
+    },
+    rationale: 'Taurine-rich, low-sodium diet essential for feline cardiac health.',
+    ruleWeight: 20,
+  },
+  {
+    id: 'mod-skin-conditions-dog-01',
+    appliesTo: {
+      species: ['dogs'],
+      healthConcerns: ['skin-conditions', 'skin conditions'],
+    },
+    ingredientChanges: {
+      remove: ['artificial-colors', 'preservatives'],
+      add: [
+        {
+          name: 'Omega-3 Fish Oil',
+          amountPer10kg: '400mg',
+          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+dog',
+          notes: 'Anti-inflammatory omega-3s for skin health.',
+        },
+        {
+          name: 'Vitamin E Supplement',
+          amountPer10kg: '100IU',
+          amazonLink: 'https://www.amazon.com/s?k=vitamin+e+for+dogs',
+          notes: 'Antioxidant support for skin barrier function.',
+        },
+        {
+          name: 'Zinc Supplement',
+          amountPer10kg: '15mg',
+          amazonLink: 'https://www.amazon.com/s?k=zinc+supplement+dog',
+          notes: 'Essential for skin healing and immune function.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      fatMin: 10,
+    },
+    rationale: 'Omega-3s, vitamin E, and zinc support healthy skin barrier and reduce inflammation.',
+    ruleWeight: 14,
+  },
+  {
+    id: 'mod-skin-conditions-cat-01',
+    appliesTo: {
+      species: ['cats'],
+      healthConcerns: ['skin-conditions', 'skin conditions'],
+    },
+    ingredientChanges: {
+      remove: ['artificial-colors', 'preservatives'],
+      add: [
+        {
+          name: 'Omega-3 Fish Oil',
+          amountPer10kg: '300mg',
+          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+cat',
+          notes: 'EPA/DHA for skin health and anti-inflammatory support.',
+        },
+        {
+          name: 'Biotin Supplement',
+          amountPer10kg: '250mcg',
+          amazonLink: 'https://www.amazon.com/s?k=biotin+for+cats',
+          notes: 'B-vitamin essential for healthy skin and coat.',
+        },
+        {
+          name: 'Vitamin E',
+          amountPer10kg: '50IU',
+          amazonLink: 'https://www.amazon.com/s?k=vitamin+e+for+cats',
+          notes: 'Antioxidant for skin barrier protection.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      fatMin: 12,
+      proteinMin: 38,
+    },
+    rationale: 'Quality protein, omega-3s, and skin-supporting vitamins for healthy coat.',
+    ruleWeight: 15,
+  },
+  {
+    id: 'mod-diabetes-dog-01',
+    appliesTo: {
+      species: ['dogs'],
+      healthConcerns: ['diabetes'],
+    },
+    ingredientChanges: {
+      remove: ['high-sugar', 'simple-carbs', 'corn-syrup', 'white-rice'],
+      substitute: [
+        { from: 'white rice', to: 'steamed cauliflower rice' },
+        { from: 'sweet potato', to: 'green beans' },
+      ],
+      add: [
+        {
+          name: 'Chromium Supplement',
+          amountPer10kg: '50mcg',
+          amazonLink: 'https://www.amazon.com/s?k=chromium+supplement+dog',
+          notes: 'Helps improve insulin sensitivity.',
+        },
+        {
+          name: 'Alpha-Lipoic Acid',
+          amountPer10kg: '25mg',
+          amazonLink: 'https://www.amazon.com/s?k=alpha-lipoic-acid+dog',
+          notes: 'Antioxidant that may help with glucose metabolism.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      proteinMin: 25,
+      fatMax: 15,
+      caloriesAdjust: -10,
+    },
+    rationale: 'Low-glycemic, high-protein diet with consistent calories for blood sugar control.',
+    ruleWeight: 17,
+  },
+  {
+    id: 'mod-diabetes-cat-01',
+    appliesTo: {
+      species: ['cats'],
+      healthConcerns: ['diabetes'],
+    },
+    ingredientChanges: {
+      remove: ['high-sugar', 'simple-carbs', 'corn-syrup', 'white-rice'],
+      substitute: [
+        { from: 'white rice', to: 'steamed cauliflower rice' },
+        { from: 'sweet potato', to: 'green beans' },
+      ],
+      add: [
+        {
+          name: 'Chromium Supplement',
+          amountPer10kg: '25mcg',
+          amazonLink: 'https://www.amazon.com/s?k=chromium+supplement+cat',
+          notes: 'Helps improve insulin sensitivity in cats.',
+        },
+        {
+          name: 'Alpha-Lipoic Acid',
+          amountPer10kg: '15mg',
+          amazonLink: 'https://www.amazon.com/s?k=alpha-lipoic-acid+cat',
+          notes: 'Antioxidant support for glucose metabolism.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      proteinMin: 40,
+      fatMax: 15,
+      caloriesAdjust: -10,
+    },
+    rationale: 'High-protein, low-carb diet with consistent calories for feline diabetes management.',
+    ruleWeight: 18,
+  },
+  {
+    id: 'mod-pancreatitis-dog-01',
+    appliesTo: {
+      species: ['dogs'],
+      healthConcerns: ['pancreatitis'],
+    },
+    ingredientChanges: {
+      remove: ['high-fat', 'pork', 'lamb', 'duck', 'fried', 'greasy'],
+      substitute: [
+        { from: 'ground beef', to: 'lean turkey breast' },
+        { from: 'salmon', to: 'white fish (cod/tilapia)' },
+      ],
+      add: [
+        {
+          name: 'MCT Oil',
+          amountPer10kg: '5ml',
+          amazonLink: 'https://www.amazon.com/s?k=mct+oil+for+dogs',
+          notes: 'Easy energy source that bypasses pancreatic enzymes.',
+        },
+        {
+          name: 'Digestive Enzymes',
+          amountPer10kg: '1 capsule',
+          amazonLink: 'https://www.amazon.com/s?k=digestive+enzymes+dog',
+          notes: 'Supports digestion during pancreatic recovery.',
+        },
+        {
+          name: 'Probiotics',
+          amountPer10kg: '1g',
+          amazonLink: 'https://www.amazon.com/s?k=probiotics+for+dogs',
+          notes: 'Supports gut health during low-fat diet.',
+        },
+      ],
+    },
+    nutritionalTargets: {
+      fatMax: 10,
+    },
+    rationale: 'Ultra-low fat diet with easily digestible proteins to rest the pancreas.',
+    ruleWeight: 19,
   },
 ];
 

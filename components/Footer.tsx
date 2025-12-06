@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Dog, Cat, Bird, Fish, Rabbit } from 'lucide-react';
+import MascotIcon from './MascotIcon';
 
 export default function Footer() {
   return (
@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="text-2xl font-bold mb-4">🐾 ThePetPantry</div>
+            <div className="text-2xl font-bold mb-4">🐾 Paw & Plate</div>
             <p className="text-gray-400">
               Fresh, personalized meal prep for all your pets. Based on AAFCO and WSAVA guidelines.
             </p>
@@ -16,7 +16,10 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <MascotIcon mascot="robin-redroute" size={16} />
+              Quick Links
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-400 hover:text-white transition-colors">
@@ -43,31 +46,34 @@ export default function Footer() {
 
           {/* Pet Categories */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Pet Categories</h3>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <MascotIcon mascot="puppy-prepper" size={16} />
+              Pet Categories
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/category/dogs" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                  <Dog size={16} /> Dogs
+                  <MascotIcon mascot="puppy-prepper" size={14} /> Dogs
                 </Link>
               </li>
               <li>
                 <Link href="/category/cats" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                  <Cat size={16} /> Cats
+                  <MascotIcon mascot="professor-purrfessor" size={14} /> Cats
                 </Link>
               </li>
               <li>
                 <Link href="/category/birds" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                  <Bird size={16} /> Birds
+                  <MascotIcon mascot="robin-redroute" size={14} /> Birds
                 </Link>
               </li>
               <li>
                 <Link href="/category/reptiles" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                  <Fish size={16} /> Reptiles
+                  <MascotIcon mascot="sherlock-shells" size={14} /> Reptiles
                 </Link>
               </li>
               <li>
                 <Link href="/category/pocket-pets" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                  <Rabbit size={16} /> Pocket Pets
+                  <MascotIcon mascot="farmer-fluff" size={14} /> Pocket Pets
                 </Link>
               </li>
             </ul>
@@ -75,7 +81,10 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <MascotIcon mascot="professor-purrfessor" size={16} />
+              Support
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
@@ -103,7 +112,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>
-            &copy; {new Date().getFullYear()} ThePetPantry. All rights reserved.
+            &copy; {new Date().getFullYear()} Paw & Plate. All rights reserved.
             Nutritional guidelines based on AAFCO and WSAVA standards.
           </p>
         </div>

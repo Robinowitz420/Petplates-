@@ -1,0 +1,28 @@
+🚀 Comprehensive Recipe Enhancement Script
+
+This script will:
+  1. Auto-tag recipes with health concerns
+  2. Generate/verify shortName fields
+  3. Assign celebrity quotes
+  4. Validate data consistency
+
+✅ Backup created: C:\Users\Robin\Workspace\pet_plates_meal_platform\lib\data\recipes-complete.backup.1764900924825.ts
+
+📖 Loading from existing JSON file (fast path)...
+✅ Loaded 0 recipes from JSON
+
+📖 Reading recipes from TypeScript file (this may take a moment)...
+❌ Error running script: Error: Could not find recipes array in file
+Error message: Could not find recipes array in file
+Stack trace: Error: Could not find recipes array in file
+    at main (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:453:15)
+    at <anonymous> (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:654:3)
+    at Object.<anonymous> (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:682:1)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object.transformer (C:\Users\Robin\Workspace\pet_plates_meal_platform\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:336:3)
+❌ Error running script: Error: Could not find recipes array in file

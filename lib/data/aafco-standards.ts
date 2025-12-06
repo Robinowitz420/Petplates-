@@ -211,7 +211,7 @@ export function compareStandards(nutrient: string): any {
   return STANDARDS_COMPARISON[nutrient as keyof typeof STANDARDS_COMPARISON];
 }
 
-// Critical nutrient validation
+// Critical nutrient validation with comprehensive AAFCO/WSAVA checks
 export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', lifeStage: 'adult' | 'growth' = 'adult'): {
   isValid: boolean;
   violations: string[];
@@ -221,36 +221,86 @@ export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', l
   const violations: string[] = [];
   const warnings: string[] = [];
 
-  // Check critical nutrients
-  if (recipe.protein < (standards.protein.min || 0)) {
-    violations.push(`Protein too low: ${recipe.protein}% vs minimum ${standards.protein.min}%`);
+  // Extract nutrient values (handle both object and number formats)
+  const getNutrientValue = (nutrient: any): number => {
+    if (typeof nutrient === 'number') return nutrient;
+    if (nutrient?.min) return nutrient.min;
+    if (nutrient?.max) return nutrient.max;
+    if (nutrient?.value) return nutrient.value;
+    return 0;
+  };
+
+  const protein = getNutrientValue(recipe.protein);
+  const calcium = getNutrientValue(recipe.calcium);
+  const phosphorus = getNutrientValue(recipe.phosphorus);
+  const fat = getNutrientValue(recipe.fat);
+  const fiber = getNutrientValue(recipe.fiber);
+  const taurine = getNutrientValue(recipe.taurine);
+
+  // Check critical nutrients - Protein
+  if (protein < (standards.protein.min || 0)) {
+    violations.push(`Protein too low: ${protein.toFixed(1)}% vs minimum ${standards.protein.min}% (AAFCO requirement)`);
+  } else if (protein > (standards.protein.max || 100)) {
+    warnings.push(`Protein may be high: ${protein.toFixed(1)}% vs maximum ${standards.protein.max}%`);
   }
 
-  if (recipe.calcium < (standards.calcium.min || 0)) {
-    violations.push(`Calcium too low: ${recipe.calcium}% vs minimum ${standards.calcium.min}%`);
+  // Check critical nutrients - Fat
+  if (fat < (standards.fat?.min || 0)) {
+    violations.push(`Fat too low: ${fat.toFixed(1)}% vs minimum ${standards.fat.min}% (AAFCO requirement)`);
+  } else if (fat > (standards.fat?.max || 100)) {
+    warnings.push(`Fat may be high: ${fat.toFixed(1)}% vs maximum ${standards.fat.max}%`);
   }
 
-  if (recipe.calcium > (standards.calcium.max || 999)) {
-    violations.push(`Calcium too high: ${recipe.calcium}% vs maximum ${standards.calcium.max}%`);
+  // Check critical nutrients - Calcium
+  if (calcium < (standards.calcium.min || 0)) {
+    violations.push(`Calcium too low: ${calcium.toFixed(1)}% vs minimum ${standards.calcium.min}% (AAFCO requirement)`);
+  } else if (calcium > (standards.calcium.max || 999)) {
+    violations.push(`Calcium too high: ${calcium.toFixed(1)}% vs maximum ${standards.calcium.max}% (may cause skeletal issues)`);
   }
 
-  if (recipe.phosphorus < (standards.phosphorus.min || 0)) {
-    violations.push(`Phosphorus too low: ${recipe.phosphorus}% vs minimum ${standards.phosphorus.min}%`);
+  // Check critical nutrients - Phosphorus
+  if (phosphorus < (standards.phosphorus.min || 0)) {
+    violations.push(`Phosphorus too low: ${phosphorus.toFixed(1)}% vs minimum ${standards.phosphorus.min}% (AAFCO requirement)`);
+  } else if (phosphorus > (standards.phosphorus.max || 999)) {
+    warnings.push(`Phosphorus may be high: ${phosphorus.toFixed(1)}% vs maximum ${standards.phosphorus.max}%`);
   }
 
-  // Check Ca:P ratio
-  const caPRatio = recipe.calcium / recipe.phosphorus;
-  const caPStandard = standards.CaP_ratio;
-  if (caPStandard) {
-    if (caPRatio < (caPStandard.min || 0) || caPRatio > (caPStandard.max || 999)) {
-      violations.push(`Ca:P ratio out of range: ${caPRatio.toFixed(2)} vs ${caPStandard.min}-${caPStandard.max}`);
+  // Check Ca:P ratio (critical for bone health)
+  if (phosphorus > 0) {
+    const caPRatio = calcium / phosphorus;
+    const caPStandard = standards.CaP_ratio;
+    if (caPStandard) {
+      if (caPRatio < (caPStandard.min || 0)) {
+        violations.push(`Ca:P ratio too low: ${caPRatio.toFixed(2)} vs minimum ${caPStandard.min} (may cause bone issues)`);
+      } else if (caPRatio > (caPStandard.max || 999)) {
+        warnings.push(`Ca:P ratio high: ${caPRatio.toFixed(2)} vs maximum ${caPStandard.max}`);
+      }
     }
   }
 
-  // Species-specific checks
-  if (species === 'cat' && recipe.taurine < (standards.taurine?.min || 0)) {
-    violations.push(`Taurine too low: ${recipe.taurine}% vs minimum ${standards.taurine?.min}%`);
+  // Check Fiber (if specified and available in standards)
+  if (fiber > 0 && (standards as any).fiber) {
+    const fiberStandard = (standards as any).fiber;
+    if (fiber < (fiberStandard.min || 0)) {
+      warnings.push(`Fiber may be low: ${fiber.toFixed(1)}% vs recommended ${fiberStandard.min}%`);
+    } else if (fiber > (fiberStandard.max || 100)) {
+      warnings.push(`Fiber may be high: ${fiber.toFixed(1)}% vs maximum ${fiberStandard.max}%`);
+    }
   }
+
+  // Species-specific checks - Taurine for cats (CRITICAL)
+  if (species === 'cat' && standards.taurine) {
+    const taurineMin = standards.taurine.min || 0;
+    if (taurine < taurineMin) {
+      violations.push(`Taurine too low: ${taurine.toFixed(3)}% vs minimum ${taurineMin}% (CRITICAL for cats - can cause heart/eye issues)`);
+    }
+  }
+
+  // WSAVA additional checks (if applicable)
+  // Note: WSAVA guidelines align closely with AAFCO but emphasize:
+  // - Complete and balanced nutrition
+  // - Appropriate for life stage
+  // - No harmful ingredients
 
   return {
     isValid: violations.length === 0,

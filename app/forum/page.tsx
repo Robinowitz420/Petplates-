@@ -36,7 +36,7 @@ export default function ForumPage() {
     {
       id: 2,
       title: "STICKY: Community Recipe Contest - Winter Warmers!",
-      author: "ThePetPantry",
+      author: "Paw & Plate",
       avatar: "/images/avatars/admin.jpg",
       category: "recipes",
       replies: 67,

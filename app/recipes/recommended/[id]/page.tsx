@@ -8,6 +8,10 @@ import { recipes } from '@/lib/data/recipes-complete';
 import type { Recipe } from '@/lib/types';
 import RecipeCard from '@/components/RecipeCard';
 import { rateRecipeForPet, type Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+import {
+  calculateImprovedCompatibility,
+  type ImprovedPet,
+} from '@/lib/utils/improvedCompatibilityScoring';
 
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
@@ -66,32 +70,56 @@ export default function RecommendedRecipesPage() {
   const scoredRecipes = useMemo(() => {
     if (!pet) return [];
 
-    console.log('Pet data:', pet);
-    console.log('Pet type:', pet.type);
-    console.log('Total recipes loaded:', recipes?.length || 0);
-    console.log('Recipes is array?', Array.isArray(recipes));
-    console.log('First recipe sample:', recipes?.[0]);
+    // Debug logging removed - use logger if needed
 
-    // Calculate match scores for all recipes against this pet
+    // Calculate match scores for all recipes against this pet using improved scoring
     const scored = recipes.map((recipe) => {
-      const score = ratingPet ? rateRecipeForPet(recipe, ratingPet) : null;
+      if (!ratingPet) return { recipe, score: null };
+      
+      try {
+        const improvedPet: ImprovedPet = {
+          id: ratingPet.id,
+          name: ratingPet.name,
+          type: ratingPet.type,
+          breed: ratingPet.breed,
+          age: typeof ratingPet.age === 'string' ? parseFloat(ratingPet.age) || 1 : ratingPet.age || 1,
+          weight: ratingPet.weight || 10,
+          activityLevel: ratingPet.activityLevel,
+          healthConcerns: ratingPet.healthConcerns || [],
+          dietaryRestrictions: ratingPet.dietaryRestrictions || [],
+          allergies: ratingPet.allergies || [],
+        };
+        const improved = calculateImprovedCompatibility(recipe, improvedPet);
+        return {
+          recipe,
+          score: {
+            matchScore: improved.overallScore,
+            stars: Math.round(improved.overallScore / 20),
+            reasoning: {
+              goodMatches: improved.reasoning.strengths,
+              conflicts: improved.reasoning.warnings,
+            },
+            enhancedScore: improved, // keep for detail view
+          }
+        };
+      } catch (error) {
+        // Fallback to original scoring
+        const score = rateRecipeForPet(recipe, ratingPet);
       return {
         recipe,
-        score: score ? {
+          score: {
           matchScore: score.overallScore,
           stars: Math.round(score.overallScore / 20),
           reasoning: {
             goodMatches: score.strengths,
             conflicts: score.warnings
           }
-        } : null
+          }
       };
+      }
     });
 
-    console.log('Sample scores for first 10 recipes:');
-    scored.slice(0, 10).forEach(({ recipe, score }) => {
-      console.log(`  ${recipe.id} (${recipe.category}): ${score?.matchScore || 0}%`);
-    });
+    // Debug logging removed - use logger if needed
 
     // Sort by match score (highest first)
     const sorted = scored.sort((a, b) => {
@@ -99,7 +127,7 @@ export default function RecommendedRecipesPage() {
       return b.score.matchScore - a.score.matchScore;
     });
 
-    console.log('Top 5 scores:', sorted.slice(0, 5).map(s => ({ id: s.recipe.id, category: s.recipe.category, score: s.score?.matchScore })));
+    // Debug logging removed - use logger if needed
 
     return sorted;
   }, [pet]);

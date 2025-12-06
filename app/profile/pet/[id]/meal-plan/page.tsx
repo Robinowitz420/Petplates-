@@ -5,8 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, RefreshCw, ShoppingCart } from 'lucide-react';
 import { recipes } from '@/lib/data/recipes-complete';
-import type { Recipe } from '@/lib/types';
+import type { Recipe, CustomMeal } from '@/lib/types';
 import { VETTED_PRODUCTS } from '@/lib/data/vetted-products';
+import { getCustomMeals } from '@/lib/utils/customMealStorage';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
@@ -46,12 +47,7 @@ const buildEvenPlan = (meals: Recipe[]) => {
   while (rotation.length < totalSlots) {
     rotation.push(...meals);
   }
-  const trimmed = rotation.slice(0, totalSlots);
-  for (let i = trimmed.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [trimmed[i], trimmed[j]] = [trimmed[j], trimmed[i]];
-  }
-  return trimmed;
+  return rotation.slice(0, totalSlots);
 };
 
 export default function MealPlanPage() {
@@ -61,8 +57,51 @@ export default function MealPlanPage() {
 
   const [pet, setPet] = useState<PetProfile | null>(null);
   const [savedMeals, setSavedMeals] = useState<Recipe[]>([]);
+  const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
   const [weeklyPlan, setWeeklyPlan] = useState<{ day: string; meals: Recipe[] }[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Convert custom meal to Recipe format for meal plan
+  const convertCustomMealToRecipe = (customMeal: CustomMeal): Recipe => {
+    return {
+      id: customMeal.id,
+      name: customMeal.name,
+      category: 'custom', // Mark as custom meal
+      ageGroup: ['adult'], // Default, could be enhanced
+      healthConcerns: [],
+      description: `Custom meal created on ${new Date(customMeal.createdAt).toLocaleDateString()}`,
+      ingredients: customMeal.ingredients.map((ing, idx) => ({
+        id: `${idx + 1}`,
+        name: ing.key.replace(/_/g, ' '),
+        amount: `${ing.grams}g`,
+      })),
+      instructions: [
+        'Mix all ingredients according to saved recipe',
+        'Serve at recommended portion size',
+        `Recommended serving: ${customMeal.analysis.recommendedServingGrams}g`,
+      ],
+      nutritionalInfo: {
+        protein: {
+          min: (customMeal.analysis.nutrients.protein_g || 0) / (customMeal.analysis.totalRecipeGrams / 100),
+          max: (customMeal.analysis.nutrients.protein_g || 0) / (customMeal.analysis.totalRecipeGrams / 100),
+          unit: '%',
+        },
+        fat: {
+          min: (customMeal.analysis.nutrients.fat_g || 0) / (customMeal.analysis.totalRecipeGrams / 100),
+          max: (customMeal.analysis.nutrients.fat_g || 0) / (customMeal.analysis.totalRecipeGrams / 100),
+          unit: '%',
+        },
+        calories: {
+          min: customMeal.analysis.nutrients.kcal || customMeal.analysis.nutrients.calories_kcal || 0,
+          max: customMeal.analysis.nutrients.kcal || customMeal.analysis.nutrients.calories_kcal || 0,
+          unit: 'kcal',
+        },
+      },
+      rating: 0,
+      reviews: 0,
+      tags: ['custom', 'user-created'],
+    };
+  };
 
   useEffect(() => {
     const userId = getCurrentUserId();
@@ -70,10 +109,15 @@ export default function MealPlanPage() {
     const foundPet = pets.find((p) => p.id === petId) || null;
     setPet(foundPet);
     if (foundPet) {
-      const meals = (foundPet.savedRecipes || [])
+      // Load saved recipes
+      const savedRecipeMeals = (foundPet.savedRecipes || [])
         .map((recipeId) => recipes.find((recipe) => recipe.id === recipeId))
         .filter(Boolean) as Recipe[];
-      setSavedMeals(meals);
+      setSavedMeals(savedRecipeMeals);
+      
+      // Load custom meals
+      const customMealsList = getCustomMeals(userId, petId);
+      setCustomMeals(customMealsList);
     }
     setLoading(false);
   }, [petId]);
@@ -106,13 +150,23 @@ export default function MealPlanPage() {
   };
 
   useEffect(() => {
-    if (savedMeals.length >= 2) {
-      setWeeklyPlan(generatePlan(savedMeals));
+    // Combine saved recipes and custom meals
+    const allMeals: Recipe[] = [
+      ...savedMeals,
+      ...customMeals.map(convertCustomMealToRecipe),
+    ];
+    
+    if (allMeals.length > 0) {
+      setWeeklyPlan(generatePlan(allMeals));
     }
-  }, [savedMeals]);
+  }, [savedMeals, customMeals]);
 
   const handleRegenerate = () => {
-    setWeeklyPlan(generatePlan(savedMeals));
+    const allMeals: Recipe[] = [
+      ...savedMeals,
+      ...customMeals.map(convertCustomMealToRecipe),
+    ];
+    setWeeklyPlan(generatePlan(allMeals));
   };
 
   if (loading) {
@@ -136,14 +190,16 @@ export default function MealPlanPage() {
     );
   }
 
-  if (savedMeals.length < 2) {
+  const allMealsCount = savedMeals.length + customMeals.length;
+  
+  if (allMealsCount < 1) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-lg bg-white rounded-xl shadow p-8 text-center space-y-4">
           <div className="text-5xl">🍽️</div>
           <h1 className="text-2xl font-bold text-gray-900">Add more meals first</h1>
           <p className="text-gray-600">
-            Save at least two meals for {pet.name} to build a balanced weekly rotation.
+            Save at least two meals (recipes or custom meals) for {pet.name} to build a balanced weekly rotation.
           </p>
           <div className="flex flex-col gap-2">
             <button
@@ -151,6 +207,12 @@ export default function MealPlanPage() {
               className="bg-primary-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
             >
               See Recommended Meals
+            </button>
+            <button
+              onClick={() => router.push(`/profile/pet/${pet.id}/recipe-builder`)}
+              className="bg-primary-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              Create Custom Meal
             </button>
             <button
               onClick={() => router.push(`/profile/pet/${pet.id}`)}
@@ -211,10 +273,18 @@ export default function MealPlanPage() {
                 {dayPlan.meals.map((meal, mealIndex) => (
                   <div key={meal.id + mealIndex} className="text-center">
                     <Link
-                      href={`/recipe/${meal.id}?petId=${petId}`}
+                      href={meal.category === 'custom' 
+                        ? `/profile/pet/${petId}/custom-meals/${meal.id}`
+                        : `/recipe/${meal.id}?petId=${petId}`
+                      }
                       className="block hover:text-primary-600 transition-colors mb-1"
                     >
-                      <p className="font-medium text-gray-900 text-xs leading-tight">{meal.name}</p>
+                      <p className="font-medium text-gray-900 text-xs leading-tight">
+                        {meal.name}
+                        {meal.category === 'custom' && (
+                          <span className="ml-1 text-xs text-primary-600">(Custom)</span>
+                        )}
+                      </p>
                     </Link>
                     <button
                       onClick={(e) => {
@@ -223,7 +293,7 @@ export default function MealPlanPage() {
                           .map((ing, index) => {
                             const genericName = ing.name.toLowerCase().trim();
                             const vettedProduct = VETTED_PRODUCTS[genericName];
-                            const link = vettedProduct ? vettedProduct.purchaseLink : ing.amazonLink;
+                            const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
                             if (link) {
                               // Extract ASIN from /dp/ASIN format
                               const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
@@ -242,7 +312,7 @@ export default function MealPlanPage() {
                           alert('No ingredient links available for this recipe.');
                         }
                       }}
-                      className="inline-flex items-center gap-1 text-xs bg-green-600 text-white px-1 py-0.5 rounded hover:bg-green-700 transition-colors"
+                      className="inline-flex items-center gap-1 text-xs bg-green-600 text-black px-1 py-0.5 rounded hover:bg-green-700 transition-colors"
                       title="Add all vetted ingredients to your Amazon cart"
                     >
                       <ShoppingCart size={8} />
@@ -257,10 +327,16 @@ export default function MealPlanPage() {
 
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-2">How rotation works</h3>
-          <p className="text-gray-600 text-sm">
-            We loop through every saved meal equally, then shuffle lightly to keep variety.
+          <p className="text-gray-600 text-sm mb-2">
+            We loop through every saved meal (recipes and custom meals) equally, then shuffle lightly to keep variety.
             Each day uses two different meals so {pet.name} never sees a repeat on the same day.
           </p>
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              <strong>Meals included:</strong> {savedMeals.length} saved recipe{savedMeals.length !== 1 ? 's' : ''} 
+              {customMeals.length > 0 && ` + ${customMeals.length} custom meal${customMeals.length !== 1 ? 's' : ''}`}
+            </p>
+          </div>
         </div>
       </div>
     </div>

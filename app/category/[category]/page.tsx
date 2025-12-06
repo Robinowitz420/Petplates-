@@ -213,11 +213,11 @@ export default function CategoryPage() {
                       </span>
                     </div>
                   )}
-                  {nutritionalInfo.calories && (
+                  {(nutritionalInfo as any).calories && (
                     <div>
                       <span className="font-semibold text-gray-700">Calories:</span>
                       <span className="text-gray-600 ml-2">
-                        {nutritionalInfo.calories.min}-{nutritionalInfo.calories.max} {nutritionalInfo.calories.unit}
+                        {(nutritionalInfo as any).calories.min}-{(nutritionalInfo as any).calories.max} {(nutritionalInfo as any).calories.unit}
                       </span>
                     </div>
                   )}
@@ -241,7 +241,7 @@ export default function CategoryPage() {
           <div className="lg:col-span-3">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Recommended Recipes
+                Recommended Meals
               </h2>
               <p className="text-gray-600">
                 Found {filteredRecipes.length} recipe{filteredRecipes.length !== 1 ? 's' : ''} matching your criteria
@@ -260,7 +260,7 @@ export default function CategoryPage() {
                   No recipes found matching your filters
                 </p>
                 <p className="text-gray-500 mb-6">
-                  Try adjusting your filters or browse all recipes
+                  Try adjusting your filters or browse all meals
                 </p>
                 <Link
                   href="/profile"

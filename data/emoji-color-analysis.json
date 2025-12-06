@@ -1,0 +1,3826 @@
+{
+  "analysis": {
+    "good": {
+      "amojis_001.png": {
+        "path": "images\\emojis\\amojis_001.png",
+        "avg_brightness": 198.62129720052084,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_002.png": {
+        "path": "images\\emojis\\amojis_002.png",
+        "avg_brightness": 176.57168240017361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_003.png": {
+        "path": "images\\emojis\\amojis_003.png",
+        "avg_brightness": 196.68629286024304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_006.png": {
+        "path": "images\\emojis\\amojis_006.png",
+        "avg_brightness": 195.84832085503473,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_008.png": {
+        "path": "images\\emojis\\amojis_008.png",
+        "avg_brightness": 188.2630615234375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_010.png": {
+        "path": "images\\emojis\\amojis_010.png",
+        "avg_brightness": 174.17964680989584,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_011.png": {
+        "path": "images\\emojis\\amojis_011.png",
+        "avg_brightness": 175.80075412326389,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_013.png": {
+        "path": "images\\emojis\\amojis_013.png",
+        "avg_brightness": 198.74262152777777,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_014.png": {
+        "path": "images\\emojis\\amojis_014.png",
+        "avg_brightness": 193.92898220486111,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_015.png": {
+        "path": "images\\emojis\\amojis_015.png",
+        "avg_brightness": 183.03858778211804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_017.png": {
+        "path": "images\\emojis\\amojis_017.png",
+        "avg_brightness": 181.62476942274304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_018.png": {
+        "path": "images\\emojis\\amojis_018.png",
+        "avg_brightness": 193.49494086371527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_019.png": {
+        "path": "images\\emojis\\amojis_019.png",
+        "avg_brightness": 184.49894205729166,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_022.png": {
+        "path": "images\\emojis\\amojis_022.png",
+        "avg_brightness": 193.15755208333334,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_023.png": {
+        "path": "images\\emojis\\amojis_023.png",
+        "avg_brightness": 189.35626898871527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_024.png": {
+        "path": "images\\emojis\\amojis_024.png",
+        "avg_brightness": 186.42959255642361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_025.png": {
+        "path": "images\\emojis\\amojis_025.png",
+        "avg_brightness": 194.25046115451389,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_026.png": {
+        "path": "images\\emojis\\amojis_026.png",
+        "avg_brightness": 193.63456217447916,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_030.png": {
+        "path": "images\\emojis\\amojis_030.png",
+        "avg_brightness": 187.73467339409723,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_031.png": {
+        "path": "images\\emojis\\amojis_031.png",
+        "avg_brightness": 198.05559624565973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_032.png": {
+        "path": "images\\emojis\\amojis_032.png",
+        "avg_brightness": 197.01357693142361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_033.png": {
+        "path": "images\\emojis\\amojis_033.png",
+        "avg_brightness": 198.74766710069446,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_042.png": {
+        "path": "images\\emojis\\amojis_042.png",
+        "avg_brightness": 184.44660101996527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_043.png": {
+        "path": "images\\emojis\\amojis_043.png",
+        "avg_brightness": 188.16221788194446,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_046.png": {
+        "path": "images\\emojis\\amojis_046.png",
+        "avg_brightness": 194.0338134765625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_047.png": {
+        "path": "images\\emojis\\amojis_047.png",
+        "avg_brightness": 181.53352864583334,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_048.png": {
+        "path": "images\\emojis\\amojis_048.png",
+        "avg_brightness": 185.29660373263889,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_016.png": {
+        "path": "images\\emojis\\copilot_emojis_016.png",
+        "avg_brightness": 189.15919029482296,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_024.png": {
+        "path": "images\\emojis\\copilot_emojis_024.png",
+        "avg_brightness": 196.12169088258804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_026.png": {
+        "path": "images\\emojis\\copilot_emojis_026.png",
+        "avg_brightness": 188.8505666055391,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_027.png": {
+        "path": "images\\emojis\\copilot_emojis_027.png",
+        "avg_brightness": 196.97884045704612,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_034.png": {
+        "path": "images\\emojis\\copilot_emojis_034.png",
+        "avg_brightness": 172.9025250387925,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_036.png": {
+        "path": "images\\emojis\\copilot_emojis_036.png",
+        "avg_brightness": 195.5843795551794,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_037.png": {
+        "path": "images\\emojis\\copilot_emojis_037.png",
+        "avg_brightness": 188.5146941270513,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_038.png": {
+        "path": "images\\emojis\\copilot_emojis_038.png",
+        "avg_brightness": 188.40795598815066,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_039.png": {
+        "path": "images\\emojis\\copilot_emojis_039.png",
+        "avg_brightness": 195.31734612310152,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_040.png": {
+        "path": "images\\emojis\\copilot_emojis_040.png",
+        "avg_brightness": 199.47931066911178,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_042.png": {
+        "path": "images\\emojis\\copilot_emojis_042.png",
+        "avg_brightness": 198.57610382282408,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_044.png": {
+        "path": "images\\emojis\\copilot_emojis_044.png",
+        "avg_brightness": 194.75880472092913,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_046.png": {
+        "path": "images\\emojis\\copilot_emojis_046.png",
+        "avg_brightness": 192.79950157521043,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_048.png": {
+        "path": "images\\emojis\\copilot_emojis_048.png",
+        "avg_brightness": 194.06629990125546,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_054.png": {
+        "path": "images\\emojis\\copilot_emojis_054.png",
+        "avg_brightness": 199.33709502985846,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_068.png": {
+        "path": "images\\emojis\\copilot_emojis_068.png",
+        "avg_brightness": 197.16142380213475,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_072.png": {
+        "path": "images\\emojis\\copilot_emojis_072.png",
+        "avg_brightness": 196.5593172520807,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_076.png": {
+        "path": "images\\emojis\\copilot_emojis_076.png",
+        "avg_brightness": 198.7946819015376,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_078.png": {
+        "path": "images\\emojis\\copilot_emojis_078.png",
+        "avg_brightness": 196.4806037522923,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_079.png": {
+        "path": "images\\emojis\\copilot_emojis_079.png",
+        "avg_brightness": 195.53098697512578,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_082.png": {
+        "path": "images\\emojis\\copilot_emojis_082.png",
+        "avg_brightness": 186.75497249259416,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_083.png": {
+        "path": "images\\emojis\\copilot_emojis_083.png",
+        "avg_brightness": 198.9875393802605,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_086.png": {
+        "path": "images\\emojis\\copilot_emojis_086.png",
+        "avg_brightness": 198.57690318333567,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_089.png": {
+        "path": "images\\emojis\\copilot_emojis_089.png",
+        "avg_brightness": 190.92754032068464,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_090.png": {
+        "path": "images\\emojis\\copilot_emojis_090.png",
+        "avg_brightness": 198.62561715333615,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_092.png": {
+        "path": "images\\emojis\\copilot_emojis_092.png",
+        "avg_brightness": 196.03376122631306,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_093.png": {
+        "path": "images\\emojis\\copilot_emojis_093.png",
+        "avg_brightness": 195.3771806084544,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_094.png": {
+        "path": "images\\emojis\\copilot_emojis_094.png",
+        "avg_brightness": 189.14924530963464,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_095.png": {
+        "path": "images\\emojis\\copilot_emojis_095.png",
+        "avg_brightness": 185.22478487797997,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_096.png": {
+        "path": "images\\emojis\\copilot_emojis_096.png",
+        "avg_brightness": 185.55835331734613,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_097.png": {
+        "path": "images\\emojis\\copilot_emojis_097.png",
+        "avg_brightness": 175.60516292848075,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_098.png": {
+        "path": "images\\emojis\\copilot_emojis_098.png",
+        "avg_brightness": 179.39862227864768,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_099.png": {
+        "path": "images\\emojis\\copilot_emojis_099.png",
+        "avg_brightness": 178.9321954201345,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_101.png": {
+        "path": "images\\emojis\\copilot_emojis_101.png",
+        "avg_brightness": 196.4147270418959,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_102.png": {
+        "path": "images\\emojis\\copilot_emojis_102.png",
+        "avg_brightness": 173.84431278506605,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_103.png": {
+        "path": "images\\emojis\\copilot_emojis_103.png",
+        "avg_brightness": 182.27004278929797,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_104.png": {
+        "path": "images\\emojis\\copilot_emojis_104.png",
+        "avg_brightness": 185.12434758075892,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_105.png": {
+        "path": "images\\emojis\\copilot_emojis_105.png",
+        "avg_brightness": 194.23099167724644,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_106.png": {
+        "path": "images\\emojis\\copilot_emojis_106.png",
+        "avg_brightness": 182.09110358771807,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_107.png": {
+        "path": "images\\emojis\\copilot_emojis_107.png",
+        "avg_brightness": 173.77399257064937,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_108.png": {
+        "path": "images\\emojis\\copilot_emojis_108.png",
+        "avg_brightness": 182.56145671697936,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_109.png": {
+        "path": "images\\emojis\\copilot_emojis_109.png",
+        "avg_brightness": 170.71051394178775,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "emoji_grid_010.png": {
+        "path": "images\\emojis\\emoji_grid_010.png",
+        "avg_brightness": 194.61257440476192,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      }
+    },
+    "inverted": {},
+    "other": {
+      "amojis_004.png": {
+        "path": "images\\emojis\\amojis_004.png",
+        "avg_brightness": 215.35496690538196,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_005.png": {
+        "path": "images\\emojis\\amojis_005.png",
+        "avg_brightness": 202.9366455078125,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_007.png": {
+        "path": "images\\emojis\\amojis_007.png",
+        "avg_brightness": 210.16239420572916,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_009.png": {
+        "path": "images\\emojis\\amojis_009.png",
+        "avg_brightness": 204.20185004340277,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_012.png": {
+        "path": "images\\emojis\\amojis_012.png",
+        "avg_brightness": 200.48383246527777,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_016.png": {
+        "path": "images\\emojis\\amojis_016.png",
+        "avg_brightness": 208.13163248697916,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_020.png": {
+        "path": "images\\emojis\\amojis_020.png",
+        "avg_brightness": 202.15667046440973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_021.png": {
+        "path": "images\\emojis\\amojis_021.png",
+        "avg_brightness": 207.83985731336804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_027.png": {
+        "path": "images\\emojis\\amojis_027.png",
+        "avg_brightness": 203.627197265625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_028.png": {
+        "path": "images\\emojis\\amojis_028.png",
+        "avg_brightness": 210.38214789496527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_029.png": {
+        "path": "images\\emojis\\amojis_029.png",
+        "avg_brightness": 208.35635036892361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_034.png": {
+        "path": "images\\emojis\\amojis_034.png",
+        "avg_brightness": 200.96770562065973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_035.png": {
+        "path": "images\\emojis\\amojis_035.png",
+        "avg_brightness": 210.6383056640625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_036.png": {
+        "path": "images\\emojis\\amojis_036.png",
+        "avg_brightness": 210.40469021267361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_037.png": {
+        "path": "images\\emojis\\amojis_037.png",
+        "avg_brightness": 207.99762641059027,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_038.png": {
+        "path": "images\\emojis\\amojis_038.png",
+        "avg_brightness": 219.66452365451389,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_039.png": {
+        "path": "images\\emojis\\amojis_039.png",
+        "avg_brightness": 212.54508463541666,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_040.png": {
+        "path": "images\\emojis\\amojis_040.png",
+        "avg_brightness": 208.20431857638889,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_041.png": {
+        "path": "images\\emojis\\amojis_041.png",
+        "avg_brightness": 210.48951551649304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_044.png": {
+        "path": "images\\emojis\\amojis_044.png",
+        "avg_brightness": 201.72828504774304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_045.png": {
+        "path": "images\\emojis\\amojis_045.png",
+        "avg_brightness": 204.16952853732639,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_049.png": {
+        "path": "images\\emojis\\amojis_049.png",
+        "avg_brightness": 222.85587565104166,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_050.png": {
+        "path": "images\\emojis\\amojis_050.png",
+        "avg_brightness": 207.13722059461804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_051.png": {
+        "path": "images\\emojis\\amojis_051.png",
+        "avg_brightness": 204.50193956163196,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_052.png": {
+        "path": "images\\emojis\\amojis_052.png",
+        "avg_brightness": 205.17435709635416,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_053.png": {
+        "path": "images\\emojis\\amojis_053.png",
+        "avg_brightness": 212.37216525607639,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_054.png": {
+        "path": "images\\emojis\\amojis_054.png",
+        "avg_brightness": 212.12042914496527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_055.png": {
+        "path": "images\\emojis\\amojis_055.png",
+        "avg_brightness": 218.28489854600696,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_056.png": {
+        "path": "images\\emojis\\amojis_056.png",
+        "avg_brightness": 205.349365234375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_057.png": {
+        "path": "images\\emojis\\amojis_057.png",
+        "avg_brightness": 214.87245008680554,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_058.png": {
+        "path": "images\\emojis\\amojis_058.png",
+        "avg_brightness": 220.22520616319446,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_059.png": {
+        "path": "images\\emojis\\amojis_059.png",
+        "avg_brightness": 225.11417643229166,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_060.png": {
+        "path": "images\\emojis\\amojis_060.png",
+        "avg_brightness": 207.54119194878473,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_061.png": {
+        "path": "images\\emojis\\amojis_061.png",
+        "avg_brightness": 220.14963107638889,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_062.png": {
+        "path": "images\\emojis\\amojis_062.png",
+        "avg_brightness": 208.35198296440973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_063.png": {
+        "path": "images\\emojis\\amojis_063.png",
+        "avg_brightness": 228.10679796006946,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_064.png": {
+        "path": "images\\emojis\\amojis_064.png",
+        "avg_brightness": 220.35276963975696,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_001.png": {
+        "path": "images\\emojis\\copilot_emojis_001.png",
+        "avg_brightness": 229.78066958198147,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_002.png": {
+        "path": "images\\emojis\\copilot_emojis_002.png",
+        "avg_brightness": 222.7501763295246,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_003.png": {
+        "path": "images\\emojis\\copilot_emojis_003.png",
+        "avg_brightness": 218.70672873465932,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_004.png": {
+        "path": "images\\emojis\\copilot_emojis_004.png",
+        "avg_brightness": 218.5440823811539,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_005.png": {
+        "path": "images\\emojis\\copilot_emojis_005.png",
+        "avg_brightness": 220.47688907697372,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_006.png": {
+        "path": "images\\emojis\\copilot_emojis_006.png",
+        "avg_brightness": 219.8599003150421,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_007.png": {
+        "path": "images\\emojis\\copilot_emojis_007.png",
+        "avg_brightness": 226.0322800583063,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_008.png": {
+        "path": "images\\emojis\\copilot_emojis_008.png",
+        "avg_brightness": 225.79470541214087,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_009.png": {
+        "path": "images\\emojis\\copilot_emojis_009.png",
+        "avg_brightness": 232.63915926082663,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_010.png": {
+        "path": "images\\emojis\\copilot_emojis_010.png",
+        "avg_brightness": 230.15658061785865,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_011.png": {
+        "path": "images\\emojis\\copilot_emojis_011.png",
+        "avg_brightness": 213.1843231297315,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_012.png": {
+        "path": "images\\emojis\\copilot_emojis_012.png",
+        "avg_brightness": 225.769878215075,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_013.png": {
+        "path": "images\\emojis\\copilot_emojis_013.png",
+        "avg_brightness": 209.7063760756101,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_014.png": {
+        "path": "images\\emojis\\copilot_emojis_014.png",
+        "avg_brightness": 204.61908120562373,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_015.png": {
+        "path": "images\\emojis\\copilot_emojis_015.png",
+        "avg_brightness": 218.16487986081722,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_017.png": {
+        "path": "images\\emojis\\copilot_emojis_017.png",
+        "avg_brightness": 208.21721446372314,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_018.png": {
+        "path": "images\\emojis\\copilot_emojis_018.png",
+        "avg_brightness": 210.63071895424838,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_019.png": {
+        "path": "images\\emojis\\copilot_emojis_019.png",
+        "avg_brightness": 213.16234071566276,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_020.png": {
+        "path": "images\\emojis\\copilot_emojis_020.png",
+        "avg_brightness": 223.99823670475385,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_021.png": {
+        "path": "images\\emojis\\copilot_emojis_021.png",
+        "avg_brightness": 212.07003808717732,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_022.png": {
+        "path": "images\\emojis\\copilot_emojis_022.png",
+        "avg_brightness": 200.6124512154982,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_023.png": {
+        "path": "images\\emojis\\copilot_emojis_023.png",
+        "avg_brightness": 209.9933229886679,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_025.png": {
+        "path": "images\\emojis\\copilot_emojis_025.png",
+        "avg_brightness": 205.19838247049418,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_028.png": {
+        "path": "images\\emojis\\copilot_emojis_028.png",
+        "avg_brightness": 200.57290638077774,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_029.png": {
+        "path": "images\\emojis\\copilot_emojis_029.png",
+        "avg_brightness": 204.42126298960832,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_030.png": {
+        "path": "images\\emojis\\copilot_emojis_030.png",
+        "avg_brightness": 206.75659472422063,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_031.png": {
+        "path": "images\\emojis\\copilot_emojis_031.png",
+        "avg_brightness": 214.87856773404806,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_032.png": {
+        "path": "images\\emojis\\copilot_emojis_032.png",
+        "avg_brightness": 203.5359712230216,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_033.png": {
+        "path": "images\\emojis\\copilot_emojis_033.png",
+        "avg_brightness": 205.1273804485823,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_035.png": {
+        "path": "images\\emojis\\copilot_emojis_035.png",
+        "avg_brightness": 202.11590727418064,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_041.png": {
+        "path": "images\\emojis\\copilot_emojis_041.png",
+        "avg_brightness": 216.98424789580102,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_043.png": {
+        "path": "images\\emojis\\copilot_emojis_043.png",
+        "avg_brightness": 205.02499177128885,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_045.png": {
+        "path": "images\\emojis\\copilot_emojis_045.png",
+        "avg_brightness": 205.25264494286924,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_047.png": {
+        "path": "images\\emojis\\copilot_emojis_047.png",
+        "avg_brightness": 201.433488503315,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_049.png": {
+        "path": "images\\emojis\\copilot_emojis_049.png",
+        "avg_brightness": 203.3400808764753,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_050.png": {
+        "path": "images\\emojis\\copilot_emojis_050.png",
+        "avg_brightness": 219.56084544129402,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_051.png": {
+        "path": "images\\emojis\\copilot_emojis_051.png",
+        "avg_brightness": 211.30392156862746,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_052.png": {
+        "path": "images\\emojis\\copilot_emojis_052.png",
+        "avg_brightness": 208.08635444585508,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_053.png": {
+        "path": "images\\emojis\\copilot_emojis_053.png",
+        "avg_brightness": 201.17908026519962,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_055.png": {
+        "path": "images\\emojis\\copilot_emojis_055.png",
+        "avg_brightness": 206.42643532233038,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_056.png": {
+        "path": "images\\emojis\\copilot_emojis_056.png",
+        "avg_brightness": 204.46033761226312,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_057.png": {
+        "path": "images\\emojis\\copilot_emojis_057.png",
+        "avg_brightness": 226.05880001880848,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_058.png": {
+        "path": "images\\emojis\\copilot_emojis_058.png",
+        "avg_brightness": 226.62996661494333,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_059.png": {
+        "path": "images\\emojis\\copilot_emojis_059.png",
+        "avg_brightness": 208.60577420416607,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_060.png": {
+        "path": "images\\emojis\\copilot_emojis_060.png",
+        "avg_brightness": 227.54276578737012,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_061.png": {
+        "path": "images\\emojis\\copilot_emojis_061.png",
+        "avg_brightness": 207.6966661964546,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_062.png": {
+        "path": "images\\emojis\\copilot_emojis_062.png",
+        "avg_brightness": 200.72739455494428,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_063.png": {
+        "path": "images\\emojis\\copilot_emojis_063.png",
+        "avg_brightness": 200.40988385761977,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_064.png": {
+        "path": "images\\emojis\\copilot_emojis_064.png",
+        "avg_brightness": 201.76966661964545,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_065.png": {
+        "path": "images\\emojis\\copilot_emojis_065.png",
+        "avg_brightness": 204.9372972210467,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_066.png": {
+        "path": "images\\emojis\\copilot_emojis_066.png",
+        "avg_brightness": 207.3366483283961,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_067.png": {
+        "path": "images\\emojis\\copilot_emojis_067.png",
+        "avg_brightness": 211.28650021159544,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_069.png": {
+        "path": "images\\emojis\\copilot_emojis_069.png",
+        "avg_brightness": 209.11633046503974,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_070.png": {
+        "path": "images\\emojis\\copilot_emojis_070.png",
+        "avg_brightness": 223.13981755771854,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_071.png": {
+        "path": "images\\emojis\\copilot_emojis_071.png",
+        "avg_brightness": 206.16328113979404,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_073.png": {
+        "path": "images\\emojis\\copilot_emojis_073.png",
+        "avg_brightness": 206.77556778106927,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_074.png": {
+        "path": "images\\emojis\\copilot_emojis_074.png",
+        "avg_brightness": 205.9785113086002,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_075.png": {
+        "path": "images\\emojis\\copilot_emojis_075.png",
+        "avg_brightness": 204.93231297315089,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_077.png": {
+        "path": "images\\emojis\\copilot_emojis_077.png",
+        "avg_brightness": 202.39213335214183,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_080.png": {
+        "path": "images\\emojis\\copilot_emojis_080.png",
+        "avg_brightness": 217.49471011426152,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_081.png": {
+        "path": "images\\emojis\\copilot_emojis_081.png",
+        "avg_brightness": 215.4820378990925,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_084.png": {
+        "path": "images\\emojis\\copilot_emojis_084.png",
+        "avg_brightness": 203.73082710302347,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_085.png": {
+        "path": "images\\emojis\\copilot_emojis_085.png",
+        "avg_brightness": 206.30086519020077,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_087.png": {
+        "path": "images\\emojis\\copilot_emojis_087.png",
+        "avg_brightness": 206.83152301688062,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_088.png": {
+        "path": "images\\emojis\\copilot_emojis_088.png",
+        "avg_brightness": 204.80034795692856,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_091.png": {
+        "path": "images\\emojis\\copilot_emojis_091.png",
+        "avg_brightness": 212.63297597216345,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_100.png": {
+        "path": "images\\emojis\\copilot_emojis_100.png",
+        "avg_brightness": 201.4517327314619,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_110.png": {
+        "path": "images\\emojis\\copilot_emojis_110.png",
+        "avg_brightness": 204.35585649127756,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_001.png": {
+        "path": "images\\emojis\\emoji_grid_001.png",
+        "avg_brightness": 218.28834821428572,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_002.png": {
+        "path": "images\\emojis\\emoji_grid_002.png",
+        "avg_brightness": 203.15284226190477,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_003.png": {
+        "path": "images\\emojis\\emoji_grid_003.png",
+        "avg_brightness": 222.77296130952382,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_004.png": {
+        "path": "images\\emojis\\emoji_grid_004.png",
+        "avg_brightness": 218.44011904761905,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_005.png": {
+        "path": "images\\emojis\\emoji_grid_005.png",
+        "avg_brightness": 207.91205357142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_006.png": {
+        "path": "images\\emojis\\emoji_grid_006.png",
+        "avg_brightness": 218.06458333333333,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_007.png": {
+        "path": "images\\emojis\\emoji_grid_007.png",
+        "avg_brightness": 206.8850744047619,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_008.png": {
+        "path": "images\\emojis\\emoji_grid_008.png",
+        "avg_brightness": 209.614375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_009.png": {
+        "path": "images\\emojis\\emoji_grid_009.png",
+        "avg_brightness": 218.53998511904763,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_011.png": {
+        "path": "images\\emojis\\emoji_grid_011.png",
+        "avg_brightness": 220.6496130952381,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_012.png": {
+        "path": "images\\emojis\\emoji_grid_012.png",
+        "avg_brightness": 208.4516517857143,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_013.png": {
+        "path": "images\\emojis\\emoji_grid_013.png",
+        "avg_brightness": 212.0780654761905,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_014.png": {
+        "path": "images\\emojis\\emoji_grid_014.png",
+        "avg_brightness": 214.84174107142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_015.png": {
+        "path": "images\\emojis\\emoji_grid_015.png",
+        "avg_brightness": 203.33107142857142,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_016.png": {
+        "path": "images\\emojis\\emoji_grid_016.png",
+        "avg_brightness": 223.86904761904762,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_017.png": {
+        "path": "images\\emojis\\emoji_grid_017.png",
+        "avg_brightness": 220.3032738095238,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_018.png": {
+        "path": "images\\emojis\\emoji_grid_018.png",
+        "avg_brightness": 201.90645833333335,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_019.png": {
+        "path": "images\\emojis\\emoji_grid_019.png",
+        "avg_brightness": 214.5611904761905,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_020.png": {
+        "path": "images\\emojis\\emoji_grid_020.png",
+        "avg_brightness": 212.37462797619048,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_021.png": {
+        "path": "images\\emojis\\emoji_grid_021.png",
+        "avg_brightness": 210.15056547619048,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_022.png": {
+        "path": "images\\emojis\\emoji_grid_022.png",
+        "avg_brightness": 205.63075892857142,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_023.png": {
+        "path": "images\\emojis\\emoji_grid_023.png",
+        "avg_brightness": 211.08598214285715,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_024.png": {
+        "path": "images\\emojis\\emoji_grid_024.png",
+        "avg_brightness": 231.95050595238095,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_025.png": {
+        "path": "images\\emojis\\emoji_grid_025.png",
+        "avg_brightness": 231.7440625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_026.png": {
+        "path": "images\\emojis\\emoji_grid_026.png",
+        "avg_brightness": 208.58239583333332,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_027.png": {
+        "path": "images\\emojis\\emoji_grid_027.png",
+        "avg_brightness": 223.0869642857143,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_028.png": {
+        "path": "images\\emojis\\emoji_grid_028.png",
+        "avg_brightness": 212.53513392857144,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_029.png": {
+        "path": "images\\emojis\\emoji_grid_029.png",
+        "avg_brightness": 216.16830357142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_030.png": {
+        "path": "images\\emojis\\emoji_grid_030.png",
+        "avg_brightness": 226.59715773809523,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_031.png": {
+        "path": "images\\emojis\\emoji_grid_031.png",
+        "avg_brightness": 205.27528273809523,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_032.png": {
+        "path": "images\\emojis\\emoji_grid_032.png",
+        "avg_brightness": 228.56361607142858,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_033.png": {
+        "path": "images\\emojis\\emoji_grid_033.png",
+        "avg_brightness": 230.7373363095238,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_034.png": {
+        "path": "images\\emojis\\emoji_grid_034.png",
+        "avg_brightness": 209.5792857142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_035.png": {
+        "path": "images\\emojis\\emoji_grid_035.png",
+        "avg_brightness": 229.69239583333334,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_036.png": {
+        "path": "images\\emojis\\emoji_grid_036.png",
+        "avg_brightness": 210.45543154761904,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_037.png": {
+        "path": "images\\emojis\\emoji_grid_037.png",
+        "avg_brightness": 215.1815625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_038.png": {
+        "path": "images\\emojis\\emoji_grid_038.png",
+        "avg_brightness": 217.70510416666667,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_039.png": {
+        "path": "images\\emojis\\emoji_grid_039.png",
+        "avg_brightness": 211.56409226190476,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_040.png": {
+        "path": "images\\emojis\\emoji_grid_040.png",
+        "avg_brightness": 231.6455505952381,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_041.png": {
+        "path": "images\\emojis\\emoji_grid_041.png",
+        "avg_brightness": 225.65181547619048,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_042.png": {
+        "path": "images\\emojis\\emoji_grid_042.png",
+        "avg_brightness": 209.30303571428573,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_043.png": {
+        "path": "images\\emojis\\emoji_grid_043.png",
+        "avg_brightness": 231.82855654761906,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_044.png": {
+        "path": "images\\emojis\\emoji_grid_044.png",
+        "avg_brightness": 225.54581845238096,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_045.png": {
+        "path": "images\\emojis\\emoji_grid_045.png",
+        "avg_brightness": 210.57745535714287,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_046.png": {
+        "path": "images\\emojis\\emoji_grid_046.png",
+        "avg_brightness": 213.54206845238096,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_047.png": {
+        "path": "images\\emojis\\emoji_grid_047.png",
+        "avg_brightness": 211.53467261904763,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_048.png": {
+        "path": "images\\emojis\\emoji_grid_048.png",
+        "avg_brightness": 231.24535714285713,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_049.png": {
+        "path": "images\\emojis\\emoji_grid_049.png",
+        "avg_brightness": 224.79260416666668,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_050.png": {
+        "path": "images\\emojis\\emoji_grid_050.png",
+        "avg_brightness": 201.71955357142858,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_051.png": {
+        "path": "images\\emojis\\emoji_grid_051.png",
+        "avg_brightness": 222.10761904761904,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_052.png": {
+        "path": "images\\emojis\\emoji_grid_052.png",
+        "avg_brightness": 217.7203869047619,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_053.png": {
+        "path": "images\\emojis\\emoji_grid_053.png",
+        "avg_brightness": 219.434375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_054.png": {
+        "path": "images\\emojis\\emoji_grid_054.png",
+        "avg_brightness": 219.92861607142856,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_055.png": {
+        "path": "images\\emojis\\emoji_grid_055.png",
+        "avg_brightness": 208.91726190476192,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_056.png": {
+        "path": "images\\emojis\\emoji_grid_056.png",
+        "avg_brightness": 229.61913690476192,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_057.png": {
+        "path": "images\\emojis\\emoji_grid_057.png",
+        "avg_brightness": 234.0640625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_058.png": {
+        "path": "images\\emojis\\emoji_grid_058.png",
+        "avg_brightness": 215.10589285714286,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_059.png": {
+        "path": "images\\emojis\\emoji_grid_059.png",
+        "avg_brightness": 218.81696428571428,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_060.png": {
+        "path": "images\\emojis\\emoji_grid_060.png",
+        "avg_brightness": 214.85739583333333,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_061.png": {
+        "path": "images\\emojis\\emoji_grid_061.png",
+        "avg_brightness": 214.77053571428573,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_062.png": {
+        "path": "images\\emojis\\emoji_grid_062.png",
+        "avg_brightness": 217.32985119047618,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_063.png": {
+        "path": "images\\emojis\\emoji_grid_063.png",
+        "avg_brightness": 209.97630952380953,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_064.png": {
+        "path": "images\\emojis\\emoji_grid_064.png",
+        "avg_brightness": 226.02004464285713,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      }
+    },
+    "all": {
+      "amojis_001.png": {
+        "path": "images\\emojis\\amojis_001.png",
+        "avg_brightness": 198.62129720052084,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_002.png": {
+        "path": "images\\emojis\\amojis_002.png",
+        "avg_brightness": 176.57168240017361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_003.png": {
+        "path": "images\\emojis\\amojis_003.png",
+        "avg_brightness": 196.68629286024304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_004.png": {
+        "path": "images\\emojis\\amojis_004.png",
+        "avg_brightness": 215.35496690538196,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_005.png": {
+        "path": "images\\emojis\\amojis_005.png",
+        "avg_brightness": 202.9366455078125,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_006.png": {
+        "path": "images\\emojis\\amojis_006.png",
+        "avg_brightness": 195.84832085503473,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_007.png": {
+        "path": "images\\emojis\\amojis_007.png",
+        "avg_brightness": 210.16239420572916,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_008.png": {
+        "path": "images\\emojis\\amojis_008.png",
+        "avg_brightness": 188.2630615234375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_009.png": {
+        "path": "images\\emojis\\amojis_009.png",
+        "avg_brightness": 204.20185004340277,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_010.png": {
+        "path": "images\\emojis\\amojis_010.png",
+        "avg_brightness": 174.17964680989584,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_011.png": {
+        "path": "images\\emojis\\amojis_011.png",
+        "avg_brightness": 175.80075412326389,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_012.png": {
+        "path": "images\\emojis\\amojis_012.png",
+        "avg_brightness": 200.48383246527777,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_013.png": {
+        "path": "images\\emojis\\amojis_013.png",
+        "avg_brightness": 198.74262152777777,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_014.png": {
+        "path": "images\\emojis\\amojis_014.png",
+        "avg_brightness": 193.92898220486111,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_015.png": {
+        "path": "images\\emojis\\amojis_015.png",
+        "avg_brightness": 183.03858778211804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_016.png": {
+        "path": "images\\emojis\\amojis_016.png",
+        "avg_brightness": 208.13163248697916,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_017.png": {
+        "path": "images\\emojis\\amojis_017.png",
+        "avg_brightness": 181.62476942274304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_018.png": {
+        "path": "images\\emojis\\amojis_018.png",
+        "avg_brightness": 193.49494086371527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_019.png": {
+        "path": "images\\emojis\\amojis_019.png",
+        "avg_brightness": 184.49894205729166,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_020.png": {
+        "path": "images\\emojis\\amojis_020.png",
+        "avg_brightness": 202.15667046440973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_021.png": {
+        "path": "images\\emojis\\amojis_021.png",
+        "avg_brightness": 207.83985731336804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_022.png": {
+        "path": "images\\emojis\\amojis_022.png",
+        "avg_brightness": 193.15755208333334,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_023.png": {
+        "path": "images\\emojis\\amojis_023.png",
+        "avg_brightness": 189.35626898871527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_024.png": {
+        "path": "images\\emojis\\amojis_024.png",
+        "avg_brightness": 186.42959255642361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_025.png": {
+        "path": "images\\emojis\\amojis_025.png",
+        "avg_brightness": 194.25046115451389,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_026.png": {
+        "path": "images\\emojis\\amojis_026.png",
+        "avg_brightness": 193.63456217447916,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_027.png": {
+        "path": "images\\emojis\\amojis_027.png",
+        "avg_brightness": 203.627197265625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_028.png": {
+        "path": "images\\emojis\\amojis_028.png",
+        "avg_brightness": 210.38214789496527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_029.png": {
+        "path": "images\\emojis\\amojis_029.png",
+        "avg_brightness": 208.35635036892361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_030.png": {
+        "path": "images\\emojis\\amojis_030.png",
+        "avg_brightness": 187.73467339409723,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_031.png": {
+        "path": "images\\emojis\\amojis_031.png",
+        "avg_brightness": 198.05559624565973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_032.png": {
+        "path": "images\\emojis\\amojis_032.png",
+        "avg_brightness": 197.01357693142361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_033.png": {
+        "path": "images\\emojis\\amojis_033.png",
+        "avg_brightness": 198.74766710069446,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_034.png": {
+        "path": "images\\emojis\\amojis_034.png",
+        "avg_brightness": 200.96770562065973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_035.png": {
+        "path": "images\\emojis\\amojis_035.png",
+        "avg_brightness": 210.6383056640625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_036.png": {
+        "path": "images\\emojis\\amojis_036.png",
+        "avg_brightness": 210.40469021267361,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_037.png": {
+        "path": "images\\emojis\\amojis_037.png",
+        "avg_brightness": 207.99762641059027,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_038.png": {
+        "path": "images\\emojis\\amojis_038.png",
+        "avg_brightness": 219.66452365451389,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_039.png": {
+        "path": "images\\emojis\\amojis_039.png",
+        "avg_brightness": 212.54508463541666,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_040.png": {
+        "path": "images\\emojis\\amojis_040.png",
+        "avg_brightness": 208.20431857638889,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_041.png": {
+        "path": "images\\emojis\\amojis_041.png",
+        "avg_brightness": 210.48951551649304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_042.png": {
+        "path": "images\\emojis\\amojis_042.png",
+        "avg_brightness": 184.44660101996527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_043.png": {
+        "path": "images\\emojis\\amojis_043.png",
+        "avg_brightness": 188.16221788194446,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_044.png": {
+        "path": "images\\emojis\\amojis_044.png",
+        "avg_brightness": 201.72828504774304,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_045.png": {
+        "path": "images\\emojis\\amojis_045.png",
+        "avg_brightness": 204.16952853732639,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_046.png": {
+        "path": "images\\emojis\\amojis_046.png",
+        "avg_brightness": 194.0338134765625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_047.png": {
+        "path": "images\\emojis\\amojis_047.png",
+        "avg_brightness": 181.53352864583334,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_048.png": {
+        "path": "images\\emojis\\amojis_048.png",
+        "avg_brightness": 185.29660373263889,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "amojis_049.png": {
+        "path": "images\\emojis\\amojis_049.png",
+        "avg_brightness": 222.85587565104166,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_050.png": {
+        "path": "images\\emojis\\amojis_050.png",
+        "avg_brightness": 207.13722059461804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_051.png": {
+        "path": "images\\emojis\\amojis_051.png",
+        "avg_brightness": 204.50193956163196,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_052.png": {
+        "path": "images\\emojis\\amojis_052.png",
+        "avg_brightness": 205.17435709635416,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_053.png": {
+        "path": "images\\emojis\\amojis_053.png",
+        "avg_brightness": 212.37216525607639,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_054.png": {
+        "path": "images\\emojis\\amojis_054.png",
+        "avg_brightness": 212.12042914496527,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_055.png": {
+        "path": "images\\emojis\\amojis_055.png",
+        "avg_brightness": 218.28489854600696,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_056.png": {
+        "path": "images\\emojis\\amojis_056.png",
+        "avg_brightness": 205.349365234375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_057.png": {
+        "path": "images\\emojis\\amojis_057.png",
+        "avg_brightness": 214.87245008680554,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_058.png": {
+        "path": "images\\emojis\\amojis_058.png",
+        "avg_brightness": 220.22520616319446,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_059.png": {
+        "path": "images\\emojis\\amojis_059.png",
+        "avg_brightness": 225.11417643229166,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_060.png": {
+        "path": "images\\emojis\\amojis_060.png",
+        "avg_brightness": 207.54119194878473,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_061.png": {
+        "path": "images\\emojis\\amojis_061.png",
+        "avg_brightness": 220.14963107638889,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_062.png": {
+        "path": "images\\emojis\\amojis_062.png",
+        "avg_brightness": 208.35198296440973,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_063.png": {
+        "path": "images\\emojis\\amojis_063.png",
+        "avg_brightness": 228.10679796006946,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "amojis_064.png": {
+        "path": "images\\emojis\\amojis_064.png",
+        "avg_brightness": 220.35276963975696,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_001.png": {
+        "path": "images\\emojis\\copilot_emojis_001.png",
+        "avg_brightness": 229.78066958198147,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_002.png": {
+        "path": "images\\emojis\\copilot_emojis_002.png",
+        "avg_brightness": 222.7501763295246,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_003.png": {
+        "path": "images\\emojis\\copilot_emojis_003.png",
+        "avg_brightness": 218.70672873465932,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_004.png": {
+        "path": "images\\emojis\\copilot_emojis_004.png",
+        "avg_brightness": 218.5440823811539,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_005.png": {
+        "path": "images\\emojis\\copilot_emojis_005.png",
+        "avg_brightness": 220.47688907697372,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_006.png": {
+        "path": "images\\emojis\\copilot_emojis_006.png",
+        "avg_brightness": 219.8599003150421,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_007.png": {
+        "path": "images\\emojis\\copilot_emojis_007.png",
+        "avg_brightness": 226.0322800583063,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_008.png": {
+        "path": "images\\emojis\\copilot_emojis_008.png",
+        "avg_brightness": 225.79470541214087,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_009.png": {
+        "path": "images\\emojis\\copilot_emojis_009.png",
+        "avg_brightness": 232.63915926082663,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_010.png": {
+        "path": "images\\emojis\\copilot_emojis_010.png",
+        "avg_brightness": 230.15658061785865,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_011.png": {
+        "path": "images\\emojis\\copilot_emojis_011.png",
+        "avg_brightness": 213.1843231297315,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_012.png": {
+        "path": "images\\emojis\\copilot_emojis_012.png",
+        "avg_brightness": 225.769878215075,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_013.png": {
+        "path": "images\\emojis\\copilot_emojis_013.png",
+        "avg_brightness": 209.7063760756101,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_014.png": {
+        "path": "images\\emojis\\copilot_emojis_014.png",
+        "avg_brightness": 204.61908120562373,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_015.png": {
+        "path": "images\\emojis\\copilot_emojis_015.png",
+        "avg_brightness": 218.16487986081722,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_016.png": {
+        "path": "images\\emojis\\copilot_emojis_016.png",
+        "avg_brightness": 189.15919029482296,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_017.png": {
+        "path": "images\\emojis\\copilot_emojis_017.png",
+        "avg_brightness": 208.21721446372314,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_018.png": {
+        "path": "images\\emojis\\copilot_emojis_018.png",
+        "avg_brightness": 210.63071895424838,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_019.png": {
+        "path": "images\\emojis\\copilot_emojis_019.png",
+        "avg_brightness": 213.16234071566276,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_020.png": {
+        "path": "images\\emojis\\copilot_emojis_020.png",
+        "avg_brightness": 223.99823670475385,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_021.png": {
+        "path": "images\\emojis\\copilot_emojis_021.png",
+        "avg_brightness": 212.07003808717732,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_022.png": {
+        "path": "images\\emojis\\copilot_emojis_022.png",
+        "avg_brightness": 200.6124512154982,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_023.png": {
+        "path": "images\\emojis\\copilot_emojis_023.png",
+        "avg_brightness": 209.9933229886679,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_024.png": {
+        "path": "images\\emojis\\copilot_emojis_024.png",
+        "avg_brightness": 196.12169088258804,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_025.png": {
+        "path": "images\\emojis\\copilot_emojis_025.png",
+        "avg_brightness": 205.19838247049418,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_026.png": {
+        "path": "images\\emojis\\copilot_emojis_026.png",
+        "avg_brightness": 188.8505666055391,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_027.png": {
+        "path": "images\\emojis\\copilot_emojis_027.png",
+        "avg_brightness": 196.97884045704612,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_028.png": {
+        "path": "images\\emojis\\copilot_emojis_028.png",
+        "avg_brightness": 200.57290638077774,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_029.png": {
+        "path": "images\\emojis\\copilot_emojis_029.png",
+        "avg_brightness": 204.42126298960832,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_030.png": {
+        "path": "images\\emojis\\copilot_emojis_030.png",
+        "avg_brightness": 206.75659472422063,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_031.png": {
+        "path": "images\\emojis\\copilot_emojis_031.png",
+        "avg_brightness": 214.87856773404806,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_032.png": {
+        "path": "images\\emojis\\copilot_emojis_032.png",
+        "avg_brightness": 203.5359712230216,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_033.png": {
+        "path": "images\\emojis\\copilot_emojis_033.png",
+        "avg_brightness": 205.1273804485823,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_034.png": {
+        "path": "images\\emojis\\copilot_emojis_034.png",
+        "avg_brightness": 172.9025250387925,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_035.png": {
+        "path": "images\\emojis\\copilot_emojis_035.png",
+        "avg_brightness": 202.11590727418064,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_036.png": {
+        "path": "images\\emojis\\copilot_emojis_036.png",
+        "avg_brightness": 195.5843795551794,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_037.png": {
+        "path": "images\\emojis\\copilot_emojis_037.png",
+        "avg_brightness": 188.5146941270513,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_038.png": {
+        "path": "images\\emojis\\copilot_emojis_038.png",
+        "avg_brightness": 188.40795598815066,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_039.png": {
+        "path": "images\\emojis\\copilot_emojis_039.png",
+        "avg_brightness": 195.31734612310152,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_040.png": {
+        "path": "images\\emojis\\copilot_emojis_040.png",
+        "avg_brightness": 199.47931066911178,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_041.png": {
+        "path": "images\\emojis\\copilot_emojis_041.png",
+        "avg_brightness": 216.98424789580102,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_042.png": {
+        "path": "images\\emojis\\copilot_emojis_042.png",
+        "avg_brightness": 198.57610382282408,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_043.png": {
+        "path": "images\\emojis\\copilot_emojis_043.png",
+        "avg_brightness": 205.02499177128885,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_044.png": {
+        "path": "images\\emojis\\copilot_emojis_044.png",
+        "avg_brightness": 194.75880472092913,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_045.png": {
+        "path": "images\\emojis\\copilot_emojis_045.png",
+        "avg_brightness": 205.25264494286924,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_046.png": {
+        "path": "images\\emojis\\copilot_emojis_046.png",
+        "avg_brightness": 192.79950157521043,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_047.png": {
+        "path": "images\\emojis\\copilot_emojis_047.png",
+        "avg_brightness": 201.433488503315,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_048.png": {
+        "path": "images\\emojis\\copilot_emojis_048.png",
+        "avg_brightness": 194.06629990125546,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_049.png": {
+        "path": "images\\emojis\\copilot_emojis_049.png",
+        "avg_brightness": 203.3400808764753,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_050.png": {
+        "path": "images\\emojis\\copilot_emojis_050.png",
+        "avg_brightness": 219.56084544129402,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_051.png": {
+        "path": "images\\emojis\\copilot_emojis_051.png",
+        "avg_brightness": 211.30392156862746,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_052.png": {
+        "path": "images\\emojis\\copilot_emojis_052.png",
+        "avg_brightness": 208.08635444585508,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_053.png": {
+        "path": "images\\emojis\\copilot_emojis_053.png",
+        "avg_brightness": 201.17908026519962,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_054.png": {
+        "path": "images\\emojis\\copilot_emojis_054.png",
+        "avg_brightness": 199.33709502985846,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_055.png": {
+        "path": "images\\emojis\\copilot_emojis_055.png",
+        "avg_brightness": 206.42643532233038,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_056.png": {
+        "path": "images\\emojis\\copilot_emojis_056.png",
+        "avg_brightness": 204.46033761226312,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_057.png": {
+        "path": "images\\emojis\\copilot_emojis_057.png",
+        "avg_brightness": 226.05880001880848,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_058.png": {
+        "path": "images\\emojis\\copilot_emojis_058.png",
+        "avg_brightness": 226.62996661494333,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_059.png": {
+        "path": "images\\emojis\\copilot_emojis_059.png",
+        "avg_brightness": 208.60577420416607,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_060.png": {
+        "path": "images\\emojis\\copilot_emojis_060.png",
+        "avg_brightness": 227.54276578737012,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_061.png": {
+        "path": "images\\emojis\\copilot_emojis_061.png",
+        "avg_brightness": 207.6966661964546,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_062.png": {
+        "path": "images\\emojis\\copilot_emojis_062.png",
+        "avg_brightness": 200.72739455494428,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_063.png": {
+        "path": "images\\emojis\\copilot_emojis_063.png",
+        "avg_brightness": 200.40988385761977,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_064.png": {
+        "path": "images\\emojis\\copilot_emojis_064.png",
+        "avg_brightness": 201.76966661964545,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_065.png": {
+        "path": "images\\emojis\\copilot_emojis_065.png",
+        "avg_brightness": 204.9372972210467,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_066.png": {
+        "path": "images\\emojis\\copilot_emojis_066.png",
+        "avg_brightness": 207.3366483283961,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_067.png": {
+        "path": "images\\emojis\\copilot_emojis_067.png",
+        "avg_brightness": 211.28650021159544,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_068.png": {
+        "path": "images\\emojis\\copilot_emojis_068.png",
+        "avg_brightness": 197.16142380213475,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_069.png": {
+        "path": "images\\emojis\\copilot_emojis_069.png",
+        "avg_brightness": 209.11633046503974,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_070.png": {
+        "path": "images\\emojis\\copilot_emojis_070.png",
+        "avg_brightness": 223.13981755771854,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_071.png": {
+        "path": "images\\emojis\\copilot_emojis_071.png",
+        "avg_brightness": 206.16328113979404,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_072.png": {
+        "path": "images\\emojis\\copilot_emojis_072.png",
+        "avg_brightness": 196.5593172520807,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_073.png": {
+        "path": "images\\emojis\\copilot_emojis_073.png",
+        "avg_brightness": 206.77556778106927,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_074.png": {
+        "path": "images\\emojis\\copilot_emojis_074.png",
+        "avg_brightness": 205.9785113086002,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_075.png": {
+        "path": "images\\emojis\\copilot_emojis_075.png",
+        "avg_brightness": 204.93231297315089,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_076.png": {
+        "path": "images\\emojis\\copilot_emojis_076.png",
+        "avg_brightness": 198.7946819015376,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_077.png": {
+        "path": "images\\emojis\\copilot_emojis_077.png",
+        "avg_brightness": 202.39213335214183,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_078.png": {
+        "path": "images\\emojis\\copilot_emojis_078.png",
+        "avg_brightness": 196.4806037522923,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_079.png": {
+        "path": "images\\emojis\\copilot_emojis_079.png",
+        "avg_brightness": 195.53098697512578,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_080.png": {
+        "path": "images\\emojis\\copilot_emojis_080.png",
+        "avg_brightness": 217.49471011426152,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_081.png": {
+        "path": "images\\emojis\\copilot_emojis_081.png",
+        "avg_brightness": 215.4820378990925,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_082.png": {
+        "path": "images\\emojis\\copilot_emojis_082.png",
+        "avg_brightness": 186.75497249259416,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_083.png": {
+        "path": "images\\emojis\\copilot_emojis_083.png",
+        "avg_brightness": 198.9875393802605,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_084.png": {
+        "path": "images\\emojis\\copilot_emojis_084.png",
+        "avg_brightness": 203.73082710302347,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_085.png": {
+        "path": "images\\emojis\\copilot_emojis_085.png",
+        "avg_brightness": 206.30086519020077,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_086.png": {
+        "path": "images\\emojis\\copilot_emojis_086.png",
+        "avg_brightness": 198.57690318333567,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_087.png": {
+        "path": "images\\emojis\\copilot_emojis_087.png",
+        "avg_brightness": 206.83152301688062,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_088.png": {
+        "path": "images\\emojis\\copilot_emojis_088.png",
+        "avg_brightness": 204.80034795692856,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_089.png": {
+        "path": "images\\emojis\\copilot_emojis_089.png",
+        "avg_brightness": 190.92754032068464,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_090.png": {
+        "path": "images\\emojis\\copilot_emojis_090.png",
+        "avg_brightness": 198.62561715333615,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_091.png": {
+        "path": "images\\emojis\\copilot_emojis_091.png",
+        "avg_brightness": 212.63297597216345,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_092.png": {
+        "path": "images\\emojis\\copilot_emojis_092.png",
+        "avg_brightness": 196.03376122631306,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_093.png": {
+        "path": "images\\emojis\\copilot_emojis_093.png",
+        "avg_brightness": 195.3771806084544,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_094.png": {
+        "path": "images\\emojis\\copilot_emojis_094.png",
+        "avg_brightness": 189.14924530963464,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_095.png": {
+        "path": "images\\emojis\\copilot_emojis_095.png",
+        "avg_brightness": 185.22478487797997,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_096.png": {
+        "path": "images\\emojis\\copilot_emojis_096.png",
+        "avg_brightness": 185.55835331734613,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_097.png": {
+        "path": "images\\emojis\\copilot_emojis_097.png",
+        "avg_brightness": 175.60516292848075,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_098.png": {
+        "path": "images\\emojis\\copilot_emojis_098.png",
+        "avg_brightness": 179.39862227864768,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_099.png": {
+        "path": "images\\emojis\\copilot_emojis_099.png",
+        "avg_brightness": 178.9321954201345,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_100.png": {
+        "path": "images\\emojis\\copilot_emojis_100.png",
+        "avg_brightness": 201.4517327314619,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "copilot_emojis_101.png": {
+        "path": "images\\emojis\\copilot_emojis_101.png",
+        "avg_brightness": 196.4147270418959,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_102.png": {
+        "path": "images\\emojis\\copilot_emojis_102.png",
+        "avg_brightness": 173.84431278506605,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_103.png": {
+        "path": "images\\emojis\\copilot_emojis_103.png",
+        "avg_brightness": 182.27004278929797,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_104.png": {
+        "path": "images\\emojis\\copilot_emojis_104.png",
+        "avg_brightness": 185.12434758075892,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_105.png": {
+        "path": "images\\emojis\\copilot_emojis_105.png",
+        "avg_brightness": 194.23099167724644,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_106.png": {
+        "path": "images\\emojis\\copilot_emojis_106.png",
+        "avg_brightness": 182.09110358771807,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_107.png": {
+        "path": "images\\emojis\\copilot_emojis_107.png",
+        "avg_brightness": 173.77399257064937,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_108.png": {
+        "path": "images\\emojis\\copilot_emojis_108.png",
+        "avg_brightness": 182.56145671697936,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_109.png": {
+        "path": "images\\emojis\\copilot_emojis_109.png",
+        "avg_brightness": 170.71051394178775,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "copilot_emojis_110.png": {
+        "path": "images\\emojis\\copilot_emojis_110.png",
+        "avg_brightness": 204.35585649127756,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_001.png": {
+        "path": "images\\emojis\\emoji_grid_001.png",
+        "avg_brightness": 218.28834821428572,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_002.png": {
+        "path": "images\\emojis\\emoji_grid_002.png",
+        "avg_brightness": 203.15284226190477,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_003.png": {
+        "path": "images\\emojis\\emoji_grid_003.png",
+        "avg_brightness": 222.77296130952382,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_004.png": {
+        "path": "images\\emojis\\emoji_grid_004.png",
+        "avg_brightness": 218.44011904761905,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_005.png": {
+        "path": "images\\emojis\\emoji_grid_005.png",
+        "avg_brightness": 207.91205357142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_006.png": {
+        "path": "images\\emojis\\emoji_grid_006.png",
+        "avg_brightness": 218.06458333333333,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_007.png": {
+        "path": "images\\emojis\\emoji_grid_007.png",
+        "avg_brightness": 206.8850744047619,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_008.png": {
+        "path": "images\\emojis\\emoji_grid_008.png",
+        "avg_brightness": 209.614375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_009.png": {
+        "path": "images\\emojis\\emoji_grid_009.png",
+        "avg_brightness": 218.53998511904763,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_010.png": {
+        "path": "images\\emojis\\emoji_grid_010.png",
+        "avg_brightness": 194.61257440476192,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": true
+      },
+      "emoji_grid_011.png": {
+        "path": "images\\emojis\\emoji_grid_011.png",
+        "avg_brightness": 220.6496130952381,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_012.png": {
+        "path": "images\\emojis\\emoji_grid_012.png",
+        "avg_brightness": 208.4516517857143,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_013.png": {
+        "path": "images\\emojis\\emoji_grid_013.png",
+        "avg_brightness": 212.0780654761905,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_014.png": {
+        "path": "images\\emojis\\emoji_grid_014.png",
+        "avg_brightness": 214.84174107142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_015.png": {
+        "path": "images\\emojis\\emoji_grid_015.png",
+        "avg_brightness": 203.33107142857142,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_016.png": {
+        "path": "images\\emojis\\emoji_grid_016.png",
+        "avg_brightness": 223.86904761904762,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_017.png": {
+        "path": "images\\emojis\\emoji_grid_017.png",
+        "avg_brightness": 220.3032738095238,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_018.png": {
+        "path": "images\\emojis\\emoji_grid_018.png",
+        "avg_brightness": 201.90645833333335,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_019.png": {
+        "path": "images\\emojis\\emoji_grid_019.png",
+        "avg_brightness": 214.5611904761905,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_020.png": {
+        "path": "images\\emojis\\emoji_grid_020.png",
+        "avg_brightness": 212.37462797619048,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_021.png": {
+        "path": "images\\emojis\\emoji_grid_021.png",
+        "avg_brightness": 210.15056547619048,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_022.png": {
+        "path": "images\\emojis\\emoji_grid_022.png",
+        "avg_brightness": 205.63075892857142,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_023.png": {
+        "path": "images\\emojis\\emoji_grid_023.png",
+        "avg_brightness": 211.08598214285715,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_024.png": {
+        "path": "images\\emojis\\emoji_grid_024.png",
+        "avg_brightness": 231.95050595238095,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_025.png": {
+        "path": "images\\emojis\\emoji_grid_025.png",
+        "avg_brightness": 231.7440625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_026.png": {
+        "path": "images\\emojis\\emoji_grid_026.png",
+        "avg_brightness": 208.58239583333332,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_027.png": {
+        "path": "images\\emojis\\emoji_grid_027.png",
+        "avg_brightness": 223.0869642857143,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_028.png": {
+        "path": "images\\emojis\\emoji_grid_028.png",
+        "avg_brightness": 212.53513392857144,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_029.png": {
+        "path": "images\\emojis\\emoji_grid_029.png",
+        "avg_brightness": 216.16830357142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_030.png": {
+        "path": "images\\emojis\\emoji_grid_030.png",
+        "avg_brightness": 226.59715773809523,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_031.png": {
+        "path": "images\\emojis\\emoji_grid_031.png",
+        "avg_brightness": 205.27528273809523,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_032.png": {
+        "path": "images\\emojis\\emoji_grid_032.png",
+        "avg_brightness": 228.56361607142858,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_033.png": {
+        "path": "images\\emojis\\emoji_grid_033.png",
+        "avg_brightness": 230.7373363095238,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_034.png": {
+        "path": "images\\emojis\\emoji_grid_034.png",
+        "avg_brightness": 209.5792857142857,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_035.png": {
+        "path": "images\\emojis\\emoji_grid_035.png",
+        "avg_brightness": 229.69239583333334,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_036.png": {
+        "path": "images\\emojis\\emoji_grid_036.png",
+        "avg_brightness": 210.45543154761904,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_037.png": {
+        "path": "images\\emojis\\emoji_grid_037.png",
+        "avg_brightness": 215.1815625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_038.png": {
+        "path": "images\\emojis\\emoji_grid_038.png",
+        "avg_brightness": 217.70510416666667,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_039.png": {
+        "path": "images\\emojis\\emoji_grid_039.png",
+        "avg_brightness": 211.56409226190476,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_040.png": {
+        "path": "images\\emojis\\emoji_grid_040.png",
+        "avg_brightness": 231.6455505952381,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_041.png": {
+        "path": "images\\emojis\\emoji_grid_041.png",
+        "avg_brightness": 225.65181547619048,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_042.png": {
+        "path": "images\\emojis\\emoji_grid_042.png",
+        "avg_brightness": 209.30303571428573,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_043.png": {
+        "path": "images\\emojis\\emoji_grid_043.png",
+        "avg_brightness": 231.82855654761906,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_044.png": {
+        "path": "images\\emojis\\emoji_grid_044.png",
+        "avg_brightness": 225.54581845238096,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_045.png": {
+        "path": "images\\emojis\\emoji_grid_045.png",
+        "avg_brightness": 210.57745535714287,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_046.png": {
+        "path": "images\\emojis\\emoji_grid_046.png",
+        "avg_brightness": 213.54206845238096,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_047.png": {
+        "path": "images\\emojis\\emoji_grid_047.png",
+        "avg_brightness": 211.53467261904763,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_048.png": {
+        "path": "images\\emojis\\emoji_grid_048.png",
+        "avg_brightness": 231.24535714285713,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_049.png": {
+        "path": "images\\emojis\\emoji_grid_049.png",
+        "avg_brightness": 224.79260416666668,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_050.png": {
+        "path": "images\\emojis\\emoji_grid_050.png",
+        "avg_brightness": 201.71955357142858,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_051.png": {
+        "path": "images\\emojis\\emoji_grid_051.png",
+        "avg_brightness": 222.10761904761904,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_052.png": {
+        "path": "images\\emojis\\emoji_grid_052.png",
+        "avg_brightness": 217.7203869047619,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_053.png": {
+        "path": "images\\emojis\\emoji_grid_053.png",
+        "avg_brightness": 219.434375,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_054.png": {
+        "path": "images\\emojis\\emoji_grid_054.png",
+        "avg_brightness": 219.92861607142856,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_055.png": {
+        "path": "images\\emojis\\emoji_grid_055.png",
+        "avg_brightness": 208.91726190476192,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_056.png": {
+        "path": "images\\emojis\\emoji_grid_056.png",
+        "avg_brightness": 229.61913690476192,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_057.png": {
+        "path": "images\\emojis\\emoji_grid_057.png",
+        "avg_brightness": 234.0640625,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_058.png": {
+        "path": "images\\emojis\\emoji_grid_058.png",
+        "avg_brightness": 215.10589285714286,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_059.png": {
+        "path": "images\\emojis\\emoji_grid_059.png",
+        "avg_brightness": 218.81696428571428,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_060.png": {
+        "path": "images\\emojis\\emoji_grid_060.png",
+        "avg_brightness": 214.85739583333333,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_061.png": {
+        "path": "images\\emojis\\emoji_grid_061.png",
+        "avg_brightness": 214.77053571428573,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_062.png": {
+        "path": "images\\emojis\\emoji_grid_062.png",
+        "avg_brightness": 217.32985119047618,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_063.png": {
+        "path": "images\\emojis\\emoji_grid_063.png",
+        "avg_brightness": 209.97630952380953,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      },
+      "emoji_grid_064.png": {
+        "path": "images\\emojis\\emoji_grid_064.png",
+        "avg_brightness": 226.02004464285713,
+        "has_color": true,
+        "color_variance": 255.0,
+        "likely_inverted": false,
+        "likely_good": false
+      }
+    }
+  },
+  "suggestions": {},
+  "summary": {
+    "total_images": 238,
+    "good_images": 70,
+    "inverted_images": 0,
+    "other_images": 168
+  }
+}

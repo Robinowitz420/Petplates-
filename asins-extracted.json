@@ -1,0 +1,2046 @@
+[
+  {
+    "name": "ground chicken",
+    "productName": "Fresh Is Best Freeze Dried Chicken Breast",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Freeze+Dried+Chicken+Breast&tag=robinfrench-20",
+    "asin": "B0BXZVFN6G",
+    "method": "scrape"
+  },
+  {
+    "name": "ground turkey",
+    "productName": "Diestel Free Range Ground Turkey",
+    "link": "https://www.amazon.com/s?k=Diestel+Free+Range+Ground+Turkey&tag=robinfrench-20",
+    "asin": "B091CCD4T7",
+    "method": "scrape"
+  },
+  {
+    "name": "ground beef (lean)",
+    "productName": "US Wellness Meats Pet Burger",
+    "link": "https://www.amazon.com/s?k=US+Wellness+Meats+Pet+Burger&tag=robinfrench-20",
+    "asin": "B07VHR2WNZ",
+    "method": "scrape"
+  },
+  {
+    "name": "ground lamb",
+    "productName": "Raw Paws Lamb Recipe Rolls",
+    "link": "https://www.amazon.com/s?k=Raw+Paws+Lamb+Recipe&tag=robinfrench-20",
+    "asin": "B0082C00P8",
+    "method": "scrape"
+  },
+  {
+    "name": "salmon (boneless)",
+    "productName": "A Better Treat Freeze Dried Salmon",
+    "link": "https://www.amazon.com/s?k=A+Better+Treat+Freeze+Dried+Salmon&tag=robinfrench-20",
+    "asin": "B08NCDSV82",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken breast",
+    "productName": "Bell & Evans Boneless Chicken Breast",
+    "link": "https://www.amazon.com/s?k=Bell+%26+Evans+Boneless+Chicken+Breast&tag=robinfrench-20",
+    "asin": "B0787WTY4C",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken thighs",
+    "productName": "Bell & Evans Boneless Chicken Thighs",
+    "link": "https://www.amazon.com/s?k=Bell+%26+Evans+Boneless+Chicken+Thighs&tag=robinfrench-20",
+    "asin": "B0787YFWYB",
+    "method": "scrape"
+  },
+  {
+    "name": "turkey breast",
+    "productName": "Fresh Is Best Freeze Dried Turkey Tenders",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Freeze+Dried+Turkey+Tenders&tag=robinfrench-20",
+    "asin": "B0CZRN7HXT",
+    "method": "scrape"
+  },
+  {
+    "name": "beef liver",
+    "productName": "Fresh Is Best Freeze Dried Beef Liver",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Freeze+Dried+Beef+Liver&tag=robinfrench-20",
+    "asin": "B07G3QFG8N",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken liver",
+    "productName": "Fresh Is Best Freeze Dried Chicken Livers",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Freeze+Dried+Chicken+Livers&tag=robinfrench-20",
+    "asin": "B07S8JCNTH",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken hearts",
+    "productName": "Vital Essentials Freeze Dried Chicken Hearts",
+    "link": "https://www.amazon.com/s?k=Vital+Essentials+Chicken+Hearts&tag=robinfrench-20",
+    "asin": "B0BXZ3JJL9",
+    "method": "scrape"
+  },
+  {
+    "name": "sardines (canned in water)",
+    "productName": "Wild Planet Sardines in Water No Salt",
+    "link": "https://www.amazon.com/s?k=Wild+Planet+Sardines+in+Water+No+Salt&tag=robinfrench-20",
+    "asin": "B01FUWYO2M",
+    "method": "scrape"
+  },
+  {
+    "name": "eggs",
+    "productName": "Whole Life Pet Freeze Dried Diced Eggs",
+    "link": "https://www.amazon.com/s?k=Whole+Life+Pet+Freeze+Dried+Eggs&tag=robinfrench-20",
+    "asin": "B001DY6U9M",
+    "method": "scrape"
+  },
+  {
+    "name": "turkey giblets",
+    "productName": "Vital Essentials Freeze Dried Turkey Giblets",
+    "link": "https://www.amazon.com/s?k=Vital+Essentials+Turkey+Giblets&tag=robinfrench-20",
+    "asin": "B0BXZ3JJL9",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken giblets",
+    "productName": "Fresh Is Best Freeze Dried Chicken Giblets",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Freeze+Dried+Chicken+Giblets&tag=robinfrench-20",
+    "asin": "B0BXZVFN6G",
+    "method": "scrape"
+  },
+  {
+    "name": "duck breast",
+    "productName": "Fresh Is Best Freeze Dried Duck Breast",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Freeze+Dried+Duck+Breast&tag=robinfrench-20",
+    "asin": "B01KAOGE5U",
+    "method": "scrape"
+  },
+  {
+    "name": "venison",
+    "productName": "Fresh Is Best Freeze Dried Venison Bites",
+    "link": "https://www.amazon.com/s?k=Fresh+Is+Best+Venison+Bites&tag=robinfrench-20",
+    "asin": "B07VHR2WNZ",
+    "method": "scrape"
+  },
+  {
+    "name": "rabbit meat",
+    "productName": "Evanger\\",
+    "link": "https://www.amazon.com/s?k=Evanger%27s+Rabbit+Grain+Free&tag=robinfrench-20",
+    "asin": "B0082C00P8",
+    "method": "scrape"
+  },
+  {
+    "name": "quail",
+    "productName": "Wholesome Beast Freeze Dried Quail Chicks",
+    "link": "https://www.amazon.com/s?k=Wholesome+Beast+Freeze+Dried+Quail+Chicks&tag=robinfrench-20",
+    "asin": "B0DK1SJ2Z7",
+    "method": "scrape"
+  },
+  {
+    "name": "ground pork (lean)",
+    "productName": "Momentum Freeze Dried Pork Tenderloin",
+    "link": "https://www.amazon.com/s?k=Momentum+Pork+Tenderloin+Freeze+Dried&tag=robinfrench-20",
+    "asin": "B0CLJW1P6D",
+    "method": "scrape"
+  },
+  {
+    "name": "turkey necks",
+    "productName": "Northwest Naturals Freeze Dried Turkey Necks",
+    "link": "https://www.amazon.com/s?k=Northwest+Naturals+Freeze+Dried+Turkey+Necks&tag=robinfrench-20",
+    "asin": "B0FHJ6G2NZ",
+    "method": "scrape"
+  },
+  {
+    "name": "brown rice",
+    "productName": "Lundberg Family Farms Organic Brown Rice",
+    "link": "https://www.amazon.com/s?k=Lundberg+Organic+Brown+Rice&tag=robinfrench-20",
+    "asin": "B072JNNB33",
+    "method": "scrape"
+  },
+  {
+    "name": "white rice",
+    "productName": "Nishiki Premium Medium Grain White Rice",
+    "link": "https://www.amazon.com/s?k=Nishiki+Premium+Medium+Grain+White+Rice&tag=robinfrench-20",
+    "asin": "B00IDQY2PW",
+    "method": "scrape"
+  },
+  {
+    "name": "quinoa",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s+Red+Mill+Organic+White+Quinoa&tag=robinfrench-20",
+    "asin": "B07ZJNYGW4",
+    "method": "scrape"
+  },
+  {
+    "name": "sweet potato",
+    "productName": "Farmer\\",
+    "link": "https://www.amazon.com/s?k=Farmer%27s+Market+Organic+Sweet+Potato+Puree&tag=robinfrench-20",
+    "asin": "B07D92VQ9C",
+    "method": "scrape"
+  },
+  {
+    "name": "pumpkin puree",
+    "productName": "Farmer\\",
+    "link": "https://www.amazon.com/s?k=Farmer%27s+Market+Organic+Pumpkin+Puree&tag=robinfrench-20",
+    "asin": "B0062A87HA",
+    "method": "scrape"
+  },
+  {
+    "name": "butternut squash",
+    "productName": "Farmer\\",
+    "link": "https://www.amazon.com/s?k=Farmer%27s+Market+Organic+Butternut+Squash+Puree&tag=robinfrench-20",
+    "asin": "B000HDCSTG",
+    "method": "scrape"
+  },
+  {
+    "name": "lentils",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s+Red+Mill+Organic+Red+Lentils&tag=robinfrench-20",
+    "asin": "B000VDZ2GI",
+    "method": "scrape"
+  },
+  {
+    "name": "chickpeas",
+    "productName": "Goya Organic Chickpeas No Salt",
+    "link": "https://www.amazon.com/s?k=Goya+Organic+Chickpeas+No+Salt&tag=robinfrench-20",
+    "asin": "B0BYPF1Y79",
+    "method": "scrape"
+  },
+  {
+    "name": "black beans",
+    "productName": "Eden Organic Black Beans No Salt",
+    "link": "https://www.amazon.com/s?k=Eden+Organic+Black+Beans+No+Salt&tag=robinfrench-20",
+    "asin": "B094WYT2BK",
+    "method": "scrape"
+  },
+  {
+    "name": "green peas",
+    "productName": "Nature\\",
+    "link": "https://www.amazon.com/s?k=Nature%27s+Touch+Frozen+Organic+Green+Peas&tag=robinfrench-20",
+    "asin": "B074H4SHTD",
+    "method": "scrape"
+  },
+  {
+    "name": "carrots",
+    "productName": "Nature\\",
+    "link": "https://www.amazon.com/s?k=Nature%27s+Touch+Frozen+Organic+Carrots&tag=robinfrench-20",
+    "asin": "B074H64BPW",
+    "method": "scrape"
+  },
+  {
+    "name": "spinach",
+    "productName": "Earthbound Farm Organic Spinach Frozen",
+    "link": "https://www.amazon.com/s?k=Earthbound+Farm+Organic+Spinach+Frozen&tag=robinfrench-20",
+    "asin": "B0013ABAJG",
+    "method": "scrape"
+  },
+  {
+    "name": "broccoli",
+    "productName": "Cascadian Farm Organic Broccoli Florets",
+    "link": "https://www.amazon.com/s?k=Cascadian+Farm+Organic+Broccoli+Florets&tag=robinfrench-20",
+    "asin": "B07SV522V9",
+    "method": "scrape"
+  },
+  {
+    "name": "zucchini",
+    "productName": "Nature\\",
+    "link": "https://www.amazon.com/s?k=Nature%27s+Touch+Frozen+Organic+Zucchini&tag=robinfrench-20",
+    "asin": "B07Q9WV1LY",
+    "method": "scrape"
+  },
+  {
+    "name": "kale",
+    "productName": "Earthbound Farm Organic Kale",
+    "link": "https://www.amazon.com/s?k=Earthbound+Farm+Organic+Kale&tag=robinfrench-20",
+    "asin": "B09VKDGT39",
+    "method": "scrape"
+  },
+  {
+    "name": "celery",
+    "productName": "Earthbound Farm Organic Celery",
+    "link": "https://www.amazon.com/s?k=Earthbound+Farm+Organic+Celery&tag=robinfrench-20",
+    "asin": "B09VKDGT39",
+    "method": "scrape"
+  },
+  {
+    "name": "brussels sprouts",
+    "productName": "Cascadian Farm Organic Brussels Sprouts",
+    "link": "https://www.amazon.com/s?k=Cascadian+Farm+Organic+Brussels+Sprouts&tag=robinfrench-20",
+    "asin": "B004DAQPR0",
+    "method": "scrape"
+  },
+  {
+    "name": "asparagus",
+    "productName": "Cascadian Farm Organic Asparagus Spears",
+    "link": "https://www.amazon.com/s?k=Cascadian+Farm+Organic+Asparagus&tag=robinfrench-20",
+    "asin": "B07QV5G8HY",
+    "method": "scrape"
+  },
+  {
+    "name": "parsley",
+    "productName": "McCormick Culinary Parsley Flakes",
+    "link": "https://www.amazon.com/s?k=McCormick+Culinary+Parsley+Flakes&tag=robinfrench-20",
+    "asin": "B0D8C4N4WY",
+    "method": "scrape"
+  },
+  {
+    "name": "cucumber",
+    "productName": "Nature\\",
+    "link": "https://www.amazon.com/s?k=Nature%27s+Touch+Frozen+Organic+Cucumber&tag=robinfrench-20",
+    "asin": "B001PLETDC",
+    "method": "scrape"
+  },
+  {
+    "name": "lettuce (romaine)",
+    "productName": "Organic Girl Romaine Lettuce",
+    "link": "https://www.amazon.com/s?k=Organic+Girl+Romaine+Lettuce&tag=robinfrench-20",
+    "asin": "B0F3YTY4XQ",
+    "method": "scrape"
+  },
+  {
+    "name": "arugula",
+    "productName": "Organic Girl Baby Arugula",
+    "link": "https://www.amazon.com/s?k=Organic+Girl+Baby+Arugula&tag=robinfrench-20",
+    "asin": "B00JXR8RYW",
+    "method": "scrape"
+  },
+  {
+    "name": "endive",
+    "productName": "Organic Endive Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Endive+Greens&tag=robinfrench-20",
+    "asin": "B0006L2XNK",
+    "method": "scrape"
+  },
+  {
+    "name": "escarole",
+    "productName": "Organic Escarole Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Escarole+Greens&tag=robinfrench-20",
+    "asin": "B084ZVBGQ6",
+    "method": "scrape"
+  },
+  {
+    "name": "dandelion greens",
+    "productName": "Organic Dandelion Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Dandelion+Greens&tag=robinfrench-20",
+    "asin": "B000WR4A5M",
+    "method": "scrape"
+  },
+  {
+    "name": "collard greens",
+    "productName": "Organic Collard Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Collard+Greens&tag=robinfrench-20",
+    "asin": "B000P6H23W",
+    "method": "scrape"
+  },
+  {
+    "name": "mustard greens",
+    "productName": "Organic Mustard Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Mustard+Greens&tag=robinfrench-20",
+    "asin": "B094JT2CCH",
+    "method": "scrape"
+  },
+  {
+    "name": "turnip greens",
+    "productName": "Organic Turnip Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Turnip+Greens&tag=robinfrench-20",
+    "asin": "B09HQH6WZT",
+    "method": "scrape"
+  },
+  {
+    "name": "beet greens",
+    "productName": "Organic Beet Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Beet+Greens&tag=robinfrench-20",
+    "asin": "B0F9LNFLTK",
+    "method": "scrape"
+  },
+  {
+    "name": "radish greens",
+    "productName": "Organic Radish Greens",
+    "link": "https://www.amazon.com/s?k=Organic+Radish+Greens&tag=robinfrench-20",
+    "asin": "B07CHNV4S1",
+    "method": "scrape"
+  },
+  {
+    "name": "coconut oil",
+    "productName": "Nutiva Organic Virgin Coconut Oil",
+    "link": "https://www.amazon.com/s?k=Nutiva+Organic+Virgin+Coconut+Oil&tag=robinfrench-20",
+    "asin": "B00UHCJKVG",
+    "method": "scrape"
+  },
+  {
+    "name": "olive oil",
+    "productName": "California Olive Ranch Extra Virgin Olive Oil",
+    "link": "https://www.amazon.com/s?k=California+Olive+Ranch+Extra+Virgin+Olive+Oil&tag=robinfrench-20",
+    "asin": "B00GGBLPVU",
+    "method": "scrape"
+  },
+  {
+    "name": "salmon oil",
+    "productName": "Grizzly Salmon Plus Omega-3 Oil",
+    "link": "https://www.amazon.com/s?k=Grizzly+Salmon+Plus+Omega-3+Oil&tag=robinfrench-20",
+    "asin": "B09RYYWHH1",
+    "method": "scrape"
+  },
+  {
+    "name": "flaxseed oil",
+    "productName": "Barlean\\",
+    "link": "https://www.amazon.com/s?k=Barlean%27s+Organic+Flax+Oil&tag=robinfrench-20",
+    "asin": "B002VLZ830",
+    "method": "scrape"
+  },
+  {
+    "name": "fish oil",
+    "productName": "Nordic Naturals Omega-3 Pet",
+    "link": "https://www.amazon.com/s?k=Nordic+Naturals+Omega-3+Pet&tag=robinfrench-20",
+    "asin": "B00CBY93XS",
+    "method": "scrape"
+  },
+  {
+    "name": "taurine powder",
+    "productName": "NOW Supplements Taurine Powder 8 oz",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Taurine+Powder+8+oz&tag=robinfrench-20",
+    "asin": "B00VAOKFO6",
+    "method": "scrape"
+  },
+  {
+    "name": "calcium carbonate",
+    "productName": "NOW Supplements Calcium Carbonate Powder",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Calcium+Carbonate+Powder&tag=robinfrench-20",
+    "asin": "B004421K68",
+    "method": "scrape"
+  },
+  {
+    "name": "vitamin e",
+    "productName": "Solgar Vitamin E 400 IU",
+    "link": "https://www.amazon.com/s?k=Solgar+Vitamin+E+400+IU&tag=robinfrench-20",
+    "asin": "B01I5OB3LW",
+    "method": "scrape"
+  },
+  {
+    "name": "b-complex",
+    "productName": "Thorne B-Complex #12",
+    "link": "https://www.amazon.com/s?k=Thorne+B-Complex+%2312&tag=robinfrench-20",
+    "asin": "B01INRFW0E",
+    "method": "scrape"
+  },
+  {
+    "name": "probiotic powder",
+    "productName": "Purina FortiFlora Probiotic Supplement",
+    "link": "https://www.amazon.com/s?k=Purina+FortiFlora+Probiotic+Supplement&tag=robinfrench-20",
+    "asin": "B0BGV8L7L2",
+    "method": "scrape"
+  },
+  {
+    "name": "psyllium husk",
+    "productName": "Organic India Whole Husk Psyllium",
+    "link": "https://www.amazon.com/s?k=Organic+India+Whole+Husk+Psyllium&tag=robinfrench-20",
+    "asin": "B0016AXN7A",
+    "method": "scrape"
+  },
+  {
+    "name": "joint supplement",
+    "productName": "Cosequin DS Plus MSM for Dogs",
+    "link": "https://www.amazon.com/s?k=Cosequin+DS+Plus+MSM+Dogs&tag=robinfrench-20",
+    "asin": "B003ULL1NQ",
+    "method": "scrape"
+  },
+  {
+    "name": "omega-3 capsules",
+    "productName": "Nordic Naturals Omega-3 Pet Capsules",
+    "link": "https://www.amazon.com/s?k=Nordic+Naturals+Omega-3+Pet+Capsules&tag=robinfrench-20",
+    "asin": "B004OA5XP4",
+    "method": "scrape"
+  },
+  {
+    "name": "digestive enzymes",
+    "productName": "NaturVet Digestive Enzymes Plus Probiotics",
+    "link": "https://www.amazon.com/s?k=NaturVet+Digestive+Enzymes+Plus+Probiotics&tag=robinfrench-20",
+    "asin": "B00O6FINFO",
+    "method": "scrape"
+  },
+  {
+    "name": "hairball paste",
+    "productName": "Tomlyn Laxatone Hairball Remedy",
+    "link": "https://www.amazon.com/s?k=Tomlyn+Laxatone+Hairball+Remedy&tag=robinfrench-20",
+    "asin": "B07B282MR4",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken broth",
+    "productName": "Brutus Bone Broth for Dogs No Salt",
+    "link": "https://www.amazon.com/s?k=Brutus+Bone+Broth+Dogs+No+Salt&tag=robinfrench-20",
+    "asin": "B07DFNP37Y",
+    "method": "scrape"
+  },
+  {
+    "name": "vitamin e oil",
+    "productName": "NOW Solutions Vitamin E Oil",
+    "link": "https://www.amazon.com/s?k=NOW+Solutions+Vitamin+E+Oil&tag=robinfrench-20",
+    "asin": "B0DZ5ZCC85",
+    "method": "scrape"
+  },
+  {
+    "name": "millet (white/red)",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+White+Millet+Spray&tag=robinfrench-20",
+    "asin": "B0002DH3FU",
+    "method": "scrape"
+  },
+  {
+    "name": "canary seed",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Canary+Seed&tag=robinfrench-20",
+    "asin": "B00027ZVG4",
+    "method": "scrape"
+  },
+  {
+    "name": "niger seed",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Niger+Seed&tag=robinfrench-20",
+    "asin": "B086211R4H",
+    "method": "scrape"
+  },
+  {
+    "name": "oat groats",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Oat+Groats&tag=robinfrench-20",
+    "asin": "B086211R4H",
+    "method": "scrape"
+  },
+  {
+    "name": "hemp seeds",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Hemp+Seed&tag=robinfrench-20",
+    "asin": "B086211R4H",
+    "method": "scrape"
+  },
+  {
+    "name": "flaxseeds",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Flax+Seed&tag=robinfrench-20",
+    "asin": "B00027ZVG4",
+    "method": "scrape"
+  },
+  {
+    "name": "sesame seeds",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Sesame+Seed&tag=robinfrench-20",
+    "asin": "B086211R4H",
+    "method": "scrape"
+  },
+  {
+    "name": "chia seeds",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Chia+Seed&tag=robinfrench-20",
+    "asin": "B086211R4H",
+    "method": "scrape"
+  },
+  {
+    "name": "quinoa (cooked)",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Cooked+Quinoa&tag=robinfrench-20",
+    "asin": "B001CCOVB4",
+    "method": "scrape"
+  },
+  {
+    "name": "rapeseed",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Rapeseed&tag=robinfrench-20",
+    "asin": "B00027ZVG4",
+    "method": "scrape"
+  },
+  {
+    "name": "sunflower seeds (small amounts)",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Sunflower+Seed&tag=robinfrench-20",
+    "asin": "B00027ZVG4",
+    "method": "scrape"
+  },
+  {
+    "name": "pumpkin seeds",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Pumpkin+Seed&tag=robinfrench-20",
+    "asin": "B00027ZVG4",
+    "method": "scrape"
+  },
+  {
+    "name": "bell peppers",
+    "productName": "Earthbound Farm Organic Bell Peppers",
+    "link": "https://www.amazon.com/s?k=Earthbound+Farm+Organic+Bell+Peppers&tag=robinfrench-20",
+    "asin": "B000P6J14K",
+    "method": "scrape"
+  },
+  {
+    "name": "corn (fresh)",
+    "productName": "Cascadian Farm Organic Corn on the Cob",
+    "link": "https://www.amazon.com/s?k=Cascadian+Farm+Organic+Corn+on+the+Cob&tag=robinfrench-20",
+    "asin": "B000REL738",
+    "method": "scrape"
+  },
+  {
+    "name": "apples (no seeds)",
+    "productName": "Organic Honeycrisp Apples",
+    "link": "https://www.amazon.com/s?k=Organic+Honeycrisp+Apples&tag=robinfrench-20",
+    "asin": "B00AR0TG44",
+    "method": "scrape"
+  },
+  {
+    "name": "blueberries",
+    "productName": "Driscoll\\",
+    "link": "https://www.amazon.com/s?k=Driscoll%27s+Organic+Blueberries&tag=robinfrench-20",
+    "asin": "B07Z568Y3N",
+    "method": "scrape"
+  },
+  {
+    "name": "strawberries",
+    "productName": "Driscoll\\",
+    "link": "https://www.amazon.com/s?k=Driscoll%27s+Organic+Strawberries&tag=robinfrench-20",
+    "asin": "B002B8Z98W",
+    "method": "scrape"
+  },
+  {
+    "name": "mango",
+    "productName": "Organic Mango",
+    "link": "https://www.amazon.com/s?k=Organic+Mango&tag=robinfrench-20",
+    "asin": "B00WM6CHFQ",
+    "method": "scrape"
+  },
+  {
+    "name": "banana",
+    "productName": "Organic Bananas",
+    "link": "https://www.amazon.com/s?k=Organic+Bananas&tag=robinfrench-20",
+    "asin": "B07ZLFKBFD",
+    "method": "scrape"
+  },
+  {
+    "name": "grapes (chopped)",
+    "productName": "Organic Red Seedless Grapes",
+    "link": "https://www.amazon.com/s?k=Organic+Red+Seedless+Grapes&tag=robinfrench-20",
+    "asin": "B000RGYJI6",
+    "method": "scrape"
+  },
+  {
+    "name": "papaya",
+    "productName": "Organic Papaya",
+    "link": "https://www.amazon.com/s?k=Organic+Papaya&tag=robinfrench-20",
+    "asin": "B07FZ159ZB",
+    "method": "scrape"
+  },
+  {
+    "name": "melon",
+    "productName": "Organic Cantaloupe Melon",
+    "link": "https://www.amazon.com/s?k=Organic+Cantaloupe+Melon&tag=robinfrench-20",
+    "asin": "B000NSGULC",
+    "method": "scrape"
+  },
+  {
+    "name": "egg (hard-boiled)",
+    "productName": "Vital Essentials Freeze Dried Egg Yolk Treats",
+    "link": "https://www.amazon.com/s?k=Vital+Essentials+Freeze+Dried+Egg+Yolk&tag=robinfrench-20",
+    "asin": "B0BWBNT8JX",
+    "method": "scrape"
+  },
+  {
+    "name": "pellets (fortified)",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Pellets&tag=robinfrench-20",
+    "asin": "B086211R4H",
+    "method": "scrape"
+  },
+  {
+    "name": "cuttlebone",
+    "productName": "Lafeber\\",
+    "link": "https://www.amazon.com/s?k=Lafeber%27s+Parrot+Food+Cuttlebone&tag=robinfrench-20",
+    "asin": "B00027ZVG4",
+    "method": "scrape"
+  },
+  {
+    "name": "honey (tiny amounts)",
+    "productName": "Local Raw Honey",
+    "link": "https://www.amazon.com/s?k=Local+Raw+Honey&tag=robinfrench-20",
+    "asin": "B0791X9GSG",
+    "method": "scrape"
+  },
+  {
+    "name": "peanut butter (unsalted, tiny amounts)",
+    "productName": "Teddie All Natural Peanut Butter",
+    "link": "https://www.amazon.com/s?k=Teddie+All+Natural+Peanut+Butter&tag=robinfrench-20",
+    "asin": "B06ZXZ3JPZ",
+    "method": "scrape"
+  },
+  {
+    "name": "dubia roaches",
+    "productName": "Josh\\",
+    "link": "https://www.amazon.com/s?k=Josh%27s+Frogs+Dubia+Roaches&tag=robinfrench-20",
+    "asin": "B09QD6PBB8",
+    "method": "scrape"
+  },
+  {
+    "name": "crickets",
+    "productName": "Fluker\\",
+    "link": "https://www.amazon.com/s?k=Fluker%27s+Live+Crickets&tag=robinfrench-20",
+    "asin": "B000YFGS52",
+    "method": "scrape"
+  },
+  {
+    "name": "mealworms",
+    "productName": "Fluker\\",
+    "link": "https://www.amazon.com/s?k=Fluker%27s+Freeze+Dried+Mealworms&tag=robinfrench-20",
+    "asin": "B07TKDYMMP",
+    "method": "scrape"
+  },
+  {
+    "name": "superworms",
+    "productName": "Josh\\",
+    "link": "https://www.amazon.com/s?k=Josh%27s+Frogs+Superworms&tag=robinfrench-20",
+    "asin": "B01018SX5Y",
+    "method": "scrape"
+  },
+  {
+    "name": "black soldier fly larvae",
+    "productName": "Grubblies Black Soldier Fly Larvae",
+    "link": "https://www.amazon.com/s?k=Grubblies+Black+Soldier+Fly+Larvae&tag=robinfrench-20",
+    "asin": "B0BLZ88Q3R",
+    "method": "scrape"
+  },
+  {
+    "name": "hornworms",
+    "productName": "Josh\\",
+    "link": "https://www.amazon.com/s?k=Josh%27s+Frogs+Hornworms&tag=robinfrench-20",
+    "asin": "B09Y4RTNK9",
+    "method": "scrape"
+  },
+  {
+    "name": "acorn squash",
+    "productName": "Organic Acorn Squash",
+    "link": "https://www.amazon.com/s?k=Organic+Acorn+Squash&tag=robinfrench-20",
+    "asin": "B07FZ34ZS4",
+    "method": "scrape"
+  },
+  {
+    "name": "figs",
+    "productName": "Organic Dried Figs",
+    "link": "https://www.amazon.com/s?k=Organic+Dried+Figs&tag=robinfrench-20",
+    "asin": "B08MDKF98D",
+    "method": "scrape"
+  },
+  {
+    "name": "timothy hay",
+    "productName": "Oxbow Animal Health Western Timothy Hay",
+    "link": "https://www.amazon.com/s?k=Oxbow+Animal+Health+Western+Timothy+Hay&tag=robinfrench-20",
+    "asin": "B006AYMMRY",
+    "method": "scrape"
+  },
+  {
+    "name": "meadow hay",
+    "productName": "Small Pet Select Meadow Hay",
+    "link": "https://www.amazon.com/s?k=Small+Pet+Select+Meadow+Hay&tag=robinfrench-20",
+    "asin": "B07CJ2FRNC",
+    "method": "scrape"
+  },
+  {
+    "name": "orchard grass hay",
+    "productName": "Oxbow Animal Health Orchard Grass Hay",
+    "link": "https://www.amazon.com/s?k=Oxbow+Animal+Health+Orchard+Grass+Hay&tag=robinfrench-20",
+    "asin": "B00S6Y8MHU",
+    "method": "scrape"
+  },
+  {
+    "name": "alfalfa hay",
+    "productName": "Kaytee Natural Alfalfa Hay",
+    "link": "https://www.amazon.com/s?k=Kaytee+Natural+Alfalfa+Hay&tag=robinfrench-20",
+    "asin": "B0CM34Z4BQ",
+    "method": "scrape"
+  },
+  {
+    "name": "romaine lettuce",
+    "productName": "Organic Girl Romaine Lettuce",
+    "link": "https://www.amazon.com/s?k=Organic+Girl+Romaine+Lettuce&tag=robinfrench-20",
+    "asin": "B0F3YTY4XQ",
+    "method": "scrape"
+  },
+  {
+    "name": "cilantro",
+    "productName": "Organic Cilantro",
+    "link": "https://www.amazon.com/s?k=Organic+Cilantro&tag=robinfrench-20",
+    "asin": "B07M9FWTRC",
+    "method": "scrape"
+  },
+  {
+    "name": "basil",
+    "productName": "Organic Basil",
+    "link": "https://www.amazon.com/s?k=Organic+Basil&tag=robinfrench-20",
+    "asin": "B097F282FC",
+    "method": "scrape"
+  },
+  {
+    "name": "duck hearts",
+    "productName": "Vital Essentials Freeze Dried Duck Hearts",
+    "link": "https://www.amazon.com/s?k=Vital%20Essentials%20freeze%20dried%20duck%20hearts&tag=robinfrench-20",
+    "asin": "B0BWBNT8JX",
+    "method": "scrape"
+  },
+  {
+    "name": "lamb liver",
+    "productName": "Stella & Chewy\\",
+    "link": "https://www.amazon.com/s?k=freeze%20dried%20lamb%20liver%20Stella%20%26%20Chewy%27s&tag=robinfrench-20",
+    "asin": "B0015G862M",
+    "method": "scrape"
+  },
+  {
+    "name": "duck liver",
+    "productName": "Vital Essentials Freeze Dried Duck Liver",
+    "link": "https://www.amazon.com/s?k=freeze%20dried%20duck%20liver%20Vital%20Essentials&tag=robinfrench-20",
+    "asin": "B0BWBV5PRJ",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken necks",
+    "productName": "Raw Paws Pet Food Raw Chicken Necks",
+    "link": "https://www.amazon.com/s?k=Raw%20Paws%20Pet%20Food%20raw%20chicken%20necks&tag=robinfrench-20",
+    "asin": "B0821PF71M",
+    "method": "scrape"
+  },
+  {
+    "name": "turkey thighs",
+    "productName": "Boneless Skinless Turkey Thighs",
+    "link": "https://www.amazon.com/s?k=boneless%20skinless%20turkey%20thighs&tag=robinfrench-20",
+    "asin": "B00AR100NE",
+    "method": "scrape"
+  },
+  {
+    "name": "ground duck",
+    "productName": "Raw Paws Pet Food Raw Ground Duck",
+    "link": "https://www.amazon.com/s?k=raw%20ground%20duck%20pet%20food&tag=robinfrench-20",
+    "asin": "B0BY3CNR3Q",
+    "method": "scrape"
+  },
+  {
+    "name": "ground lamb (lean)",
+    "productName": "Lean Ground Lamb Meat",
+    "link": "https://www.amazon.com/s?k=lean%20ground%20lamb%20meat&tag=robinfrench-20",
+    "asin": "B088Y2N6WC",
+    "method": "scrape"
+  },
+  {
+    "name": "ground herring",
+    "productName": "K9 Natural Hoki Fish Blend",
+    "link": "https://www.amazon.com/s?k=K9%20Natural%20Hoki%20fish%20blend&tag=robinfrench-20",
+    "asin": "B00B3G89MQ",
+    "method": "scrape"
+  },
+  {
+    "name": "ground mackerel",
+    "productName": "Northwest Naturals Raw Fish Blend",
+    "link": "https://www.amazon.com/s?k=Northwest%20Naturals%20raw%20fish%20blend&tag=robinfrench-20",
+    "asin": "B079Z4MZTG",
+    "method": "scrape"
+  },
+  {
+    "name": "mackerel (canned)",
+    "productName": "Wild Planet Canned Mackerel",
+    "link": "https://www.amazon.com/s?k=Wild%20Planet%20canned%20mackerel%20no%20salt&tag=robinfrench-20",
+    "asin": "B017J9X8IA",
+    "method": "scrape"
+  },
+  {
+    "name": "herring (canned)",
+    "productName": "Crown Prince Canned Herring",
+    "link": "https://www.amazon.com/s?k=canned%20herring%20no%20salt%20in%20water%20Crown%20Prince&tag=robinfrench-20",
+    "asin": "B01FUWYO2M",
+    "method": "scrape"
+  },
+  {
+    "name": "chicken sausage (no additives)",
+    "productName": "Applegate Naturals Chicken Sausage",
+    "link": "https://www.amazon.com/s?k=Applegate%20Naturals%20chicken%20sausage%20no%20nitrates&tag=robinfrench-20",
+    "asin": "B001JO4O80",
+    "method": "scrape"
+  },
+  {
+    "name": "turkey sausage (no additives)",
+    "productName": "Applegate Naturals Turkey Sausage",
+    "link": "https://www.amazon.com/s?k=Applegate%20turkey%20sausage%20no%20sugar%20no%20nitrates&tag=robinfrench-20",
+    "asin": "B00I2VLI5A",
+    "method": "scrape"
+  },
+  {
+    "name": "ground pork (lean, small amounts)",
+    "productName": "Lean Ground Pork",
+    "link": "https://www.amazon.com/s?k=lean%20ground%20pork%20for%20human%20consumption&tag=robinfrench-20",
+    "asin": "B01H0AI6J4",
+    "method": "scrape"
+  },
+  {
+    "name": "regular potato",
+    "productName": "Fresh Russet Potatoes",
+    "link": "https://www.amazon.com/s?k=fresh%20russet%20potatoes&tag=robinfrench-20",
+    "asin": "B09SHBJWBR",
+    "method": "scrape"
+  },
+  {
+    "name": "walnut oil",
+    "productName": "La Tourangelle Walnut Oil",
+    "link": "https://www.amazon.com/s?k=La%20Tourangelle%20walnut%20oil%20cold%20pressed&tag=robinfrench-20",
+    "asin": "B00QGWLZ3C",
+    "method": "scrape"
+  },
+  {
+    "name": "black currant oil",
+    "productName": "NOW Foods Black Currant Seed Oil",
+    "link": "https://www.amazon.com/s?k=black%20currant%20seed%20oil%20NOW%20Foods&tag=robinfrench-20",
+    "asin": "B01FXEM0BY",
+    "method": "scrape"
+  },
+  {
+    "name": "almond oil",
+    "productName": "Viva Naturals Sweet Almond Oil",
+    "link": "https://www.amazon.com/s?k=Viva%20Naturals%20sweet%20almond%20oil%20cold%20pressed%20edible&tag=robinfrench-20",
+    "asin": "B0BXMMDNJ8",
+    "method": "scrape"
+  },
+  {
+    "name": "sunflower oil",
+    "productName": "High Oleic Sunflower Oil Cold Pressed",
+    "link": "https://www.amazon.com/s?k=high%20oleic%20sunflower%20oil%20cold%20pressed&tag=robinfrench-20",
+    "asin": "B00MNTRVPS",
+    "method": "scrape"
+  },
+  {
+    "name": "chia seed oil",
+    "productName": "Healthworks Organic Chia Seed Oil",
+    "link": "https://www.amazon.com/s?k=organic%20chia%20seed%20oil%20Healthworks&tag=robinfrench-20",
+    "asin": "B00WM6CHFQ",
+    "method": "scrape"
+  },
+  {
+    "name": "herring oil",
+    "productName": "Nordic Naturals Pet Herring Oil",
+    "link": "https://www.amazon.com/s?k=Nordic%20Naturals%20pet%20herring%20oil&tag=robinfrench-20",
+    "asin": "B00CBY93XS",
+    "method": "scrape"
+  },
+  {
+    "name": "anchovy oil",
+    "productName": "Carlson Labs Fish Oil Anchovy",
+    "link": "https://www.amazon.com/s?k=Carlson%20Labs%20fish%20oil%20anchovy&tag=robinfrench-20",
+    "asin": "B0FDNB2DVS",
+    "method": "scrape"
+  },
+  {
+    "name": "evening primrose oil",
+    "productName": "Nature\\",
+    "link": "https://www.amazon.com/s?k=evening%20primrose%20oil%20supplement%20Nature%27s%20Way&tag=robinfrench-20",
+    "asin": "B07FPBQ31W",
+    "method": "scrape"
+  },
+  {
+    "name": "mackerel oil",
+    "productName": "Jarrow Formulas Fish Oil Supplement",
+    "link": "https://www.amazon.com/s?k=Jarrow%20Formulas%20fish%20oil%20supplement&tag=robinfrench-20",
+    "asin": "B01NBTJFJB",
+    "method": "scrape"
+  },
+  {
+    "name": "sardine oil",
+    "productName": "Zesty Paws Sardine Oil for Dogs",
+    "link": "https://www.amazon.com/s?k=Zesty%20Paws%20sardine%20oil%20for%20dogs&tag=robinfrench-20",
+    "asin": "B0CXKHT5K2",
+    "method": "scrape"
+  },
+  {
+    "name": "borage oil",
+    "productName": "NOW Foods Borage Oil Softgels",
+    "link": "https://www.amazon.com/s?k=borage%20oil%20softgels%20NOW%20Foods&tag=robinfrench-20",
+    "asin": "B01FXEM0BY",
+    "method": "scrape"
+  },
+  {
+    "name": "sesame oil",
+    "productName": "Spectrum Cold Pressed Sesame Oil",
+    "link": "https://www.amazon.com/s?k=cold%20pressed%20sesame%20oil%20Spectrum&tag=robinfrench-20",
+    "asin": "B0797GTG2C",
+    "method": "scrape"
+  },
+  {
+    "name": "avocado oil",
+    "productName": "Chosen Foods Pure Avocado Oil",
+    "link": "https://www.amazon.com/s?k=Chosen%20Foods%20avocado%20oil%20pure&tag=robinfrench-20",
+    "asin": "B0C3WCRNPN",
+    "method": "scrape"
+  },
+  {
+    "name": "avocado oil (tiny amounts)",
+    "productName": "Chosen Foods Pure Avocado Oil",
+    "link": "https://www.amazon.com/s?k=Chosen%20Foods%20avocado%20oil%20pure&tag=robinfrench-20",
+    "asin": "B0C3WCRNPN",
+    "method": "scrape"
+  },
+  {
+    "name": "wheat germ oil",
+    "productName": "NOW Foods Wheat Germ Oil Liquid",
+    "link": "https://www.amazon.com/s?k=wheat%20germ%20oil%20liquid%20NOW%20Foods%20edible&tag=robinfrench-20",
+    "asin": "B001GAOHK2",
+    "method": "scrape"
+  },
+  {
+    "name": "krill oil",
+    "productName": "Kori Krill Oil Pure Supplement",
+    "link": "https://www.amazon.com/s?k=Kori%20Krill%20Oil%20pure%20supplement&tag=robinfrench-20",
+    "asin": "B004HIQ9CY",
+    "method": "scrape"
+  },
+  {
+    "name": "algae oil (dha)",
+    "productName": "Nordic Naturals Algae Omega DHA",
+    "link": "https://www.amazon.com/s?k=Nordic%20Naturals%20Algae%20Omega%20DHA&tag=robinfrench-20",
+    "asin": "B079J5YZSS",
+    "method": "scrape"
+  },
+  {
+    "name": "omega-3 oil",
+    "productName": "Grizzly Salmon Oil for Pets",
+    "link": "https://www.amazon.com/s?k=Grizzly%20Salmon%20Oil%20for%20pets&tag=robinfrench-20",
+    "asin": "B09RYYWHH1",
+    "method": "scrape"
+  },
+  {
+    "name": "kelp powder",
+    "productName": "NOW Foods Organic Kelp Powder",
+    "link": "https://www.amazon.com/s?k=NOW%20Foods%20organic%20kelp%20powder&tag=robinfrench-20",
+    "asin": "B0002JG1GG",
+    "method": "scrape"
+  },
+  {
+    "name": "joint health powder",
+    "productName": "Nutramax Dasuquin Joint Health Powder",
+    "link": "https://www.amazon.com/s?k=Dasuquin%20joint%20health%20powder%20for%20pets&tag=robinfrench-20",
+    "asin": "B00PXK1G50",
+    "method": "scrape"
+  },
+  {
+    "name": "amino acid supplement",
+    "productName": "Purina Pro Plan Amino Acid Supplement",
+    "link": "https://www.amazon.com/s?k=Purina%20Pro%20Plan%20amino%20acid%20supplement&tag=robinfrench-20",
+    "asin": "B0C2JFLZHF",
+    "method": "scrape"
+  },
+  {
+    "name": "calcium supplement",
+    "productName": "Thomas Labs Calcium Carbonate Powder",
+    "link": "https://www.amazon.com/s?k=calcium%20carbonate%20powder%20unflavored%20Thomas%20Labs&tag=robinfrench-20",
+    "asin": "B0CKNK682W",
+    "method": "scrape"
+  },
+  {
+    "name": "spirulina powder",
+    "productName": "Vimergy Organic Spirulina Powder",
+    "link": "https://www.amazon.com/s?k=organic%20spirulina%20powder%20Vimergy%20high%20purity&tag=robinfrench-20",
+    "asin": "B08S4982CC",
+    "method": "scrape"
+  },
+  {
+    "name": "electrolyte powder",
+    "productName": "ReptoBoost Electrolyte Powder",
+    "link": "https://www.amazon.com/s?k=ReptoBoost%20electrolyte%20powder%20for%20reptiles&tag=robinfrench-20",
+    "asin": "B0FMZHN6M1",
+    "method": "scrape"
+  },
+  {
+    "name": "vitamin d3 drops",
+    "productName": "Ddrops Liquid Vitamin D3 Drops",
+    "link": "https://www.amazon.com/s?k=Vitamin%20D3%20drops%201000%20IU%20Ddrops&tag=robinfrench-20",
+    "asin": "B0062QD5LM",
+    "method": "scrape"
+  },
+  {
+    "name": "s yeast",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=brewer%27s%20yeast%20flakes%20unfortified%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B084JL2R77",
+    "method": "scrape"
+  },
+  {
+    "name": "buckwheat",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20raw%20hulled%20buckwheat%20groats&tag=robinfrench-20",
+    "asin": "B00KQ17MDG",
+    "method": "scrape"
+  },
+  {
+    "name": "buckwheat (tiny amounts)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20raw%20hulled%20buckwheat%20groats&tag=robinfrench-20",
+    "asin": "B00KQ17MDG",
+    "method": "scrape"
+  },
+  {
+    "name": "buckwheat (hulled)",
+    "productName": "Anthony\\",
+    "link": "https://www.amazon.com/s?k=hulled%20buckwheat%20groats%20Anthony%27s%20Goods&tag=robinfrench-20",
+    "asin": "B0D15QDVW7",
+    "method": "scrape"
+  },
+  {
+    "name": "sorghum",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=whole%20grain%20sorghum%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B0FKBVN6XP",
+    "method": "scrape"
+  },
+  {
+    "name": "barley",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20hulled%20barley%20grain&tag=robinfrench-20",
+    "asin": "B0D481997Z",
+    "method": "scrape"
+  },
+  {
+    "name": "barley (cooked, minimal)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20hulled%20barley%20grain&tag=robinfrench-20",
+    "asin": "B00QKP257A",
+    "method": "scrape"
+  },
+  {
+    "name": "barley (hulled)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20hulled%20barley%20grain&tag=robinfrench-20",
+    "asin": "B00QKP257A",
+    "method": "scrape"
+  },
+  {
+    "name": "millet",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=whole%20grain%20millet%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B0FKBVN6XP",
+    "method": "scrape"
+  },
+  {
+    "name": "millet (tiny amounts)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=whole%20grain%20millet%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B07XPCWYP2",
+    "method": "scrape"
+  },
+  {
+    "name": "farro",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20farro%20grain&tag=robinfrench-20",
+    "asin": "B0FKBVN6XP",
+    "method": "scrape"
+  },
+  {
+    "name": "bulgur",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=fine%20bulgur%20wheat%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B081DQ5NG5",
+    "method": "scrape"
+  },
+  {
+    "name": "amaranth (tiny amounts)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=whole%20grain%20amaranth%20seed%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B000V1O40U",
+    "method": "scrape"
+  },
+  {
+    "name": "amaranth seeds",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=whole%20grain%20amaranth%20seed%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B000V1O40U",
+    "method": "scrape"
+  },
+  {
+    "name": "teff seeds",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s%20Red%20Mill%20whole%20grain%20teff%20seeds&tag=robinfrench-20",
+    "asin": "B0FKBVN6XP",
+    "method": "scrape"
+  },
+  {
+    "name": "wheat (hulled)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=whole%20hulled%20wheat%20berries%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B000YFB5NC",
+    "method": "scrape"
+  },
+  {
+    "name": "oat bran (small amounts)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=pure%20oat%20bran%20cereal%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B07CC9RF6Y",
+    "method": "scrape"
+  },
+  {
+    "name": "oatmeal (cooked, small amounts)",
+    "productName": "Quaker Rolled Oats Old Fashioned",
+    "link": "https://www.amazon.com/s?k=Quaker%20rolled%20oats%20old%20fashioned&tag=robinfrench-20",
+    "asin": "B00CTLAIH8",
+    "method": "scrape"
+  },
+  {
+    "name": "corn (cracked)",
+    "productName": "Scratch and Peck Cracked Corn Non-GMO",
+    "link": "https://www.amazon.com/s?k=Scratch%20and%20Peck%20cracked%20corn%20non-gmo&tag=robinfrench-20",
+    "asin": "B01HHGD81C",
+    "method": "scrape"
+  },
+  {
+    "name": "safflower seeds",
+    "productName": "Wagner\\",
+    "link": "https://www.amazon.com/s?k=pure%20safflower%20seed%20bird%20food%20Wagner%27s&tag=robinfrench-20",
+    "asin": "B0FWLFGG21",
+    "method": "scrape"
+  },
+  {
+    "name": "nyjer seeds",
+    "productName": "Wagner\\",
+    "link": "https://www.amazon.com/s?k=nyjer%20seed%20bird%20food%20Kaytee&tag=robinfrench-20",
+    "asin": "B0D6688V7C",
+    "method": "scrape"
+  },
+  {
+    "name": "bok choi",
+    "productName": "Fresh Baby Bok Choy",
+    "link": "https://www.amazon.com/s?k=fresh%20baby%20bok%20choy&tag=robinfrench-20",
+    "asin": "B0FN4YGSK6",
+    "method": "scrape"
+  },
+  {
+    "name": "bok choy (small amounts)",
+    "productName": "Fresh Baby Bok Choy",
+    "link": "https://www.amazon.com/s?k=fresh%20baby%20bok%20choy&tag=robinfrench-20",
+    "asin": "B0FN4YGSK6",
+    "method": "scrape"
+  },
+  {
+    "name": "navy beans (mashed)",
+    "productName": "Goya Canned Navy Beans Low Sodium",
+    "link": "https://www.amazon.com/s?k=canned%20navy%20beans%20low%20sodium%20Goya&tag=robinfrench-20",
+    "asin": "B006AZE13G",
+    "method": "scrape"
+  },
+  {
+    "name": "kidney beans (mashed)",
+    "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+    "link": "https://www.amazon.com/s?k=canned%20dark%20red%20kidney%20beans%20low%20sodium&tag=robinfrench-20",
+    "asin": "B00552005I",
+    "method": "scrape"
+  },
+  {
+    "name": "kidney beans (mashed, tiny amounts)",
+    "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+    "link": "https://www.amazon.com/s?k=canned%20dark%20red%20kidney%20beans%20low%20sodium&tag=robinfrench-20",
+    "asin": "B00552005I",
+    "method": "scrape"
+  },
+  {
+    "name": "pinto beans (mashed)",
+    "productName": "Bush\\",
+    "link": "https://www.amazon.com/s?k=canned%20pinto%20beans%20low%20sodium%20Bush%27s&tag=robinfrench-20",
+    "asin": "B0C4G2PR58",
+    "method": "scrape"
+  },
+  {
+    "name": "purslane",
+    "productName": "Fresh Purslane Leaves",
+    "link": "https://www.amazon.com/s?k=fresh%20purslane%20leaves&tag=robinfrench-20",
+    "asin": "B09MDXM2YQ",
+    "method": "scrape"
+  },
+  {
+    "name": "purslane (small amounts)",
+    "productName": "Fresh Purslane Leaves",
+    "link": "https://www.amazon.com/s?k=fresh%20purslane%20leaves&tag=robinfrench-20",
+    "asin": "B0BWY8JWVL",
+    "method": "scrape"
+  },
+  {
+    "name": "s lettuce",
+    "productName": "Miner\\",
+    "link": "https://www.amazon.com/s?k=miner%27s%20lettuce%20seeds%20for%20planting&tag=robinfrench-20",
+    "asin": "B0D3J7FZFD",
+    "method": "scrape"
+  },
+  {
+    "name": "flaxseed (ground)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=organic%20ground%20flaxseed%20meal%20Bob%27s%20Red%20Mill&tag=robinfrench-20",
+    "asin": "B075XC6C69",
+    "method": "scrape"
+  },
+  {
+    "name": "fennel",
+    "productName": "Fresh Fennel Bulb",
+    "link": "https://www.amazon.com/s?k=fresh%20fennel%20bulb&tag=robinfrench-20",
+    "asin": "B00E3J6RC4",
+    "method": "scrape"
+  },
+  {
+    "name": "delicata squash",
+    "productName": "Fresh Delicata Squash",
+    "link": "https://www.amazon.com/s?k=fresh%20delicata%20squash&tag=robinfrench-20",
+    "asin": "B07KHH8K4L",
+    "method": "scrape"
+  },
+  {
+    "name": "yellow squash",
+    "productName": "Fresh Yellow Summer Squash",
+    "link": "https://www.amazon.com/s?k=fresh%20yellow%20summer%20squash&tag=robinfrench-20",
+    "asin": "B08QVBFGDC",
+    "method": "scrape"
+  },
+  {
+    "name": "leeks",
+    "productName": "Fresh Leeks",
+    "link": "https://www.amazon.com/s?k=fresh%20leeks&tag=robinfrench-20",
+    "asin": "B09HQJGQDG",
+    "method": "scrape"
+  },
+  {
+    "name": "shallots",
+    "productName": "Fresh Shallots",
+    "link": "https://www.amazon.com/s?k=fresh%20shallots&tag=robinfrench-20",
+    "asin": "B09B2ZWHKQ",
+    "method": "scrape"
+  },
+  {
+    "name": "tomatoes (small amounts)",
+    "productName": "Fresh Ripe Vine Tomatoes",
+    "link": "https://www.amazon.com/s?k=fresh%20ripe%20vine%20tomatoes&tag=robinfrench-20",
+    "asin": "B086WX15TH",
+    "method": "scrape"
+  },
+  {
+    "name": "napa cabbage",
+    "productName": "Fresh Napa Cabbage",
+    "link": "https://www.amazon.com/s?k=fresh%20napa%20cabbage&tag=robinfrench-20",
+    "asin": "B07FTVYNM3",
+    "method": "scrape"
+  },
+  {
+    "name": "napa cabbage (small amounts)",
+    "productName": "Fresh Napa Cabbage",
+    "link": "https://www.amazon.com/s?k=fresh%20napa%20cabbage&tag=robinfrench-20",
+    "asin": "B079VV1K9L",
+    "method": "scrape"
+  },
+  {
+    "name": "artichokes",
+    "productName": "Fresh Artichoke Hearts",
+    "link": "https://www.amazon.com/s?k=fresh%20artichoke%20hearts&tag=robinfrench-20",
+    "asin": "B0DF91JXND",
+    "method": "scrape"
+  },
+  {
+    "name": "frisee",
+    "productName": "Fresh Frisee Lettuce",
+    "link": "https://www.amazon.com/s?k=fresh%20frisee%20lettuce&tag=robinfrench-20",
+    "asin": "B07FZGKZL4",
+    "method": "scrape"
+  },
+  {
+    "name": "radicchio",
+    "productName": "Fresh Radicchio Lettuce",
+    "link": "https://www.amazon.com/s?k=fresh%20radicchio%20lettuce&tag=robinfrench-20",
+    "asin": "B00BJPTZLA",
+    "method": "scrape"
+  },
+  {
+    "name": "red cabbage",
+    "productName": "Fresh Red Cabbage Head",
+    "link": "https://www.amazon.com/s?k=fresh%20red%20cabbage%20head&tag=robinfrench-20",
+    "asin": "B000RH1MXK",
+    "method": "scrape"
+  },
+  {
+    "name": "green cabbage",
+    "productName": "Fresh Green Cabbage Head",
+    "link": "https://www.amazon.com/s?k=fresh%20green%20cabbage%20head&tag=robinfrench-20",
+    "asin": "B09HQGDCKV",
+    "method": "scrape"
+  },
+  {
+    "name": "swiss chard",
+    "productName": "Fresh Swiss Chard",
+    "link": "https://www.amazon.com/s?k=fresh%20swiss%20chard&tag=robinfrench-20",
+    "asin": "B07F12P248",
+    "method": "scrape"
+  },
+  {
+    "name": "swiss chard (cooked, tiny amounts)",
+    "productName": "Fresh Swiss Chard",
+    "link": "https://www.amazon.com/s?k=fresh%20swiss%20chard&tag=robinfrench-20",
+    "asin": "B07F12P248",
+    "method": "scrape"
+  },
+  {
+    "name": "lettuce (romaine, small amounts)",
+    "productName": "Fresh Romaine Lettuce Hearts",
+    "link": "https://www.amazon.com/s?k=fresh%20romaine%20lettuce%20hearts&tag=robinfrench-20",
+    "asin": "B074H5J9G2",
+    "method": "scrape"
+  },
+  {
+    "name": "red leaf lettuce",
+    "productName": "Fresh Red Leaf Lettuce",
+    "link": "https://www.amazon.com/s?k=fresh%20red%20leaf%20lettuce&tag=robinfrench-20",
+    "asin": "B0BX76BG5V",
+    "method": "scrape"
+  },
+  {
+    "name": "mache",
+    "productName": "Fresh Mache Lamb\\",
+    "link": "https://www.amazon.com/s?k=fresh%20mache%20lamb%27s%20lettuce&tag=robinfrench-20",
+    "asin": "B00AWLAQFG",
+    "method": "scrape"
+  },
+  {
+    "name": "alfalfa sprouts (small amounts)",
+    "productName": "Fresh Alfalfa Sprouts",
+    "link": "https://www.amazon.com/s?k=fresh%20alfalfa%20sprouts&tag=robinfrench-20",
+    "asin": "B0DFZTWLTY",
+    "method": "scrape"
+  },
+  {
+    "name": "cat grass (wheatgrass)",
+    "productName": "SmartyKat Cat Grass Growing Kit Wheatgrass",
+    "link": "https://www.amazon.com/s?k=Cat%20Grass%20growing%20kit%20wheatgrass%20SmartyKat&tag=robinfrench-20",
+    "asin": "B0D45F9TGG",
+    "method": "scrape"
+  },
+  {
+    "name": "squash (cooked)",
+    "productName": "Fresh Butternut Squash",
+    "link": "https://www.amazon.com/s?k=fresh%20butternut%20squash&tag=robinfrench-20",
+    "asin": "B002QY3U5A",
+    "method": "scrape"
+  },
+  {
+    "name": "s quarters",
+    "productName": "Lamb\\",
+    "link": "https://www.amazon.com/s?k=lamb%27s%20quarters%20seeds&tag=robinfrench-20",
+    "asin": "B0DYPHGW89",
+    "method": "scrape"
+  },
+  {
+    "name": "amaranth leaves",
+    "productName": "Fresh Amaranth Leaves",
+    "link": "https://www.amazon.com/s?k=fresh%20amaranth%20leaves&tag=robinfrench-20",
+    "asin": "B0F2YRBGS6",
+    "method": "scrape"
+  },
+  {
+    "name": "ginger (small amounts)",
+    "productName": "Simply Organic Fresh Ginger Root",
+    "link": "https://www.amazon.com/s?k=organic%20ginger%20root%20fresh&tag=robinfrench-20",
+    "asin": "B0C6V3416T",
+    "method": "scrape"
+  },
+  {
+    "name": "turmeric",
+    "productName": "Simply Organic Pure Turmeric Powder",
+    "link": "https://www.amazon.com/s?k=Simply%20Organic%20pure%20turmeric%20powder&tag=robinfrench-20",
+    "asin": "B018GPDCV4",
+    "method": "scrape"
+  },
+  {
+    "name": "rosemary",
+    "productName": "Frontier Co-op Dried Organic Rosemary",
+    "link": "https://www.amazon.com/s?k=Frontier%20Co-op%20dried%20organic%20rosemary&tag=robinfrench-20",
+    "asin": "B004JWLMNY",
+    "method": "scrape"
+  },
+  {
+    "name": "sage",
+    "productName": "Simply Organic Dried Sage Leaf",
+    "link": "https://www.amazon.com/s?k=Simply%20Organic%20dried%20sage%20leaf&tag=robinfrench-20",
+    "asin": "B0CH3R9TVY",
+    "method": "scrape"
+  },
+  {
+    "name": "mint",
+    "productName": "Fresh Mint Leaves",
+    "link": "https://www.amazon.com/s?k=fresh%20mint%20leaves&tag=robinfrench-20",
+    "asin": "B097F3NT7N",
+    "method": "scrape"
+  },
+  {
+    "name": "garlic chives",
+    "productName": "Fresh Garlic Chives",
+    "link": "https://www.amazon.com/s?k=fresh%20garlic%20chives&tag=robinfrench-20",
+    "asin": "B097F3J1PY",
+    "method": "scrape"
+  },
+  {
+    "name": "raisins (unsweetened)",
+    "productName": "Sun-Maid Organic Raisins Unsweetened",
+    "link": "https://www.amazon.com/s?k=organic%20raisins%20unsweetened%20no%20oil%20Sun-Maid&tag=robinfrench-20",
+    "asin": "B01GXPRIQY",
+    "method": "scrape"
+  },
+  {
+    "name": "plums (pitted)",
+    "productName": "Fresh Plums Pitted",
+    "link": "https://www.amazon.com/s?k=fresh%20plums%20pitted&tag=robinfrench-20",
+    "asin": "B07P6Z8L76",
+    "method": "scrape"
+  },
+  {
+    "name": "apricots (pitted)",
+    "productName": "NOW Foods Dried Apricots Unsulphured",
+    "link": "https://www.amazon.com/s?k=dried%20apricots%20unsulphured%20no%20sugar%20NOW%20Foods&tag=robinfrench-20",
+    "asin": "B07FZWBPC5",
+    "method": "scrape"
+  },
+  {
+    "name": "kiwi",
+    "productName": "Fresh Kiwi Fruit",
+    "link": "https://www.amazon.com/s?k=fresh%20kiwi%20fruit&tag=robinfrench-20",
+    "asin": "B01LASWK7G",
+    "method": "scrape"
+  },
+  {
+    "name": "mulberries",
+    "productName": "Terrasoul Dried Mulberries Organic",
+    "link": "https://www.amazon.com/s?k=Terrasoul%20dried%20mulberries%20organic&tag=robinfrench-20",
+    "asin": "B074153BXC",
+    "method": "scrape"
+  },
+  {
+    "name": "raspberries",
+    "productName": "Fresh Raspberries Organic",
+    "link": "https://www.amazon.com/s?k=fresh%20raspberries%20organic&tag=robinfrench-20",
+    "asin": "B000P6G12U",
+    "method": "scrape"
+  },
+  {
+    "name": "cranberries",
+    "productName": "NOW Foods Dried Cranberries Unsweetened",
+    "link": "https://www.amazon.com/s?k=NOW%20Foods%20dried%20cranberries%20unsweetened&tag=robinfrench-20",
+    "asin": "B074153BXC",
+    "method": "scrape"
+  },
+  {
+    "name": "pineapple (small amounts)",
+    "productName": "Fresh Pineapple Fruit",
+    "link": "https://www.amazon.com/s?k=fresh%20pineapple%20fruit&tag=robinfrench-20",
+    "asin": "B000P6L3V4",
+    "method": "scrape"
+  },
+  {
+    "name": "pears (no seeds)",
+    "productName": "Fresh Pears No Seeds",
+    "link": "https://www.amazon.com/s?k=fresh%20pears%20no%20seeds&tag=robinfrench-20",
+    "asin": "B0DYKVQ3XZ",
+    "method": "scrape"
+  },
+  {
+    "name": "pinhead crickets",
+    "productName": "Josh\\",
+    "link": "https://www.amazon.com/s?k=Josh%27s%20Frogs%20live%20pinhead%20crickets&tag=robinfrench-20",
+    "asin": "B07196FX9W",
+    "method": "scrape"
+  },
+  {
+    "name": "locusts",
+    "productName": "Exo Terra Canned Locusts Reptile Food",
+    "link": "https://www.amazon.com/s?k=Exo%20Terra%20canned%20locusts%20reptile%20food&tag=robinfrench-20",
+    "asin": "B000CMKHBS",
+    "method": "scrape"
+  },
+  {
+    "name": "butterworms",
+    "productName": "Rainbow Mealworms Live Butterworms",
+    "link": "https://www.amazon.com/s?k=Rainbow%20Mealworms%20live%20butterworms&tag=robinfrench-20",
+    "asin": "B093BD8NXR",
+    "method": "scrape"
+  },
+  {
+    "name": "grasshoppers",
+    "productName": "Fluker\\",
+    "link": "https://www.amazon.com/s?k=Fluker%27s%20dried%20grasshoppers%20reptile%20food&tag=robinfrench-20",
+    "asin": "B004HSQRG2",
+    "method": "scrape"
+  },
+  {
+    "name": "small dubia roaches",
+    "productName": "Small Live Dubia Roaches Feeder",
+    "link": "https://www.amazon.com/s?k=small%20live%20dubia%20roaches%20feeder&tag=robinfrench-20",
+    "asin": "B09QD6PBB8",
+    "method": "scrape"
+  },
+  {
+    "name": "silkworms",
+    "productName": "Live Silkworms Reptile Food",
+    "link": "https://www.amazon.com/s?k=live%20silkworms%20reptile%20food&tag=robinfrench-20",
+    "asin": "B08JKNZPSF",
+    "method": "scrape"
+  },
+  {
+    "name": "earthworms",
+    "productName": "Uncle Jim\\",
+    "link": "https://www.amazon.com/s?k=Uncle%20Jim%27s%20live%20earthworms&tag=robinfrench-20",
+    "asin": "B097PDMK47",
+    "method": "scrape"
+  },
+  {
+    "name": "wheat hay",
+    "productName": "Oxbow Wheat Hay Small Animal",
+    "link": "https://www.amazon.com/s?k=Oxbow%20wheat%20hay%20small%20animal&tag=robinfrench-20",
+    "asin": "B0CLC76V98",
+    "method": "scrape"
+  },
+  {
+    "name": "fescue hay",
+    "productName": "Small Pet Select Fescue Hay",
+    "link": "https://www.amazon.com/s?k=Small%20Pet%20Select%20fescue%20hay&tag=robinfrench-20",
+    "asin": "B00S6YIF36",
+    "method": "scrape"
+  },
+  {
+    "name": "oat hay",
+    "productName": "Oxbow Oat Hay Small Animal",
+    "link": "https://www.amazon.com/s?k=Oxbow%20oat%20hay%20small%20animal&tag=robinfrench-20",
+    "asin": "B000WFKP80",
+    "method": "scrape"
+  },
+  {
+    "name": "bluegrass hay",
+    "productName": "Small Pet Select Bluegrass Hay",
+    "link": "https://www.amazon.com/s?k=Small%20Pet%20Select%20bluegrass%20hay&tag=robinfrench-20",
+    "asin": "B00S6Y8MHU",
+    "method": "scrape"
+  },
+  {
+    "name": "straw (wheat/pine)",
+    "productName": "Oxbow Wheat Straw Bedding",
+    "link": "https://www.amazon.com/s?k=Oxbow%20wheat%20straw%20bedding&tag=robinfrench-20",
+    "asin": "B0CDQMD1CB",
+    "method": "scrape"
+  },
+  {
+    "name": "dried grass",
+    "productName": "Kaytee Dried Natural Grass Small Animal",
+    "link": "https://www.amazon.com/s?k=dried%20natural%20grass%20small%20animal%20Kaytee&tag=robinfrench-20",
+    "asin": "B0002DK8OI",
+    "method": "scrape"
+  },
+  {
+    "name": "bermuda hay",
+    "productName": "Standlee Premium Bermuda Hay",
+    "link": "https://www.amazon.com/s?k=Standlee%20premium%20bermuda%20hay&tag=robinfrench-20",
+    "asin": "B0FSVM5P3D",
+    "method": "scrape"
+  },
+  {
+    "name": "barley hay",
+    "productName": "Standlee Barley Hay",
+    "link": "https://www.amazon.com/s?k=Standlee%20barley%20hay&tag=robinfrench-20",
+    "asin": "B08YM9VJC5",
+    "method": "scrape"
+  },
+  {
+    "name": "guinea pig pellets (with vitamin c)",
+    "productName": "Oxbow Essentials Cavy Cuisine Guinea Pig Pellets",
+    "link": "https://www.amazon.com/s?k=Oxbow%20guinea%20pig%20pellets%20vitamin%20c&tag=robinfrench-20",
+    "asin": "B00E4KT5NA",
+    "method": "scrape"
+  },
+  {
+    "name": "rabbit pellets (high fiber)",
+    "productName": "Oxbow Essentials Rabbit Food High Fiber",
+    "link": "https://www.amazon.com/s?k=Oxbow%20adult%20rabbit%20pellets%20high%20fiber&tag=robinfrench-20",
+    "asin": "B0017JANQY",
+    "method": "scrape"
+  },
+  {
+    "name": "hamster pellets (higher protein)",
+    "productName": "Oxbow Essentials Hamster Food Higher Protein",
+    "link": "https://www.amazon.com/s?k=Oxbow%20hamster%20food%20higher%20protein&tag=robinfrench-20",
+    "asin": "B0053SYJVA",
+    "method": "scrape"
+  },
+  {
+    "name": "wild bird mix",
+    "productName": "Lyric Wild Bird Mix No Filler",
+    "link": "https://www.amazon.com/s?k=Lyric%20wild%20bird%20mix%20no%20filler&tag=robinfrench-20",
+    "asin": "B0FWLFGG21",
+    "method": "scrape"
+  },
+  {
+    "name": "beta-glucans",
+    "productName": "NOW Supplements Beta Glucans 60 Capsules",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Beta+Glucans+60+Capsules&tag=robinfrench-20",
+    "asin": "B01LWVNL9J",
+    "method": "scrape"
+  },
+  {
+    "name": "biotin",
+    "productName": "NOW Supplements Biotin 5000 mcg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Biotin+5000+mcg&tag=robinfrench-20",
+    "asin": "B01AMJCHB8",
+    "method": "scrape"
+  },
+  {
+    "name": "bone broth (low sodium)",
+    "productName": "Brutus Bone Broth for Dogs Low Sodium",
+    "link": "https://www.amazon.com/s?k=Brutus+Bone+Broth+Dogs+Low+Sodium&tag=robinfrench-20",
+    "asin": "B07DFNP37Y",
+    "method": "scrape"
+  },
+  {
+    "name": "cauliflower",
+    "productName": "Fresh Organic Cauliflower",
+    "link": "https://www.amazon.com/s?k=fresh+organic+cauliflower&tag=robinfrench-20",
+    "asin": "B000P6G0GM",
+    "method": "scrape"
+  },
+  {
+    "name": "chicory root",
+    "productName": "NOW Supplements Inulin Prebiotic Fiber",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Inulin+Prebiotic+Fiber&tag=robinfrench-20",
+    "asin": "B08Q7KZYKC",
+    "method": "scrape"
+  },
+  {
+    "name": "chondroitin sulfate",
+    "productName": "Cosequin DS Plus MSM with Chondroitin",
+    "link": "https://www.amazon.com/s?k=Cosequin+DS+Plus+MSM+Chondroitin&tag=robinfrench-20",
+    "asin": "B003ULL1NQ",
+    "method": "scrape"
+  },
+  {
+    "name": "cranberry extract",
+    "productName": "NOW Supplements Cranberry Extract 5000 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Cranberry+Extract+5000+mg&tag=robinfrench-20",
+    "asin": "B01N7KMPU3",
+    "method": "scrape"
+  },
+  {
+    "name": "curcumin (turmeric extract)",
+    "productName": "NOW Supplements Curcumin with BioPerine",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Curcumin+BioPerine&tag=robinfrench-20",
+    "asin": "B0CK3C31JP",
+    "method": "scrape"
+  },
+  {
+    "name": "d-mannose",
+    "productName": "NOW Supplements D-Mannose Powder",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+D-Mannose+Powder&tag=robinfrench-20",
+    "asin": "B01N6X9YBS",
+    "method": "scrape"
+  },
+  {
+    "name": "egg yolks",
+    "productName": "Vital Farms Pasture-Raised Eggs",
+    "link": "https://www.amazon.com/s?k=Vital+Farms+Pasture-Raised+Eggs&tag=robinfrench-20",
+    "asin": "B00M1QWODW",
+    "method": "scrape"
+  },
+  {
+    "name": "eggplant",
+    "productName": "Fresh Organic Eggplant",
+    "link": "https://www.amazon.com/s?k=fresh+organic+eggplant&tag=robinfrench-20",
+    "asin": "B001PLGQPQ",
+    "method": "scrape"
+  },
+  {
+    "name": "eggshells (crushed)",
+    "productName": "NOW Supplements Calcium Carbonate Powder",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Calcium+Carbonate+Powder&tag=robinfrench-20",
+    "asin": "B004421K68",
+    "method": "scrape"
+  },
+  {
+    "name": "fish broth (no salt)",
+    "productName": "Brutus Fish Broth for Dogs No Salt",
+    "link": "https://www.amazon.com/s?k=Brutus+Fish+Broth+Dogs+No+Salt&tag=robinfrench-20",
+    "asin": "B07DFQFLJL",
+    "method": "scrape"
+  },
+  {
+    "name": "fructooligosaccharides (fos)",
+    "productName": "NOW Supplements FOS Prebiotic Fiber",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+FOS+Prebiotic+Fiber&tag=robinfrench-20",
+    "asin": "B08Q7KZYKC",
+    "method": "scrape"
+  },
+  {
+    "name": "glucosamine sulfate",
+    "productName": "Cosequin DS Plus MSM Glucosamine",
+    "link": "https://www.amazon.com/s?k=Cosequin+DS+Plus+MSM+Glucosamine&tag=robinfrench-20",
+    "asin": "B003ULL1NQ",
+    "method": "scrape"
+  },
+  {
+    "name": "green beans",
+    "productName": "Fresh Organic Green Beans",
+    "link": "https://www.amazon.com/s?k=fresh+organic+green+beans&tag=robinfrench-20",
+    "asin": "B0DDTC6QNY",
+    "method": "scrape"
+  },
+  {
+    "name": "green beans (cooked)",
+    "productName": "Fresh Organic Green Beans",
+    "link": "https://www.amazon.com/s?k=fresh+organic+green+beans&tag=robinfrench-20",
+    "asin": "B0DDTC6QNY",
+    "method": "scrape"
+  },
+  {
+    "name": "hairball control paste",
+    "productName": "Tomlyn Laxatone Hairball Remedy",
+    "link": "https://www.amazon.com/s?k=Tomlyn+Laxatone+Hairball+Remedy&tag=robinfrench-20",
+    "asin": "B07B282MR4",
+    "method": "scrape"
+  },
+  {
+    "name": "hyaluronic acid",
+    "productName": "NOW Supplements Hyaluronic Acid 100 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Hyaluronic+Acid+100+mg&tag=robinfrench-20",
+    "asin": "B07XHNCJMC",
+    "method": "scrape"
+  },
+  {
+    "name": "inulin (prebiotic)",
+    "productName": "NOW Supplements Inulin Prebiotic Fiber",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Inulin+Prebiotic+Fiber&tag=robinfrench-20",
+    "asin": "B08Q7KZYKC",
+    "method": "scrape"
+  },
+  {
+    "name": "jerusalem artichoke",
+    "productName": "Fresh Jerusalem Artichoke Sunchokes",
+    "link": "https://www.amazon.com/s?k=fresh+Jerusalem+artichoke+sunchokes&tag=robinfrench-20",
+    "asin": "B0CQK5XCVZ",
+    "method": "scrape"
+  },
+  {
+    "name": "joint health supplement",
+    "productName": "Cosequin DS Plus MSM for Dogs",
+    "link": "https://www.amazon.com/s?k=Cosequin+DS+Plus+MSM+Dogs&tag=robinfrench-20",
+    "asin": "B003ULL1NQ",
+    "method": "scrape"
+  },
+  {
+    "name": "l-carnitine powder",
+    "productName": "NOW Supplements L-Carnitine 500 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+L-Carnitine+500+mg&tag=robinfrench-20",
+    "asin": "B06Y1BTLGK",
+    "method": "scrape"
+  },
+  {
+    "name": "lysine powder",
+    "productName": "NOW Supplements L-Lysine 1000 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+L-Lysine+1000+mg&tag=robinfrench-20",
+    "asin": "B00V3MR88G",
+    "method": "scrape"
+  },
+  {
+    "name": "malabar spinach",
+    "productName": "Fresh Malabar Spinach Leaves",
+    "link": "https://www.amazon.com/s?k=fresh+Malabar+spinach+leaves&tag=robinfrench-20",
+    "asin": "B0DLT7BSNJ",
+    "method": "scrape"
+  },
+  {
+    "name": "mannanoligosaccharides (mos)",
+    "productName": "NOW Supplements MOS Prebiotic",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+MOS+Prebiotic&tag=robinfrench-20",
+    "asin": "B0CRFWM2Z6",
+    "method": "scrape"
+  },
+  {
+    "name": "milk thistle",
+    "productName": "NOW Supplements Milk Thistle 150 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Milk+Thistle+150+mg&tag=robinfrench-20",
+    "asin": "B0019LVFD0",
+    "method": "scrape"
+  },
+  {
+    "name": "new zealand spinach",
+    "productName": "Fresh New Zealand Spinach",
+    "link": "https://www.amazon.com/s?k=fresh+New+Zealand+spinach&tag=robinfrench-20",
+    "asin": "B0C8VD126M",
+    "method": "scrape"
+  },
+  {
+    "name": "niacinamide",
+    "productName": "NOW Supplements Niacinamide 500 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Niacinamide+500+mg&tag=robinfrench-20",
+    "asin": "B0CZMBZPLV",
+    "method": "scrape"
+  },
+  {
+    "name": "oats (rolled)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s+Red+Mill+Old+Fashioned+Rolled+Oats&tag=robinfrench-20",
+    "asin": "B07VCM66N6",
+    "method": "scrape"
+  },
+  {
+    "name": "peas",
+    "productName": "Fresh Organic Green Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+green+peas&tag=robinfrench-20",
+    "asin": "B07D1NGQ6B",
+    "method": "scrape"
+  },
+  {
+    "name": "peas (mashed)",
+    "productName": "Fresh Organic Green Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+green+peas&tag=robinfrench-20",
+    "asin": "B07D1NGQ6B",
+    "method": "scrape"
+  },
+  {
+    "name": "pectin (from apples)",
+    "productName": "NOW Supplements Apple Pectin Powder",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Apple+Pectin+Powder&tag=robinfrench-20",
+    "asin": "B01CO69SYG",
+    "method": "scrape"
+  },
+  {
+    "name": "pumpkin seed oil",
+    "productName": "NOW Solutions Pumpkin Seed Oil",
+    "link": "https://www.amazon.com/s?k=NOW+Solutions+Pumpkin+Seed+Oil&tag=robinfrench-20",
+    "asin": "B0FKYLMWYG",
+    "method": "scrape"
+  },
+  {
+    "name": "quail eggs",
+    "productName": "Fresh Quail Eggs",
+    "link": "https://www.amazon.com/s?k=fresh+quail+eggs&tag=robinfrench-20",
+    "asin": "B0BSRGV9PR",
+    "method": "scrape"
+  },
+  {
+    "name": "quercetin",
+    "productName": "NOW Supplements Quercetin with Bromelain",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Quercetin+Bromelain&tag=robinfrench-20",
+    "asin": "B08M5L372P",
+    "method": "scrape"
+  },
+  {
+    "name": "rice (hulled)",
+    "productName": "Lundberg Organic Brown Rice",
+    "link": "https://www.amazon.com/s?k=Lundberg+Organic+Brown+Rice&tag=robinfrench-20",
+    "asin": "B072JNNB33",
+    "method": "scrape"
+  },
+  {
+    "name": "romanesco broccoli",
+    "productName": "Fresh Romanesco Broccoli",
+    "link": "https://www.amazon.com/s?k=fresh+romanesco+broccoli&tag=robinfrench-20",
+    "asin": "B01I1Q74MQ",
+    "method": "scrape"
+  },
+  {
+    "name": "s-adenosyl methionine (sam-e)",
+    "productName": "NOW Supplements SAM-e 200 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+SAM-e+200+mg&tag=robinfrench-20",
+    "asin": "B000OSSQFY",
+    "method": "scrape"
+  },
+  {
+    "name": "sardines (in water)",
+    "productName": "Wild Planet Sardines in Water No Salt",
+    "link": "https://www.amazon.com/s?k=Wild+Planet+Sardines+Water+No+Salt&tag=robinfrench-20",
+    "asin": "B01FUWYO2M",
+    "method": "scrape"
+  },
+  {
+    "name": "snap peas",
+    "productName": "Fresh Organic Snap Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+snap+peas&tag=robinfrench-20",
+    "asin": "B077L6C7YB",
+    "method": "scrape"
+  },
+  {
+    "name": "snow peas",
+    "productName": "Fresh Organic Snow Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+snow+peas&tag=robinfrench-20",
+    "asin": "B07MGSDD7L",
+    "method": "scrape"
+  },
+  {
+    "name": "snow peas (mashed)",
+    "productName": "Fresh Organic Snow Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+snow+peas&tag=robinfrench-20",
+    "asin": "B08KRNKC9G",
+    "method": "scrape"
+  },
+  {
+    "name": "split peas",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s+Red+Mill+Split+Peas&tag=robinfrench-20",
+    "asin": "B08DVGSW58",
+    "method": "scrape"
+  },
+  {
+    "name": "split peas (mashed)",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s+Red+Mill+Split+Peas&tag=robinfrench-20",
+    "asin": "B08DVGSW58",
+    "method": "scrape"
+  },
+  {
+    "name": "sugar snap peas",
+    "productName": "Fresh Organic Sugar Snap Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+sugar+snap+peas&tag=robinfrench-20",
+    "asin": "B08DVGSW58",
+    "method": "scrape"
+  },
+  {
+    "name": "sugar snap peas (mashed)",
+    "productName": "Fresh Organic Sugar Snap Peas",
+    "link": "https://www.amazon.com/s?k=fresh+organic+sugar+snap+peas&tag=robinfrench-20",
+    "asin": "B08DVGSW58",
+    "method": "scrape"
+  },
+  {
+    "name": "turkey broth (no salt)",
+    "productName": "Brutus Turkey Broth for Dogs No Salt",
+    "link": "https://www.amazon.com/s?k=Brutus+Turkey+Broth+Dogs+No+Salt&tag=robinfrench-20",
+    "asin": "B07DFQFLJL",
+    "method": "scrape"
+  },
+  {
+    "name": "vitamin b complex",
+    "productName": "Thorne B-Complex #12",
+    "link": "https://www.amazon.com/s?k=Thorne+B-Complex+%2312&tag=robinfrench-20",
+    "asin": "B01INRFW0E",
+    "method": "scrape"
+  },
+  {
+    "name": "vitamin c (small amounts)",
+    "productName": "NOW Supplements Vitamin C 1000 mg",
+    "link": "https://www.amazon.com/s?k=NOW+Supplements+Vitamin+C+1000+mg&tag=robinfrench-20",
+    "asin": "B074GCB1ND",
+    "method": "scrape"
+  },
+  {
+    "name": "watercress",
+    "productName": "Fresh Organic Watercress",
+    "link": "https://www.amazon.com/s?k=fresh+organic+watercress&tag=robinfrench-20",
+    "asin": "B0BSK8P8KS",
+    "method": "scrape"
+  },
+  {
+    "name": "watercress (small amounts)",
+    "productName": "Fresh Organic Watercress",
+    "link": "https://www.amazon.com/s?k=fresh+organic+watercress&tag=robinfrench-20",
+    "asin": "B0BSK8P8KS",
+    "method": "scrape"
+  },
+  {
+    "name": "wheat germ",
+    "productName": "Bob\\",
+    "link": "https://www.amazon.com/s?k=Bob%27s+Red+Mill+Wheat+Germ&tag=robinfrench-20",
+    "asin": "B0FKBVN6XP",
+    "method": "scrape"
+  },
+  {
+    "name": "wild rice",
+    "productName": "Lundberg Organic Wild Rice",
+    "link": "https://www.amazon.com/s?k=Lundberg+Organic+Wild+Rice&tag=robinfrench-20",
+    "asin": "B089CP461X",
+    "method": "scrape"
+  }
+]

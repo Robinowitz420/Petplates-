@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 240, 240, 240;
+  --background-start-rgb: 10, 30, 20;
+  --background-end-rgb: 15, 35, 25;
 }
 
 body {
@@ -66,7 +66,7 @@ body {
   /* Primary Button - Gradient */
   .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    @apply text-white;
+    color: #0f2c0f;
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
@@ -81,22 +81,22 @@ body {
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
   }
 
-  /* Secondary Button - Outlined */
+  /* Secondary Button - Adjusted for Dark Mode */
   .btn-secondary {
-    @apply bg-white border-2 border-gray-300 text-gray-700;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    @apply bg-surface border-2 border-surface-highlight text-gray-200;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   .btn-secondary:hover {
-    @apply bg-gray-50 border-gray-400 text-gray-900;
+    @apply bg-surface-highlight text-white border-white/20;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   /* Success Button */
   .btn-success {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    @apply text-white;
+    color: #0f2c0f;
     box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
@@ -109,7 +109,7 @@ body {
   /* Danger Button */
   .btn-danger {
     background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-    @apply text-white;
+    color: #0f2c0f;
     box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
@@ -119,23 +119,26 @@ body {
     box-shadow: 0 8px 25px rgba(245, 101, 101, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
   }
 
-  /* Warning Button */
+  /* Warning Button -> Dark Green with Orange text/outline */
   .btn-warning {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    @apply text-white;
-    box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #0f2c0f;
+    color: #f97316;
+    border: 2px solid #f97316;
+    box-shadow: 0 6px 20px rgba(15, 44, 15, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .btn-warning:hover {
-    background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+    background: #0c240c;
+    color: #f97316;
+    border-color: #f97316;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(237, 137, 54, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(15, 44, 15, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
   }
 
   /* Info Button */
   .btn-info {
     background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-    @apply text-white;
+    color: #0f2c0f;
     box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
@@ -145,14 +148,35 @@ body {
     box-shadow: 0 8px 25px rgba(66, 153, 225, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
   }
 
-  /* Ghost Button */
+  /* Dark Green / Orange Button */
+  .btn-darkgreen {
+    background: #0f2c0f;
+    color: #f97316;
+    border: 2px solid #f97316;
+    box-shadow: 0 6px 20px rgba(15, 44, 15, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-darkgreen:hover {
+    background: #0c240c;
+    color: #f97316;
+    border-color: #f97316;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15, 44, 15, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-darkgreen:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(15, 44, 15, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Ghost Button - Adjusted for Dark Mode */
   .btn-ghost {
-    @apply bg-transparent border-2 border-current text-current;
+    @apply bg-transparent border-2 border-surface-highlight text-gray-300;
     box-shadow: none;
   }
 
   .btn-ghost:hover {
-    @apply bg-current text-white;
+    @apply bg-surface-highlight text-white border-white/20;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
@@ -248,4 +272,202 @@ body {
   .btn-square {
     border-radius: 8px;
   }
+}
+
+/* Base styles for inputs to ensure visibility in dark mode */
+@layer base {
+  input, textarea, select {
+    @apply bg-surface border border-surface-highlight text-foreground rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 outline-none;
+  }
+  
+  /* Placeholder color */
+  input::placeholder, textarea::placeholder {
+    @apply text-gray-500;
+  }
+}
+
+/* Mascot Animations */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes stern-active {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(1deg);
+  }
+}
+
+@keyframes anxious-active {
+  0%, 100% {
+    transform: translateX(0px) translateY(0px);
+  }
+  25% {
+    transform: translateX(-1px) translateY(-1px);
+  }
+  50% {
+    transform: translateX(1px) translateY(0px);
+  }
+  75% {
+    transform: translateX(-1px) translateY(-1px);
+  }
+}
+
+@keyframes excitable-active {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  25% {
+    transform: translateY(-4px) scale(1.05);
+  }
+  50% {
+    transform: translateY(0px) scale(1);
+  }
+  75% {
+    transform: translateY(-4px) scale(1.05);
+  }
+}
+
+@keyframes thoughtful-active {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-1px) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-1px) rotate(0.5deg);
+  }
+}
+
+@keyframes hyperactive-active {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-3px) rotate(-2deg) scale(1.03);
+  }
+  50% {
+    transform: translateY(0px) rotate(2deg) scale(1);
+  }
+  75% {
+    transform: translateY(-3px) rotate(-2deg) scale(1.03);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.animate-stern-active {
+  animation: stern-active 1s ease-in-out infinite;
+}
+
+.animate-anxious-active {
+  animation: anxious-active 0.6s ease-in-out infinite;
+}
+
+.animate-excitable-active {
+  animation: excitable-active 0.8s ease-in-out infinite;
+}
+
+.animate-thoughtful-active {
+  animation: thoughtful-active 2s ease-in-out infinite;
+}
+
+.animate-hyperactive-active {
+  animation: hyperactive-active 0.5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Prevent emoji image color inversion */
+img[alt*="🐕"],
+img[alt*="🐈"],
+img[alt*="🐦"],
+img[alt*="🦎"],
+img[alt*="🐰"],
+img[alt*="🐹"],
+img[alt*="🐾"],
+img[alt*="❤️"],
+img[alt*="🎂"],
+img[alt*="⚖️"],
+img[alt*="⭐"],
+img[alt*="✨"],
+img[alt*="✅"],
+img[alt*="⚠️"],
+img[alt*="👍"],
+img[alt*="🏆"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  color-scheme: normal !important;
+}
+
+/* Prevent any parent filters from affecting emoji images */
+.emoji-wrapper,
+[class*="emoji"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Prevent parent filters from affecting all mascot images (except inverted ones) */
+img[src*="Mascots"]:not(.mascot-icon.mascot-puppy-prepper):not(.mascot-icon.mascot-professor-purrfessor),
+img[alt*="mascot"]:not(.mascot-icon.mascot-puppy-prepper):not(.mascot-icon.mascot-professor-purrfessor) {
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Prevent dark mode from inverting mascot images */
+.mascot-icon.mascot-puppy-prepper,
+.mascot-icon.mascot-professor-purrfessor,
+nav .mascot-icon.mascot-puppy-prepper,
+nav img.mascot-icon.mascot-puppy-prepper,
+img[src*="Prep Puppy"],
+img[src*="Prep%20Puppy"],
+img[src*="ProfessorPurffesor"],
+img[alt*="puppy-prepper"],
+img[alt*="professor-purrfessor"] {
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Fix color inversion on puppy and cat mascot images (HIGH SPECIFICITY - MUST BE LAST) */
+.mascot-icon.mascot-puppy-prepper,
+.mascot-icon.mascot-professor-purrfessor,
+nav .mascot-icon.mascot-puppy-prepper,
+nav img.mascot-icon.mascot-puppy-prepper,
+img[src*="Prep Puppy"],
+img[src*="Prep%20Puppy"],
+img[src*="ProfessorPurffesor"],
+img[alt*="puppy-prepper"],
+img[alt*="professor-purrfessor"] {
+  filter: invert(1) !important;
+  -webkit-filter: invert(1) !important;
 }

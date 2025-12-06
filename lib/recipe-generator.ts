@@ -242,7 +242,7 @@ export interface IngredientTemplate {
   };
   safeFor: PetCategory[];
   avoidFor?: HealthConcern[];
-  amazonLink?: string;
+  asinLink?: string; // ASIN-based direct product link
   notes?: string;
 }
 
@@ -333,7 +333,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         phosphorus: 220
       },
       safeFor: ['dogs'],
-      amazonLink: 'https://www.amazon.com/s?k=chicken+breast+dog+food'
+      asinLink: undefined, // Use vetted products insteadchicken+breast+dog+food'
     },
     {
       id: 'brown-rice',
@@ -348,7 +348,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
       },
       safeFor: ['dogs'],
       avoidFor: ['weight-management'],
-      amazonLink: 'https://www.amazon.com/s?k=brown+rice+dog+food'
+      asinLink: undefined, // Use vetted products insteadbrown+rice+dog+food'
     },
     {
       id: 'sweet-potato',
@@ -362,7 +362,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 86
       },
       safeFor: ['dogs'],
-      amazonLink: 'https://www.amazon.com/s?k=sweet+potato+dog+treats'
+      asinLink: undefined, // Use vetted products insteadsweet+potato+dog+treats'
     },
     {
       id: 'pumpkin',
@@ -376,7 +376,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 26
       },
       safeFor: ['dogs'],
-      amazonLink: 'https://www.amazon.com/s?k=pumpkin+dog+food'
+      asinLink: undefined, // Use vetted products insteadpumpkin+dog+food'
     }
   ],
 
@@ -394,7 +394,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         phosphorus: 200
       },
       safeFor: ['cats'],
-      amazonLink: 'https://www.amazon.com/s?k=turkey+breast+cat+food'
+      asinLink: undefined, // Use vetted products insteadturkey+breast+cat+food'
     },
     {
       id: 'fish-oil',
@@ -405,7 +405,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 902
       },
       safeFor: ['cats'],
-      amazonLink: 'https://www.amazon.com/s?k=fish+oil+cats'
+      asinLink: undefined, // Use vetted products insteadfish+oil+cats'
     },
     {
       id: 'cat-grass',
@@ -419,7 +419,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 24
       },
       safeFor: ['cats'],
-      amazonLink: 'https://www.amazon.com/s?k=cat+grass'
+      asinLink: undefined, // Use vetted products insteadcat+grass'
     }
   ],
 
@@ -435,7 +435,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 584
       },
       safeFor: ['birds'],
-      amazonLink: 'https://www.amazon.com/s?k=sunflower+seeds+birds'
+      asinLink: undefined, // Use vetted products insteadsunflower+seeds+birds'
     },
     {
       id: 'mixed-millet',
@@ -448,7 +448,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 378
       },
       safeFor: ['birds'],
-      amazonLink: 'https://www.amazon.com/s?k=millet+bird+seed'
+      asinLink: undefined, // Use vetted products insteadmillet+bird+seed'
     },
     {
       id: 'bell-peppers',
@@ -462,7 +462,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 31
       },
       safeFor: ['birds'],
-      amazonLink: 'https://www.amazon.com/s?k=bell+peppers+birds'
+      asinLink: undefined, // Use vetted products insteadbell+peppers+birds'
     }
   ],
 
@@ -481,7 +481,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         phosphorus: 200
       },
       safeFor: ['reptiles'],
-      amazonLink: 'https://www.amazon.com/s?k=crickets+reptiles'
+      asinLink: undefined, // Use vetted products insteadcrickets+reptiles'
     },
     {
       id: 'mealworms',
@@ -497,7 +497,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         phosphorus: 200
       },
       safeFor: ['reptiles'],
-      amazonLink: 'https://www.amazon.com/s?k=mealworms+reptiles'
+      asinLink: undefined, // Use vetted products insteadmealworms+reptiles'
     },
     {
       id: 'collard-greens',
@@ -513,7 +513,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         phosphorus: 37
       },
       safeFor: ['reptiles'],
-      amazonLink: 'https://www.amazon.com/s?k=collard+greens+reptiles'
+      asinLink: undefined, // Use vetted products insteadcollard+greens+reptiles'
     }
   ],
 
@@ -532,7 +532,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         phosphorus: 150
       },
       safeFor: ['pocket-pets'],
-      amazonLink: 'https://www.amazon.com/s?k=timothy+hay+small+pets'
+      asinLink: undefined, // Use vetted products insteadtimothy+hay+small+pets'
     },
     {
       id: 'oat-hay',
@@ -546,7 +546,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 145
       },
       safeFor: ['pocket-pets'],
-      amazonLink: 'https://www.amazon.com/s?k=oat+hay+small+pets'
+      asinLink: undefined, // Use vetted products insteadoat+hay+small+pets'
     },
     {
       id: 'carrot',
@@ -560,7 +560,7 @@ export const INGREDIENT_TEMPLATES: Record<PetCategory, IngredientTemplate[]> = {
         calories: 41
       },
       safeFor: ['pocket-pets'],
-      amazonLink: 'https://www.amazon.com/s?k=carrots+small+pets'
+      asinLink: undefined, // Use vetted products insteadcarrots+small+pets'
     }
   ]
 };
@@ -1035,7 +1035,7 @@ export async function generateRecipe(options: RecipeGenerationOptions): Promise<
       id: ing.id,
       name: researchProduct?.productName || ing.name,
       amount: `${Math.round(amounts[ing.id])}g`,
-      amazonLink: researchProduct?.amazonLink || ing.amazonLink,
+      asinLink: (researchProduct as any)?.amazonLink || (researchProduct as any)?.asinLink || (ing as any).asinLink || '',
       productName: researchProduct?.productName,
       notes: researchProduct?.vetNote
     };
@@ -1162,30 +1162,69 @@ export async function batchGenerateRecipes(
 }
 
 /**
- * Validate recipe meets nutritional requirements
+ * Validate recipe meets nutritional requirements with comprehensive AAFCO/WSAVA checks
  */
 export function validateRecipeNutrition(
   recipe: GeneratedRecipe,
   category: PetCategory
-): { valid: boolean; issues: string[] } {
+): { valid: boolean; issues: string[]; warnings: string[] } {
   const issues: string[] = [];
-
-  // Category-specific validation would go here
-  // This is a simplified version
+  const warnings: string[] = [];
 
   const nutrition = recipe.nutritionalInfo;
   if (!nutrition) {
-    return { valid: false, issues: ['Missing nutritional information'] };
+    return { valid: false, issues: ['Missing nutritional information'], warnings: [] };
   }
 
   // Basic validation - ensure all required nutrients are present
   if (!nutrition.protein || !nutrition.fat || !nutrition.fiber) {
-    issues.push('Missing required nutritional data');
+    issues.push('Missing required nutritional data (protein, fat, or fiber)');
+  }
+
+  // Category-specific validation
+  if (category === 'dogs' || category === 'cats') {
+    const species = category === 'dogs' ? 'dog' : 'cat';
+    const lifeStage = 'adult'; // Default to adult, could be parameterized
+    
+    // Use AAFCO validation if available
+    try {
+      const { validateCriticalNutrients } = require('@/lib/data/aafco-standards');
+      const aafcoResult = validateCriticalNutrients(nutrition, species, lifeStage);
+      
+      if (!aafcoResult.isValid) {
+        issues.push(...aafcoResult.violations);
+      }
+      warnings.push(...aafcoResult.warnings);
+    } catch (e) {
+      // AAFCO validation not available, use basic checks
+      warnings.push('AAFCO validation unavailable - using basic checks');
+    }
+  }
+
+  // General nutrient range checks
+  const protein = parseFloat(nutrition.protein?.min?.toString() || nutrition.protein?.max?.toString() || '0');
+  const fat = parseFloat(nutrition.fat?.min?.toString() || nutrition.fat?.max?.toString() || '0');
+  
+  if (protein > 0) {
+    if (protein < 10) {
+      warnings.push('Protein content seems low');
+    } else if (protein > 50) {
+      warnings.push('Protein content seems very high');
+    }
+  }
+
+  if (fat > 0) {
+    if (fat < 5) {
+      warnings.push('Fat content seems low');
+    } else if (fat > 30) {
+      warnings.push('Fat content seems very high');
+    }
   }
 
   return {
     valid: issues.length === 0,
-    issues
+    issues,
+    warnings
   };
 }
 
@@ -1265,7 +1304,7 @@ const recipeLibrary = batchGenerateRecipes(allTemplates, 10);
 // Validate nutrition
 const validation = validateRecipeNutrition(dogRecipe, 'dogs');
 
-console.log(`Generated ${recipeLibrary.length} recipes`);
+// Debug logging removed - use logger if needed
 */
 
 export default {

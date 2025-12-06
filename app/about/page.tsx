@@ -7,7 +7,7 @@ export default function AboutPage() {
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            About ThePetPantry
+            About Paw & Plate
           </h1>
           <p className="text-xl text-primary-100">
             Fresh, personalized nutrition for pets we love
@@ -20,7 +20,7 @@ export default function AboutPage() {
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
           <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            ThePetPantry was founded on a simple belief: our pets deserve the same quality nutrition we give ourselves.
+            Paw & Plate was founded on a simple belief: our pets deserve the same quality nutrition we give ourselves.
             Just as meal prep has transformed human health, we're bringing that same personalized, 
             fresh-food approach to pet nutrition.
           </p>

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, ChefHat } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useUser, UserButton } from '@clerk/nextjs';
 
@@ -10,22 +11,34 @@ export default function Navigation() {
   const { isSignedIn, isLoaded } = useUser();
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-background/95 backdrop-blur-sm border-b border-surface-highlight sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center space-x-2">
-            <ChefHat className="h-8 w-8 text-primary-600" />
-            <span className="text-2xl font-bold text-gray-900">Paw & Plate</span>
+            <div className="h-10 w-10 relative">
+              <Image
+                src="/images/emojis/GREENPAW.jpeg"
+                alt="Paw & Plate logo"
+                fill
+                className="object-contain rounded-md"
+                sizes="40px"
+                priority
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-foreground">Paw & Plate</span>
+              <span className="text-xs text-gray-400 -mt-1 leading-tight">Meal prep made easy, for ALL your pets!</span>
+            </div>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/about" className="text-gray-300 hover:text-orange-400 transition-colors">
               About
             </Link>
-            <Link href="/blog" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/blog" className="text-gray-300 hover:text-orange-400 transition-colors">
               Blog
             </Link>
-            <Link href="/forum" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/forum" className="text-gray-300 hover:text-orange-400 transition-colors">
               Community
             </Link>
             
@@ -40,7 +53,7 @@ export default function Navigation() {
                   </Link>
                 ) : (
                   <>
-                    <Link href="/profile" className="text-gray-700 hover:text-primary-600 transition-colors">
+                    <Link href="/profile" className="text-gray-300 hover:text-orange-400 transition-colors">
                       My Pets
                     </Link>
                     <UserButton afterSignOutUrl="/" />
@@ -63,13 +76,13 @@ export default function Navigation() {
         {isOpen && (
           <div className="md:hidden pb-4">
             <div className="flex flex-col space-y-4">
-              <Link href="/about" className="text-gray-700 hover:text-primary-600">
+              <Link href="/about" className="text-gray-300 hover:text-orange-400">
                 About
               </Link>
-              <Link href="/blog" className="text-gray-700 hover:text-primary-600">
+              <Link href="/blog" className="text-gray-300 hover:text-orange-400">
                 Blog
               </Link>
-              <Link href="/forum" className="text-gray-700 hover:text-primary-600">
+              <Link href="/forum" className="text-gray-300 hover:text-orange-400">
                 Community
               </Link>
               
@@ -84,7 +97,7 @@ export default function Navigation() {
                     </Link>
                   ) : (
                     <>
-                      <Link href="/profile" className="text-gray-700 hover:text-primary-600">
+                      <Link href="/profile" className="text-gray-300 hover:text-orange-400">
                         My Pets
                       </Link>
                       <UserButton afterSignOutUrl="/" />

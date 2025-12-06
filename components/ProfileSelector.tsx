@@ -99,7 +99,7 @@ export default function ProfileSelector() {
         <h2 className="text-2xl font-bold text-gray-900">My Pets</h2>
         <button 
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          className="btn btn-md btn-darkgreen"
         >
           <Plus size={20} />
           Add Pet
@@ -112,7 +112,7 @@ export default function ProfileSelector() {
           <p className="text-gray-600 mb-4">No pets added yet</p>
           <button 
             onClick={() => setShowModal(true)}
-            className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+            className="btn btn-md btn-darkgreen w-full justify-center"
           >
             Add Your First Pet
           </button>
@@ -132,8 +132,8 @@ export default function ProfileSelector() {
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${selectedPet === pet.id ? 'bg-orange-600' : 'bg-gray-100'}`}>
-                    <Icon size={24} className={selectedPet === pet.id ? 'text-white' : 'text-gray-600'} />
+                  <div className={`p-2 rounded-lg ${selectedPet === pet.id ? 'bg-dark-green' : 'bg-gray-100'}`}>
+                    <Icon size={24} className={selectedPet === pet.id ? 'text-orange-400' : 'text-gray-600'} />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900">{pet.name}</h3>
@@ -193,7 +193,7 @@ export default function ProfileSelector() {
                               setFormData({ ...formData, type: type.id, breed: '' });
                               setStep(2);
                             }}
-                            className="p-6 rounded-lg border-2 transition-all hover:border-orange-400 border-gray-200 hover:bg-orange-50"
+                            className="p-6 rounded-lg border-2 transition-all hover:border-primary-500 border-gray-200 hover:bg-primary-900/10"
                           >
                             <Icon size={32} className="mx-auto mb-2 text-orange-600" />
                             <div className="font-semibold text-gray-900">{type.name}</div>
@@ -251,7 +251,7 @@ export default function ProfileSelector() {
                       type="button"
                       onClick={() => setStep(3)}
                       disabled={!formData.name || !formData.breed}
-                      className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 btn btn-md btn-darkgreen disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
@@ -275,7 +275,7 @@ export default function ProfileSelector() {
                             setFormData({ ...formData, age: age.id });
                             setStep(4);
                           }}
-                          className="p-4 rounded-lg border-2 text-left transition-all hover:border-orange-400 border-gray-200 hover:bg-orange-50"
+                          className="p-4 rounded-lg border-2 text-left transition-all hover:border-primary-500 border-gray-200 hover:bg-primary-900/10"
                         >
                           <div className="font-bold text-gray-900">{age.name}</div>
                           <div className="text-sm text-gray-600">{age.description}</div>
@@ -307,8 +307,8 @@ export default function ProfileSelector() {
                           key={concern.id}
                           className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                             formData.healthConcerns.includes(concern.id)
-                              ? 'border-orange-600 bg-orange-50'
-                              : 'border-gray-200 hover:border-orange-300'
+                              ? 'border-primary-500 bg-primary-900/10'
+                              : 'border-gray-200 hover:border-primary-300'
                           }`}
                         >
                           <input
@@ -334,7 +334,7 @@ export default function ProfileSelector() {
                     <button
                       type="button"
                       onClick={handleAddPet}
-                      className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold"
+                      className="flex-1 btn btn-md btn-darkgreen font-semibold"
                     >
                       Add {formData.name}
                     </button>

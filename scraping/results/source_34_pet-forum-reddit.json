@@ -1,0 +1,49 @@
+{
+  "ingredients": [],
+  "nutritionalInfo": [],
+  "healthRecommendations": [],
+  "preparationMethods": [],
+  "veterinaryInsights": [],
+  "researchFindings": [
+    {
+      "text": "[December 02, 2025] - weekly Lost/Found/Need a New Home thread",
+      "source": "https://www.reddit.com/r/budgies/",
+      "category": "birds",
+      "nlpAnalysis": {
+        "sentences": [
+          "[December 02, 2025] - weekly Lost/Found/Need a New Home thread"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Lost, found, or need a new home",
+      "source": "https://www.reddit.com/r/budgies/",
+      "category": "birds",
+      "nlpAnalysis": {
+        "sentences": [
+          "Lost, found, or need a new home"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "source": "https://www.reddit.com/r/budgies/",
+  "type": "pet-forum-reddit",
+  "category": "birds",
+  "credibility": 3
+}

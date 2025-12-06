@@ -2,17 +2,11 @@
   "ingredients": [],
   "nutritionalInfo": [],
   "healthRecommendations": [],
-  "preparationMethods": [
-    {
-      "text": "➤ Hamster Care Central, the largest hamster discord server.",
-      "species": "pocket-pets",
-      "method": "general"
-    }
-  ],
+  "preparationMethods": [],
   "veterinaryInsights": [],
   "researchFindings": [],
-  "source": "https://www.reddit.com/r/hamsters/",
+  "source": "https://www.reddit.com/r/cats/",
   "type": "pet-forum-reddit",
-  "category": "pocket-pets",
+  "category": "cats",
   "credibility": 3
 }

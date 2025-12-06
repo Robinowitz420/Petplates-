@@ -9,6 +9,7 @@ import {
   getRecipeRatingData
 } from '@/lib/utils/ratings';
 import { CheckCircle, X, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { logger } from '@/lib/utils/logger';
 
 interface RecipeRatingSectionProps {
   recipeId: string;
@@ -114,7 +115,7 @@ export const RecipeRatingSection: React.FC<RecipeRatingSectionProps> = ({
       setReviewText('');
       setModifications('');
     } catch (error) {
-      console.error('Error saving rating:', error);
+      logger.error('Error saving rating:', error);
       setMessage('Failed to save rating. Please try again.');
       setTimeout(() => setMessage(null), 3000);
     } finally {

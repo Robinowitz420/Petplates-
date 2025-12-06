@@ -104,7 +104,7 @@ export default function CommunityGalleryPage() {
                 filter === 'all' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              All Recipes
+              All Meals
             </button>
             <button
               onClick={() => setFilter('highly-rated')}

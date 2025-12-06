@@ -1,0 +1,140 @@
+// src/utils/nutrition-data.ts
+// Consolidated nutritional data structures and calculation functions
+// Moved from App.jsx for better code organization
+
+import { INGREDIENT_COMPOSITIONS as INGREDIENT_COMPOSITIONS_DATA, type IngredientComposition, getIngredientComposition } from '../../lib/data/ingredientCompositions';
+import exoticStandards from '../../lib/data/exotic-standards.json';
+
+// Re-export INGREDIENT_COMPOSITIONS for backward compatibility
+export const INGREDIENT_COMPOSITIONS = INGREDIENT_COMPOSITIONS_DATA;
+
+// Export exotic standards as EXOTIC_TARGETS
+export const EXOTIC_TARGETS = exoticStandards;
+
+// Mock ingredient names (placeholder - update with actual data if needed)
+export const MOCK_INGREDIENT_NAMES: string[] = [
+  'Chicken Breast',
+  'Ground Turkey',
+  'Salmon',
+  'Beef',
+  'Eggs',
+  'Kale',
+  'Spinach',
+  'Carrots',
+  'Sweet Potato',
+  'Pumpkin',
+  'Broccoli',
+  'Green Beans',
+  'Brown Rice',
+  'White Rice',
+  'Oats',
+  'Quinoa',
+  'Blueberries',
+  'Bananas'
+];
+
+/**
+ * Calculate recipe nutrition from ingredients
+ * Uses real USDA data when available, falls back to estimates
+ */
+export function calculateRecipeNutrients(recipe: any): {
+  protein: number;
+  fat: number;
+  calcium: number;
+  phosphorus: number;
+  calories: number;
+  omega3?: number;
+  vitaminA?: number;
+  vitaminC?: number;
+  source: 'real' | 'estimated';
+} {
+  const ingredients = recipe.ingredients || [];
+  let totalProtein = 0;
+  let totalFat = 0;
+  let totalCalcium = 0;
+  let totalPhosphorus = 0;
+  let totalCalories = 0;
+  let totalOmega3 = 0;
+  let totalVitaminA = 0;
+  let totalVitaminC = 0;
+  let totalWeight = 0;
+
+  // Try to get real nutritional data
+  for (const ingredient of ingredients) {
+    const name = typeof ingredient === 'string' ? ingredient : ingredient.name;
+    const amount = typeof ingredient === 'string' ? 100 : (ingredient.amount || 100); // Assume 100g if not specified
+
+    const composition = getIngredientComposition(name);
+    if (composition) {
+      totalProtein += (composition.protein || 0) * (amount / 100);
+      totalFat += (composition.fat || 0) * (amount / 100);
+      totalCalcium += (composition.calcium || 0) * (amount / 100);
+      totalPhosphorus += (composition.phosphorus || 0) * (amount / 100);
+      totalCalories += (composition.kcal || 0) * (amount / 100);
+      totalOmega3 += (composition.omega3 || 0) * (amount / 100);
+      totalVitaminA += (composition.vitaminA || 0) * (amount / 100);
+      totalVitaminC += (composition.vitaminC || 0) * (amount / 100);
+      totalWeight += amount;
+    }
+  }
+
+  // If we have real data for at least 50% of ingredients, use it
+  const realDataRatio = totalWeight / (ingredients.length * 100);
+  if (realDataRatio >= 0.5 && totalWeight > 0) {
+    return {
+      protein: totalProtein / totalWeight * 100,
+      fat: totalFat / totalWeight * 100,
+      calcium: totalCalcium / totalWeight * 100,
+      phosphorus: totalPhosphorus / totalWeight * 100,
+      calories: totalCalories / totalWeight * 100,
+      omega3: totalOmega3 > 0 ? totalOmega3 / totalWeight * 100 : undefined,
+      vitaminA: totalVitaminA > 0 ? totalVitaminA / totalWeight * 100 : undefined,
+      vitaminC: totalVitaminC > 0 ? totalVitaminC / totalWeight * 100 : undefined,
+      source: 'real'
+    };
+  }
+
+  // Fall back to estimated values
+  const name = recipe.name?.toLowerCase() || '';
+  const ingredientsText = ingredients
+    .map((i: any) => (typeof i === 'string' ? i : i.name).toLowerCase())
+    .join(' ') || '';
+  const allText = `${name} ${ingredientsText}`;
+
+  // Estimate protein
+  let estimatedProtein = 25;
+  if (allText.includes('venison')) estimatedProtein = 34;
+  else if (allText.includes('rabbit')) estimatedProtein = 33;
+  else if (allText.includes('salmon') || allText.includes('fish')) estimatedProtein = 32;
+  else if (allText.includes('chicken')) estimatedProtein = 30;
+  else if (allText.includes('turkey')) estimatedProtein = 29;
+  else if (allText.includes('beef')) estimatedProtein = 28;
+  else if (allText.includes('pork')) estimatedProtein = 27;
+
+  // Estimate fat
+  let estimatedFat = 15;
+  if (allText.includes('salmon') || allText.includes('duck')) estimatedFat = 18;
+  else if (allText.includes('lean') || allText.includes('turkey')) estimatedFat = 10;
+  else if (allText.includes('pork') || allText.includes('lamb')) estimatedFat = 16;
+
+  // Estimate phosphorus
+  let estimatedPhosphorus = 0.5;
+  if (allText.includes('liver') || allText.includes('kidney') || allText.includes('organ')) {
+    estimatedPhosphorus = 0.8;
+  } else if (allText.includes('egg whites') || allText.includes('rice')) {
+    estimatedPhosphorus = 0.3;
+  }
+
+  return {
+    protein: estimatedProtein,
+    fat: estimatedFat,
+    calcium: 0.8, // Estimated
+    phosphorus: estimatedPhosphorus,
+    calories: 150, // Estimated
+    source: 'estimated'
+  };
+}
+
+// Re-export types for convenience
+export type { IngredientComposition } from '../../lib/data/ingredientCompositions';
+

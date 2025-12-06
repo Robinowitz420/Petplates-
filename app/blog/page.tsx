@@ -11,7 +11,7 @@ export default function BlogPage() {
       date: '2024-11-20',
       readTime: '8 min read',
       category: 'Nutrition',
-      image: '/IMAGES FOR SITE/Dogo.jpg'
+      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     },
     {
       id: 'cat-nutrition-myths-debunked',
@@ -21,7 +21,7 @@ export default function BlogPage() {
       date: '2024-11-18',
       readTime: '6 min read',
       category: 'Myths',
-      image: '/IMAGES FOR SITE/CatScientist.png'
+      image: '/images/emojis/Mascots/ProfessorPurffesor.jpg'
     },
     {
       id: 'fresh-pet-food-market-trends',
@@ -31,7 +31,7 @@ export default function BlogPage() {
       date: '2024-11-15',
       readTime: '5 min read',
       category: 'Industry',
-      image: '/IMAGES FOR SITE/Dinner.jpg'
+      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     },
     {
       id: 'supplements-every-pet-needs',
@@ -41,7 +41,7 @@ export default function BlogPage() {
       date: '2024-11-12',
       readTime: '7 min read',
       category: 'Supplements',
-      image: '/IMAGES FOR SITE/Puppychef1.png'
+      image: '/images/emojis/Mascots/ProfessorPurffesor.jpg'
     },
     {
       id: 'reading-pet-food-labels',
@@ -51,7 +51,7 @@ export default function BlogPage() {
       date: '2024-11-10',
       readTime: '4 min read',
       category: 'Education',
-      image: '/IMAGES FOR SITE/dishe.jpg'
+      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     },
     {
       id: 'seasonal-pet-nutrition',
@@ -61,7 +61,7 @@ export default function BlogPage() {
       date: '2024-11-08',
       readTime: '6 min read',
       category: 'Seasonal',
-      image: '/IMAGES FOR SITE/indian-food-illustration-kawaii-design-600nw-2629494985.webp'
+      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     }
   ];
 

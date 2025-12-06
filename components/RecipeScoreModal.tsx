@@ -1,11 +1,16 @@
 'use client';
 
-import React from 'react';
-import { X, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X, AlertTriangle, CheckCircle, Info, Star } from 'lucide-react';
 import type { Pet } from '@/lib/utils/petRatingSystem';
 import { rateRecipeForPet } from '@/lib/utils/petRatingSystem';
+import {
+  calculateImprovedCompatibility,
+  type ImprovedPet,
+} from '@/lib/utils/improvedCompatibilityScoring';
 import type { Recipe } from '@/lib/types';
 import healthConcerns from '@/lib/data/healthConcerns';
+import { actionNeededBeep } from '@/lib/utils/beep';
 
 interface Props {
   recipe: Recipe;
@@ -21,23 +26,67 @@ const Btn: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ children
 );
 
 export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
-  const rating = pet ? rateRecipeForPet(recipe, pet) : null;
+  // Use improved scoring if available, fallback to original
+  let rating: any = null;
+
+  if (pet) {
+    try {
+      const improvedPet: ImprovedPet = {
+        id: pet.id,
+        name: pet.name,
+        type: pet.type,
+        breed: pet.breed,
+        age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
+        weight: pet.weight || 10,
+        activityLevel: pet.activityLevel,
+        healthConcerns: pet.healthConcerns || [],
+        dietaryRestrictions: pet.dietaryRestrictions || [],
+        allergies: pet.allergies || [],
+      };
+      const improvedScore = calculateImprovedCompatibility(recipe, improvedPet);
+      rating = {
+        overallScore: improvedScore.overallScore,
+        stars: improvedScore.stars,
+        recommendation: improvedScore.recommendation,
+        summaryReasoning: improvedScore.summaryReasoning,
+        compatibility: improvedScore.recommendation || (improvedScore.stars >= 4 ? 'excellent' : improvedScore.stars >= 3 ? 'good' : 'fair'),
+        breakdown: {
+          petTypeMatch: { score: improvedScore.factors.ingredientSafety },
+          ageAppropriate: { score: improvedScore.factors.lifeStageFit },
+          nutritionalFit: { score: improvedScore.factors.nutritionalAdequacy },
+          healthCompatibility: { score: improvedScore.factors.healthAlignment },
+          allergenSafety: { score: improvedScore.factors.allergenSafety },
+        },
+        warnings: improvedScore.reasoning.warnings,
+        strengths: improvedScore.reasoning.strengths,
+        recommendations: improvedScore.reasoning.recommendations,
+      };
+    } catch (error) {
+      // Fallback to original scoring
+      rating = rateRecipeForPet(recipe, pet);
+    }
+  }
 
   if (!rating) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-        <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
+        <div className="w-full max-w-2xl bg-surface rounded-xl shadow-lg border border-surface-highlight p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold">Recipe Compatibility</h3>
-            <button onClick={onClose}><X /></button>
+            <h3 className="text-lg font-bold text-foreground">Recipe Compatibility</h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-white"><X /></button>
           </div>
-          <p className="text-sm text-gray-600">Select a pet to view compatibility details.</p>
+          <p className="text-sm text-gray-400">Select a pet to view compatibility details.</p>
         </div>
       </div>
     );
   }
 
-  const { overallScore, compatibility, breakdown, warnings, strengths, recommendations } = rating;
+  // Play a short cue when the modal opens to prompt user action.
+  useEffect(() => {
+    actionNeededBeep();
+  }, []);
+
+  const { overallScore, compatibility, breakdown, warnings, strengths, recommendations, stars, summaryReasoning, recommendation } = rating;
 
   function openAmazon(link: string) {
     if (!link) return;
@@ -53,59 +102,72 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
     .filter(Boolean) as (typeof healthConcerns[0])[];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4 sm:px-6">
-      <div className="w-full max-w-3xl bg-white rounded-xl shadow-2xl overflow-hidden ring-1 ring-black/5">
-        <div className="flex items-start justify-between p-5 border-b">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4 sm:px-6 bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-3xl bg-surface rounded-xl shadow-2xl overflow-hidden border border-surface-highlight">
+        <div className="flex items-start justify-between p-5 border-b border-surface-highlight bg-surface">
           <div>
-            <h2 className="text-xl font-bold">{recipe.name}</h2>
-            <p className="text-sm text-gray-600 mt-1">{recipe.description}</p>
+            <h2 className="text-xl font-bold text-foreground">{recipe.name}</h2>
+            <p className="text-sm text-gray-400 mt-1">{recipe.description}</p>
           </div>
           <div className="flex flex-col items-end gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Score</span>
-              <div className={`px-3 py-1 rounded-md font-semibold ${overallScore >= 85 ? 'bg-green-50 text-green-700' : overallScore >= 70 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>
+              <span className="text-xs text-gray-400">Score</span>
+              <div className={`px-3 py-1 rounded-md font-semibold ${overallScore >= 85 ? 'bg-green-900/30 text-green-400 border border-green-800' : overallScore >= 70 ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-red-900/30 text-red-400 border border-red-800'}`}>
                 {overallScore} / 100
               </div>
             </div>
-            <button onClick={onClose} className="p-2 rounded hover:bg-gray-100">
+            <div className="flex items-center gap-1 text-yellow-500" aria-label="star rating">
+              {[1,2,3,4,5].map(i => (
+                <Star key={i} className={`w-4 h-4 ${stars && i <= stars ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`} />
+              ))}
+              <span className="text-xs text-gray-400 ml-1">{recommendation || compatibility}</span>
+            </div>
+            <button onClick={onClose} className="p-2 rounded text-gray-400 hover:bg-surface-highlight hover:text-white">
               <X />
             </button>
           </div>
         </div>
 
-        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 bg-surface">
           {/* Left: Breakdown */}
           <div className="md:col-span-2">
-            <h4 className="text-sm font-semibold mb-2">Why this score</h4>
-            <div className="space-y-2 text-sm text-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-gray-200">Why this score</h4>
+            </div>
+            {summaryReasoning && (
+              <div className="mb-3 text-sm text-gray-300 font-semibold italic">
+                {summaryReasoning}
+              </div>
+            )}
+            <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center justify-between">
-                <div>Species match</div>
-                <div className="font-mono">{breakdown.petTypeMatch.score}%</div>
+                <div>Ingredient Safety</div>
+                <div className="font-mono text-gray-300">{breakdown.petTypeMatch.score}%</div>
               </div>
               <div className="flex items-center justify-between">
-                <div>Age appropriateness</div>
-                <div className="font-mono">{breakdown.ageAppropriate.score}%</div>
+                <div>Nutritional Adequacy</div>
+                <div className="font-mono text-gray-300">{breakdown.nutritionalFit.score}%</div>
               </div>
               <div className="flex items-center justify-between">
-                <div>Nutritional fit</div>
-                <div className="font-mono">{breakdown.nutritionalFit.score}%</div>
+                <div>Health Alignment</div>
+                <div className="font-mono text-gray-300">{breakdown.healthCompatibility.score}%</div>
               </div>
               <div className="flex items-center justify-between">
-                <div>Health compatibility</div>
-                <div className="font-mono">{breakdown.healthCompatibility.score}%</div>
+                <div>Life Stage Fit</div>
+                <div className="font-mono text-gray-300">{breakdown.ageAppropriate.score}%</div>
               </div>
               <div className="flex items-center justify-between">
-                <div>Allergen safety</div>
-                <div className="font-mono">{breakdown.allergenSafety.score}%</div>
+                <div>Allergen Safety</div>
+                <div className="font-mono text-gray-300">{breakdown.allergenSafety.score}%</div>
               </div>
             </div>
 
             {/* Strengths */}
             {strengths.length > 0 && (
               <div className="mt-4">
-                <h5 className="text-sm font-semibold">Strengths</h5>
-                <ul className="list-disc ml-5 text-sm text-gray-700">
-                  {strengths.map((s, i) => <li key={i}>{s}</li>)}
+                <h5 className="text-sm font-semibold text-green-400">Strengths</h5>
+                <ul className="list-disc ml-5 text-sm text-gray-400">
+                  {strengths.map((s: string, i: number) => <li key={i}>{s}</li>)}
                 </ul>
               </div>
             )}
@@ -113,40 +175,36 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
             {/* Warnings */}
             {warnings.length > 0 && (
               <div className="mt-4">
-                <h5 className="text-sm font-semibold">Warnings</h5>
-                <ul className="list-disc ml-5 text-sm text-red-700">
-                  {warnings.map((w, i) => <li key={i}>{w}</li>)}
+                <h5 className="text-sm font-semibold text-red-400">Warnings</h5>
+                <ul className="list-disc ml-5 text-sm text-red-300/80">
+                  {warnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
                 </ul>
               </div>
             )}
 
             {/* Recommendations (generic) */}
             <div className="mt-4">
-              <h5 className="text-sm font-semibold">Quick recommendations</h5>
+              <h5 className="text-sm font-semibold text-gray-200">Quick recommendations</h5>
               <div className="flex flex-wrap gap-2 mt-2">
-                {/* show recommended ingredient/supplement buttons from the concernRecs */}
                 {concernRecs.map((c) => (
                   <button
                     key={c.value}
                     onClick={() => {
-                      // open primary recommended supplement/product (first item) if present
                       const first = c.recommendedProducts?.[0];
                       if (first?.affiliateUrl) openAmazon(first.affiliateUrl);
                     }}
-                    className="px-3 py-1 rounded-md border text-sm bg-white hover:bg-gray-50"
+                    className="px-3 py-1 rounded-md border border-surface-highlight text-sm bg-surface-lighter text-gray-300 hover:bg-surface-highlight hover:text-white"
                     title={c.label}
                   >
                     {c.label} → Suggested
                   </button>
                 ))}
 
-                {/* Add a generic "Add supplement" CTA (hook to your affiliate flow) */}
                 <button
                   onClick={() => {
-                    // example: open a general supplements search
                     openAmazon('https://www.amazon.com/s?k=dog+joint+supplement');
                   }}
-                  className="px-3 py-1 rounded-md border text-sm bg-primary-50 text-primary-700"
+                  className="px-3 py-1 rounded-md border border-primary-800 text-sm bg-primary-900/20 text-primary-300 hover:bg-primary-900/40"
                 >
                   Browse supplements
                 </button>
@@ -156,33 +214,33 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
 
           {/* Right: Quick edits / portion & swaps */}
           <div>
-            <h4 className="text-sm font-semibold mb-2">Quick fixes</h4>
+            <h4 className="text-sm font-semibold mb-2 text-gray-200">Quick fixes</h4>
 
             <div className="space-y-3 text-sm">
               {/* Portion hint */}
-              <div className="p-3 border rounded-md">
+              <div className="p-3 border border-surface-highlight rounded-md bg-surface-lighter">
                 <div className="flex items-start gap-2">
                   <Info className="w-5 h-5 text-gray-400" />
                   <div>
-                    <div className="text-xs text-gray-600">Portion suggestion</div>
-                    <div className="font-semibold">{recipe.servings} serving(s) — reduce by 10% if weight loss is target</div>
+                    <div className="text-xs text-gray-500">Portion suggestion</div>
+                    <div className="font-semibold text-gray-200">{recipe.servings} serving(s) — reduce by 10% if weight loss is target</div>
                   </div>
                 </div>
               </div>
 
               {/* Swap protein (example action) */}
-              <div className="p-3 border rounded-md">
-                <div className="text-xs text-gray-600">Swap protein</div>
+              <div className="p-3 border border-surface-highlight rounded-md bg-surface-lighter">
+                <div className="text-xs text-gray-500">Swap protein</div>
                 <div className="mt-2 flex gap-2">
                   <button
                     onClick={() => openAmazon('https://www.amazon.com/s?k=novel+protein+venison')}
-                    className="px-3 py-1 rounded-md border text-sm"
+                    className="px-3 py-1 rounded-md border border-surface-highlight text-gray-300 hover:bg-surface-highlight hover:text-white text-sm"
                   >
                     Venison topper
                   </button>
                   <button
                     onClick={() => openAmazon('https://www.amazon.com/s?k=novel+protein=rabbit')}
-                    className="px-3 py-1 rounded-md border text-sm"
+                    className="px-3 py-1 rounded-md border border-surface-highlight text-gray-300 hover:bg-surface-highlight hover:text-white text-sm"
                   >
                     Rabbit topper
                   </button>
@@ -190,11 +248,10 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
               </div>
 
               {/* Save recipe to pet quick CTA */}
-              <div className="p-3 border rounded-md">
-                <div className="text-xs text-gray-600">Save / Add</div>
+              <div className="p-3 border border-surface-highlight rounded-md bg-surface-lighter">
+                <div className="text-xs text-gray-500">Save / Add</div>
                 <div className="mt-2 flex gap-2">
                   <Btn onClick={() => {
-                    // hacky client save for MVP: store saved recipes per pet in localStorage
                     if (!pet) { alert('Select a pet first'); return; }
                     const key = `saved_recipes_${pet.id}`;
                     const existing = localStorage.getItem(key);
@@ -209,17 +266,16 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
                   }}>Add to {pet?.name ?? 'Pet'}</Btn>
 
                   <button onClick={() => {
-                    // navigate to full recipe page
                     window.location.href = `/recipe/${recipe.id}?petId=${pet?.id ?? ''}`;
-                  }} className="px-3 py-1 rounded-md border">View recipe</button>
+                  }} className="px-3 py-1 rounded-md border border-surface-highlight text-gray-300 hover:bg-surface-highlight hover:text-white">View recipe</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="p-5 border-t flex justify-end gap-3">
-          <button onClick={onClose} className="px-3 py-2 rounded-md border">Close</button>
+        <div className="p-5 border-t border-surface-highlight bg-surface flex justify-end gap-3">
+          <button onClick={onClose} className="px-3 py-2 rounded-md border border-surface-highlight text-gray-300 hover:bg-surface-highlight hover:text-white">Close</button>
         </div>
       </div>
     </div>

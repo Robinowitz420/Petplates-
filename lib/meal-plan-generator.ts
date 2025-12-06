@@ -16,13 +16,46 @@ export interface PetProfile {
   healthConcern: string | null; // e.g., 'weight-management' or null
 }
 
+import { normalizeToSubtype } from '@/lib/utils/ingredientWhitelists';
+
+/**
+ * Check if recipe matches species/subtype (for meal plan generation)
+ */
+function matchesSpeciesForPlan(recipe: Recipe, profile: PetProfile): boolean {
+  // Exact match
+  if (recipe.category === profile.category) return true;
+  
+  // Subtype matching for exotics
+  const subtype = normalizeToSubtype(profile.category as any, profile.breed || undefined);
+  
+  if (profile.category === 'birds') {
+    // Allow generic bird recipes
+    if (recipe.category === 'birds' || recipe.category === 'bird') return true;
+    // Allow subtype-specific
+    if (recipe.category === subtype) return true;
+  }
+  
+  if (profile.category === 'reptiles') {    
+    if (recipe.category === 'reptiles' || recipe.category === 'reptile') return true;
+    if (recipe.category === subtype) return true;
+  }
+  
+  if (profile.category === 'pocket-pets') {
+    if (recipe.category === 'pocket-pets' || recipe.category === 'pocket-pet') return true;
+    if (recipe.category === subtype) return true;
+  }
+  
+  return false;
+}
+
 /**
  * Filters the master recipe list based on the pet's profile metadata.
+ * Now supports subtype matching for exotic species.
  */
 const filterRecipes = (profile: PetProfile): Recipe[] => {
   return recipes.filter(recipe => {
-    // 1. Category Match (Required)
-    if (recipe.category !== profile.category) {
+    // 1. Category/Subtype Match (Required)
+    if (!matchesSpeciesForPlan(recipe, profile)) {
       return false;
     }
 

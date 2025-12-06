@@ -287,17 +287,92 @@ export interface CompatibilityRating {
   recommendations: string[];
 }
 
-const HEALTH_CONCERNS: Record<string, { maxPhosphorus?: number; maxFat?: number; restrictions: string[] }> = {
-  'kidney-disease': { maxPhosphorus: 200, restrictions: ['liver', 'kidney', 'organ'] },
-  'pancreatitis': { maxFat: 12, restrictions: ['high-fat', 'pork', 'lamb', 'duck'] },
-  'obesity': { maxFat: 12, restrictions: [] },
-  'digestive-issues': { restrictions: ['spicy', 'raw'] },
-  'allergies': { restrictions: ['chicken', 'beef', 'dairy', 'wheat', 'corn', 'soy'] },
-  'joint-health': { restrictions: [] },
-  'skin-conditions': { restrictions: [] }
+// Helper to normalize health concern keys
+function normalizeHealthConcernKey(concern: string): string {
+  const normalized = concern.toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  
+  // Map variations to standard keys
+  const mapping: Record<string, string> = {
+    'pancreatitis': 'pancreatitis',
+    'pancreatic': 'pancreatitis',
+    'heart-disease': 'heart-disease',
+    'heart disease': 'heart-disease',
+    'heart': 'heart-disease',
+    'diabetes': 'diabetes',
+    'diabetic': 'diabetes',
+    'skin-conditions': 'skin-conditions',
+    'skin conditions': 'skin-conditions',
+    'skin condition': 'skin-conditions',
+    'skin-coat': 'skin-conditions',
+    'allergies': 'allergies',
+    'allergy': 'allergies',
+    'skin-issues': 'allergies',
+    'skin issues': 'allergies',
+    'kidney-disease': 'kidney-disease',
+    'kidney disease': 'kidney-disease',
+    'kidney': 'kidney-disease',
+    'digestive-issues': 'digestive-issues',
+    'digestive issues': 'digestive-issues',
+    'digestive': 'digestive-issues',
+    'joint-health': 'joint-health',
+    'joint health': 'joint-health',
+    'arthritis': 'joint-health',
+    'joint pain': 'joint-health',
+    'weight-management': 'weight-management',
+    'weight management': 'weight-management',
+    'obesity': 'weight-management',
+    'dental-issues': 'dental-issues',
+    'dental issues': 'dental-issues',
+    'dental': 'dental-issues'
+  };
+  
+  return mapping[normalized] || normalized;
+}
+
+const HEALTH_CONCERNS: Record<string, { maxPhosphorus?: number; maxFat?: number; maxProtein?: number; minProtein?: number; restrictions: string[]; requires?: string[] }> = {
+  'kidney-disease': { maxPhosphorus: 200, restrictions: ['liver', 'kidney', 'organ'], requires: ['low-phosphorus', 'high-quality-protein'] },
+  'pancreatitis': { maxFat: 12, restrictions: ['high-fat', 'pork', 'lamb', 'duck', 'fried', 'greasy'], requires: ['low-fat', 'easily-digestible'] },
+  'obesity': { maxFat: 12, maxProtein: 30, restrictions: ['high-calorie', 'treats'], requires: ['low-calorie', 'high-fiber'] },
+  'digestive-issues': { restrictions: ['spicy', 'raw', 'high-fiber', 'dairy'], requires: ['easily-digestible', 'bland'] },
+  'allergies': { restrictions: ['chicken', 'beef', 'dairy', 'wheat', 'corn', 'soy', 'eggs'], requires: ['novel-protein', 'hypoallergenic'] },
+  'joint-health': { restrictions: [], requires: ['omega-3', 'glucosamine', 'chondroitin'] },
+  'skin-conditions': { restrictions: ['artificial-colors', 'preservatives'], requires: ['omega-3', 'quality-protein', 'vitamin-e'] },
+  'heart-disease': { maxFat: 15, restrictions: ['high-sodium', 'processed'], requires: ['taurine', 'omega-3', 'low-sodium'] },
+  'diabetes': { maxFat: 15, restrictions: ['high-sugar', 'simple-carbs', 'corn-syrup'], requires: ['complex-carbs', 'high-fiber', 'low-glycemic'] }
 };
 
+/**
+ * Calculates compatibility rating between a recipe and a pet profile.
+ * 
+ * @param recipe - Recipe object from recipes-complete.ts
+ * @param pet - Pet profile with type, age, weight, health concerns, etc.
+ * @returns CompatibilityRating with overall score (0-100), breakdown, warnings, and recommendations
+ * 
+ * @example
+ * ```ts
+ * const rating = rateRecipeForPet(recipe, pet);
+ * console.log(rating.overallScore); // 85
+ * console.log(rating.compatibility); // 'excellent'
+ * ```
+ * 
+ * @contract
+ * - Input: Recipe from lib/data/recipes-complete.ts, Pet from localStorage/backend
+ * - Output: CompatibilityRating with standardized structure
+ * - Side effects: None (pure function)
+ * - Migration: Compatible with Firebase/Supabase (receives Pet object, not storage)
+ */
 export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
+  // Normalize array-like fields to avoid runtime errors
+  const safePet: Pet = {
+    ...pet,
+    dietaryRestrictions: Array.isArray((pet as any).dietaryRestrictions) ? (pet as any).dietaryRestrictions : [],
+    allergies: Array.isArray(pet.allergies) ? pet.allergies : [],
+    healthConcerns: Array.isArray(pet.healthConcerns) ? pet.healthConcerns : [],
+    dislikes: Array.isArray((pet as any).dislikes) ? (pet as any).dislikes : [],
+  };
+
   const warnings: string[] = [];
   const strengths: string[] = [];
   const recommendations: string[] = [];
@@ -307,15 +382,15 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
   const realNutrition = calculateRecipeNutrition(recipe);
 
   // 1. Pet Type Match (20%)
-  const petTypeMatch = (recipe.category === pet.type || recipe.category === `${pet.type}s`) ? 100 : 0;
+  const petTypeMatch = (recipe.category === safePet.type || recipe.category === `${safePet.type}s`) ? 100 : 0;
 
   // 2. Age Appropriate (15%)
-  const petAgeGroup = pet.age < 1 ? 'baby' : pet.age < 2 ? 'young' : pet.age < 7 ? 'adult' : 'senior';
+  const petAgeGroup = safePet.age < 1 ? 'baby' : safePet.age < 2 ? 'young' : safePet.age < 7 ? 'adult' : 'senior';
   const ageMatch = (recipe.ageGroup || []).includes(petAgeGroup) || (recipe.ageGroup || []).includes('all');
   const ageScore = ageMatch ? 100 : 70;
 
   // 3. Species-Specific Nutritional Fit (30%)
-  const speciesScore = calculateSpeciesSpecificScore(recipe, pet);
+  const speciesScore = calculateSpeciesSpecificScore(recipe, safePet);
 
   // 4. Health Compatibility (25%)
   let healthScore = 90;
@@ -325,10 +400,10 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
     ? recipe.healthConcerns
     : enriched.healthBenefits;
 
-  if (pet.healthConcerns.length > 0) {
+  if (safePet.healthConcerns.length > 0) {
     healthScore = 70; // Start lower
 
-    for (const concern of pet.healthConcerns) {
+    for (const concern of safePet.healthConcerns) {
       // Bonus for matching benefits
       if (effectiveHealthTags.some((tag: string) => tag.includes(concern) || concern.includes(tag))) {
         healthScore += 20;
@@ -336,7 +411,8 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
       }
 
       // Penalties for contradictions
-      const rules = HEALTH_CONCERNS[concern];
+      const normalizedConcern = normalizeHealthConcernKey(concern);
+      const rules = HEALTH_CONCERNS[normalizedConcern];
       if (rules) {
         // Check Fat cap
         const fatVal = (nutrition && !nutrition.isGeneric) ? nutrition.fat : enriched.estimatedFat;
@@ -356,7 +432,7 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
 
   // 5. Allergen Safety (10%)
   let allergenScore = 100;
-  const allRestrictions = [...pet.dietaryRestrictions, ...(pet.healthConcerns.includes('allergies') ? pet.allergies || [] : [])];
+  const allRestrictions = [...(safePet.dietaryRestrictions || []), ...(safePet.healthConcerns?.includes('allergies') ? safePet.allergies || [] : [])];
 
   for (const restriction of allRestrictions) {
     const rLower = restriction.toLowerCase();

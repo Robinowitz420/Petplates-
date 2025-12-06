@@ -2,10 +2,11 @@ import type { Recipe, ModifiedRecipeResult, PetNutritionProfile, PortionPlan, Sh
 import { recipes } from './data/recipes-complete';
 import { dogModifiers } from './data/nutrition-dog-modifiers';
 import { catModifiers } from './data/nutrition-cat-modifiers';
-import { scoreRecipe } from './scoreRecipe';
+import { scoreRecipeImproved } from './scoreRecipe';
 import { getPortionPlan } from './portionCalc';
 import { scaleAmount } from './portionCalc';
 import { getVettedProduct, getAllAffiliateLinks } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
+import { matchesSpecies } from './utils/recipeRecommendations';
 
 interface ApplyModifiersResult {
   modifiedRecipe: Recipe;
@@ -39,8 +40,33 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
   let hasHydrationSupport = false;
 
   // 1. Apply Health Concern Modifiers (Supplements/Additions)
+  // Import normalizeHealthConcernForMatching from scoreRecipe (or define locally)
+  const normalizeConcern = (c: string): string => {
+    const normalized = c.toLowerCase().trim();
+    // Map human-readable to normalized format
+    const mapping: Record<string, string> = {
+      'arthritis/joint pain': 'joint-health',
+      'joint pain': 'joint-health',
+      'arthritis': 'joint-health',
+      'obesity/weight management': 'weight-management',
+      'obesity': 'weight-management',
+      'weight management': 'weight-management',
+      'kidney disease': 'kidney-disease',
+      'kidney': 'kidney-disease',
+      'urinary problems': 'urinary-health',
+      'urinary tract issues': 'urinary-health',
+      'dental problems': 'dental-issues',
+      'dental disease': 'dental-issues',
+      'digestive issues': 'digestive-issues',
+      'allergies/skin issues': 'allergies',
+      'skin issues': 'allergies',
+    };
+    return mapping[normalized] || normalized.replace(/[^a-z0-9]+/g, '-');
+  };
+
   for (const concern of pet.healthConcerns || []) {
-    const modKey = concernToModifierKey[concern.toLowerCase()];
+    const normalizedConcern = normalizeConcern(concern);
+    const modKey = concernToModifierKey[normalizedConcern] || concernToModifierKey[concern.toLowerCase()];
     if (modKey && (modifiers as any)[modKey]) {
       const modifier = (modifiers as any)[modKey];
 
@@ -51,7 +77,7 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
         addedIngredients.push({
           name: vettedProduct?.productName || supplement.name,
           benefit: supplement.benefit,
-          amazon: vettedProduct?.amazonLink || supplement.amazon, // Use vetted link if available
+          amazon: vettedProduct?.asinLink || supplement.amazon, // Use vetted ASIN link if available
           forConcern: concern,
         });
       }
@@ -81,34 +107,34 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
             ...ing,
             name: vettedProduct.productName, // Use the specific product name
             productName: vettedProduct.productName, // Set the specific product name
-            amazonLink: vettedProduct.amazonLink, // Use the specific affiliate link
-            notes: ing.notes ? `${ing.notes} | VET NOTE: ${vettedProduct.vetNote}` : `VET NOTE: ${vettedProduct.vetNote}`,
+            asinLink: vettedProduct.asinLink, // Use the specific ASIN link
+            notes: (ing as any).notes ? `${(ing as any).notes} | VET NOTE: ${vettedProduct.vetNote}` : `VET NOTE: ${vettedProduct.vetNote}`,
         };
     }
-    // If no vetted product, remove amazonLink to ensure only vetted products have buy links
+    // If no vetted product, remove asinLink to ensure only vetted products have buy links
     return {
       ...ing,
-      amazonLink: undefined,
+      asinLink: undefined,
     };
   });
 
   // 3. Map Supplements to Vetted Products (ensure all buy links are vetted)
-  if (modifiedRecipe.supplements) {
-    modifiedRecipe.supplements = modifiedRecipe.supplements.map(supplement => {
+  if ((modifiedRecipe as any).supplements) {
+    (modifiedRecipe as any).supplements = (modifiedRecipe as any).supplements.map((supplement: any) => {
       const vettedProduct = getVettedProduct(supplement.name);
       if (vettedProduct) {
         return {
           ...supplement,
           name: vettedProduct.productName,
           productName: vettedProduct.productName,
-          amazonLink: vettedProduct.amazonLink,
+          asinLink: vettedProduct.asinLink,
           notes: supplement.notes ? `${supplement.notes} | VET NOTE: ${vettedProduct.vetNote}` : `VET NOTE: ${vettedProduct.vetNote}`,
         };
       }
-      // If no vetted product, remove amazonLink to ensure only vetted products have buy links
+      // If no vetted product, remove asinLink to ensure only vetted products have buy links
       return {
         ...supplement,
-        amazonLink: undefined,
+        asinLink: undefined,
       };
     });
   }
@@ -122,15 +148,70 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
 }
 
 export function generateModifiedRecommendations({ profile, recipeIds, limit }: { profile: PetNutritionProfile, recipeIds: string[], limit: number }): ModifiedRecipeResult[] {
+    console.log('🔍 generateModifiedRecommendations called:', {
+        species: profile.species,
+        ageGroup: profile.ageGroup,
+        healthConcerns: profile.healthConcerns,
+        limit
+    });
+    
     // NOTE: 'recipes' is imported from './data/recipes-complete'
-    const allRecipesForCategory = recipes.filter(r => r.category === profile.species);
+    // Use matchesSpecies instead of strict equality to support subtype matching
+    const petForMatching = {
+        id: '',
+        name: '',
+        type: profile.species,
+        breed: profile.breed || '',
+        age: profile.ageGroup,
+        healthConcerns: profile.healthConcerns || []
+    };
+    
+    // Use matchesSpecies for sophisticated matching (handles subtypes)
+    let allRecipesForCategory = recipes.filter(r => matchesSpecies(r, petForMatching));
+    console.log(`📊 Found ${allRecipesForCategory.length} recipes for species "${profile.species}"`);
+    
+    // Fallback: If no matches, try simple normalization (cat/cats, dog/dogs)
+    if (allRecipesForCategory.length === 0) {
+        const normalizeSpecies = (species: string) => species.toLowerCase().replace(/s$/, '');
+        const normalizedPet = normalizeSpecies(profile.species);
+        allRecipesForCategory = recipes.filter(r => {
+            const normalizedRecipe = normalizeSpecies(r.category);
+            return normalizedPet === normalizedRecipe;
+        });
+    }
+    
+    // Log for debugging
+    if (allRecipesForCategory.length === 0) {
+        console.warn(`No recipes found for species: ${profile.species}, breed: ${profile.breed}, age: ${profile.ageGroup}`);
+        console.warn(`Total recipes available: ${recipes.length}`);
+        console.warn(`Sample recipe categories: ${recipes.slice(0, 5).map(r => r.category).join(', ')}`);
+    }
+    
     const targetRecipes = recipeIds.length > 0
         ? allRecipesForCategory.filter(r => recipeIds.includes(r.id))
         : allRecipesForCategory.slice(0, 50); // Use a subset if no IDs provided
 
     // 1. Score all recipes
-    const scoredRecipes = targetRecipes.map(recipe => {
-        const petRating = scoreRecipe(recipe, profile);
+    console.log(`🎯 Scoring ${targetRecipes.length} recipes...`);
+    const scoredRecipes = targetRecipes.map((recipe, idx) => {
+        // Convert PetNutritionProfile to pet object format expected by scoreRecipeImproved
+        const petForScoring = {
+            id: '',
+            name: profile.petName || '',
+            type: profile.species,
+            breed: profile.breed || '',
+            age: profile.ageGroup,
+            weight: profile.weightKg,
+            weightKg: profile.weightKg,
+            activityLevel: undefined,
+            healthConcerns: profile.healthConcerns || [],
+            dietaryRestrictions: profile.allergies || [],
+            allergies: profile.allergies || [],
+        };
+        const petRating = scoreRecipeImproved(recipe, petForScoring);
+        if (idx < 3) { // Log first 3 for debugging
+            console.log(`  Recipe "${recipe.name}": ${petRating.matchScore}% (${petRating.reasoning.goodMatches.length} matches, ${petRating.reasoning.conflicts.length} conflicts)`);
+        }
         return { recipe, petRating };
     });
 
@@ -141,8 +222,17 @@ export function generateModifiedRecommendations({ profile, recipeIds, limit }: {
 
     // 3. Apply modifiers to the top N recipes
     const results = topScored.map(({ recipe, petRating }) => {
+        // Convert PetNutritionProfile to pet object format expected by applyModifiers
+        const petForModifiers = {
+            type: profile.species,
+            age: profile.ageGroup,
+            breed: profile.breed || '',
+            healthConcerns: profile.healthConcerns || [],
+            allergies: profile.allergies || [],
+            weightKg: profile.weightKg,
+        };
         // Apply modifiers, which now performs the ingredient vetting lookup (Step 2 in applyModifiers)
-        const { modifiedRecipe, addedIngredients, conflictCount, hasHydrationSupport } = applyModifiers(recipe, profile);
+        const { modifiedRecipe, addedIngredients, conflictCount, hasHydrationSupport } = applyModifiers(recipe, petForModifiers);
 
         const portionPlan = getPortionPlan(recipe, profile);
 
@@ -159,16 +249,16 @@ export function generateModifiedRecommendations({ profile, recipeIds, limit }: {
                 return {
                     name: vettedProduct?.productName || ing.name,
                     amount: scaleAmount(ing.amount, portionPlan.multiplier) || ing.amount,
-                    amazonLink: bestLink?.url || ing.amazonLink, // Use best commission link
-                    notes: ing.notes,
-                    category: ing.category,
+                    asinLink: bestLink?.url || ing.asinLink, // Use best commission link
+                    notes: (ing as any).notes,
+                    category: (ing as any).category,
                 };
             }),
             // 2. Added supplements/modifiers
             ...addedIngredients.map(add => ({
                 name: add.name,
                 amount: '1 dose/day', // Default amount for a supplement
-                amazonLink: add.amazon,
+                asinLink: add.amazon,
                 notes: `Added for ${add.forConcern} support. Benefit: ${add.benefit}`,
                 category: 'Supplement',
             })),

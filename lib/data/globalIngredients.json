@@ -1,0 +1,161 @@
+{
+  "heart": {
+    "id": "heart",
+    "displayName": "heart",
+    "category": "protein",
+    "commonNames": [
+      "heart"
+    ],
+    "confidenceLevel": "high",
+    "lastScraped": "2025-12-02T19:30:10.772Z",
+    "sources": [
+      "https://vetnutrition.tufts.edu/",
+      "https://drjudymorgan.com/"
+    ],
+    "scrapedCount": 6
+  },
+  "kidney": {
+    "id": "kidney",
+    "displayName": "kidney",
+    "category": "protein",
+    "commonNames": [
+      "kidney"
+    ],
+    "confidenceLevel": "high",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://vetnutrition.tufts.edu/",
+      "https://drjudymorgan.com/"
+    ],
+    "scrapedCount": 6
+  },
+  "supplement": {
+    "id": "supplement",
+    "displayName": "supplement",
+    "category": "supplement",
+    "commonNames": [
+      "supplement"
+    ],
+    "confidenceLevel": "high",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://balanceit.com/",
+      "https://www.vetmed.ucdavis.edu/hospital/small-animal/nutrition"
+    ],
+    "scrapedCount": 6
+  },
+  "nutrient": {
+    "id": "nutrient",
+    "displayName": "nutrient",
+    "category": "other",
+    "commonNames": [
+      "nutrient"
+    ],
+    "confidenceLevel": "medium",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://balanceit.com/"
+    ],
+    "scrapedCount": 3
+  },
+  "chicken": {
+    "id": "chicken",
+    "displayName": "chicken",
+    "category": "protein",
+    "commonNames": [
+      "chicken"
+    ],
+    "confidenceLevel": "medium",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://www.whole-dog-journal.com/",
+      "https://drjudymorgan.com/"
+    ],
+    "scrapedCount": 4
+  },
+  "sweet_potato": {
+    "id": "sweet_potato",
+    "displayName": "sweet potato",
+    "category": "other",
+    "commonNames": [
+      "sweet potato"
+    ],
+    "confidenceLevel": "low",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://www.whole-dog-journal.com/"
+    ],
+    "scrapedCount": 1
+  },
+  "glucosamine": {
+    "id": "glucosamine",
+    "displayName": "glucosamine",
+    "category": "supplement",
+    "commonNames": [
+      "glucosamine"
+    ],
+    "confidenceLevel": "medium",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://www.whole-dog-journal.com/"
+    ],
+    "scrapedCount": 3
+  },
+  "pea": {
+    "id": "pea",
+    "displayName": "pea",
+    "category": "other",
+    "commonNames": [
+      "pea"
+    ],
+    "confidenceLevel": "medium",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://drjudymorgan.com/"
+    ],
+    "scrapedCount": 3
+  },
+  "pumpkin": {
+    "id": "pumpkin",
+    "displayName": "pumpkin",
+    "category": "grain",
+    "commonNames": [
+      "pumpkin"
+    ],
+    "confidenceLevel": "medium",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://lafeber.com/"
+    ],
+    "scrapedCount": 3
+  },
+  "turkey": {
+    "id": "turkey",
+    "displayName": "turkey",
+    "category": "protein",
+    "commonNames": [
+      "turkey"
+    ],
+    "confidenceLevel": "medium",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://www.whole-dog-journal.com/",
+      "https://www.birdforum.net/"
+    ],
+    "scrapedCount": 4
+  },
+  "guinea_pig": {
+    "id": "guinea_pig",
+    "displayName": "guinea pig",
+    "category": "other",
+    "commonNames": [
+      "guinea pig"
+    ],
+    "confidenceLevel": "low",
+    "lastScraped": "2025-12-02T19:30:10.773Z",
+    "sources": [
+      "https://www.guineapigcages.com/forum/"
+    ],
+    "scrapedCount": 2
+  }
+}

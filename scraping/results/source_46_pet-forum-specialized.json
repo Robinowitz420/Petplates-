@@ -1,0 +1,74 @@
+{
+  "ingredients": [
+    "turkey"
+  ],
+  "nutritionalInfo": [],
+  "healthRecommendations": [
+    {
+      "text": "paddyluke",
+      "category": "general-health",
+      "source": "pet-forum-specialized"
+    }
+  ],
+  "preparationMethods": [
+    {
+      "text": "ZEISS\n\n\n\t\t\t\n\n\t\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\n\t\n\tNews Feed\n\n\t\n\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\n\t\n\tOptical Knowledge\n\n\t\n\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\n\t\n\tAbout Zeiss\n\n\t\n\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\n\t\n\tZEISS Nature Observation Blog",
+      "species": "birds",
+      "method": "general"
+    },
+    {
+      "text": "Cooking Recipes",
+      "species": "birds",
+      "method": "cooked"
+    },
+    {
+      "text": "Food and Feeders",
+      "species": "birds",
+      "method": "general"
+    }
+  ],
+  "veterinaryInsights": [
+    {
+      "text": "Miscellaneous Nature Study Equipment\n    \n    \n        (6 Viewers)",
+      "type": "pet-forum-specialized",
+      "credibility": 4,
+      "nlpAnalysis": {
+        "sentences": [
+          "Miscellaneous Nature Study Equipment\n    \n    \n        (6 Viewers)"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [
+    {
+      "text": "Miscellaneous Nature Study Equipment\n    \n    \n        (6 Viewers)",
+      "source": "https://www.birdforum.net/",
+      "category": "birds",
+      "nlpAnalysis": {
+        "sentences": [
+          "Miscellaneous Nature Study Equipment\n    \n    \n        (6 Viewers)"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "source": "https://www.birdforum.net/",
+  "type": "pet-forum-specialized",
+  "category": "birds",
+  "credibility": 4
+}

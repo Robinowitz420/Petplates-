@@ -1,0 +1,1451 @@
+{
+  "total_images": 238,
+  "unique_usable": 238,
+  "duplicates": 0,
+  "by_source": {
+    "amojis": 64,
+    "copilot": 110,
+    "emoji": 64
+  },
+  "candidates": {
+    "dog": "public\\images\\emojis\\amojis_001.png",
+    "cat": "public\\images\\emojis\\amojis_002.png",
+    "rabbit": "public\\images\\emojis\\amojis_003.png",
+    "bird": "public\\images\\emojis\\amojis_005.png",
+    "turtle": "public\\images\\emojis\\amojis_006.png",
+    "hedgehog": "public\\images\\emojis\\amojis_010.png",
+    "mouse": "public\\images\\emojis\\amojis_064.png",
+    "paw_print": "public\\images\\emojis\\copilot_emojis_001.png",
+    "check": "public\\images\\emojis\\copilot_emojis_070.png"
+  },
+  "all_usable": [
+    {
+      "file": "images\\emojis\\amojis_001.png",
+      "source": "amojis",
+      "number": 1,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_002.png",
+      "source": "amojis",
+      "number": 2,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_003.png",
+      "source": "amojis",
+      "number": 3,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_004.png",
+      "source": "amojis",
+      "number": 4,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_005.png",
+      "source": "amojis",
+      "number": 5,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_006.png",
+      "source": "amojis",
+      "number": 6,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_007.png",
+      "source": "amojis",
+      "number": 7,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_008.png",
+      "source": "amojis",
+      "number": 8,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_009.png",
+      "source": "amojis",
+      "number": 9,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_010.png",
+      "source": "amojis",
+      "number": 10,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_011.png",
+      "source": "amojis",
+      "number": 11,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_012.png",
+      "source": "amojis",
+      "number": 12,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_013.png",
+      "source": "amojis",
+      "number": 13,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_014.png",
+      "source": "amojis",
+      "number": 14,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_015.png",
+      "source": "amojis",
+      "number": 15,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_016.png",
+      "source": "amojis",
+      "number": 16,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_017.png",
+      "source": "amojis",
+      "number": 17,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_018.png",
+      "source": "amojis",
+      "number": 18,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_019.png",
+      "source": "amojis",
+      "number": 19,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_020.png",
+      "source": "amojis",
+      "number": 20,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_021.png",
+      "source": "amojis",
+      "number": 21,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_022.png",
+      "source": "amojis",
+      "number": 22,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_023.png",
+      "source": "amojis",
+      "number": 23,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_024.png",
+      "source": "amojis",
+      "number": 24,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_025.png",
+      "source": "amojis",
+      "number": 25,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_026.png",
+      "source": "amojis",
+      "number": 26,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_027.png",
+      "source": "amojis",
+      "number": 27,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_028.png",
+      "source": "amojis",
+      "number": 28,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_029.png",
+      "source": "amojis",
+      "number": 29,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_030.png",
+      "source": "amojis",
+      "number": 30,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_031.png",
+      "source": "amojis",
+      "number": 31,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_032.png",
+      "source": "amojis",
+      "number": 32,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_033.png",
+      "source": "amojis",
+      "number": 33,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_034.png",
+      "source": "amojis",
+      "number": 34,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_035.png",
+      "source": "amojis",
+      "number": 35,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_036.png",
+      "source": "amojis",
+      "number": 36,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_037.png",
+      "source": "amojis",
+      "number": 37,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_038.png",
+      "source": "amojis",
+      "number": 38,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_039.png",
+      "source": "amojis",
+      "number": 39,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_040.png",
+      "source": "amojis",
+      "number": 40,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_041.png",
+      "source": "amojis",
+      "number": 41,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_042.png",
+      "source": "amojis",
+      "number": 42,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_043.png",
+      "source": "amojis",
+      "number": 43,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_044.png",
+      "source": "amojis",
+      "number": 44,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_045.png",
+      "source": "amojis",
+      "number": 45,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_046.png",
+      "source": "amojis",
+      "number": 46,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_047.png",
+      "source": "amojis",
+      "number": 47,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_048.png",
+      "source": "amojis",
+      "number": 48,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_049.png",
+      "source": "amojis",
+      "number": 49,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_050.png",
+      "source": "amojis",
+      "number": 50,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_051.png",
+      "source": "amojis",
+      "number": 51,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_052.png",
+      "source": "amojis",
+      "number": 52,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_053.png",
+      "source": "amojis",
+      "number": 53,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_054.png",
+      "source": "amojis",
+      "number": 54,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_055.png",
+      "source": "amojis",
+      "number": 55,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_056.png",
+      "source": "amojis",
+      "number": 56,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_057.png",
+      "source": "amojis",
+      "number": 57,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_058.png",
+      "source": "amojis",
+      "number": 58,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_059.png",
+      "source": "amojis",
+      "number": 59,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_060.png",
+      "source": "amojis",
+      "number": 60,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_061.png",
+      "source": "amojis",
+      "number": 61,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_062.png",
+      "source": "amojis",
+      "number": 62,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_063.png",
+      "source": "amojis",
+      "number": 63,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\amojis_064.png",
+      "source": "amojis",
+      "number": 64,
+      "size": "128x192"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_001.png",
+      "source": "copilot",
+      "number": 1,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_002.png",
+      "source": "copilot",
+      "number": 2,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_003.png",
+      "source": "copilot",
+      "number": 3,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_004.png",
+      "source": "copilot",
+      "number": 4,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_005.png",
+      "source": "copilot",
+      "number": 5,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_006.png",
+      "source": "copilot",
+      "number": 6,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_007.png",
+      "source": "copilot",
+      "number": 7,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_008.png",
+      "source": "copilot",
+      "number": 8,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_009.png",
+      "source": "copilot",
+      "number": 9,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_010.png",
+      "source": "copilot",
+      "number": 10,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_011.png",
+      "source": "copilot",
+      "number": 11,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_012.png",
+      "source": "copilot",
+      "number": 12,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_013.png",
+      "source": "copilot",
+      "number": 13,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_014.png",
+      "source": "copilot",
+      "number": 14,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_015.png",
+      "source": "copilot",
+      "number": 15,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_016.png",
+      "source": "copilot",
+      "number": 16,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_017.png",
+      "source": "copilot",
+      "number": 17,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_018.png",
+      "source": "copilot",
+      "number": 18,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_019.png",
+      "source": "copilot",
+      "number": 19,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_020.png",
+      "source": "copilot",
+      "number": 20,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_021.png",
+      "source": "copilot",
+      "number": 21,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_022.png",
+      "source": "copilot",
+      "number": 22,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_023.png",
+      "source": "copilot",
+      "number": 23,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_024.png",
+      "source": "copilot",
+      "number": 24,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_025.png",
+      "source": "copilot",
+      "number": 25,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_026.png",
+      "source": "copilot",
+      "number": 26,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_027.png",
+      "source": "copilot",
+      "number": 27,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_028.png",
+      "source": "copilot",
+      "number": 28,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_029.png",
+      "source": "copilot",
+      "number": 29,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_030.png",
+      "source": "copilot",
+      "number": 30,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_031.png",
+      "source": "copilot",
+      "number": 31,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_032.png",
+      "source": "copilot",
+      "number": 32,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_033.png",
+      "source": "copilot",
+      "number": 33,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_034.png",
+      "source": "copilot",
+      "number": 34,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_035.png",
+      "source": "copilot",
+      "number": 35,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_036.png",
+      "source": "copilot",
+      "number": 36,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_037.png",
+      "source": "copilot",
+      "number": 37,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_038.png",
+      "source": "copilot",
+      "number": 38,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_039.png",
+      "source": "copilot",
+      "number": 39,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_040.png",
+      "source": "copilot",
+      "number": 40,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_041.png",
+      "source": "copilot",
+      "number": 41,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_042.png",
+      "source": "copilot",
+      "number": 42,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_043.png",
+      "source": "copilot",
+      "number": 43,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_044.png",
+      "source": "copilot",
+      "number": 44,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_045.png",
+      "source": "copilot",
+      "number": 45,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_046.png",
+      "source": "copilot",
+      "number": 46,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_047.png",
+      "source": "copilot",
+      "number": 47,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_048.png",
+      "source": "copilot",
+      "number": 48,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_049.png",
+      "source": "copilot",
+      "number": 49,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_050.png",
+      "source": "copilot",
+      "number": 50,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_051.png",
+      "source": "copilot",
+      "number": 51,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_052.png",
+      "source": "copilot",
+      "number": 52,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_053.png",
+      "source": "copilot",
+      "number": 53,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_054.png",
+      "source": "copilot",
+      "number": 54,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_055.png",
+      "source": "copilot",
+      "number": 55,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_056.png",
+      "source": "copilot",
+      "number": 56,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_057.png",
+      "source": "copilot",
+      "number": 57,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_058.png",
+      "source": "copilot",
+      "number": 58,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_059.png",
+      "source": "copilot",
+      "number": 59,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_060.png",
+      "source": "copilot",
+      "number": 60,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_061.png",
+      "source": "copilot",
+      "number": 61,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_062.png",
+      "source": "copilot",
+      "number": 62,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_063.png",
+      "source": "copilot",
+      "number": 63,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_064.png",
+      "source": "copilot",
+      "number": 64,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_065.png",
+      "source": "copilot",
+      "number": 65,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_066.png",
+      "source": "copilot",
+      "number": 66,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_067.png",
+      "source": "copilot",
+      "number": 67,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_068.png",
+      "source": "copilot",
+      "number": 68,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_069.png",
+      "source": "copilot",
+      "number": 69,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_070.png",
+      "source": "copilot",
+      "number": 70,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_071.png",
+      "source": "copilot",
+      "number": 71,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_072.png",
+      "source": "copilot",
+      "number": 72,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_073.png",
+      "source": "copilot",
+      "number": 73,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_074.png",
+      "source": "copilot",
+      "number": 74,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_075.png",
+      "source": "copilot",
+      "number": 75,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_076.png",
+      "source": "copilot",
+      "number": 76,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_077.png",
+      "source": "copilot",
+      "number": 77,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_078.png",
+      "source": "copilot",
+      "number": 78,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_079.png",
+      "source": "copilot",
+      "number": 79,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_080.png",
+      "source": "copilot",
+      "number": 80,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_081.png",
+      "source": "copilot",
+      "number": 81,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_082.png",
+      "source": "copilot",
+      "number": 82,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_083.png",
+      "source": "copilot",
+      "number": 83,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_084.png",
+      "source": "copilot",
+      "number": 84,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_085.png",
+      "source": "copilot",
+      "number": 85,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_086.png",
+      "source": "copilot",
+      "number": 86,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_087.png",
+      "source": "copilot",
+      "number": 87,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_088.png",
+      "source": "copilot",
+      "number": 88,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_089.png",
+      "source": "copilot",
+      "number": 89,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_090.png",
+      "source": "copilot",
+      "number": 90,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_091.png",
+      "source": "copilot",
+      "number": 91,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_092.png",
+      "source": "copilot",
+      "number": 92,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_093.png",
+      "source": "copilot",
+      "number": 93,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_094.png",
+      "source": "copilot",
+      "number": 94,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_095.png",
+      "source": "copilot",
+      "number": 95,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_096.png",
+      "source": "copilot",
+      "number": 96,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_097.png",
+      "source": "copilot",
+      "number": 97,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_098.png",
+      "source": "copilot",
+      "number": 98,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_099.png",
+      "source": "copilot",
+      "number": 99,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_100.png",
+      "source": "copilot",
+      "number": 100,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_101.png",
+      "source": "copilot",
+      "number": 101,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_102.png",
+      "source": "copilot",
+      "number": 102,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_103.png",
+      "source": "copilot",
+      "number": 103,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_104.png",
+      "source": "copilot",
+      "number": 104,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_105.png",
+      "source": "copilot",
+      "number": 105,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_106.png",
+      "source": "copilot",
+      "number": 106,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_107.png",
+      "source": "copilot",
+      "number": 107,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_108.png",
+      "source": "copilot",
+      "number": 108,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_109.png",
+      "source": "copilot",
+      "number": 109,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\copilot_emojis_110.png",
+      "source": "copilot",
+      "number": 110,
+      "size": "102x139"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_001.png",
+      "source": "emoji",
+      "number": 1,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_002.png",
+      "source": "emoji",
+      "number": 2,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_003.png",
+      "source": "emoji",
+      "number": 3,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_004.png",
+      "source": "emoji",
+      "number": 4,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_005.png",
+      "source": "emoji",
+      "number": 5,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_006.png",
+      "source": "emoji",
+      "number": 6,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_007.png",
+      "source": "emoji",
+      "number": 7,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_008.png",
+      "source": "emoji",
+      "number": 8,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_009.png",
+      "source": "emoji",
+      "number": 9,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_010.png",
+      "source": "emoji",
+      "number": 10,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_011.png",
+      "source": "emoji",
+      "number": 11,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_012.png",
+      "source": "emoji",
+      "number": 12,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_013.png",
+      "source": "emoji",
+      "number": 13,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_014.png",
+      "source": "emoji",
+      "number": 14,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_015.png",
+      "source": "emoji",
+      "number": 15,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_016.png",
+      "source": "emoji",
+      "number": 16,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_017.png",
+      "source": "emoji",
+      "number": 17,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_018.png",
+      "source": "emoji",
+      "number": 18,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_019.png",
+      "source": "emoji",
+      "number": 19,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_020.png",
+      "source": "emoji",
+      "number": 20,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_021.png",
+      "source": "emoji",
+      "number": 21,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_022.png",
+      "source": "emoji",
+      "number": 22,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_023.png",
+      "source": "emoji",
+      "number": 23,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_024.png",
+      "source": "emoji",
+      "number": 24,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_025.png",
+      "source": "emoji",
+      "number": 25,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_026.png",
+      "source": "emoji",
+      "number": 26,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_027.png",
+      "source": "emoji",
+      "number": 27,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_028.png",
+      "source": "emoji",
+      "number": 28,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_029.png",
+      "source": "emoji",
+      "number": 29,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_030.png",
+      "source": "emoji",
+      "number": 30,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_031.png",
+      "source": "emoji",
+      "number": 31,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_032.png",
+      "source": "emoji",
+      "number": 32,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_033.png",
+      "source": "emoji",
+      "number": 33,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_034.png",
+      "source": "emoji",
+      "number": 34,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_035.png",
+      "source": "emoji",
+      "number": 35,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_036.png",
+      "source": "emoji",
+      "number": 36,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_037.png",
+      "source": "emoji",
+      "number": 37,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_038.png",
+      "source": "emoji",
+      "number": 38,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_039.png",
+      "source": "emoji",
+      "number": 39,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_040.png",
+      "source": "emoji",
+      "number": 40,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_041.png",
+      "source": "emoji",
+      "number": 41,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_042.png",
+      "source": "emoji",
+      "number": 42,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_043.png",
+      "source": "emoji",
+      "number": 43,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_044.png",
+      "source": "emoji",
+      "number": 44,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_045.png",
+      "source": "emoji",
+      "number": 45,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_046.png",
+      "source": "emoji",
+      "number": 46,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_047.png",
+      "source": "emoji",
+      "number": 47,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_048.png",
+      "source": "emoji",
+      "number": 48,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_049.png",
+      "source": "emoji",
+      "number": 49,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_050.png",
+      "source": "emoji",
+      "number": 50,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_051.png",
+      "source": "emoji",
+      "number": 51,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_052.png",
+      "source": "emoji",
+      "number": 52,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_053.png",
+      "source": "emoji",
+      "number": 53,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_054.png",
+      "source": "emoji",
+      "number": 54,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_055.png",
+      "source": "emoji",
+      "number": 55,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_056.png",
+      "source": "emoji",
+      "number": 56,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_057.png",
+      "source": "emoji",
+      "number": 57,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_058.png",
+      "source": "emoji",
+      "number": 58,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_059.png",
+      "source": "emoji",
+      "number": 59,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_060.png",
+      "source": "emoji",
+      "number": 60,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_061.png",
+      "source": "emoji",
+      "number": 61,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_062.png",
+      "source": "emoji",
+      "number": 62,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_063.png",
+      "source": "emoji",
+      "number": 63,
+      "size": "200x112"
+    },
+    {
+      "file": "images\\emojis\\emoji_grid_064.png",
+      "source": "emoji",
+      "number": 64,
+      "size": "200x112"
+    }
+  ]
+}

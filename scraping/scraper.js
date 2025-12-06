@@ -135,6 +135,75 @@ class PetRecipeScraper {
           tables: 'table'
         }
       },
+      // REPTILES - Additional Sources
+      {
+        url: 'https://www.reptifiles.com/',
+        type: 'reptile-care',
+        category: 'reptiles',
+        selectors: {
+          content: '.content, article, .entry-content, .main-content',
+          headings: 'h1, h2, h3, h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reptilesmagazine.com/',
+        type: 'reptile-education',
+        category: 'reptiles',
+        selectors: {
+          content: '.content, article, .entry-content, .main-content',
+          headings: 'h1, h2, h3, h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.beardeddragon.org/',
+        type: 'reptile-forum',
+        category: 'reptiles',
+        selectors: {
+          content: '.content, article, .entry-content, .main-content',
+          headings: 'h1, h2, h3, h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      // BIRDS - Additional Sources
+      {
+        url: 'https://www.parrots.org/',
+        type: 'avian-education',
+        category: 'birds',
+        selectors: {
+          content: '.content, article, .entry-content, .main-content',
+          headings: 'h1, h2, h3, h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      // POCKET PETS - Additional Sources
+      {
+        url: 'https://www.guineapigcages.com/',
+        type: 'pocket-pet-care',
+        category: 'pocket-pets',
+        selectors: {
+          content: '.content, article, .entry-content, .main-content',
+          headings: 'h1, h2, h3, h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.hamsterhideout.com/',
+        type: 'pocket-pet-care',
+        category: 'pocket-pets',
+        selectors: {
+          content: '.content, article, .entry-content, .main-content',
+          headings: 'h1, h2, h3, h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
 
       // ADDITIONAL VETERINARY SCHOOL SOURCES
       // Cornell University College of Veterinary Medicine
@@ -313,6 +382,117 @@ class PetRecipeScraper {
       },
       {
         url: 'https://www.reddit.com/r/hamsters/',
+        type: 'pet-forum-reddit',
+        category: 'pocket-pets',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      // Additional Reddit Sources for Exotics
+      {
+        url: 'https://www.reddit.com/r/parrots/',
+        type: 'pet-forum-reddit',
+        category: 'birds',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/cockatiel/',
+        type: 'pet-forum-reddit',
+        category: 'birds',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/budgies/',
+        type: 'pet-forum-reddit',
+        category: 'birds',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/BeardedDragons/',
+        type: 'pet-forum-reddit',
+        category: 'reptiles',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/leopardgeckos/',
+        type: 'pet-forum-reddit',
+        category: 'reptiles',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/snakes/',
+        type: 'pet-forum-reddit',
+        category: 'reptiles',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/guineapigs/',
+        type: 'pet-forum-reddit',
+        category: 'pocket-pets',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/chinchilla/',
+        type: 'pet-forum-reddit',
+        category: 'pocket-pets',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/ferrets/',
+        type: 'pet-forum-reddit',
+        category: 'pocket-pets',
+        selectors: {
+          content: '.Post, [data-testid="post-container"], .Comment',
+          headings: 'h1, h2, h3, h4, .Post h3, .Comment h4',
+          lists: 'ul, ol',
+          tables: 'table'
+        }
+      },
+      {
+        url: 'https://www.reddit.com/r/hedgehog/',
         type: 'pet-forum-reddit',
         category: 'pocket-pets',
         selectors: {
@@ -809,12 +989,15 @@ class PetRecipeScraper {
         /\b(?:cuttlebone|grit|calcium|vitamin-d)\b/gi
       ],
       'reptiles': [
-        /\b(?:cricket|mealworm|superworm|roach|dubia|gut-loading)\b/gi,
-        /\b(?:collard|mustard|dandelion|turnip|beet|greens)\b/gi
+        /\b(?:cricket|mealworm|superworm|roach|dubia|gut-loading|hornworm|silkworm|waxworm|phoenix|black.*soldier.*fly|locust|mantid|fruit.*fly)\b/gi,
+        /\b(?:collard|mustard|dandelion|turnip|beet|greens|kale|spinach|arugula|endive|escarole|bok.*choy|cabbage|squash|pumpkin|butternut|acorn)\b/gi,
+        /\b(?:calcium|phosphorus|vitamin.*d|uvb|supplement|dusting|gut.*load)\b/gi
       ],
       'pocket-pets': [
-        /\b(?:hay|timothy|alfalfa|pellet|block|treat)\b/gi,
-        /\b(?:vitamin-c|guinea pig|chinchilla|degus)\b/gi
+        /\b(?:hay|timothy|alfalfa|pellet|block|treat|orchard.*grass|meadow|bermuda|bluegrass|fescue|ryegrass|straw)\b/gi,
+        /\b(?:vitamin-c|guinea.*pig|chinchilla|degus|rabbit|hamster|gerbil|rat|mouse|ferret|hedgehog)\b/gi,
+        /\b(?:romaine|lettuce|bell.*pepper|carrot|cucumber|parsley|cilantro|kale|spinach|broccoli|arugula)\b/gi,
+        /\b(?:apple|strawberry|blueberry|banana|melon|grape|papaya|pear|peach|plum|apricot|cherry)\b/gi
       ]
     };
 

@@ -1,0 +1,43 @@
+🚀 Comprehensive Recipe Enhancement Script
+
+This script will:
+  1. Auto-tag recipes with health concerns
+  2. Generate/verify shortName fields
+  3. Assign celebrity quotes
+  4. Validate data consistency
+
+✅ Backup created: C:\Users\Robin\Workspace\pet_plates_meal_platform\lib\data\recipes-complete.backup.1764904321022.ts
+
+📖 Loading from existing JSON file (fast path)...
+✅ Loaded 0 recipes from JSON
+
+📖 Reading recipes from TypeScript file (this may take a moment)...
+Main file exists, length: 540502 chars
+
+First 200 chars: // lib/data/recipes-complete.ts
+// Auto-generated comprehensive recipe database
+// Auto-tagged on: 2025-12-03T17:05:04.843Z
+// Total recipes: 170
+
+import type { Recipe } from '../types';
+
+export const
+
+Searching for recipes array in file content (length: 540502)...
+
+arrayStart position: 188
+
+❌ Severe Parsing Error: The recipe array in the source file has invalid JavaScript syntax (e.g., trailing commas, comments). Error: Parsed content was not a valid recipe array.
+❌ Error running script: Error: Recipe array source is corrupted and cannot be parsed: Parsed content was not a valid recipe array.
+Error message: Recipe array source is corrupted and cannot be parsed: Parsed content was not a valid recipe array.
+Stack trace: Error: Recipe array source is corrupted and cannot be parsed: Parsed content was not a valid recipe array.
+    at parseRecipeArray (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:439:11)
+    at main (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:577:17)
+    at backupFile (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:743:3)
+    at Object.<anonymous> (C:\Users\Robin\Workspace\pet_plates_meal_platform\scripts\enhance-recipes.ts:771:1)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object.transformer (C:\Users\Robin\Workspace\pet_plates_meal_platform\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)

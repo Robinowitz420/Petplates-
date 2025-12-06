@@ -140,10 +140,12 @@ export const getPortionPlan = (
   const weeklyPortionGrams = dailyPortionGrams * 7;
 
   return {
+    dailyGrams: dailyPortionGrams,
+    mealsPerDay: 2, // Default to 2 meals per day
+    multiplier,
     caloriesPerKg,
     dailyCalories,
     weeklyCalories,
-    multiplier,
     dailyPortionGrams,
     weeklyPortionGrams,
     notes,
@@ -162,4 +164,5 @@ export const scaleAmount = (
   const scaled = (quantity * multiplier).toFixed(1).replace(/\.0$/, '');
   return amount.replace(numericMatch[0], scaled);
 };
+
 

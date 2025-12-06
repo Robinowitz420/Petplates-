@@ -6,9 +6,20 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    'text-[#0f2c0f]',
+  ],
   theme: {
     extend: {
       colors: {
+        background: 'rgb(var(--background-start-rgb))',
+        foreground: 'rgb(var(--foreground-rgb))',
+        'dark-green': '#0f2c0f',
+        surface: {
+           DEFAULT: '#143424', // Slightly lighter than background (approx rgb(20, 52, 36))
+           highlight: '#1e4a36',
+           lighter: '#2a6148',
+        },
         primary: {
           50: '#f0fdf4',
           100: '#dcfce7',

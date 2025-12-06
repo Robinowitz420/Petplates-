@@ -1,36 +1,31 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Check, Upload, Camera } from 'lucide-react';
-import { healthConcernOptions as fullHealthConcernOptions } from '@/lib/utils/petRatingSystem';
+import { X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import Image from 'next/image';
+import { getMascotFaceForPetType } from '@/lib/utils/emojiMapping';
 
 // --- Type Definitions ---
 interface Pet {
   id: string;
-  names: string[];
+  name: string;
   type: string;
   breed: string;
-  weight: string;
   age: string;
   healthConcerns: string[];
   mealPlan: string[]; // Critical for meal engine - initialized as []
-  dislikes?: string[];
-  image?: string; // Base64 encoded image data
 }
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
-type HealthConcern = 'none' | 'kidney-disease' | 'heart-disease' | 'diabetes' | 'pancreatitis' | 'obesity' | 'digestive-issues' | 'allergies' | 'dental-issues' | 'joint-health' | 'skin-conditions' | 'hip-dysplasia';
+type HealthConcern = 'none' | 'weight-management' | 'allergies' | 'joint-health' | 'digestive' | 'kidney' | 'dental';
 
 interface FormData {
-  names: string[];
+  name: string;
   type: PetCategory | '';
   breed: string;
-  weight: string;
   age: AgeGroup | '';
   healthConcerns: HealthConcern[];
-  dislikes: string[];
-  image?: string; // Base64 encoded image data
 }
 
 interface AddPetModalProps {
@@ -44,17 +39,17 @@ interface AddPetModalProps {
 
 const breedsByType: Record<PetCategory, string[]> = {
   dogs: [
-    'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'French Bulldog', 'Bulldog', 'Poodle', 'Beagle',
-    'Rottweiler', 'Yorkshire Terrier', 'German Shorthaired Pointer', 'Dachshund', 'Pembroke Welsh Corgi',
-    'Australian Shepherd', 'Boxer', 'Great Dane', 'Siberian Husky', 'Doberman Pinscher',
-    'Cavalier King Charles Spaniel', 'Miniature Schnauzer', 'Shih Tzu', 'Boston Terrier',
-    'Bernese Mountain Dog', 'Pomeranian', 'Havanese', 'Shetland Sheepdog', 'Brittany',
+    'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'French Bulldog', 'Bulldog', 'Poodle', 'Beagle', 
+    'Rottweiler', 'Yorkshire Terrier', 'German Shorthaired Pointer', 'Dachshund', 'Pembroke Welsh Corgi', 
+    'Australian Shepherd', 'Boxer', 'Great Dane', 'Siberian Husky', 'Doberman Pinscher', 
+    'Cavalier King Charles Spaniel', 'Miniature Schnauzer', 'Shih Tzu', 'Boston Terrier', 
+    'Bernese Mountain Dog', 'Pomeranian', 'Havanese', 'Shetland Sheepdog', 'Brittany', 
     'English Springer Spaniel', 'Mastiff', 'Cocker Spaniel', 'Border Collie', 'Chihuahua', 'Mixed Breed'
   ].sort(),
   cats: [
-    'Persian', 'Maine Coon', 'Siamese', 'Ragdoll', 'Bengal', 'British Shorthair', 'Abyssinian',
-    'Scottish Fold', 'Sphynx', 'American Shorthair', 'Russian Blue', 'Birman', 'Oriental',
-    'Norwegian Forest Cat', 'Devon Rex', 'Burmese', 'Tonkinese', 'Exotic Shorthair',
+    'Persian', 'Maine Coon', 'Siamese', 'Ragdoll', 'Bengal', 'British Shorthair', 'Abyssinian', 
+    'Scottish Fold', 'Sphynx', 'American Shorthair', 'Russian Blue', 'Birman', 'Oriental', 
+    'Norwegian Forest Cat', 'Devon Rex', 'Burmese', 'Tonkinese', 'Exotic Shorthair', 
     'Turkish Angora', 'Himalayan', 'Domestic Shorthair', 'Domestic Longhair', 'Mixed Breed'
   ].sort(),
   birds: [
@@ -75,55 +70,43 @@ const ageGroups = [
   { value: 'senior', label: 'Senior (7+ years)' }
 ];
 
-// Use the comprehensive health concern options from the rating system, plus "none"
 const healthConcernOptions = [
   { value: 'none', label: 'None' },
-  ...fullHealthConcernOptions.map(option => ({
-    value: option.value,
-    label: option.label
-  }))
+  { value: 'weight-management', label: 'Weight Management' },
+  { value: 'allergies', label: 'Allergies' },
+  { value: 'joint-health', label: 'Joint Health' },
+  { value: 'digestive', label: 'Digestive Issues' },
+  { value: 'kidney', label: 'Kidney Support' },
+  { value: 'dental', label: 'Dental Health' }
 ];
 
 const initialFormData: FormData = {
-  names: [],
+  name: '',
   type: '',
   breed: '',
-  weight: '',
   age: '',
   healthConcerns: [],
-  dislikes: [],
-  image: undefined,
-};
-
-// --- Pet Type Icons ---
-const petTypeIcons: Record<PetCategory, string> = {
-  dogs: '🐕',
-  cats: '🐈',
-  birds: '🦜',
-  reptiles: '🦎',
-  'pocket-pets': '🐰',
 };
 
 // --- Main Component ---
 export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: AddPetModalProps) {
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [error, setError] = useState<string | null>(null);
 
-  // Effect to reset form when modal opens/closes or for editing
+  // Effect to reset form when modal opens/closes or for editing (future use)
   useEffect(() => {
     if (isOpen) {
       setError(null);
+      setStep(1);
       // For editing:
       if (editingPet) {
         setFormData({
-          names: editingPet.names || [],
+          name: editingPet.name,
           type: editingPet.type as PetCategory,
           breed: editingPet.breed,
-          weight: editingPet.weight || '',
           age: editingPet.age as AgeGroup,
           healthConcerns: editingPet.healthConcerns as HealthConcern[],
-          dislikes: editingPet.dislikes || [],
-          image: editingPet.image,
         });
       } else {
         setFormData(initialFormData);
@@ -133,6 +116,7 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
 
   const availableBreeds = useMemo(() => {
     if (!formData.type) return [];
+    // The cast below is safe because formData.type is checked against PetCategory keys
     return breedsByType[formData.type as PetCategory];
   }, [formData.type]);
 
@@ -141,100 +125,51 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePetTypeSelect = (type: PetCategory) => {
-    setFormData(prev => ({
-      ...prev,
-      type,
-      breed: '' // Reset breed when type changes
-    }));
-  };
-
   const handleHealthConcernToggle = (concern: HealthConcern) => {
     if (concern === 'none') {
+      // If 'None' is selected, clear all others and set only 'none'
       setFormData(prev => ({ ...prev, healthConcerns: prev.healthConcerns.includes('none') ? [] : ['none'] }));
     } else {
+      // If any other concern is selected/deselected
       setFormData(prev => {
-        const currentConcerns = prev.healthConcerns.filter(c => c !== 'none');
-        let newConcerns: HealthConcern[];
+        const currentConcerns = prev.healthConcerns.filter(c => c !== 'none'); // Remove 'none' if present
+
+        let newConcerns;
         if (currentConcerns.includes(concern)) {
+          // Deselect
           newConcerns = currentConcerns.filter(c => c !== concern);
         } else {
+          // Select
           newConcerns = [...currentConcerns, concern];
         }
+
+        // If no concerns are selected after toggling, default back to 'none' for consistency
         if (newConcerns.length === 0) {
-          newConcerns = ['none'];
+            newConcerns.push('none');
         }
+
         return { ...prev, healthConcerns: newConcerns };
       });
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('Please select a valid image file');
-        return;
-      }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image file size must be less than 5MB');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        setFormData(prev => ({ ...prev, image: base64 }));
-        setError(null);
-      };
-      reader.onerror = () => {
-        setError('Failed to read image file');
-      };
-      reader.readAsDataURL(file);
+  const handleNext = () => {
+    setError(null);
+    if (!formData.name || !formData.type || !formData.breed || !formData.age) {
+      setError('Please fill out all fields in Step 1.');
+      return;
     }
+    setStep(2);
   };
 
-  const removeImage = () => {
-    setFormData(prev => ({ ...prev, image: undefined }));
-  };
-
-  const handleDelete = () => {
-    if (editingPet && typeof window !== 'undefined') {
-      const userId = 'clerk_simulated_user_id_123'; // Same as profile page
-      const currentPets = JSON.parse(localStorage.getItem(`pets_${userId}`) || '[]');
-      const updatedPets = currentPets.filter((p: any) => p.id !== editingPet.id);
-      localStorage.setItem(`pets_${userId}`, JSON.stringify(updatedPets));
-      window.location.reload(); // Refresh to update UI
-    }
-  };
-
-
-
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
 
-    // Validation: Check required fields
-    if (!formData.names.length || !formData.names[0].trim()) {
-      setError('At least one pet name is required');
-      return;
-    }
-    if (!formData.type) {
-      setError('Pet type is required');
-      return;
-    }
-    if (!formData.breed) {
-      setError('Breed is required');
-      return;
-    }
-    if (!formData.weight.trim()) {
-      setError('Weight is required');
-      return;
-    }
-    if (!formData.age) {
-      setError('Age group is required');
+    // Step 2 validation is simple, as healthConcerns array is initialized and auto-managed.
+    if (formData.healthConcerns.length === 0) {
+      setError('Please select at least one health concern (or "None").');
       return;
     }
 
@@ -245,246 +180,225 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
       type: formData.type as string,
       age: formData.age as string,
       // Initialize the mealPlan array as required for the meal engine
-      mealPlan: editingPet?.mealPlan || [],
+      mealPlan: editingPet?.mealPlan || [], 
     };
 
     onSubmit(newPet);
     onClose();
   };
 
-  // --- Compact Single Page Form ---
-    const CompactForm = () => (
-      <div className="space-y-3">
-        {/* Pet Names */}
+  // --- Step 1 JSX: Basic Information ---
+  const Step1 = () => (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-foreground">1. Basic Info</h3>
+      
+      {/* Pet Name */}
+      <div className="space-y-2">
+        <label htmlFor="name" className="text-sm font-medium text-gray-300 block">Pet's Name</label>
         <input
-          name="names"
+          id="name"
+          name="name"
           type="text"
-          value={formData.names.join(', ')}
-          onChange={(e) => {
-            const value = e.target.value;
-            const names = value.split(',').map(s => s.trim()).filter(Boolean);
-            setFormData(prev => ({ ...prev, names }));
-          }}
-          onKeyDown={(e) => {
-            // Prevent form submission on Enter
-            if (e.key === 'Enter') {
-              e.preventDefault();
-            }
-          }}
-          placeholder="Pet's Names (comma separated, e.g., Buddy, Max, Charlie)"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition duration-150 text-sm"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="e.g., Buster"
+          className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150"
           required
-          autoComplete="off"
-          autoFocus
         />
+      </div>
 
-        {/* Pet Image Upload */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Pet Photo (Optional)</label>
-          <div className="flex items-center space-x-4">
-            <div className="flex-shrink-0">
-              {formData.image ? (
-                <div className="relative">
-                  <img
-                    src={formData.image}
-                    alt="Pet preview"
-                    className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+      {/* Pet Type (Meal Engine Criteria) */}
+      <div className="space-y-2">
+        <label htmlFor="type" className="text-sm font-medium text-gray-300 block">Pet Type</label>
+        <div className="grid grid-cols-5 gap-3">
+          {(['dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'] as PetCategory[]).map((petType) => {
+            const isSelected = formData.type === petType;
+            const typeLabels: Record<PetCategory, string> = {
+              'dogs': 'Dogs',
+              'cats': 'Cats',
+              'birds': 'Birds',
+              'reptiles': 'Reptiles',
+              'pocket-pets': 'Pocket Pets'
+            };
+            return (
+              <button
+                key={petType}
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, type: petType }))}
+                className={`
+                  flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all duration-200
+                  ${isSelected 
+                    ? 'border-primary-500 bg-primary-900/30 shadow-md' 
+                    : 'border-surface-highlight bg-surface-lighter hover:border-primary-400/50 hover:bg-surface-highlight'
+                  }
+                `}
+        >
+                <div className="w-12 h-12 rounded-full overflow-hidden mb-2 flex-shrink-0">
+                  <Image
+                    src={getMascotFaceForPetType(petType)}
+                    alt={`${petType} mascot`}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                    unoptimized
                   />
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="btn btn-danger btn-icon-sm absolute -top-2 -right-2"
-                    title="Remove image"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
                 </div>
-              ) : (
-                <div className="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                  <Camera className="w-6 h-6 text-gray-400" />
-                </div>
-              )}
-            </div>
-            <div className="flex-1">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-                id="pet-image-upload"
-              />
-              <label
-                htmlFor="pet-image-upload"
-                className="btn btn-secondary btn-sm"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                {formData.image ? 'Change Photo' : 'Upload Photo'}
-              </label>
-              <p className="text-xs text-gray-500 mt-1">
-                Max 5MB. JPG, PNG, or GIF formats.
-              </p>
-            </div>
-          </div>
+                <span className={`text-xs font-medium ${isSelected ? 'text-primary-400' : 'text-gray-400'}`}>
+                  {typeLabels[petType]}
+                </span>
+              </button>
+            );
+          })}
         </div>
-  
-        {/* Pet Type - Emoji Buttons */}
-        <div className="space-y-2">
-          <div className="grid grid-cols-5 gap-2">
-            {Object.entries(petTypeIcons).map(([type, emoji]) => {
-              const isSelected = formData.type === type;
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => handlePetTypeSelect(type as PetCategory)}
-                  className={`p-2 text-center rounded-lg border-2 text-sm ${
-                    isSelected
-                      ? 'bg-primary-600 border-primary-600 text-white'
-                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="text-lg mb-1">{emoji}</div>
-                  <div className="capitalize text-xs">{type.replace('-', ' ')}</div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-  
-        {/* Breed */}
+        {!formData.type && (
+          <p className="text-xs text-gray-500 mt-1">Please select a pet type</p>
+        )}
+      </div>
+
+      {/* Breed (Meal Engine Criteria) */}
+      <div className="space-y-2">
+        <label htmlFor="breed" className="text-sm font-medium text-gray-300 block">Breed</label>
         <select
+          id="breed"
           name="breed"
           value={formData.breed}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500 transition duration-150 text-sm disabled:bg-gray-50 disabled:text-gray-500"
+          className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150 disabled:bg-surface disabled:text-gray-600"
           disabled={!formData.type}
           required
         >
-          <option value="" disabled>
-            {formData.type ? 'Breed' : 'Breed'}
+          <option value="" disabled className="bg-surface text-gray-500">
+            {formData.type ? `Select ${formData.type}'s breed` : 'Select a Pet Type first'}
           </option>
           {availableBreeds.map(breed => (
-            <option key={breed} value={breed}>{breed}</option>
+            <option key={breed} value={breed} className="bg-surface text-foreground">{breed}</option>
           ))}
         </select>
+      </div>
 
-        {/* Weight */}
-        <input
-          name="weight"
-          type="text"
-          value={formData.weight}
-          onChange={handleChange}
-          placeholder="Weight (e.g., 25 lbs or 11 kg)"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 transition duration-150 text-sm"
-          required
-        />
-  
-        {/* Age Group */}
+      {/* Age Group (Meal Engine Criteria) */}
+      <div className="space-y-2">
+        <label htmlFor="age" className="text-sm font-medium text-gray-300 block">Age Group</label>
         <select
+          id="age"
           name="age"
           value={formData.age}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500 transition duration-150 text-sm"
+          className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150"
           required
         >
-          <option value="" disabled>Select age group</option>
+          <option value="" disabled className="bg-surface text-gray-500">Select age group</option>
           {ageGroups.map(group => (
-            <option key={group.value} value={group.value}>{group.label}</option>
+            <option key={group.value} value={group.value} className="bg-surface text-foreground">{group.label}</option>
           ))}
         </select>
-  
-        {/* Health Concerns */}
-         <div className="space-y-2">
-           <div className="grid grid-cols-3 gap-2">
-             {healthConcernOptions.map(option => {
-               const isSelected = formData.healthConcerns.includes(option.value as HealthConcern);
-               return (
-                 <button
-                   key={option.value}
-                   type="button"
-                   onClick={() => handleHealthConcernToggle(option.value as HealthConcern)}
-                   className={`
-                     flex items-center justify-between p-2 border rounded-lg text-left text-xs
-                     ${isSelected
-                       ? 'bg-primary-50 border-primary-600 text-primary-800'
-                       : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'
-                     }
-                   `}
-                 >
-                   <span>{option.label}</span>
-                   <div className={`w-3 h-3 rounded border flex items-center justify-center ${isSelected ? 'bg-primary-600 border-primary-600' : 'bg-white border-gray-400'}`}>
-                     {isSelected && <Check className="w-2 h-2 text-white" />}
-                   </div>
-                 </button>
-               );
-             })}
-           </div>
-         </div>
-
-         {/* Dislikes */}
-         <input
-           name="dislikes"
-           type="text"
-           value={formData.dislikes.join(', ')}
-           onChange={(e) => {
-             const value = e.target.value;
-             const dislikes = value.split(',').map(s => s.trim()).filter(Boolean);
-             setFormData(prev => ({ ...prev, dislikes }));
-           }}
-           placeholder="Ingredients your pet dislikes (comma separated, e.g., carrots, liver)"
-           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 text-sm"
-         />
-  
-        {error && <p className="text-red-500 text-xs">{error}</p>}
       </div>
-    );
 
+      {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
+      
+      <div className="flex justify-end pt-4 border-t border-surface-highlight">
+        <button
+          type="button"
+          onClick={handleNext}
+          className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 shadow-lg"
+        >
+          Next: Health Concerns
+          <ChevronRight className="w-5 h-5 ml-2" />
+        </button>
+      </div>
+    </div>
+  );
+
+  // --- Step 2 JSX: Health Concerns ---
+  const Step2 = () => (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-foreground">2. Health & Dietary Needs</h3>
+      <p className="text-sm text-gray-400">Select any concerns your pet currently has. This will tailor their meal plan recommendations.</p>
+      
+      <div className="grid grid-cols-2 gap-4">
+        {healthConcernOptions.map(option => {
+          const isSelected = formData.healthConcerns.includes(option.value as HealthConcern);
+          const isDisabled = (option.value !== 'none' && formData.healthConcerns.includes('none'));
+          
+          return (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => handleHealthConcernToggle(option.value as HealthConcern)}
+              disabled={isDisabled}
+              className={`
+                flex items-center justify-between p-4 border-2 rounded-xl text-left 
+                transition-all duration-200
+                ${isDisabled ? 'bg-surface border-surface-highlight text-gray-600 cursor-not-allowed' : ''}
+                ${isSelected 
+                  ? 'bg-primary-900/30 border-primary-500 text-primary-200 shadow-md' 
+                  : 'bg-surface-lighter border-surface-highlight text-gray-300 hover:bg-surface-highlight hover:border-primary-400/50'
+                }
+              `}
+            >
+              <span className="font-medium text-sm">{option.label}</span>
+              <div className={`w-5 h-5 rounded-full border ${isSelected ? 'bg-primary-600 border-primary-600' : 'bg-surface border-gray-500'} flex items-center justify-center`}>
+                {isSelected && <Check className="w-3 h-3 text-white" />}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
+
+      <div className="flex justify-between pt-6 border-t border-surface-highlight">
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="flex items-center px-4 py-3 border-2 border-surface-highlight text-gray-300 font-medium rounded-xl hover:bg-surface-highlight transition-colors duration-150"
+        >
+          <ChevronLeft className="w-5 h-5 mr-2" />
+          Back
+        </button>
+        <button
+          type="submit"
+          className="flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-colors duration-150 shadow-lg"
+        >
+          <Check className="w-5 h-5 mr-2" />
+          {editingPet ? 'Save Changes' : 'Create Pet Profile'}
+        </button>
+      </div>
+    </div>
+  );
 
   // --- Modal Wrapper JSX ---
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-70 flex items-center justify-center p-2" onClick={onClose}>
-      <div
-        className="bg-white rounded-xl w-full max-w-lg shadow-2xl relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto"
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+      <div 
+        className="bg-surface rounded-2xl w-full max-w-lg shadow-2xl border border-surface-highlight relative transform transition-all duration-300 scale-100 opacity-100" 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4">
-
-          <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-            <h2 className="text-lg font-bold text-gray-900">
+        <div className="p-6 sm:p-8">
+          
+          <div className="flex justify-between items-center mb-6 border-b border-surface-highlight pb-4">
+            <h2 className="text-2xl font-bold text-foreground">
               {editingPet ? 'Edit Pet Profile' : 'Create New Pet Profile'}
             </h2>
             <button
               onClick={onClose}
-              className="btn btn-ghost btn-icon"
+              className="p-2 rounded-full text-gray-400 hover:bg-surface-highlight hover:text-white transition-colors"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
           </div>
 
-          <div>
-            <CompactForm />
-            <div className={`flex ${editingPet ? 'justify-between' : 'justify-end'} pt-3 border-t border-gray-100 mt-4`}>
-              {editingPet && (
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="btn btn-danger btn-md"
-                >
-                  Delete Pet
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="btn btn-success btn-md btn-ripple"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                {editingPet ? 'Save Changes' : 'Add Pet'}
-              </button>
-            </div>
+          <form onSubmit={handleSubmit}>
+            {step === 1 ? <Step1 /> : <Step2 />}
+          </form>
+
+          {/* Step Indicator */}
+          <div className="flex justify-center mt-6">
+            <div className={`w-8 h-1 rounded-full mx-1 ${step === 1 ? 'bg-primary-600' : 'bg-gray-600'}`}></div>
+            <div className={`w-8 h-1 rounded-full mx-1 ${step === 2 ? 'bg-primary-600' : 'bg-gray-600'}`}></div>
           </div>
         </div>
       </div>
