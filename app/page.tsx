@@ -101,7 +101,7 @@ export default function HomePage() {
               href="/profile"
               className="btn btn-lg btn-darkgreen"
             >
-              {hasPets ? 'View Your Pets' : "Start Your Pet's Plan"} <ArrowRight size={20} className="ml-2" />
+              View Your Pets <ArrowRight size={20} className="ml-2" />
             </Link>
           </section>
           
@@ -150,10 +150,10 @@ export default function HomePage() {
             Get vet-approved, custom-portioned meals designed specifically for your pet's breed, age, and health needs.
           </p>
           <Link
-            href="/sign-in"
+            href="/sign-up"
             className="btn btn-lg btn-darkgreen"
           >
-            Start Your Pet's Plan
+            Get Started
           </Link>
         </section>
 
