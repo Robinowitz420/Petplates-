@@ -25,6 +25,12 @@ interface Pet {
     age: string;
     healthConcerns: string[];
     savedRecipes: SavedRecipe[]; // Array of recipes saved to this pet
+    names?: string[];
+    weight?: string | number;
+    weightKg?: number;
+    dietaryRestrictions?: string[];
+    allergies?: string[];
+    dislikes?: string[];
 }
 
 // Firestore Globals (MUST be used)

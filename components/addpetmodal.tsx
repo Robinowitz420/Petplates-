@@ -12,7 +12,12 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
-  healthConcerns: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  dislikes?: string[];
   mealPlan: string[]; // Critical for meal engine - initialized as []
 }
 

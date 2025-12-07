@@ -170,7 +170,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       </div>
 
       <p className="text-gray-700 leading-relaxed mb-8">
-        Remember, these are starting points. Every dog is unique, and their nutritional needs can vary based on age, activity level, health status, and individual metabolism. When in doubt, consult with a veterinary nutritionist to create a diet perfectly tailored to your dog's needs.
+        Remember, these are starting points. Every dog is unique, and their nutritional needs can vary based on age, activity level, health status, and individual metabolism. When in doubt, consult with a pet health specialist to create a diet perfectly tailored to your dog's needs.
       </p>
     `,
     author: 'Dr. Sarah Mitchell, DVM',
@@ -178,7 +178,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     readTime: '8 min read',
     category: 'Nutrition',
     image: '/images/emojis/Mascots/Prep Puppy.jpg',
-    tags: ['homemade dog food', 'nutrition', 'recipes', 'veterinary advice']
+    tags: ['homemade dog food', 'nutrition', 'recipes', 'pet health specialist advice']
   };
 
   return (
@@ -188,7 +188,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
+            className="inline-flex items-center gap-2 text-green-800 hover:text-green-900 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
@@ -200,7 +200,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         {/* Header */}
         <header className="mb-8">
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-            <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full">
+            <span className="bg-green-900/20 text-green-800 px-3 py-1 rounded-full">
               {blogPost.category}
             </span>
             <div className="flex items-center gap-1">
@@ -223,12 +223,12 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-primary-600" />
+              <div className="w-12 h-12 bg-green-900/20 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-green-800" />
               </div>
               <div>
                 <div className="font-semibold text-gray-900">{blogPost.author}</div>
-                <div className="text-sm text-gray-600">Veterinary Nutritionist</div>
+                <div className="text-sm text-gray-600">Pet Health Specialist</div>
               </div>
             </div>
 
@@ -275,21 +275,21 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         {/* Author Bio */}
         <div className="mt-8 bg-gray-100 rounded-lg p-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-8 h-8 text-primary-600" />
+            <div className="w-16 h-16 bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="w-8 h-8 text-green-800" />
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-1">{blogPost.author}</h3>
               <p className="text-gray-600 text-sm mb-3">
-                Dr. Mitchell is a board-certified veterinary nutritionist with over 15 years of experience
+                Dr. Mitchell is a board-certified pet health specialist with over 15 years of experience
                 helping pet parents create balanced homemade diets. She specializes in preventive nutrition
                 and works with pets of all species.
               </p>
               <Link
                 href="/about"
-                className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                className="text-green-800 hover:text-green-900 font-medium text-sm"
               >
-                Learn more about our veterinary team →
+                Learn more about our pet health specialist team →
               </Link>
             </div>
           </div>

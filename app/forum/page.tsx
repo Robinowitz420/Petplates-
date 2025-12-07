@@ -255,7 +255,7 @@ export default function ForumPage() {
                           </span>
                         </div>
 
-                        <Link href={`/forum/thread/${thread.id}`}>
+                        <Link href="/forum">
                           <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors mb-2">
                             {thread.title}
                           </h3>

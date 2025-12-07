@@ -14,6 +14,12 @@ interface Pet {
   breed: string;
   age: string;
   weight: string;
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  dislikes?: string[];
+  savedRecipes?: string[];
+  weightKg?: number;
 }
 
 const getCurrentUserId = () => {
@@ -97,7 +103,7 @@ export default function CustomMealsHistoryPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white p-8 rounded-xl shadow text-center space-y-4">
           <p className="text-xl font-semibold text-gray-800">Pet not found.</p>
-          <Link href="/profile" className="text-primary-600 font-semibold">
+          <Link href="/profile" className="text-green-800 font-semibold">
             Back to Profiles
           </Link>
         </div>
@@ -135,7 +141,7 @@ export default function CustomMealsHistoryPage() {
             </div>
             <Link
               href={`/profile/pet/${petId}/recipe-builder`}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-md hover:bg-green-900 transition-colors"
             >
               <ChefHat size={16} />
               Create New Meal
@@ -230,7 +236,7 @@ export default function CustomMealsHistoryPage() {
                   </div>
                   <div className="flex justify-between mb-1">
                     <span className="text-gray-600">Recommended Serving:</span>
-                    <span className="font-medium text-primary-600">
+                    <span className="font-medium text-green-800">
                       {meal.analysis.recommendedServingGrams}g
                     </span>
                   </div>
@@ -260,7 +266,7 @@ export default function CustomMealsHistoryPage() {
                       // TODO: Implement view details
                       router.push(`/profile/pet/${petId}/custom-meals/${meal.id}`);
                     }}
-                    className="flex-1 px-3 py-2 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-md hover:bg-primary-100 transition-colors"
+                    className="flex-1 px-3 py-2 text-sm font-medium text-green-800 bg-green-900/10 border border-green-800/30 rounded-md hover:bg-green-900/20 transition-colors"
                   >
                     View Details
                   </button>

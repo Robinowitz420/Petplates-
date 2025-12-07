@@ -1,27 +1,25 @@
 import Link from 'next/link';
-import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 export default function BlogPage() {
   const blogPosts = [
     {
       id: 'complete-guide-homemade-dog-food',
       title: 'The Complete Guide to Homemade Dog Food: What Every Pet Parent Needs to Know',
-      excerpt: 'Learn how to safely transition your dog to homemade meals while ensuring complete nutrition. Our veterinary-approved guide covers everything from ingredient selection to portion calculations.',
+      excerpt: 'Learn how to safely transition your dog to homemade meals while ensuring complete nutrition. Our pet health specialist-approved guide covers everything from ingredient selection to portion calculations.',
       author: 'Dr. Sarah Mitchell, DVM',
       date: '2024-11-20',
       readTime: '8 min read',
-      category: 'Nutrition',
-      image: '/images/emojis/Mascots/Prep Puppy.jpg'
+      category: 'Nutrition'
     },
     {
       id: 'cat-nutrition-myths-debunked',
       title: 'Cat Nutrition Myths Debunked: Separating Fact from Fiction',
       excerpt: 'From "cats need milk" to "raw diets are dangerous," we examine common misconceptions about feline nutrition and provide evidence-based guidance.',
-      author: 'Dr. Michael Chen, Veterinary Nutritionist',
+      author: 'Dr. Michael Chen, Pet Health Specialist',
       date: '2024-11-18',
       readTime: '6 min read',
       category: 'Myths',
-      image: '/images/emojis/Mascots/ProfessorPurffesor.jpg'
     },
     {
       id: 'fresh-pet-food-market-trends',
@@ -31,17 +29,15 @@ export default function BlogPage() {
       date: '2024-11-15',
       readTime: '5 min read',
       category: 'Industry',
-      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     },
     {
       id: 'supplements-every-pet-needs',
       title: 'Essential Supplements Every Pet Needs (And Why)',
       excerpt: 'Not all pets need supplements, but many benefit from targeted nutritional support. Learn which supplements are essential and how to choose quality products.',
-      author: 'Dr. James Park, Veterinary Researcher',
+      author: 'Dr. James Park, Pet Health Researcher',
       date: '2024-11-12',
       readTime: '7 min read',
       category: 'Supplements',
-      image: '/images/emojis/Mascots/ProfessorPurffesor.jpg'
     },
     {
       id: 'reading-pet-food-labels',
@@ -51,7 +47,6 @@ export default function BlogPage() {
       date: '2024-11-10',
       readTime: '4 min read',
       category: 'Education',
-      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     },
     {
       id: 'seasonal-pet-nutrition',
@@ -61,7 +56,6 @@ export default function BlogPage() {
       date: '2024-11-08',
       readTime: '6 min read',
       category: 'Seasonal',
-      image: '/images/emojis/Mascots/Prep Puppy.jpg'
     }
   ];
 
@@ -70,141 +64,92 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16 px-4">
+      <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Pet Nutrition Blog
           </h1>
-          <p className="text-xl text-primary-100">
+          <p className="text-lg text-gray-200">
             Expert insights, research-backed advice, and the latest in pet nutrition science
           </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 mb-8 justify-center">
+        <div className="flex flex-wrap gap-2 mb-6 justify-center">
           {categories.map((category) => (
             <button
               key={category}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-primary-50 hover:border-primary-300 transition-colors"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium hover:bg-gray-100 hover:border-gray-400 transition-colors"
             >
               {category}
             </button>
           ))}
         </div>
 
-        {/* Featured Post */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-12">
-          <div className="md:flex">
-            <div className="md:w-1/2">
-              <img
-                src={blogPosts[0].image}
-                alt={blogPosts[0].title}
-                className="w-full h-64 md:h-full object-cover"
-              />
-            </div>
-            <div className="md:w-1/2 p-8">
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full">
-                  {blogPosts[0].category}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {new Date(blogPosts[0].date).toLocaleDateString()}
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {blogPosts[0].readTime}
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {blogPosts[0].title}
-              </h2>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                {blogPosts[0].excerpt}
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{blogPosts[0].author}</span>
-                </div>
-                <Link
-                  href={`/blog/${blogPosts[0].id}`}
-                  className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  Read More
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Blog Posts List - Reddit Style */}
+        <div className="space-y-4">
+          {blogPosts.map((post) => (
+            <article key={post.id} className="bg-white rounded border border-gray-200 hover:border-gray-300 transition-colors">
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  {/* Left side - voting area (optional, can be removed) */}
+                  <div className="flex flex-col items-center pt-1">
+                    <button className="text-gray-400 hover:text-green-600 transition-colors">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    <span className="text-xs text-gray-500 mt-1">0</span>
+                    <button className="text-gray-400 hover:text-red-500 transition-colors">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
 
-        {/* Blog Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.slice(1).map((post) => (
-            <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-xs font-medium">
-                    {post.category}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                  {post.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(post.date).toLocaleDateString()}
+                  {/* Right side - content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+                        {post.category}
+                      </span>
+                      <span>•</span>
+                      <span>{post.author}</span>
+                      <span>•</span>
+                      <span>{new Date(post.date).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {post.readTime}
+                      </span>
+                    </div>
+                    <Link href={`/blog/${post.id}`}>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-green-700 transition-colors">
+                        {post.title}
+                      </h3>
+                    </Link>
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <Link
+                        href={`/blog/${post.id}`}
+                        className="hover:text-green-700 font-medium transition-colors"
+                      >
+                        Read more
+                      </Link>
+                      <span>•</span>
+                      <button className="hover:text-green-700 transition-colors">Share</button>
+                      <span>•</span>
+                      <button className="hover:text-green-700 transition-colors">Save</button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {post.readTime}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600 truncate">{post.author}</span>
-                  </div>
-                  <Link
-                    href={`/blog/${post.id}`}
-                    className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-                  >
-                    Read More →
-                  </Link>
                 </div>
               </div>
             </article>
           ))}
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className="bg-primary-600 text-white rounded-lg p-8 mt-12 text-center">
-          <h3 className="text-2xl font-bold mb-4">Stay Updated on Pet Nutrition</h3>
-          <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
-            Get the latest research, recipe ideas, and expert advice delivered to your inbox weekly.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900"
-            />
-            <button className="px-6 py-3 bg-white text-primary-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-              Subscribe
-            </button>
-          </div>
         </div>
       </div>
     </div>

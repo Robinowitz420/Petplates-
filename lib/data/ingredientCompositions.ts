@@ -3,6 +3,7 @@
 // All values per 100g raw edible portion unless otherwise noted
 
 export type SpeciesCompatibility = 'ok' | 'avoid' | 'limit' | 'caution';
+export type ConfidenceLevel = 'high' | 'medium' | 'low';
 export type FeedingRole = 'staple' | 'treat' | 'supplement' | 'forage';
 
 export interface IngredientComposition {
@@ -29,6 +30,15 @@ export interface IngredientComposition {
     bird?: SpeciesCompatibility;
     reptile?: SpeciesCompatibility;
     'pocket-pet'?: SpeciesCompatibility;
+  };
+  
+  // Data confidence (NEW - communicates evidence strength)
+  confidenceBySpecies?: {
+    dog?: ConfidenceLevel;
+    cat?: ConfidenceLevel;
+    bird?: ConfidenceLevel;
+    reptile?: ConfidenceLevel;
+    'pocket-pet'?: ConfidenceLevel;
   };
   
   // Feeding role (NEW - how this ingredient should be used)
@@ -80,11 +90,20 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.50,
       cat: 0.60,
       bird: 0.10,
-      reptile: 0.20
+      reptile: 0.20,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       bird: 'Only for carnivorous birds (raptors, corvids). Not suitable for seed-eating birds.',
-      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.'
+      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils except under vet direction.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "ground_turkey": {
@@ -106,7 +125,20 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.50,
       cat: 0.60,
       bird: 0.10,
-      reptile: 0.20
+      reptile: 0.20,
+      'pocket-pet': 0
+    },
+    notesBySpecies: {
+      bird: 'Only for carnivorous birds (raptors, corvids). Not suitable for seed-eating birds.',
+      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils except under vet direction.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "ground_chicken": {
@@ -128,11 +160,20 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.50,
       cat: 0.60,
       bird: 0.10,
-      reptile: 0.20
+      reptile: 0.20,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       bird: 'Only for carnivorous birds (raptors, corvids). Not suitable for seed-eating birds.',
-      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.'
+      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils except under vet direction.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "chicken_thighs": {
@@ -154,7 +195,20 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.50,
       cat: 0.60,
       bird: 0.10,
-      reptile: 0.20
+      reptile: 0.20,
+      'pocket-pet': 0
+    },
+    notesBySpecies: {
+      bird: 'Only for carnivorous birds (raptors, corvids). Not suitable for seed-eating birds.',
+      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils except under vet direction.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "turkey_breast": {
@@ -177,7 +231,20 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.50,
       cat: 0.60,
       bird: 0.10,
-      reptile: 0.20
+      reptile: 0.20,
+      'pocket-pet': 0
+    },
+    notesBySpecies: {
+      bird: 'Only for carnivorous birds (raptors, corvids). Not suitable for seed-eating birds.',
+      reptile: 'Only for omnivorous/carnivorous reptiles. Not for herbivorous species.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils except under vet direction.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "chicken_liver": {
@@ -199,13 +266,22 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.10,
       cat: 0.15,
       bird: 0.05,
-      reptile: 0.10
+      reptile: 0.10,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       dog: 'High in vitamin A - limit to prevent hypervitaminosis A.',
       cat: 'Excellent source of taurine and vitamin A. Limit to prevent toxicity.',
       bird: 'Only for carnivorous birds. Very high in vitamin A.',
-      reptile: 'Only for carnivorous reptiles. High vitamin A content.'
+      reptile: 'Only for carnivorous reptiles. High vitamin A content.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils; vitamin A levels are excessive.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "chicken_hearts": {
@@ -227,10 +303,19 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.15,
       cat: 0.20,
       bird: 0.05,
-      reptile: 0.10
+      reptile: 0.10,
+      'pocket-pet': 0
     },
     notesBySpecies: {
-      cat: 'Excellent source of taurine for cats.'
+      cat: 'Excellent source of taurine for cats.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils; excessive animal protein.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
 
@@ -255,11 +340,20 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.40,
       cat: 0.50,
       bird: 0.10,
-      reptile: 0.15
+      reptile: 0.15,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       bird: 'Only for carnivorous birds. High fat content - limit frequency.',
-      reptile: 'Only for carnivorous reptiles. Ensure proper Ca:P ratio with supplementation.'
+      reptile: 'Only for carnivorous reptiles. Ensure proper Ca:P ratio with supplementation.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets (rabbits, guinea pigs). Avoid for omnivorous hamsters/gerbils due to fat and protein load.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "sardines_water": {
@@ -282,13 +376,22 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.30,
       cat: 0.40,
       bird: 0.10,
-      reptile: 0.15
+      reptile: 0.15,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       dog: 'Excellent source of omega-3 and calcium. High phosphorus - balance with calcium.',
       cat: 'Great source of omega-3 and taurine. High calcium content.',
       bird: 'Only for carnivorous birds. High fat content.',
-      reptile: 'Only for carnivorous reptiles. High calcium but also high phosphorus.'
+      reptile: 'Only for carnivorous reptiles. High calcium but also high phosphorus.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets. Avoid for omnivorous hamsters/gerbils; excessive fat and calcium.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "tuna_water": {
@@ -310,12 +413,21 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.30,
       cat: 0.40,
       bird: 0.10,
-      reptile: 0.15
+      reptile: 0.15,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       cat: 'Good source of protein. Limit frequency due to mercury concerns.',
       bird: 'Only for carnivorous birds. Limit due to mercury.',
-      reptile: 'Only for carnivorous reptiles. Low fat option.'
+      reptile: 'Only for carnivorous reptiles. Low fat option.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets. Avoid for omnivorous hamsters/gerbils; mercury risk and protein load.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
 
@@ -339,12 +451,21 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.50,
       cat: 0.30,
       bird: 0.10,
-      reptile: 0.20
+      reptile: 0.20,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       cat: 'Some cats are allergic or intolerant to beef. Monitor for reactions.',
       bird: 'Only for carnivorous birds.',
-      reptile: 'Only for carnivorous reptiles.'
+      reptile: 'Only for carnivorous reptiles.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets. Avoid for omnivorous hamsters/gerbils due to high fat/protein.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'medium',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "beef_liver": {
@@ -366,13 +487,22 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.10,
       cat: 0.10,
       bird: 0.05,
-      reptile: 0.10
+      reptile: 0.10,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       dog: 'Very high in vitamin A - limit to prevent hypervitaminosis A.',
       cat: 'Some cats allergic to beef. High vitamin A - limit to prevent toxicity.',
       bird: 'Only for carnivorous birds. Extremely high in vitamin A.',
-      reptile: 'Only for carnivorous reptiles. Very high vitamin A content.'
+      reptile: 'Only for carnivorous reptiles. Very high vitamin A content.',
+      'pocket-pet': 'Not suitable for herbivorous pocket pets. Avoid for omnivorous hamsters/gerbils; vitamin A content is excessive.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'medium',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
 
@@ -405,6 +535,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for all birds. Cook thoroughly to prevent salmonella.',
       reptile: 'Good protein source for omnivorous reptiles. Cook thoroughly.',
       'pocket-pet': 'Good for hamsters and gerbils. Limit for rabbits and guinea pigs.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'medium'
     }
   },
 
@@ -439,6 +576,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for parrots. High in vitamin A and calcium.',
       reptile: 'Excellent for herbivorous lizards. High Ca:P ratio is ideal.',
       'pocket-pet': 'Great for rabbits and guinea pigs. High calcium content.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "spinach_raw": {
@@ -470,6 +614,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for parrots. High in vitamin A and calcium.',
       reptile: 'Great for herbivorous lizards. Good Ca:P ratio.',
       'pocket-pet': 'Excellent for rabbits and guinea pigs. High calcium.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "carrots_raw": {
@@ -501,6 +652,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for all birds. High in vitamin A.',
       reptile: 'Good for herbivorous reptiles. High vitamin A content.',
       'pocket-pet': 'Great for all pocket pets. High in vitamin A.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "sweet_potato": {
@@ -532,6 +690,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for larger parrots. Cook before feeding.',
       reptile: 'Excellent for herbivorous reptiles. Cook before feeding.',
       'pocket-pet': 'Good for all pocket pets. Cook before feeding.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "pumpkin": {
@@ -564,6 +729,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for all birds. High in beta-carotene.',
       reptile: 'Excellent for herbivorous reptiles. High in beta-carotene.',
       'pocket-pet': 'Good for all pocket pets. High in beta-carotene.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "broccoli_raw": {
@@ -595,6 +767,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for parrots. High in vitamin C.',
       reptile: 'Good for herbivorous reptiles. High in vitamin C.',
       'pocket-pet': 'Great for rabbits and guinea pigs. High in vitamin C.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "green_beans_raw": {
@@ -627,6 +806,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for all birds. Low phosphorus makes it good for kidney health.',
       reptile: 'Excellent for herbivorous reptiles. Low phosphorus, good Ca:P ratio.',
       'pocket-pet': 'Great for rabbits and guinea pigs. Low phosphorus is beneficial.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "celery_raw": {
@@ -658,6 +844,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for all birds. High water content.',
       reptile: 'Excellent for herbivorous reptiles. Good Ca:P ratio.',
       'pocket-pet': 'Great for rabbits and guinea pigs. High water content.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "bok_choy": {
@@ -691,6 +884,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for all birds. Low oxalates, high calcium.',
       reptile: 'Excellent for herbivorous reptiles. Low oxalates, excellent Ca:P ratio.',
       'pocket-pet': 'Great for rabbits and guinea pigs. Low oxalates make it safer than kale.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
 
@@ -724,6 +924,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for all birds. High in antioxidants.',
       reptile: 'Good for omnivorous reptiles. High in antioxidants.',
       'pocket-pet': 'Great treat for all pocket pets. High in antioxidants.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "bananas_raw": {
@@ -755,6 +962,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Excellent for all birds. High in potassium.',
       reptile: 'Good for omnivorous reptiles. High in potassium.',
       'pocket-pet': 'Great treat for all pocket pets. High in potassium.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'high',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
 
@@ -786,6 +1000,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for larger parrots. Smaller birds may prefer whole grains.',
       reptile: 'Only for omnivorous species. Not suitable for strict herbivores or carnivores.',
       'pocket-pet': 'Suitable for hamsters, gerbils. Limit for rabbits and guinea pigs.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'medium'
     }
   },
   "white_rice_cooked": {
@@ -815,6 +1036,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for larger parrots. Lower in fiber than brown rice.',
       reptile: 'Only for omnivorous species. Lower in nutrients than brown rice.',
       'pocket-pet': 'Suitable for hamsters, gerbils. Lower in nutrients than brown rice.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'medium'
     }
   },
   "oats": {
@@ -844,6 +1072,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for larger parrots. Smaller birds prefer whole grains.',
       reptile: 'Only for omnivorous species. Not suitable for strict herbivores or carnivores.',
       'pocket-pet': 'Suitable for hamsters, gerbils. Limit for rabbits and guinea pigs.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'medium'
     }
   },
   "quinoa_cooked": {
@@ -873,6 +1108,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Good for larger parrots. High protein for a grain.',
       reptile: 'Only for omnivorous species. Not suitable for strict herbivores or carnivores.',
       'pocket-pet': 'Suitable for hamsters, gerbils. Limit for rabbits and guinea pigs.'
+    },
+    confidenceBySpecies: {
+      dog: 'medium',
+      cat: 'medium',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'medium'
     }
   },
 
@@ -903,6 +1145,13 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       bird: 'Critical for egg-laying females. Prevents egg binding.',
       reptile: 'Essential for herbivorous species. Prevents metabolic bone disease.',
       'pocket-pet': 'Critical for rabbits and guinea pigs. Prevents dental issues.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'high',
+      reptile: 'high',
+      'pocket-pet': 'high'
     }
   },
   "fish_oil": {
@@ -923,13 +1172,22 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
       dog: 0.05,
       cat: 0.05,
       bird: 0.02,
-      reptile: 0.02
+      reptile: 0.02,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       dog: 'Excellent source of omega-3. Supports skin, coat, and joint health.',
       cat: 'Essential for cats. Supports heart and eye health.',
       bird: 'Only for carnivorous birds. Not needed for seed-eating species.',
-      reptile: 'Only for carnivorous reptiles. Not for herbivorous species.'
+      reptile: 'Only for carnivorous reptiles. Not for herbivorous species.',
+      'pocket-pet': 'Avoid for rabbits and guinea pigs; fat load and fish proteins are inappropriate for herbivorous pocket pets.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   },
   "taurine_powder": {
@@ -945,11 +1203,24 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
     feedingRole: 'supplement',
     maxInclusionPercentBySpecies: {
       dog: 0.01,
-      cat: 0.02
+      cat: 0.02,
+      bird: 0,
+      reptile: 0,
+      'pocket-pet': 0
     },
     notesBySpecies: {
       dog: 'Dogs can synthesize taurine but supplementation can be beneficial.',
-      cat: 'CRITICAL for cats. Cats cannot synthesize taurine - deficiency causes blindness and heart failure.'
+      cat: 'CRITICAL for cats. Cats cannot synthesize taurine - deficiency causes blindness and heart failure.',
+      bird: 'Avoid for seed-eating birds; unnecessary and unstudied.',
+      reptile: 'Avoid for herbivorous reptiles; unnecessary for carnivores when diet is balanced.',
+      'pocket-pet': 'Avoid for rabbits and guinea pigs; not part of herbivore requirement.'
+    },
+    confidenceBySpecies: {
+      dog: 'high',
+      cat: 'high',
+      bird: 'medium',
+      reptile: 'medium',
+      'pocket-pet': 'high'
     }
   }
 };

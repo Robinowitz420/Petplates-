@@ -1,18 +1,6 @@
 // Utility functions for pet management
-
-export interface Pet {
-  id: string;
-  names: string[];
-  type: string;
-  breed: string;
-  weight: string;
-  age: string;
-  healthConcerns: string[];
-  mealPlan: string[];
-  savedRecipes: string[];
-  dislikes?: string[];
-  image?: string;
-}
+import type { Pet } from '../types';
+export type { Pet } from '../types';
 
 /**
  * Get a random name from the pet's names array

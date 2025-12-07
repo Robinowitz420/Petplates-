@@ -23,6 +23,13 @@ interface Pet {
   age: string;
   healthConcerns: string[];
   mealPlan: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  weight?: string | number;
+  weightKg?: number;
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  dislikes?: string[];
 }
 
 const getPetsFromLocalStorage = (userId: string): Pet[] => {

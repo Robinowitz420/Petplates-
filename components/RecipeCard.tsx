@@ -42,17 +42,6 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
             {recipe.description}
           </p>
 
-          {/* Celebrity Quote (no image) */}
-          {recipe.celebrityQuote && recipe.celebrityName && (
-            <div className="mb-4 p-3 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-800/30">
-              <p className="text-sm italic text-gray-300 mb-1">
-                "{recipe.celebrityQuote}"
-              </p>
-              <p className="text-xs text-gray-500 font-medium text-right">
-                — {recipe.celebrityName}
-              </p>
-            </div>
-          )}
 
           {/* Meta Information */}
           {(recipe as any).meta && (

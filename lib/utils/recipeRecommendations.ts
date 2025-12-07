@@ -12,6 +12,9 @@ interface Pet {
   activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
   allergies?: string[];
   dietaryRestrictions?: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  weightKg?: number;
 }
 
 import { normalizeToSubtype, type Subtype } from './ingredientWhitelists';

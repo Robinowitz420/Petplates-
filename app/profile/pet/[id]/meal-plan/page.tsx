@@ -182,7 +182,7 @@ export default function MealPlanPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white p-8 rounded-xl shadow text-center space-y-4">
           <p className="text-xl font-semibold text-gray-800">Pet not found.</p>
-          <Link href="/profile" className="text-primary-600 font-semibold">
+          <Link href="/profile" className="text-green-800 font-semibold">
             Back to Profiles
           </Link>
         </div>
@@ -204,19 +204,19 @@ export default function MealPlanPage() {
           <div className="flex flex-col gap-2">
             <button
               onClick={() => router.push(`/recipes/recommended/${pet.id}`)}
-              className="bg-primary-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
+              className="bg-green-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-900 transition-colors"
             >
               See Recommended Meals
             </button>
             <button
               onClick={() => router.push(`/profile/pet/${pet.id}/recipe-builder`)}
-              className="bg-primary-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
+              className="bg-green-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-900 transition-colors"
             >
               Create Custom Meal
             </button>
             <button
               onClick={() => router.push(`/profile/pet/${pet.id}`)}
-              className="text-primary-600 font-semibold"
+              className="text-green-800 font-semibold"
             >
               Find More Meals for {pet.name}
             </button>
@@ -230,7 +230,7 @@ export default function MealPlanPage() {
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
-          <div className="flex items-center gap-3 text-primary-600">
+          <div className="flex items-center gap-3 text-green-800">
             <button
               onClick={() => router.push('/profile')}
               className="inline-flex items-center gap-2 font-semibold"
@@ -253,7 +253,7 @@ export default function MealPlanPage() {
             </div>
             <button
               onClick={handleRegenerate}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-800 text-white font-semibold hover:bg-green-900"
             >
               <RefreshCw size={18} />
               Regenerate Plan
@@ -282,7 +282,7 @@ export default function MealPlanPage() {
                       <p className="font-medium text-gray-900 text-xs leading-tight">
                         {meal.name}
                         {meal.category === 'custom' && (
-                          <span className="ml-1 text-xs text-primary-600">(Custom)</span>
+                          <span className="ml-1 text-xs text-green-800">(Custom)</span>
                         )}
                       </p>
                     </Link>

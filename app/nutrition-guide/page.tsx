@@ -5,7 +5,7 @@ import Link from 'next/link';
 const foundations = [
   'AAFCO nutrient profiles for growth, maintenance, and senior diets (dogs/cats)',
   'NRC (National Research Council) data for exotic species',
-  'Veterinary guidance for balancing protein, fats, essential amino acids, minerals, vitamins, and calories',
+  'Pet health specialist guidance for balancing protein, fats, essential amino acids, minerals, vitamins, and calories',
   'Evidence-backed functional ingredients (joint care, skin, digestion, urinary health, metabolic support)',
 ];
 
@@ -29,7 +29,7 @@ export default function NutritionGuidePage() {
         <header>
           <h1 className="text-4xl font-extrabold text-gray-900 mb-3">Nutrition Guide</h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            Paw & Plate uses peer-reviewed science, veterinary standards, and functional ingredients to
+            Paw & Plate uses peer-reviewed science, pet health specialist standards, and functional ingredients to
             keep every fresh meal nutritionally complete.
           </p>
         </header>

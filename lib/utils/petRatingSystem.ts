@@ -12,12 +12,15 @@ export interface Pet {
   type: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
   breed: string;
   age: number;
-  weight: number;
-  activityLevel: 'sedentary' | 'moderate' | 'active' | 'very-active';
+  weight?: number;
+  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
   healthConcerns: string[];
   dietaryRestrictions: string[];
   allergies?: string[];
   dislikes?: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  weightKg?: number;
 }
 
 // Helper to detect if data is just the auto-generated placeholder

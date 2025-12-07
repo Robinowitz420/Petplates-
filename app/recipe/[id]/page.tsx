@@ -523,17 +523,45 @@ export default function RecipeDetailPage() {
       };
       const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
       // Convert to compatible format
+      // Generate reason text that includes issues for better keyword matching
+      const getReasonWithIssues = (factor: typeof enhanced.factors.ingredientSafety) => {
+        if (factor.issues.length > 0) {
+          return factor.issues.join('; ') + (factor.reasoning ? ` (${factor.reasoning})` : '');
+        }
+        return factor.reasoning || '';
+      };
+
       return {
         overallScore: enhanced.overallScore,
         compatibility: enhanced.grade === 'A+' || enhanced.grade === 'A' ? 'excellent' :
                        enhanced.grade === 'B+' || enhanced.grade === 'B' ? 'good' :
                        enhanced.grade === 'C+' || enhanced.grade === 'C' ? 'fair' : 'poor',
         breakdown: {
-          petTypeMatch: { score: enhanced.factors.ingredientSafety.score },
-          ageAppropriate: { score: enhanced.factors.lifeStageFit.score },
-          nutritionalFit: { score: enhanced.factors.nutritionalAdequacy.score },
-          healthCompatibility: { score: enhanced.factors.healthAlignment.score },
-          allergenSafety: { score: enhanced.factors.allergenSafety.score },
+          petTypeMatch: { 
+            score: enhanced.factors.ingredientSafety.score,
+            weight: enhanced.factors.ingredientSafety.weight,
+            reason: getReasonWithIssues(enhanced.factors.ingredientSafety)
+          },
+          ageAppropriate: { 
+            score: enhanced.factors.lifeStageFit.score,
+            weight: enhanced.factors.lifeStageFit.weight,
+            reason: getReasonWithIssues(enhanced.factors.lifeStageFit)
+          },
+          nutritionalFit: { 
+            score: enhanced.factors.nutritionalAdequacy.score,
+            weight: enhanced.factors.nutritionalAdequacy.weight,
+            reason: getReasonWithIssues(enhanced.factors.nutritionalAdequacy)
+          },
+          healthCompatibility: { 
+            score: enhanced.factors.healthAlignment.score,
+            weight: enhanced.factors.healthAlignment.weight,
+            reason: getReasonWithIssues(enhanced.factors.healthAlignment)
+          },
+          allergenSafety: { 
+            score: enhanced.factors.allergenSafety.score,
+            weight: enhanced.factors.allergenSafety.weight,
+            reason: getReasonWithIssues(enhanced.factors.allergenSafety)
+          },
         },
         warnings: enhanced.detailedBreakdown.warnings,
         strengths: enhanced.detailedBreakdown.healthBenefits,
@@ -883,20 +911,6 @@ export default function RecipeDetailPage() {
                 )}
 
 
-                {/* Celebrity Quote (no image) */}
-                {recipe.celebrityQuote && recipe.celebrityName && (
-                  <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 p-6 mb-8 rounded-xl relative">
-                    <span className="absolute top-2 left-2 text-4xl text-blue-800/50">
-                      "
-                    </span>
-                    <p className="italic text-gray-300 text-lg relative z-10 leading-relaxed">
-                      {recipe.celebrityQuote}
-                    </p>
-                    <p className="text-right font-bold text-blue-400 mt-3">
-                      - {recipe.celebrityName}
-                    </p>
-                  </div>
-                )}
 
 
                 <p className="text-gray-300 mb-8 leading-relaxed text-lg">
@@ -1133,31 +1147,46 @@ export default function RecipeDetailPage() {
                   {Object.entries(scoreForQueryPet.breakdown).map(([key, factor]) => {
                     const f = factor as { score: number; weight: number; reason?: string };
                     const reasonLower = (f.reason || '').toLowerCase();
+                    const score = f.score || 0;
+                    const weight = f.weight || 0;
 
-                    const isLow = ['too low', 'low', 'deficient', 'insufficient', 'lacking'].some(term =>
+                    // Check reason text for keywords
+                    const isLow = ['too low', 'low', 'deficient', 'insufficient', 'lacking', 'below', 'may be too low'].some(term =>
                       reasonLower.includes(term)
                     );
-                    const isHigh = ['too high', 'high', 'excess', 'elevated'].some(term =>
+                    const isHigh = ['too high', 'high', 'excess', 'elevated', 'above', 'may be too high'].some(term =>
                       reasonLower.includes(term)
                     );
-                    const isHazard = ['toxic', 'unsafe', 'risk', 'hazard', 'problem', 'issue', 'adverse'].some(term =>
+                    const isHazard = ['toxic', 'unsafe', 'risk', 'hazard', 'problem', 'issue', 'adverse', 'should be avoided', 'avoid', 'not suitable'].some(term =>
                       reasonLower.includes(term)
                     );
 
+                    // Also check score thresholds if reason doesn't have keywords
                     let icon = '';
-                    if (isLow) icon = '🔻';
-                    else if (isHigh) icon = '🔺';
-                    else if (isHazard) icon = '⚠️';
+                    if (isLow || (score < 50 && !isHigh && !isHazard)) {
+                      icon = '🔻';
+                    } else if (isHigh) {
+                      icon = '🔺';
+                    } else if (isHazard || score < 30) {
+                      icon = '⚠️';
+                    }
 
-                    if (!icon) return null;
+                    // Only show items with issues (low score or negative keywords)
+                    if (!icon || score >= 70) return null;
+
+                    // Format tooltip content with detailed data
+                    const factorName = key.replace(/([A-Z])/g, ' $1').toLowerCase();
+                    const tooltipContent = `Score: ${score}%\nWeight: ${(weight * 100).toFixed(0)}%\n\n${f.reason || 'No additional details available'}`;
 
                     return (
-                      <div key={key} className="flex items-center gap-2 p-2 bg-surface-lighter rounded-lg border border-surface-highlight">
-                        <span className="text-sm">{icon}</span>
-                        <span className="text-gray-300 text-sm capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
-                        </span>
-                      </div>
+                      <Tooltip key={key} content={tooltipContent}>
+                        <div className="flex items-center gap-2 p-2 bg-surface-lighter rounded-lg border border-surface-highlight cursor-help hover:bg-surface-highlight transition-colors">
+                          <span className="text-sm">{icon}</span>
+                          <span className="text-gray-300 text-sm capitalize">
+                            {factorName}
+                          </span>
+                        </div>
+                      </Tooltip>
                     );
                   })}
                 </div>

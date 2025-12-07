@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HeartOff, ArrowLeft, Utensils, Clock, Trash2 } from 'lucide-react';
 import { recipes } from '@/lib/data/recipes-complete';
-import Image from '@/components/Image';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import type { CustomMeal } from '@/lib/types';
 
@@ -21,9 +20,14 @@ interface Pet {
   type: PetCategory;
   breed: string;
   age: AgeGroup;
-  healthConcerns: string[];
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  dislikes?: string[];
   // In profile/page.tsx this is string[] of recipe IDs
-  savedRecipes: string[];
+  savedRecipes?: string[];
+  weight?: string;
+  weightKg?: number;
 }
 
 // Same simulated user ID setup as profile/page.tsx
@@ -88,7 +92,6 @@ export default function SavedRecipesPage() {
     const allMeals: {
       id: string;
       name: string;
-      imageUrl: string;
       dateAdded?: number;
       isCustom?: boolean;
     }[] = [];
@@ -101,7 +104,6 @@ export default function SavedRecipesPage() {
           allMeals.push({
             id: recipe.id,
             name: recipe.name,
-            imageUrl: (recipe as any).imageUrl || '',
             dateAdded: undefined,
             isCustom: false,
           });
@@ -114,7 +116,6 @@ export default function SavedRecipesPage() {
       allMeals.push({
         id: meal.id,
         name: meal.name,
-        imageUrl: '', // Custom meals don't have images yet
         dateAdded: meal.createdAt ? new Date(meal.createdAt).getTime() : undefined,
         isCustom: true,
       });
@@ -155,7 +156,7 @@ export default function SavedRecipesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <p className="text-xl text-primary-600 font-medium">Loading pet profile...</p>
+        <p className="text-xl text-green-800 font-medium">Loading pet profile...</p>
       </div>
     );
   }
@@ -171,7 +172,7 @@ export default function SavedRecipesPage() {
         </p>
         <Link
           href="/profile"
-          className="mt-6 inline-flex items-center text-primary-600 hover:text-primary-800 transition-colors font-medium"
+          className="mt-6 inline-flex items-center text-green-800 hover:text-green-900 transition-colors font-medium"
         >
           <ArrowLeft className="w-5 h-5 mr-2" /> Back to Pet Profiles
         </Link>
@@ -192,7 +193,7 @@ export default function SavedRecipesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/profile"
-          className="inline-flex items-center text-gray-500 hover:text-primary-600 transition-colors mb-3 text-sm"
+          className="inline-flex items-center text-gray-500 hover:text-green-800 transition-colors mb-3 text-sm"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Pet Profiles
         </Link>
@@ -218,7 +219,7 @@ export default function SavedRecipesPage() {
               className={`px-5 py-3 rounded-lg font-semibold transition-colors ${
                 savedRecipeDetails.length < 2
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700'
+                  : 'bg-green-800 text-white hover:bg-green-900'
               }`}
             >
               Create Meal Plan
@@ -240,15 +241,7 @@ export default function SavedRecipesPage() {
                   }
                   className="flex items-center flex-grow group"
                 >
-                  <Image
-                    src={recipe.imageUrl}
-                    variant="thumbnail"
-                    alt={recipe.name}
-                    className="w-16 h-16 object-cover rounded-lg mr-4 shadow-sm"
-                    petCategory={recipe.category}
-                    fallbackSrc="https://placehold.co/64x64/E0E0E0/888888?text=Food"
-                  />
-                  <div>
+                  <div className="ml-0">
                     <div className="flex items-center gap-2">
                       <p className="text-lg font-semibold text-gray-800 group-hover:text-primary-600 transition-colors">
                         {recipe.name}
@@ -288,7 +281,7 @@ export default function SavedRecipesPage() {
               </p>
               <Link
                 href={`/profile/pet/${pet.id}`}
-                className="mt-4 inline-block px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-md"
+                className="mt-4 inline-block px-6 py-2 bg-green-800 text-white rounded-lg hover:bg-green-900 transition-colors font-medium shadow-md"
               >
                 Find Meals
               </Link>

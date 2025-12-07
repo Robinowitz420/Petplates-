@@ -4,6 +4,25 @@
 import type { CustomMeal } from '@/lib/types';
 import type { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
 
+// Helper to get pets from localStorage
+const getPetsFromLocalStorage = (userId: string): any[] => {
+  if (typeof window === 'undefined') return [];
+  const stored = localStorage.getItem(`pets_${userId}`);
+  if (!stored) return [];
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+};
+
+// Helper to save pets to localStorage
+const savePetsToLocalStorage = (userId: string, pets: any[]): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(`pets_${userId}`, JSON.stringify(pets));
+  }
+};
+
 /**
  * Data contract for custom meal storage operations.
  * Currently uses localStorage, but can be swapped to Firebase/Supabase without changing callers.
@@ -111,6 +130,22 @@ export function saveCustomMeal(
   meals.push(customMeal);
   localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(meals));
   
+  // Also add the custom meal ID to the pet's savedRecipes array
+  const pets = getPetsFromLocalStorage(userId);
+  const updatedPets = pets.map((pet: any) => {
+    if (pet.id === petId) {
+      const savedRecipes = pet.savedRecipes || [];
+      if (!savedRecipes.includes(customMeal.id)) {
+        return {
+          ...pet,
+          savedRecipes: [...savedRecipes, customMeal.id],
+        };
+      }
+    }
+    return pet;
+  });
+  savePetsToLocalStorage(userId, updatedPets);
+  
   return customMeal;
 }
 
@@ -134,6 +169,19 @@ export function deleteCustomMeal(userId: string, petId: string, mealId: string):
   const meals = getCustomMeals(userId, petId);
   const filtered = meals.filter(m => m.id !== mealId);
   localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(filtered));
+  
+  // Also remove the custom meal ID from the pet's savedRecipes array
+  const pets = getPetsFromLocalStorage(userId);
+  const updatedPets = pets.map((pet: any) => {
+    if (pet.id === petId) {
+      return {
+        ...pet,
+        savedRecipes: (pet.savedRecipes || []).filter((id: string) => id !== mealId),
+      };
+    }
+    return pet;
+  });
+  savePetsToLocalStorage(userId, updatedPets);
 }
 
 /**

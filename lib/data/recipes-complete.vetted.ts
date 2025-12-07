@@ -30,7 +30,7 @@ export const recipes: Recipe[] = [
       "homemade",
       "balanced"
     ],
-    "imageUrl": "/images/AAGRBT0C7xk_1763846334320.png",
+    "imageUrl": "/images/bannernew.jpeg",
     "prepTime": "31 min",
     "cookTime": "18 min",
     "servings": 1,
@@ -144,7 +144,7 @@ export const recipes: Recipe[] = [
       "homemade",
       "balanced"
     ],
-    "imageUrl": "/images/AAGRBT0C7xk_1763846334340.png",
+    "imageUrl": "/images/bannernew.jpeg",
     "prepTime": "19 min",
     "cookTime": "14 min",
     "servings": 1,
@@ -254,7 +254,7 @@ export const recipes: Recipe[] = [
       "homemade",
       "balanced"
     ],
-    "imageUrl": "/images/AAGRBT0C7xk_1763846334354.png",
+    "imageUrl": "/images/bannernew.jpeg",
     "prepTime": "15 min",
     "cookTime": "14 min",
     "servings": 1,
@@ -367,7 +367,7 @@ export const recipes: Recipe[] = [
       "homemade",
       "balanced"
     ],
-    "imageUrl": "/images/AAGRBT0C7xk_1763846334332.png",
+    "imageUrl": "/images/bannernew.jpeg",
     "prepTime": "22 min",
     "cookTime": "19 min",
     "servings": 1,
@@ -477,7 +477,7 @@ export const recipes: Recipe[] = [
       "homemade",
       "balanced"
     ],
-    "imageUrl": "/images/AAGRBT0C7xk_1763846334342.png",
+    "imageUrl": "/images/bannernew.jpeg",
     "prepTime": "21 min",
     "cookTime": "22 min",
     "servings": 1,

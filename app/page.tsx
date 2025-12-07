@@ -7,7 +7,6 @@ import { Check, Calendar, ShoppingCart, ArrowRight } from 'lucide-react';
 import { useUser, SignOutButton } from '@clerk/nextjs'; 
 import { recipes } from '@/lib/data/recipes-complete';
 import { PetCategory } from '@/lib/types';
-import RecipeImage from '@/components/Image';
 
 const getPetData = (userId: string) => {
   if (typeof window === 'undefined') return [];
@@ -21,7 +20,7 @@ const whyCards = [
     title: 'AAFCO Approved',
     subtitle: 'All meals meet or exceed AAFCO + WSAVA nutritional standards',
     hover:
-      '**AAFCO** (Association of American Feed Control Officials) and **WSAVA** (World Small Animal Veterinary Association) set the gold standard for pet nutrition. We build every meal to those benchmarks so your pet stays balanced.',
+      '**AAFCO** (Association of American Feed Control Officials) and **WSAVA** (World Small Animal Veterinary Association) set the gold standard for pet nutrition. We build every meal to those benchmarks with guidance from pet health specialists so your pet stays balanced.',
     icon: Check,
   },
   {
@@ -185,15 +184,6 @@ export default function HomePage() {
                 href={`/recipe/${recipe.id}`} 
                 className="block bg-surface rounded-xl shadow-lg border border-surface-highlight hover:shadow-2xl hover:border-orange-500/50 transition overflow-hidden group"
               >
-                <div className="h-48 bg-surface-lighter relative">
-                  <RecipeImage 
-                    src={recipe.imageUrl} 
-                    variant="card"
-                    alt={recipe.name} 
-                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                    petCategory={recipe.category}
-                  />
-                </div>
                 <div className="p-4">
                   <h3 className="text-lg font-semibold text-white truncate group-hover:text-orange-400 transition-colors">{recipe.name}</h3>
                   <p className="text-sm text-gray-400 mt-1">⭐ {(recipe.rating || 0).toFixed(1)}</p>

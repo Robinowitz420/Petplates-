@@ -778,14 +778,14 @@ export const recipes: Recipe[] = recipesData as Recipe[];
     if (allWarnings.length > 10) logToFile(`   ... and ${allWarnings.length - 10} more`);
   }
 
-    logToFile('\n✅ Files updated:');
-    logToFile('   - lib/data/recipes-complete.json (data)');
-    logToFile('   - lib/data/recipes-complete.ts (imports JSON)');
-    logToFile('🔄 Restart your dev server to see changes');
-    
-    // Write log to file
-    fs.writeFileSync(logFile, logMessages.join('\n'), 'utf8');
-    logToFile(`\n📝 Full log written to: ${logFile}`);
+  logToFile('\n✅ Files updated:');
+  logToFile('   - lib/data/recipes-complete.json (data)');
+  logToFile('   - lib/data/recipes-complete.ts (imports JSON)');
+  logToFile('🔄 Restart your dev server to see changes');
+  
+  // Write log to file
+  fs.writeFileSync(logFile, logMessages.join('\n'), 'utf8');
+  logToFile(`\n📝 Full log written to: ${logFile}`);
   } catch (error) {
     const errorMsg = `❌ Error running script: ${error}`;
     logToFile(errorMsg);

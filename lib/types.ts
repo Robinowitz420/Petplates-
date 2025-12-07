@@ -49,8 +49,6 @@ export interface Recipe {
   id: string;
   name: string;
   shortName?: string;
-  celebrityName?: string;
-  celebrityQuote?: string;
   category: string;
   breed?: string | string[] | null;
   ageGroup: string[];
@@ -75,6 +73,33 @@ export interface Recipe {
   };
   rating?: number;
   reviews?: number;
+  score?: number;
+}
+
+export interface Pet {
+  id: string;
+  name?: string;
+  names?: string[];
+  type: string | PetCategory;
+  breed?: string | null;
+  age?: string;
+  weight?: string;
+  weightKg?: number;
+  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
+  mealPlan?: string[];
+  savedRecipes?: string[];
+  // Wellness and preference fields
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
+  dislikes?: string[];
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  customMeals?: CustomMeal[];
+  userId?: string;
+  image?: string;
 }
 
 export interface ModifiedRecipeResult {

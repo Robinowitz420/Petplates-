@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { CheckCircle, AlertTriangle, XCircle, Info, Plus, RotateCcw, Save } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { CheckCircle, AlertTriangle, XCircle, Info, Plus, RotateCcw, Save, ShoppingCart } from 'lucide-react';
 import { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
 import MealCompositionList from '@/components/MealCompositionList';
 import { generateMealName } from '@/lib/utils/mealNameGenerator';
@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import FireworksAnimation from '@/components/FireworksAnimation';
 import { saveCustomMeal } from '@/lib/utils/customMealStorage';
 import { logger } from '@/lib/utils/logger';
+import { getVettedProduct } from '@/lib/data/vetted-products';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -51,26 +52,21 @@ export default function MealCompleteView({
   const [showMealCreated, setShowMealCreated] = useState(false);
   const [mealName, setMealName] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
   const hasShownPopup = useRef(false); // Track if we've shown the popup
-  const hasAppliedRecommended = useRef(false); // Track if we've auto-applied recommended amounts
 
   const handleSaveMeal = () => {
     if (!analysis || !mealName.trim()) {
-      setSaveMessage('Please enter a meal name');
-      setTimeout(() => setSaveMessage(null), 3000);
       return;
     }
 
     setIsSaving(true);
     try {
       saveCustomMeal(userId, petId, mealName.trim(), selectedIngredients, analysis);
-      setSaveMessage('Meal saved successfully! ✓');
-      setTimeout(() => setSaveMessage(null), 3000);
+      setIsSaved(true);
     } catch (error) {
       logger.error('Error saving meal:', error);
-      setSaveMessage('Error saving meal. Please try again.');
-      setTimeout(() => setSaveMessage(null), 3000);
+      setIsSaved(false);
     } finally {
       setIsSaving(false);
     }
@@ -140,30 +136,6 @@ export default function MealCompleteView({
 
   const recommendedAmounts = calculateRecommendedAmounts();
 
-  // Auto-apply recommended amounts when analysis is complete (only once)
-  useEffect(() => {
-    if (analysis && analysis.recommendedServingGrams > 0 && selectedIngredients.length > 0 && !hasAppliedRecommended.current) {
-      const currentTotal = totalGrams;
-      if (currentTotal > 0) {
-        const recommendedTotal = analysis.recommendedServingGrams;
-        // Only apply if current total is significantly different from recommended (more than 10% difference)
-        const difference = Math.abs(currentTotal - recommendedTotal) / recommendedTotal;
-        if (difference > 0.1) {
-          // Apply recommended amounts
-          const recommendedAmounts = calculateRecommendedAmounts();
-          Object.entries(recommendedAmounts).forEach(([key, grams]) => {
-            onUpdateAmount(key, grams);
-          });
-          hasAppliedRecommended.current = true;
-        } else {
-          // If already close to recommended, just mark as applied
-          hasAppliedRecommended.current = true;
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [analysis, totalGrams]);
-
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
     if (score >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
@@ -205,14 +177,21 @@ export default function MealCompleteView({
               </p>
             </div>
             <div className="flex gap-3">
-              <button
-                onClick={handleSaveMeal}
-                disabled={isSaving || !analysis || !mealName.trim()}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save size={16} />
-                {isSaving ? 'Saving...' : 'Save Meal'}
-              </button>
+              {isSaved ? (
+                <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md">
+                  <CheckCircle size={16} />
+                  Meal Saved
+                </div>
+              ) : (
+                <button
+                  onClick={handleSaveMeal}
+                  disabled={isSaving || !analysis || !mealName.trim()}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Save size={16} />
+                  {isSaving ? 'Saving...' : 'Save Meal'}
+                </button>
+              )}
               <button
                 onClick={onAddMore}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
@@ -228,15 +207,6 @@ export default function MealCompleteView({
                 Start Over
               </button>
             </div>
-            {saveMessage && (
-              <div className={`mt-2 px-3 py-2 rounded-md text-sm ${
-                saveMessage.includes('Error') 
-                  ? 'bg-red-50 text-red-800' 
-                  : 'bg-green-50 text-green-800'
-              }`}>
-                {saveMessage}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -323,11 +293,59 @@ export default function MealCompleteView({
               <MealCompositionList
                 ingredients={selectedIngredients}
                 onRemove={onRemove}
-                onUpdateAmount={onUpdateAmount}
                 getIngredientDisplayName={getIngredientDisplayName}
                 getCompatibilityIndicator={getCompatibilityIndicator}
                 recommendedAmounts={recommendedAmounts}
               />
+              
+              {/* Buy All Ingredients Button */}
+              {(() => {
+                const ingredientLinks = new Set<string>();
+                selectedIngredients.forEach(ing => {
+                  const ingredientName = getIngredientDisplayName(ing.key).toLowerCase();
+                  const vettedProduct = getVettedProduct(ingredientName);
+                  const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink;
+                  if (link) {
+                    ingredientLinks.add(link);
+                  }
+                });
+                
+                const totalIngredients = ingredientLinks.size;
+                if (totalIngredients === 0) return null;
+                
+                const handleBuyAll = async () => {
+                  const linksArray = Array.from(ingredientLinks);
+                  
+                  // Open first tab immediately (user gesture)
+                  if (linksArray.length > 0) {
+                    window.open(linksArray[0], '_blank');
+                  }
+                  
+                  // Open remaining tabs with delays
+                  for (let i = 1; i < linksArray.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    const newWindow = window.open(linksArray[i], '_blank');
+                    
+                    // If popup was blocked, try again with a longer delay
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                      await new Promise(resolve => setTimeout(resolve, 1000));
+                      window.open(linksArray[i], '_blank');
+                    }
+                  }
+                };
+                
+                return (
+                  <div className="mt-4">
+                    <button
+                      onClick={handleBuyAll}
+                      className="w-full py-3 px-6 rounded-lg font-bold text-base transition-all bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    >
+                      <ShoppingCart size={20} />
+                      Buy All {totalIngredients} Ingredients
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
 
 
@@ -389,7 +407,7 @@ export default function MealCompleteView({
             )}
           </div>
 
-          {/* RIGHT: Meal Data & Image */}
+          {/* RIGHT: Meal Data */}
           <div className="space-y-6">
             {/* Meal Name */}
             {mealName && (
@@ -405,16 +423,6 @@ export default function MealCompleteView({
               </div>
             )}
 
-            {/* Meal Image Placeholder */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <label className="block text-xs font-medium text-gray-700 mb-2">Meal Image</label>
-              <div className="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                <div className="text-center">
-                  <Info size={32} className="mx-auto text-gray-400 mb-2" />
-                  <p className="text-xs text-gray-500">80x80px</p>
-                </div>
-              </div>
-            </div>
 
             {/* Nutritional Summary */}
             {analysis && (

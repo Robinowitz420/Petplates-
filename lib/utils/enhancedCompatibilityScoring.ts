@@ -21,6 +21,9 @@ export interface Pet {
   dietaryRestrictions: string[];
   allergies?: string[];
   dislikes?: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  weightKg?: number;
 }
 
 export interface EnhancedCompatibilityScore {

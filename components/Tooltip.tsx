@@ -25,7 +25,7 @@ export default function Tooltip({ content, children, className = '', mascot }: T
             </span>
           </div>
         )}
-        <div className={mascot ? 'text-xs' : ''}>{content}</div>
+        <div className={mascot ? 'text-xs' : ''} style={{ whiteSpace: 'pre-line' }}>{content}</div>
         <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
       </div>
     </div>

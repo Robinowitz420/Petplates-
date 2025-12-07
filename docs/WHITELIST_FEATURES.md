@@ -34,6 +34,15 @@ Shows count of ingredients marked as 'avoid' for the species:
 - "X ingredients to avoid" badge
 - Helps users understand safety boundaries
 
+### 5. Confidence Levels (live)
+
+- `confidenceBySpecies` per ingredient with values `high` | `medium` | `low`
+- Rubric:
+  - `high` — vet-reviewed or primary-source nutrition data
+  - `medium` — widely accepted practice or analogous-species data pending review
+  - `low` — heuristic/placeholder; requires vet verification before surfacing
+- Intended to power UI badges for exotic species data strength.
+
 ## Usage
 
 ### In Meal Builder
@@ -62,26 +71,19 @@ The meal builder automatically filters available ingredients through the whiteli
 
 ## Future Enhancements
 
-### 1. Confidence Levels
-
-Add `confidenceLevel` field to ingredients:
-- `high` - Vet-verified, research-backed
-- `medium` - Generally accepted, needs review
-- `low` - Limited data, use caution
-
-### 2. User Feedback System
+### 1. User Feedback System
 
 - "Report unsafe ingredient" button per ingredient
 - "My vet says this is safe/unsafe for X" feedback
 - Community-vetted ingredient tags
 
-### 3. Vet-Approved Custom Ingredients
+### 2. Vet-Approved Custom Ingredients
 
 - "Add your own vet-approved ingredient" flow
 - Stores user notes separately from core safe list
 - Allows personal ingredient database
 
-### 4. Subtype Detection
+### 3. Subtype Detection
 
 Auto-detect reptile/pocket pet subtypes:
 - Reptile: Check if herbivore (no meat) vs insectivore (insects only) vs omnivore

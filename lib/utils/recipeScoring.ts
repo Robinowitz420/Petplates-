@@ -9,6 +9,13 @@ export interface Pet {
   ageGroup: 'baby' | 'young' | 'adult' | 'senior';
   weightStatus?: 'overweight' | 'underweight' | 'ideal';
   healthConcerns: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  weightKg?: number;
+  weight?: number | string;
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  dislikes?: string[];
 }
 
 export interface ScoreResult {

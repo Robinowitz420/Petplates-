@@ -1,16 +1,21 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { getPrimaryName, type Pet } from '@/lib/utils/petUtils';
+import { Plus, Edit, Trash2, ShoppingCart } from 'lucide-react';
+import { getPrimaryName } from '@/lib/utils/petUtils';
+import type { Pet } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import HealthConcernsDropdown from '@/components/HealthConcernsDropdown';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { getMascotFaceForPetType } from '@/lib/utils/emojiMapping';
 import { recipes } from '@/lib/data/recipes-complete';
 import { rateRecipeForPet, type Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
 import Image from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
+import ConfirmModal from '@/components/ConfirmModal';
+import { getCustomMeals } from '@/lib/utils/customMealStorage';
+import type { CustomMeal } from '@/lib/types';
 
 // =================================================================
 // 1. TYPES & LOCAL STORAGE FUNCTIONS
@@ -19,10 +24,12 @@ import EmojiIcon from '@/components/EmojiIcon';
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
 
+type ProfilePet = Pet;
+
 // Simulated user id (replace with Clerk user.id in real auth)
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
-const getPetsFromLocalStorage = (userId: string): Pet[] => {
+const getPetsFromLocalStorage = (userId: string): ProfilePet[] => {
   if (typeof window === 'undefined') return [];
   const stored = localStorage.getItem(`pets_${userId}`);
 
@@ -39,6 +46,7 @@ const getPetsFromLocalStorage = (userId: string): Pet[] => {
             savedRecipes: p.savedRecipes || [],
             healthConcerns: p.healthConcerns || [],
             weight: p.weight || '',
+            allergies: p.allergies || [],
           }))
         : [];
     } catch (e) {
@@ -350,7 +358,7 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
                 Primary Name
               </label>
               <div className="flex items-center gap-2">
-                <div className="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-base font-semibold shadow-sm flex-1">
+                <div className="bg-green-900/20 text-green-800 px-3 py-1.5 rounded-lg text-base font-semibold shadow-sm flex-1">
                   {firstName}
                 </div>
                 <button
@@ -388,7 +396,7 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
                     }
                   }}
                   placeholder={firstName ? "Add another name..." : "Type a name and press Enter"}
-                  className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                  className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-800 focus:border-green-800"
                 />
                 <button
                   type="button"
@@ -408,7 +416,7 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
                         <button
                           type="button"
                           onClick={() => handleRemoveName(index + 1)}
-                          className="text-primary-600 hover:text-primary-800"
+                          className="text-green-800 hover:text-green-900"
                           title="Remove name"
                         >
                           ✕
@@ -470,7 +478,7 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
                       key={age}
                       type="button"
                       onClick={() => setFormData({...formData, age})}
-                      className={`px-2 py-1.5 text-xs rounded border capitalize ${formData.age === age ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`px-2 py-1.5 text-xs rounded border capitalize ${formData.age === age ? 'border-green-800 bg-green-900/10' : 'border-gray-200 hover:border-gray-300'}`}
                     >
                       {age}
                     </button>
@@ -533,12 +541,25 @@ export default function MyPetsPage() {
   const userId = SIMULATED_USER_ID;
   const { setUserId } = useVillageStore();
 
-  const [pets, setPets] = useState<Pet[]>([]);
+  const [pets, setPets] = useState<ProfilePet[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [activePetId, setActivePetId] = useState<string | null>(null);
+  const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
   const [activeTab, setActiveTab] = useState<'bio' | 'saved' | 'plan'>('bio');
+  const [planOffset, setPlanOffset] = useState(0);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
   const recipeNameMap = useMemo(() => {
     const map = new Map<string, string>();
     recipes.forEach((r) => {
@@ -555,7 +576,6 @@ export default function MyPetsPage() {
     },
     [recipeNameMap]
   );
-  const [planOffset, setPlanOffset] = useState(0);
   const buildWeeklyPlan = useCallback(
     (saved: string[], offset: number): WeeklyPlanEntry[] => {
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -605,6 +625,16 @@ export default function MyPetsPage() {
     }
   }, [pets, activePetId]);
 
+  // Load custom meals when active pet changes
+  useEffect(() => {
+    if (activePetId && userId) {
+      const meals = getCustomMeals(userId, activePetId);
+      setCustomMeals(meals);
+    } else {
+      setCustomMeals([]);
+    }
+  }, [activePetId, userId]);
+
   const handleAddPet = useCallback(
     (newPet: any) => {
       // Ensure names array is properly formatted and has at least one name
@@ -650,24 +680,171 @@ export default function MyPetsPage() {
   }, []);
 
   const handleDeletePet = useCallback((petId: string) => {
-    if (confirm('Are you sure you want to delete this pet?')) {
-      setPets(prevPets => {
-        const updatedPets = prevPets.filter(p => p.id !== petId);
-        savePetsToLocalStorage(userId, updatedPets);
-        if (activePetId === petId) {
-          setActivePetId(null);
-          setActiveTab('bio');
-        }
-        return updatedPets;
-      });
+    const pet = pets.find(p => p.id === petId);
+    const petName = pet ? getPrimaryName(pet.names || []) : 'this pet';
+    
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Pet',
+      message: `Are you sure you want to delete ${petName}? This action cannot be undone.`,
+      onConfirm: () => {
+        setPets(prevPets => {
+          const updatedPets = prevPets.filter(p => p.id !== petId);
+          savePetsToLocalStorage(userId, updatedPets);
+          if (activePetId === petId) {
+            setActivePetId(null);
+            setActiveTab('bio');
+          }
+          return updatedPets;
+        });
+      },
+    });
+  }, [userId, activePetId, pets]);
+
+  const handleRemoveSavedMeal = useCallback((recipeId: string) => {
+    if (!activePetId) return;
+    
+    // If it's a custom meal, also delete it from custom meals storage
+    if (recipeId.startsWith('custom_')) {
+      const { deleteCustomMeal } = require('@/lib/utils/customMealStorage');
+      deleteCustomMeal(userId, activePetId, recipeId);
+      // Update local custom meals state
+      setCustomMeals(prev => prev.filter(m => m.id !== recipeId));
     }
+    
+    setPets(prevPets => {
+      const updatedPets = prevPets.map(p => {
+        if (p.id === activePetId) {
+          return {
+            ...p,
+            savedRecipes: (p.savedRecipes || []).filter(id => id !== recipeId)
+          };
+        }
+        return p;
+      });
+      savePetsToLocalStorage(userId, updatedPets);
+      return updatedPets;
+    });
   }, [userId, activePetId]);
+
+  // Component to buy all ingredients from meal plan
+  const BuyAllMealPlanIngredientsButton = ({ weeklyPlan, petId }: { weeklyPlan: { day: string; meals: (string | null)[] }[]; petId: string }) => {
+    const [isOpening, setIsOpening] = useState(false);
+    const [openedCount, setOpenedCount] = useState(0);
+
+    const handleBuyAll = async () => {
+      setIsOpening(true);
+      setOpenedCount(0);
+
+      // Collect all unique ingredients from all meals in the plan
+      const ingredientLinks = new Set<string>();
+      
+      weeklyPlan.forEach(({ meals }) => {
+        meals.forEach(mealId => {
+          if (mealId) {
+            const recipe = recipes.find(r => r.id === mealId);
+            if (recipe && recipe.ingredients) {
+              recipe.ingredients.forEach(ing => {
+                // Try to get vetted product link first
+                const vettedProduct = getVettedProduct(ing.name);
+                const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink || (ing as any).asinLink;
+                
+                if (link) {
+                  ingredientLinks.add(link);
+                }
+              });
+            }
+          }
+        });
+      });
+
+      const linksArray = Array.from(ingredientLinks);
+      
+      if (linksArray.length === 0) {
+        alert('No ingredient purchase links available for meals in this plan.');
+        setIsOpening(false);
+        return;
+      }
+
+      // Open first tab immediately (user gesture)
+      if (linksArray.length > 0) {
+        window.open(linksArray[0], '_blank');
+        setOpenedCount(1);
+      }
+
+      // Open remaining tabs with delays
+      for (let i = 1; i < linksArray.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        const newWindow = window.open(linksArray[i], '_blank');
+        setOpenedCount(i + 1);
+        
+        // If popup was blocked, try again with a longer delay
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          window.open(linksArray[i], '_blank');
+        }
+      }
+
+      // Reset state after all tabs are opened
+      setTimeout(() => {
+        setIsOpening(false);
+        setOpenedCount(0);
+      }, 1000);
+    };
+
+    const totalIngredients = useMemo(() => {
+      const links = new Set<string>();
+      weeklyPlan.forEach(({ meals }) => {
+        meals.forEach(mealId => {
+          if (mealId) {
+            const recipe = recipes.find(r => r.id === mealId);
+            if (recipe && recipe.ingredients) {
+              recipe.ingredients.forEach(ing => {
+                const vettedProduct = getVettedProduct(ing.name);
+                const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink || (ing as any).asinLink;
+                if (link) links.add(link);
+              });
+            }
+          }
+        });
+      });
+      return links.size;
+    }, [weeklyPlan]);
+
+    if (totalIngredients === 0) {
+      return null;
+    }
+
+    return (
+      <button
+        onClick={handleBuyAll}
+        disabled={isOpening}
+        className={`w-full py-3 px-6 rounded-lg font-bold text-base transition-all ${
+          isOpening
+            ? 'bg-gray-600 cursor-wait text-gray-300'
+            : 'bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black shadow-lg hover:shadow-xl'
+        } flex items-center justify-center gap-2`}
+      >
+        {isOpening ? (
+          <>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            Opening {openedCount}/{totalIngredients} tabs...
+          </>
+        ) : (
+          <>
+            <ShoppingCart size={20} />
+            Buy All {totalIngredients} Ingredients for Weekly Plan
+          </>
+        )}
+      </button>
+    );
+  };
 
   if (!isClient) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800 mx-auto"></div>
           <p className="text-gray-400 mt-4">Loading your pets...</p>
         </div>
       </div>
@@ -730,7 +907,7 @@ export default function MyPetsPage() {
                 <div className="space-y-2">
                   {pets.map((pet) => {
                     if (!pet?.id) return null;
-                    const name = getPrimaryName(pet.names) || 'Unnamed Pet';
+                    const name = getPrimaryName(pet.names || []) || 'Unnamed Pet';
                   return (
                     <button
                       key={pet.id}
@@ -740,8 +917,8 @@ export default function MyPetsPage() {
                       }}
                       className={`w-full flex items-center gap-3 rounded-xl border px-3 py-2 text-left transition ${
                         activePetId === pet.id
-                          ? 'border-primary-500 bg-primary-900/20 text-white'
-                          : 'border-surface-highlight bg-surface-highlight/60 text-foreground hover:border-primary-500 hover:bg-surface-highlight'
+                          ? 'border-green-800 bg-green-900/20 text-white'
+                          : 'border-surface-highlight bg-surface-highlight/60 text-foreground hover:border-green-800 hover:bg-surface-highlight'
                       }`}
                     >
                       <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-surface flex items-center justify-center flex-shrink-0">
@@ -774,7 +951,7 @@ export default function MyPetsPage() {
                           <div className="w-14 h-14 rounded-full overflow-hidden border border-white/10 bg-surface-highlight flex items-center justify-center">
                             <Image
                               src={getMascotFaceForPetType(activePet.type as PetCategory)}
-                              alt={`${getPrimaryName(activePet.names) || 'Pet'} mascot`}
+                          alt={`${getPrimaryName(activePet.names || []) || 'Pet'} mascot`}
                               width={56}
                               height={56}
                               className="object-cover"
@@ -783,7 +960,7 @@ export default function MyPetsPage() {
                           </div>
                           <div>
                             <h2 className="text-xl font-bold">
-                              {getPrimaryName(activePet.names) || 'Unnamed Pet'}
+                              {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
                             </h2>
                             <div className="text-sm text-gray-400 capitalize">
                               {activePet.type} {activePet.age ? `• ${activePet.age}` : '• age n/a'}
@@ -891,16 +1068,25 @@ export default function MyPetsPage() {
                             {Array.isArray(activePet.savedRecipes) && activePet.savedRecipes.length > 0 ? (
                               <ul className="space-y-1 text-sm">
                                 {activePet.savedRecipes.slice(0, 5).map((rid) => {
-                                  const recipe = recipes.find(r => r.id === rid);
+                                  const isCustomMeal = rid.startsWith('custom_');
+                                  const recipe = isCustomMeal ? null : recipes.find(r => r.id === rid);
+                                  const customMeal = isCustomMeal ? customMeals.find(m => m.id === rid) : null;
+                                  const mealName = isCustomMeal ? (customMeal?.name || 'Custom Meal') : getRecipeName(rid);
                                   const rating = recipe?.rating ?? 0;
+                                  const compat = isCustomMeal ? customMeal?.analysis?.score : undefined;
 
-                                  let compat: number | undefined;
-                                  if (recipe && activePet) {
+                                  // Calculate compatibility for regular recipes
+                                  let regularCompat: number | undefined;
+                                  if (recipe && activePet && !isCustomMeal) {
                                     const petForRating: RatingPet = {
                                       id: activePet.id,
+                                      name: activePet.name || activePet.names?.[0] || 'Unknown',
                                       type: activePet.type as any,
                                       age: activePet.age as any,
-                                      breed: activePet.breed,
+                                      breed: activePet.breed || '',
+                                      weight: activePet.weight ? Number(activePet.weight) : undefined,
+                                      activityLevel: (activePet.activityLevel as 'sedentary' | 'moderate' | 'active' | 'very-active') || 'moderate',
+                                      dietaryRestrictions: activePet.dietaryRestrictions || [],
                                       healthConcerns: activePet.healthConcerns || [],
                                       allergies: activePet.allergies || [],
                                       savedRecipes: activePet.savedRecipes || [],
@@ -908,22 +1094,42 @@ export default function MyPetsPage() {
                                       weightKg: activePet.weight ? Number(activePet.weight) || undefined : undefined,
                                     };
                                     const result = rateRecipeForPet(recipe as any, petForRating);
-                                    compat = result?.overallScore;
+                                    regularCompat = result?.overallScore;
                                   }
 
                                   return (
                                     <li key={rid} className="bg-surface-highlight rounded px-2 py-1 flex items-center justify-between gap-2">
                                       <a
-                                        href={`/recipe/${rid}?petId=${activePet.id}`}
-                                        className="text-primary-300 hover:text-primary-100 text-xs underline underline-offset-2 truncate"
+                                        href={isCustomMeal ? `/profile/pet/${activePet.id}/recipe-builder` : `/recipe/${rid}?petId=${activePet.id}`}
+                                        className="text-primary-300 hover:text-primary-100 text-xs underline underline-offset-2 truncate flex-1"
                                       >
-                                        {getRecipeName(rid)}
+                                        {mealName}
                                       </a>
                                       <div className="flex items-center gap-2 whitespace-nowrap">
-                                        <span className="text-amber-300 text-xs">★ {rating.toFixed(1)}</span>
-                                        {typeof compat === 'number' && (
-                                          <span className="text-green-300 text-xs">Compatibility Score: {compat}%</span>
+                                        {!isCustomMeal && <span className="text-amber-300 text-xs">★ {rating.toFixed(1)}</span>}
+                                        {typeof (regularCompat ?? compat) === 'number' && (
+                                          <span className="text-green-300 text-xs">Meal Score: {regularCompat ?? compat}%</span>
                                         )}
+                                        <button
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setConfirmModal({
+                                              isOpen: true,
+                                              title: 'Remove Meal',
+                                              message: `Remove "${mealName}" from saved meals?`,
+                                              onConfirm: () => {
+                                                handleRemoveSavedMeal(rid);
+                                              },
+                                            });
+                                          }}
+                                          className="ml-2 p-1 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors"
+                                          title="Remove meal"
+                                        >
+                                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                          </svg>
+                                        </button>
                                       </div>
                                     </li>
                                   );
@@ -939,12 +1145,20 @@ export default function MyPetsPage() {
                                 No saved meals yet. Use “Find Meals” to add some.
                               </div>
                             )}
-                            <a
-                              href={`/profile/pet/${activePet.id}`}
-                              className="btn btn-success btn-sm"
-                            >
-                              Find Meals
-                            </a>
+                            <div className="flex flex-wrap gap-2">
+                              <a
+                                href={`/profile/pet/${activePet.id}`}
+                                className="btn btn-success btn-sm"
+                              >
+                                Find Meals
+                              </a>
+                              <a
+                                href={`/profile/pet/${activePet.id}/recipe-builder`}
+                                className="btn btn-success btn-sm"
+                              >
+                                Create Meal
+                              </a>
+                            </div>
                           </div>
                         )}
 
@@ -952,55 +1166,65 @@ export default function MyPetsPage() {
                           <div className="space-y-3 text-sm">
                             <p className="text-gray-300">Weekly plan (Mon–Fri):</p>
                             {Array.isArray(activePet.savedRecipes) && activePet.savedRecipes.length >= 2 ? (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {buildWeeklyPlan(activePet.savedRecipes, planOffset).map(({ day, meals }) => (
-                                  <div key={day} className="bg-surface-highlight rounded-lg border border-surface-highlight px-3 py-2">
-                                    <div className="text-white font-semibold mb-2">{day}</div>
-                                    <div className="space-y-1">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-gray-300 text-xs">Meal 1</span>
-                                        {meals[0] ? (() => {
-                                          const recipe = recipes.find(r => r.id === meals[0]);
-                                          const compat = typeof recipe?.score === 'number' ? recipe.score : undefined;
-                                          return (
-                                            <a
-                                              href={`/recipe/${meals[0]}?petId=${activePet.id}`}
-                                              className="text-primary-300 hover:text-primary-100 text-xs flex items-center gap-1"
-                                            >
-                                              <span className="truncate">{getRecipeName(meals[0])}</span>
-                                              {compat !== undefined && (
-                                                <span className="text-green-300 whitespace-nowrap">Meal Score: {compat}%</span>
-                                              )}
-                                            </a>
-                                          );
-                                        })() : (
-                                          <span className="text-gray-500 text-xs">Add a meal</span>
-                                        )}
-                                      </div>
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-gray-300 text-xs">Meal 2</span>
-                                        {meals[1] ? (() => {
-                                          const recipe = recipes.find(r => r.id === meals[1]);
-                                          const compat = typeof recipe?.score === 'number' ? recipe.score : undefined;
-                                          return (
-                                            <a
-                                              href={`/recipe/${meals[1]}?petId=${activePet.id}`}
-                                              className="text-primary-300 hover:text-primary-100 text-xs flex items-center gap-1"
-                                            >
-                                              <span className="truncate">{getRecipeName(meals[1])}</span>
-                                              {compat !== undefined && (
-                                                <span className="text-green-300 whitespace-nowrap">Meal Score: {compat}%</span>
-                                              )}
-                                            </a>
-                                          );
-                                        })() : (
-                                          <span className="text-gray-500 text-xs">Add a meal</span>
-                                        )}
+                              <>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  {buildWeeklyPlan(activePet.savedRecipes, planOffset).map(({ day, meals }) => (
+                                    <div key={day} className="bg-surface-highlight rounded-lg border border-surface-highlight px-3 py-2">
+                                      <div className="text-white font-semibold mb-2">{day}</div>
+                                      <div className="space-y-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-gray-300 text-xs">Meal 1</span>
+                                          {meals[0] ? (() => {
+                                            const recipe = recipes.find(r => r.id === meals[0]);
+                                            const compat = typeof recipe?.score === 'number' ? recipe.score : undefined;
+                                            return (
+                                              <a
+                                                href={`/recipe/${meals[0]}?petId=${activePet.id}`}
+                                                className="text-green-300 hover:text-green-200 text-xs flex items-center gap-1"
+                                              >
+                                                <span className="truncate">{getRecipeName(meals[0])}</span>
+                                                {compat !== undefined && (
+                                                  <span className="text-green-300 whitespace-nowrap">Meal Score: {compat}%</span>
+                                                )}
+                                              </a>
+                                            );
+                                          })() : (
+                                            <span className="text-gray-500 text-xs">Add a meal</span>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-gray-300 text-xs">Meal 2</span>
+                                          {meals[1] ? (() => {
+                                            const recipe = recipes.find(r => r.id === meals[1]);
+                                            const compat = typeof recipe?.score === 'number' ? recipe.score : undefined;
+                                            return (
+                                              <a
+                                                href={`/recipe/${meals[1]}?petId=${activePet.id}`}
+                                                className="text-green-300 hover:text-green-200 text-xs flex items-center gap-1"
+                                              >
+                                                <span className="truncate">{getRecipeName(meals[1])}</span>
+                                                {compat !== undefined && (
+                                                  <span className="text-green-300 whitespace-nowrap">Meal Score: {compat}%</span>
+                                                )}
+                                              </a>
+                                            );
+                                          })() : (
+                                            <span className="text-gray-500 text-xs">Add a meal</span>
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
-                              </div>
+                                  ))}
+                                </div>
+                                
+                                {/* Buy All Ingredients Button */}
+                                <div className="mt-4">
+                                  <BuyAllMealPlanIngredientsButton 
+                                    weeklyPlan={buildWeeklyPlan(activePet.savedRecipes, planOffset)}
+                                    petId={activePet.id}
+                                  />
+                                </div>
+                              </>
                             ) : (
                               <div className="text-gray-400">
                                 Add at least two meals to populate a weekly plan.
@@ -1021,6 +1245,12 @@ export default function MyPetsPage() {
                                 className="btn btn-success btn-sm"
                               >
                                 Find Meals
+                              </a>
+                              <a
+                                href={`/profile/pet/${activePet.id}/recipe-builder`}
+                                className="btn btn-success btn-sm"
+                              >
+                                Create Meal
                               </a>
                             </div>
                           </div>
@@ -1050,6 +1280,17 @@ export default function MyPetsPage() {
             setEditingPet(null);
           }}
           editingPet={editingPet}
+        />
+
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+          onConfirm={confirmModal.onConfirm}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
         />
       </div>
     </div>

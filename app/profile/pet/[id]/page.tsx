@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus } from 'lucide-react';
@@ -11,7 +11,6 @@ import { calculateImprovedCompatibility, type ImprovedPet } from '@/lib/utils/im
 import { CompatibilityBadge } from '@/components/CompatibilityBadge';
 import { getRandomName } from '@/lib/utils/petUtils';
 import EmojiIcon from '@/components/EmojiIcon';
-import Image from '@/components/Image';
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
@@ -23,10 +22,12 @@ interface Pet {
   type: PetCategory;
   breed: string;
   age: AgeGroup;
-  healthConcerns: string[];
-  savedRecipes: string[];
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  savedRecipes?: string[];
   allergies?: string[];
   weightKg?: number;
+  weight?: string;
   dislikes?: string[];
 }
 
@@ -75,24 +76,33 @@ export default function RecommendedRecipesPage() {
   const [cardMessage, setCardMessage] = useState<{ id: string; text: string } | null>(null);
   const petId = params.id as string;
 
-  // Get pet display name (use names array if available, fallback to name field)
-  const petDisplayName = pet 
-    ? getRandomName(pet.names || (pet.name ? [pet.name] : ['Unnamed Pet']))
-    : 'Pet';
+  // Get pet display name (use names array if available, fallback to name field) - memoized for stability
+  const petDisplayName = useMemo(() => {
+    if (!pet) return 'Pet';
+    return getRandomName(pet.names || (pet.name ? [pet.name] : ['Unnamed Pet']));
+  }, [pet?.id, pet?.names, pet?.name]);
 
-  // Convert pet data to rating system format
-  const ratingPet: RatingPet | null = pet ? {
-    id: pet.id,
-    name: petDisplayName,
-    type: pet.type as RatingPet['type'],
-    breed: pet.breed,
-    age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10,
-    weight: pet.weightKg || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
-    activityLevel: 'moderate' as const, // Could be improved with pet data
-    healthConcerns: pet.healthConcerns || [],
-    dietaryRestrictions: pet.allergies || [],
-    dislikes: pet.dislikes || []
-  } : null;
+  // Convert pet data to rating system format - memoized to prevent recalculation when only savedRecipes changes
+  // Use JSON.stringify for arrays to ensure stable comparison
+  const healthConcernsKey = pet ? JSON.stringify(pet.healthConcerns || []) : '';
+  const allergiesKey = pet ? JSON.stringify(pet.allergies || []) : '';
+  const dislikesKey = pet ? JSON.stringify(pet.dislikes || []) : '';
+  
+  const ratingPet: RatingPet | null = useMemo(() => {
+    if (!pet) return null;
+    return {
+      id: pet.id,
+      name: petDisplayName,
+      type: pet.type as RatingPet['type'],
+      breed: pet.breed,
+      age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10,
+      weight: pet.weightKg || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
+      activityLevel: 'moderate' as const, // Could be improved with pet data
+      healthConcerns: pet.healthConcerns || [],
+      dietaryRestrictions: pet.allergies || [],
+      dislikes: pet.dislikes || []
+    };
+  }, [pet?.id, pet?.type, pet?.breed, pet?.age, pet?.weightKg, healthConcernsKey, allergiesKey, dislikesKey, petDisplayName]);
 
 
   useEffect(() => {
@@ -181,50 +191,6 @@ useEffect(() => {
     }
   }, [engineMeals, pet]);
 
-  const handleSaveRecipe = (recipeId: string, recipeName: string) => {
-    const userId = getCurrentUserId();
-    if (!userId || !pet) return;
-
-    const pets = getPetsFromLocalStorage(userId);
-    let didChange = false;
-
-    const updatedPets = pets.map((p) => {
-      if (p.id !== pet.id) return p;
-
-      const existing = p.savedRecipes || [];
-      if (existing.includes(recipeId)) {
-        return p;
-      }
-
-      didChange = true;
-      return {
-        ...p,
-        savedRecipes: [...existing, recipeId],
-      };
-    });
-
-    if (!didChange) {
-      setCardMessage({ id: recipeId, text: 'Already saved for this pet.' });
-      setTimeout(() => setCardMessage(null), 2500);
-      return;
-    }
-
-    savePetsToLocalStorage(userId, updatedPets);
-
-    const updatedPet = updatedPets.find((p) => p.id === pet.id) || null;
-    setPet(updatedPet);
-      setCardMessage({ id: recipeId, text: `${recipeName} added to ${petDisplayName}'s meals.` });
-    setTimeout(() => setCardMessage(null), 2500);
-  };
-
-  if (!pet) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
   // Import subtype matching
   const { normalizeToSubtype } = require('@/lib/utils/ingredientWhitelists');
   
@@ -254,8 +220,16 @@ useEffect(() => {
   };
 
   // Use tiered recommendation system to ensure we always have results
-  const { getRecommendedRecipes } = require('@/lib/utils/recipeRecommendations');
-  const tieredRecommendations = getRecommendedRecipes(pet, 20, true);
+  // Only depend on properties that affect recommendations, NOT savedRecipes
+  // Use JSON.stringify for arrays to ensure stable comparison
+  const tieredHealthConcernsKey = pet ? JSON.stringify(pet.healthConcerns || []) : '';
+  const tieredAllergiesKey = pet ? JSON.stringify(pet.allergies || []) : '';
+  
+  const tieredRecommendations = useMemo(() => {
+    if (!pet) return [];
+    const { getRecommendedRecipes } = require('@/lib/utils/recipeRecommendations');
+    return getRecommendedRecipes(pet, 20, true);
+  }, [pet?.id, pet?.type, pet?.breed, pet?.age, tieredHealthConcernsKey, pet?.weightKg, tieredAllergiesKey]);
   
   const buildFallbackExplanation = (recipe: Recipe, currentPet: Pet, tierLabel?: string, warning?: string) => {
     if (warning) {
@@ -266,85 +240,197 @@ useEffect(() => {
     }
     const concern = (currentPet.healthConcerns || [])[0]?.replace(/-/g, ' ') || 'overall wellness';
     const highlight = recipe.tags?.[0] || (recipe.description || '').split('. ')[0] || recipe.name;
-    return `${recipe.name} keeps ${currentPet.name}'s ${concern} on track with ${highlight?.toLowerCase()}.`;
+    return `${recipe.name} keeps ${currentPet.name || 'pet'}'s ${concern} on track with ${highlight?.toLowerCase()}.`;
   };
 
   // Convert tiered recommendations to format expected by UI
-  const fallbackMeals = tieredRecommendations.map((rec: any) => ({
-    recipe: rec.recipe,
-    explanation: buildFallbackExplanation(rec.recipe, pet, rec.tierLabel, rec.warning),
-    _tierLabel: rec.tierLabel,
-    _warning: rec.warning,
-    _healthMatch: rec.healthConcernMatch,
-    _tier: rec.tier
-  }));
-  // Fix: Properly check for empty array - use fallback if engineMeals is null, undefined, or empty
-  const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] =
-    (engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0) ? engineMeals : fallbackMeals;
-
-  // Compute scores (with decimals) for all meals, then apply a gentle percentile spread to reduce ties
-  const computeMealScore = (meal: any): number => {
-    if ('score' in meal && typeof (meal as ModifiedRecipeResult).score === 'number') {
-      return Number((meal as ModifiedRecipeResult).score);
-    }
-    if (!ratingPet) return 0;
-    try {
-      const enhancedPet: ImprovedPet = {
-        id: ratingPet.id,
-        name: ratingPet.name,
-        type: ratingPet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
-        breed: ratingPet.breed,
-        age: typeof ratingPet.age === 'string' ? parseFloat(ratingPet.age) || 1 : ratingPet.age || 1,
-        weight: ratingPet.weight || 10,
-        activityLevel: ratingPet.activityLevel,
-        healthConcerns: ratingPet.healthConcerns || [],
-        dietaryRestrictions: ratingPet.dietaryRestrictions || [],
-        allergies: ratingPet.allergies || [],
-      };
-      const improved = calculateImprovedCompatibility(meal.recipe, enhancedPet);
-      return Number(improved.overallScore);
-    } catch (error) {
-      return rateRecipeForPet(meal.recipe, ratingPet).overallScore;
-    }
-  };
-
-  const mealsWithScores = mealsToRender.map((meal) => ({
-    meal,
-    rawScore: computeMealScore(meal),
-  }));
-
-  const applyPercentileSpread = (items: { meal: any; rawScore: number }[]) => {
-    const valid = items.filter(i => typeof i.rawScore === 'number');
-    if (valid.length < 4) return items;
-    const sorted = [...valid].sort((a, b) => b.rawScore - a.rawScore);
-    const n = sorted.length;
-    const adjustedMap = new Map<any, number>();
-    sorted.forEach((item, idx) => {
-      const percentile = 1 - idx / Math.max(1, n - 1);
-      let bump = 0;
-      if (percentile >= 0.9) bump = 2;
-      else if (percentile >= 0.75) bump = 1;
-      else if (percentile <= 0.1) bump = -2;
-      else if (percentile <= 0.25) bump = -1;
-      const adjusted = Math.max(0, Math.min(100, item.rawScore + bump));
-      adjustedMap.set(item.meal, Number(adjusted.toFixed(1)));
-    });
-    return items.map(i => ({
-      ...i,
-      spreadScore: adjustedMap.get(i.meal) ?? i.rawScore,
+  // Only depend on properties that affect meal recommendations, NOT savedRecipes
+  const fallbackHealthConcernsKey = pet ? JSON.stringify(pet.healthConcerns || []) : '';
+  const fallbackPetName = pet?.name || '';
+  
+  const fallbackMeals = useMemo(() => {
+    if (!pet) return [];
+    return tieredRecommendations.map((rec: any) => ({
+      recipe: rec.recipe,
+      explanation: buildFallbackExplanation(rec.recipe, pet, rec.tierLabel, rec.warning),
+      _tierLabel: rec.tierLabel,
+      _warning: rec.warning,
+      _healthMatch: rec.healthConcernMatch,
+      _tier: rec.tier
     }));
+  }, [pet?.id, pet?.type, pet?.breed, pet?.age, fallbackHealthConcernsKey, fallbackPetName, tieredRecommendations]);
+
+  // Fix: Properly check for empty array - use fallback if engineMeals is null, undefined, or empty
+  // Memoize mealsToRender to prevent recalculation when only savedRecipes changes
+  const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
+    return (engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0) ? engineMeals : fallbackMeals;
+  }, [engineMeals, fallbackMeals]);
+
+  // Store previous order in a ref to maintain stability
+  const previousOrderRef = useRef<Map<string, number>>(new Map());
+  const previousMealIdsRef = useRef<string[]>([]);
+
+  // Memoize sorted meals to prevent reordering when only savedRecipes changes
+  const sortedMealsToRender = useMemo(() => {
+    // Get current meal IDs
+    const currentMealIds = mealsToRender.map(m => m.recipe?.id || '').filter(Boolean);
+    
+    // Check if the meal list has actually changed (not just savedRecipes)
+    const mealListChanged = 
+      currentMealIds.length !== previousMealIdsRef.current.length ||
+      currentMealIds.some((id, idx) => id !== previousMealIdsRef.current[idx]);
+    
+    // If meal list hasn't changed, preserve the previous order
+    if (!mealListChanged && previousOrderRef.current.size > 0) {
+      const sorted = [...mealsToRender].sort((a, b) => {
+        const aId = a.recipe?.id || '';
+        const bId = b.recipe?.id || '';
+        const aOrder = previousOrderRef.current.get(aId) ?? 0;
+        const bOrder = previousOrderRef.current.get(bId) ?? 0;
+        return aOrder - bOrder;
+      });
+      return sorted;
+    }
+    // Create a stable key for each meal based on recipe ID
+    const mealsWithKeys = mealsToRender.map((meal, index) => ({
+      meal,
+      recipeId: meal.recipe?.id || `unknown-${index}`,
+      originalIndex: index
+    }));
+
+    // Compute scores (with decimals) for all meals, then apply a gentle percentile spread to reduce ties
+    const computeMealScore = (meal: any): number => {
+      if ('score' in meal && typeof (meal as ModifiedRecipeResult).score === 'number') {
+        return Number((meal as ModifiedRecipeResult).score);
+      }
+      if (!ratingPet) return 0;
+      try {
+        const enhancedPet: ImprovedPet = {
+          id: ratingPet.id,
+          name: ratingPet.name,
+          type: ratingPet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+          breed: ratingPet.breed,
+          age: typeof ratingPet.age === 'string' ? parseFloat(ratingPet.age) || 1 : ratingPet.age || 1,
+          weight: ratingPet.weight || 10,
+          activityLevel: ratingPet.activityLevel,
+          healthConcerns: ratingPet.healthConcerns || [],
+          dietaryRestrictions: ratingPet.dietaryRestrictions || [],
+          allergies: ratingPet.allergies || [],
+        };
+        const improved = calculateImprovedCompatibility(meal.recipe, enhancedPet);
+        return Number(improved.overallScore);
+      } catch (error) {
+        return rateRecipeForPet(meal.recipe, ratingPet).overallScore;
+      }
+    };
+
+    const mealsWithScores = mealsWithKeys.map((item) => ({
+      ...item,
+      rawScore: computeMealScore(item.meal),
+    }));
+
+    const applyPercentileSpread = (items: typeof mealsWithScores) => {
+      const valid = items.filter(i => typeof i.rawScore === 'number');
+      if (valid.length < 4) return items;
+      // Sort by score first, but preserve recipe ID order for ties
+      const sorted = [...valid].sort((a, b) => {
+        const scoreDiff = b.rawScore - a.rawScore;
+        if (Math.abs(scoreDiff) > 0.01) return scoreDiff;
+        return a.recipeId.localeCompare(b.recipeId);
+      });
+      const n = sorted.length;
+      const adjustedMap = new Map<string, number>();
+      sorted.forEach((item, idx) => {
+        const percentile = 1 - idx / Math.max(1, n - 1);
+        let bump = 0;
+        if (percentile >= 0.9) bump = 2;
+        else if (percentile >= 0.75) bump = 1;
+        else if (percentile <= 0.1) bump = -2;
+        else if (percentile <= 0.25) bump = -1;
+        const adjusted = Math.max(0, Math.min(100, item.rawScore + bump));
+        adjustedMap.set(item.recipeId, Number(adjusted.toFixed(1)));
+      });
+      return items.map(i => ({
+        ...i,
+        spreadScore: adjustedMap.get(i.recipeId) ?? i.rawScore,
+      }));
+    };
+
+    const mealsWithSpread = applyPercentileSpread(mealsWithScores);
+
+    // Sort with recipe ID as primary tiebreaker to ensure stability
+    const sorted = mealsWithSpread
+      .sort((a, b) => {
+        // Primary sort: by score (descending)
+        const scoreDiff = b.spreadScore - a.spreadScore;
+        if (Math.abs(scoreDiff) > 0.5) { // Only reorder if score difference is significant
+          return scoreDiff;
+        }
+        // Secondary sort: by recipe ID (always stable, prevents any reordering)
+        return a.recipeId.localeCompare(b.recipeId);
+      })
+      .map(i => {
+        if ('score' in i.meal && typeof (i.meal as ModifiedRecipeResult).score === 'number') {
+          return { ...(i.meal as ModifiedRecipeResult), score: i.spreadScore };
+        }
+        return i.meal;
+      });
+    
+    // Update the refs with the new order
+    previousOrderRef.current = new Map(
+      sorted.map((meal, index) => [meal.recipe?.id || '', index])
+    );
+    previousMealIdsRef.current = currentMealIds;
+    
+    return sorted;
+  }, [mealsToRender, ratingPet]);
+
+  // Track saved recipes separately to avoid triggering meal recalculation
+  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
+
+  // Initialize savedRecipeIds from pet when pet loads
+  useEffect(() => {
+    if (pet?.savedRecipes) {
+      setSavedRecipeIds(new Set(pet.savedRecipes));
+    }
+  }, [pet?.id]); // Only update when pet ID changes, not when savedRecipes changes
+
+  const handleSaveRecipe = (recipeId: string, recipeName: string) => {
+    const userId = getCurrentUserId();
+    if (!userId || !pet) return;
+
+    // Check if already saved (using local state)
+    if (savedRecipeIds.has(recipeId)) {
+      setCardMessage({ id: recipeId, text: 'Already saved for this pet.' });
+      setTimeout(() => setCardMessage(null), 2500);
+      return;
+    }
+
+    // Update localStorage
+    const pets = getPetsFromLocalStorage(userId);
+    const updatedPets = pets.map((p) => {
+      if (p.id !== pet.id) return p;
+      const existing = p.savedRecipes || [];
+      return {
+        ...p,
+        savedRecipes: [...existing, recipeId],
+      };
+    });
+    savePetsToLocalStorage(userId, updatedPets);
+
+    // Update local state only (don't update pet state to avoid recalculation)
+    setSavedRecipeIds(new Set([...savedRecipeIds, recipeId]));
+    setCardMessage({ id: recipeId, text: `${recipeName} added to ${petDisplayName}'s meals.` });
+    setTimeout(() => setCardMessage(null), 2500);
   };
 
-  const mealsWithSpread = applyPercentileSpread(mealsWithScores);
-
-  const sortedMealsToRender = mealsWithSpread
-    .sort((a, b) => b.spreadScore - a.spreadScore)
-    .map(i => {
-      if ('score' in i.meal && typeof (i.meal as ModifiedRecipeResult).score === 'number') {
-        return { ...(i.meal as ModifiedRecipeResult), score: i.spreadScore };
-      }
-      return i.meal;
-    });
+  if (!pet) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   const totalMeals = sortedMealsToRender.length;
   const usingEngine = Boolean(engineMeals && engineMeals.length > 0);
@@ -462,11 +548,6 @@ useEffect(() => {
             >
               <Link href={`/recipe/${recipeId}?petId=${petId}`}>
                 <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-lg hover:border-orange-500/30 transition-all">
-                  <div className="aspect-[4/3] relative h-32 flex items-center justify-center bg-surface-lighter text-white">
-                    <span className="text-4xl">
-                      <EmojiIcon emoji={getPetEmoji(recipe.category as any) || '🍽️'} size={36} />
-                    </span>
-                  </div>
                   <div className="p-3">
                     <h3 className="text-base font-bold text-foreground mb-1 line-clamp-1">{recipe.name}</h3>
                     <p className="text-gray-400 text-xs mb-2 line-clamp-2">
@@ -475,11 +556,6 @@ useEffect(() => {
                     <p className="text-xs text-gray-300 bg-surface-highlight rounded-lg p-2 mb-2 line-clamp-2 border border-white/5">
                       {explanation}
                     </p>
-                    {recipe.celebrityQuote && (
-                      <p className="italic text-gray-400 text-xs mb-2 line-clamp-1">
-                        "{recipe.celebrityQuote}"
-                      </p>
-                    )}
                     {pet.healthConcerns.length > 0 && (
                       (() => {
                         const score = getHealthMatchScore(recipe, pet);
@@ -516,15 +592,13 @@ useEffect(() => {
                         />
                       </div>
                     )}
-                    <div className="flex items-center justify-end text-sm text-gray-500 mt-1">
-                      <span>{recipe.prepTime}</span>
-                    </div>
+                    <div className="h-4"></div>
                   </div>
                 </div>
               </Link>
 
               {(() => {
-                const isSaved = pet.savedRecipes.includes(recipeId);
+                const isSaved = savedRecipeIds.has(recipeId);
                 return (
                   <button
                     onClick={(e) => {
@@ -532,19 +606,19 @@ useEffect(() => {
                       handleSaveRecipe(recipeId, recipe.name);
                     }}
                     disabled={isSaved}
-                    className={`absolute top-4 right-4 px-3 py-1 rounded-lg shadow-lg transition-colors flex items-center gap-1 ${
+                    className={`absolute bottom-2 left-2 px-2 py-0.5 rounded-md shadow-md transition-colors flex items-center gap-1 text-xs ${
                       hoveredRecipe === recipeId || isSaved
                         ? 'opacity-100'
                         : 'opacity-0 group-hover:opacity-100'
                     } transition-opacity ${
                       isSaved
                         ? 'bg-green-600 text-white cursor-not-allowed'
-                        : 'bg-primary-600 text-white hover:bg-primary-700'
+                        : 'bg-green-800 text-white hover:bg-green-900'
                     }`}
                   >
                     {isSaved ? '✓ Added' : (
                       <>
-                        <Plus className="h-4 w-4" /> +Add Meal
+                        <Plus className="h-3 w-3" /> +Add Meal
                       </>
                     )}
                   </button>

@@ -59,8 +59,13 @@ interface Pet {
   breed: string;
   age: string;
   weight: string;
-  healthConcerns: string[];
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  dislikes?: string[];
   image?: string;
+  savedRecipes?: string[];
+  weightKg?: number;
 }
 
 // Species-appropriate ingredient categories
@@ -688,7 +693,7 @@ export default function RecipeBuilderPage() {
   if (!pet) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800"></div>
         <span className="ml-3 text-gray-600">Loading pet data...</span>
       </div>
     );
@@ -890,7 +895,7 @@ export default function RecipeBuilderPage() {
         <p className="text-gray-600 mb-4">Starting meal builder...</p>
         <button
           onClick={() => setShowWizard(true)}
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+          className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-900"
         >
           Start Wizard
         </button>
