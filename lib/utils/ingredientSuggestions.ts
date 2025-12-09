@@ -37,6 +37,11 @@ export function generateIngredientSuggestions(pet: PetProfile): SuggestedIngredi
     return (key in obj ? obj[key] : defaultValue) || defaultValue;
   };
 
+  const addUnique = (name: string, reason: string, category: string) => {
+    if (suggestions.some((s) => s.name === name)) return;
+    suggestions.push({ name, reason, category });
+  };
+
   const proteins = getProperty<string>(speciesData, 'proteins');
   const vegetables = getProperty<string>(speciesData, 'vegetables');
   const carbs = getProperty<string>(speciesData, 'carbs');
@@ -160,101 +165,77 @@ export function generateIngredientSuggestions(pet: PetProfile): SuggestedIngredi
   }
 
   if (healthConcerns.some(hc => hc.includes('joint') || hc.includes('mobility'))) {
-    if (supplements.includes('Glucosamine Sulfate')) {
-      suggestions.push({
-        name: 'Glucosamine Sulfate',
-        reason: 'Supports joint cartilage and mobility',
-        category: 'Supplements'
-      });
-    }
-    if (fats.includes('Fish Oil') || supplements.includes('Fish Oil')) {
-      suggestions.push({
-        name: 'Fish Oil',
-        reason: 'Anti-inflammatory omega-3s help reduce joint inflammation',
-        category: 'Supplements'
-      });
-    }
+    if (supplements.includes('Glucosamine Sulfate')) addUnique('Glucosamine Sulfate', 'Supports joint cartilage and mobility', 'Supplements');
+    if (fats.includes('Fish Oil') || supplements.includes('Fish Oil')) addUnique('Fish Oil', 'Anti-inflammatory omega-3s help reduce joint inflammation', 'Supplements');
   }
 
   if (healthConcerns.some(hc => hc.includes('weight') || hc.includes('obesity'))) {
     if (proteins.includes('Ground Turkey')) {
-      suggestions.push({
-        name: 'Ground Turkey',
-        reason: 'Lean protein helps maintain muscle while managing weight',
-        category: 'Proteins'
-      });
+      addUnique('Ground Turkey', 'Lean protein helps maintain muscle while managing weight', 'Proteins');
     }
     if (vegetables.includes('Green Beans') || vegetables.includes('Green Beans (cooked)')) {
-      suggestions.push({
-        name: vegetables.includes('Green Beans') ? 'Green Beans' : 'Green Beans (cooked)',
-        reason: 'Low calorie, high fiber - helps with satiety',
-        category: 'Greens & Veggies'
-      });
+      addUnique(vegetables.includes('Green Beans') ? 'Green Beans' : 'Green Beans (cooked)', 'Low calorie, high fiber - helps with satiety', 'Greens & Veggies');
     }
   }
 
   if (healthConcerns.some(hc => hc.includes('digestive') || hc.includes('gi'))) {
     if (carbs.includes('Pumpkin Puree') || carbs.includes('Pumpkin Puree (small amounts)')) {
-      suggestions.push({
-        name: carbs.includes('Pumpkin Puree') ? 'Pumpkin Puree' : 'Pumpkin Puree (small amounts)',
-        reason: 'Soluble fiber helps regulate digestion',
-        category: 'Grains & Carbs'
-      });
+      addUnique(carbs.includes('Pumpkin Puree') ? 'Pumpkin Puree' : 'Pumpkin Puree (small amounts)', 'Soluble fiber helps regulate digestion', 'Grains & Carbs');
     }
     if (supplements.includes('Probiotic Powder')) {
-      suggestions.push({
-        name: 'Probiotic Powder',
-        reason: 'Supports healthy gut bacteria and digestive function',
-        category: 'Supplements'
-      });
+      addUnique('Probiotic Powder', 'Supports healthy gut bacteria and digestive function', 'Supplements');
     }
   }
 
   if (healthConcerns.some(hc => hc.includes('skin') || hc.includes('coat'))) {
     if (fats.includes('Salmon Oil') || supplements.includes('Salmon Oil')) {
-      suggestions.push({
-        name: 'Salmon Oil',
-        reason: 'Omega-3 fatty acids promote healthy skin and shiny coat',
-        category: 'Supplements'
-      });
+      addUnique('Salmon Oil', 'Omega-3 fatty acids promote healthy skin and shiny coat', 'Supplements');
     }
     const salmonOptions = proteins.filter(p => p.toLowerCase().includes('salmon'));
     if (salmonOptions.length > 0) {
-      suggestions.push({
-        name: salmonOptions[0],
-        reason: 'Rich in omega-3s for healthy skin and coat',
-        category: 'Proteins'
-      });
+      addUnique(salmonOptions[0], 'Rich in omega-3s for healthy skin and coat', 'Proteins');
     }
   }
 
-  // General species recommendations
+  // Baseline species recommendations to ensure multiple options
   if (normalizedSpecies === 'dogs') {
-    if (vegetables.includes('Carrots')) {
-      suggestions.push({
-        name: 'Carrots',
-        reason: 'Great source of beta-carotene and fiber for dogs',
-        category: 'Greens & Veggies'
-      });
-    }
+    addUnique('Chicken Breast', 'Lean, versatile protein for most dogs', 'Proteins');
+    addUnique('Brown Rice', 'Gentle carb to mix meals', 'Grains & Carbs');
+    addUnique('Carrots', 'Great source of beta-carotene and fiber for dogs', 'Greens & Veggies');
   }
 
   if (normalizedSpecies === 'cats') {
     const sardineOptions = proteins.filter(p => p.toLowerCase().includes('sardine'));
     if (sardineOptions.length > 0) {
-      suggestions.push({
-        name: sardineOptions[0],
-        reason: 'High in taurine and omega-3s - excellent for cats',
-        category: 'Proteins'
-      });
+      addUnique(sardineOptions[0], 'High in taurine and omega-3s - excellent for cats', 'Proteins');
     }
+    addUnique('Chicken Liver', 'Taurine-rich organ meat for cats', 'Proteins');
+    addUnique('Pumpkin Puree (small amounts)', 'Fiber to help digestion', 'Grains & Carbs');
   }
 
-  // Remove duplicates and limit to 8 suggestions
-  const unique = suggestions.filter((sug, idx, self) => 
+  if (normalizedSpecies === 'birds') {
+    addUnique('Millet (white/red)', 'Staple seed birds readily accept', 'Seeds');
+    addUnique('Carrots (grated)', 'Vitamin A-rich veggie for birds', 'Greens & Veggies');
+    addUnique('Apples (no seeds)', 'Common fruit treat (seed-free)', 'Fruits');
+  }
+
+  if (normalizedSpecies === 'reptiles') {
+    addUnique('Collard Greens', 'High-calcium staple green', 'Greens & Veggies');
+    addUnique('Dubia Roaches', 'Staple insect protein with good Ca:P', 'Proteins');
+    addUnique('Blueberries', 'Occasional fruit treat many reptiles accept', 'Fruits');
+  }
+
+  if (normalizedSpecies === 'pocket-pets') {
+    addUnique('Timothy Hay', 'Essential daily fiber source', 'Hay');
+    addUnique('Bell Peppers (high vitamin C)', 'Vitamin C boost for pocket pets', 'Greens & Veggies');
+    addUnique('Carrots', 'Crunchy, familiar veggie treat', 'Greens & Veggies');
+  }
+
+  // Remove duplicates and keep a healthy list (up to 12)
+  const unique = suggestions.filter((sug, idx, self) =>
     idx === self.findIndex(s => s.name === sug.name)
   );
 
-  return unique.slice(0, 8);
+  return unique.slice(0, 12);
 }
 

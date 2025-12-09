@@ -60,6 +60,7 @@ export default function MealPlanPage() {
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
   const [weeklyPlan, setWeeklyPlan] = useState<{ day: string; meals: Recipe[] }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [swapTarget, setSwapTarget] = useState<{ dayIdx: number; mealIdx: number } | null>(null);
 
   // Convert custom meal to Recipe format for meal plan
   const convertCustomMealToRecipe = (customMeal: CustomMeal): Recipe => {
@@ -149,23 +150,20 @@ export default function MealPlanPage() {
     return plan;
   };
 
-  useEffect(() => {
-    // Combine saved recipes and custom meals
-    const allMeals: Recipe[] = [
+  const allMeals = useMemo<Recipe[]>(() => {
+    return [
       ...savedMeals,
       ...customMeals.map(convertCustomMealToRecipe),
     ];
-    
+  }, [savedMeals, customMeals]);
+
+  useEffect(() => {
     if (allMeals.length > 0) {
       setWeeklyPlan(generatePlan(allMeals));
     }
-  }, [savedMeals, customMeals]);
+  }, [allMeals]);
 
   const handleRegenerate = () => {
-    const allMeals: Recipe[] = [
-      ...savedMeals,
-      ...customMeals.map(convertCustomMealToRecipe),
-    ];
     setWeeklyPlan(generatePlan(allMeals));
   };
 
@@ -318,12 +316,73 @@ export default function MealPlanPage() {
                       <ShoppingCart size={8} />
                       Buy
                     </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
+                      }}
+                    className="mt-2 w-full inline-flex items-center justify-center gap-1 text-xs px-2 py-1 rounded border border-primary-500 text-primary-700 bg-white hover:bg-primary-50 transition-colors"
+                      title="Edit this slot"
+                    >
+                    Edit
+                    </button>
                   </div>
                 ))}
               </div>
             </div>
           ))}
         </div>
+
+        {swapTarget && (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-5 border border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-bold text-gray-900">Swap Meal</h3>
+                <button
+                  onClick={() => setSwapTarget(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                  aria-label="Close swap dialog"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Choose a saved meal to place into this slot.</p>
+              <div className="max-h-72 overflow-y-auto space-y-2">
+                {allMeals.map((meal) => (
+                  <button
+                    key={meal.id}
+                    onClick={() => {
+                      if (!swapTarget) return;
+                      const planCopy = weeklyPlan.map((d) => ({ ...d, meals: [...d.meals] }));
+                      planCopy[swapTarget.dayIdx].meals[swapTarget.mealIdx] = meal;
+                      setWeeklyPlan(planCopy);
+                      setSwapTarget(null);
+                    }}
+                    className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-green-600 hover:bg-green-50 transition-colors"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-gray-900">{meal.name}</span>
+                      {meal.category === 'custom' && (
+                        <span className="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Custom</span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+                {allMeals.length === 0 && (
+                  <p className="text-sm text-gray-500">No saved meals available.</p>
+                )}
+              </div>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  onClick={() => setSwapTarget(null)}
+                  className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-2">How rotation works</h3>

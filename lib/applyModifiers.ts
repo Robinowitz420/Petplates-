@@ -273,7 +273,7 @@ export function generateModifiedRecommendations({ profile, recipeIds, limit }: {
             nutritionChanges: {}, // TODO: implement nutrition changes
             portionPlan,
             shoppingList,
-            explanation: 'Recipe modified for pet profile',
+            explanation: '', // avoid noisy banner text
             weeklyPlan: [], // TODO: implement weekly plan
             score: petRating.matchScore,
         };

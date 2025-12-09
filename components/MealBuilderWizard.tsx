@@ -37,6 +37,9 @@ export default function MealBuilderWizard({
   petName,
   recommendedIngredients = []
 }: MealBuilderWizardProps) {
+  const skipProteins = !categories.proteins.required || categories.proteins.ingredients.length === 0;
+  const stepOrder = CATEGORY_ORDER.filter((key) => !(skipProteins && key === 'proteins'));
+
   const [currentStep, setCurrentStep] = useState(0);
   const [selections, setSelections] = useState<{ [key: string]: string | null }>({
     proteins: null,
@@ -48,14 +51,14 @@ export default function MealBuilderWizard({
 
   if (!isOpen) return null;
 
-  const currentCategoryKey = CATEGORY_ORDER[currentStep];
+  const currentCategoryKey = stepOrder[currentStep];
   const currentCategory = categories[currentCategoryKey];
   const isRequired = currentCategory.required;
   const hasSelection = selections[currentCategoryKey] !== null;
   const hasIngredients = currentCategory.ingredients.length > 0;
   // Allow proceeding if: not required, OR has selection, OR required but no ingredients available
   const canProceed = !isRequired || hasSelection || !hasIngredients;
-  const isLastStep = currentStep === CATEGORY_ORDER.length - 1;
+  const isLastStep = currentStep === stepOrder.length - 1;
 
   const handleSelect = (ingredient: string) => {
     setSelections(prev => ({
@@ -76,15 +79,6 @@ export default function MealBuilderWizard({
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const handleSkip = () => {
-    if (isLastStep) {
-      onComplete(selections);
-      handleClose();
-    } else {
-      setCurrentStep(prev => prev + 1);
     }
   };
 
@@ -110,7 +104,7 @@ export default function MealBuilderWizard({
               Create Meal for {petName}
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              Step {currentStep + 1} of {CATEGORY_ORDER.length}
+              Step {currentStep + 1} of {stepOrder.length}
             </p>
           </div>
           <button
@@ -124,7 +118,7 @@ export default function MealBuilderWizard({
         {/* Progress Bar */}
         <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
           <div className="flex gap-2">
-            {CATEGORY_ORDER.map((key, index) => {
+            {stepOrder.map((key, index) => {
               const category = categories[key];
               const isActive = index === currentStep;
               const isCompleted = selections[key] !== null;
@@ -244,14 +238,6 @@ export default function MealBuilderWizard({
           </button>
 
           <div className="flex gap-3">
-            {!isRequired && (
-              <button
-                onClick={handleSkip}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                Skip
-              </button>
-            )}
             <button
               onClick={handleNext}
               disabled={!canProceed}

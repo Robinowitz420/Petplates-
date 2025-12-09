@@ -553,9 +553,11 @@ useEffect(() => {
                     <p className="text-gray-400 text-xs mb-2 line-clamp-2">
                       {recipe.description}
                     </p>
-                    <p className="text-xs text-gray-300 bg-surface-highlight rounded-lg p-2 mb-2 line-clamp-2 border border-white/5">
-                      {explanation}
-                    </p>
+                    {explanation && (
+                      <p className="text-xs text-gray-300 bg-surface-highlight rounded-lg p-2 mb-2 line-clamp-2 border border-white/5">
+                        {explanation}
+                      </p>
+                    )}
                     {pet.healthConcerns.length > 0 && (
                       (() => {
                         const score = getHealthMatchScore(recipe, pet);

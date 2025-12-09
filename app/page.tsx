@@ -77,7 +77,7 @@ export default function HomePage() {
     
     return (
       <div className="min-h-screen bg-background text-foreground">
-        <header className="relative w-full bg-surface/30 border-b border-surface-highlight py-8">
+        <header className="relative w-full border-b border-surface-highlight py-8" style={{ backgroundColor: '#043136' }}>
           <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[250px] md:h-[300px]">
             <Image
               src="/images/emojis/Mascots/HeroPics/HeroBanner-v3.png"
@@ -97,12 +97,6 @@ export default function HomePage() {
             <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8">
               Fresh, vet-approved, and personalized nutrition for your beloved pets.
             </p>
-            <Link
-              href="/profile"
-              className="btn btn-lg btn-darkgreen"
-            >
-              View Your Pets <ArrowRight size={20} className="ml-2" />
-            </Link>
           </section>
           
           <section className="py-12">
@@ -126,7 +120,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="relative w-full bg-surface/30 border-b border-surface-highlight py-8">
+      <header className="relative w-full border-b border-surface-highlight py-8" style={{ backgroundColor: '#043136' }}>
         <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[250px] md:h-[300px]">
           <Image
             src="/images/emojis/Mascots/HeroPics/HeroBanner-v3.png"
@@ -140,57 +134,12 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <section className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-orange-500 tracking-tight mb-4 drop-shadow-sm">
-            Paw & Plate
-          </h1>
-          <p className="mt-2 text-2xl md:text-3xl text-orange-400 font-medium mb-2">
-            Meal prep made easy, for ALL your pets!
-          </p>
-          <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-            Get vet-approved, custom-portioned meals designed specifically for your pet's breed, age, and health needs.
-          </p>
           <Link
             href="/sign-up"
             className="btn btn-lg btn-darkgreen"
           >
             Get Started
           </Link>
-        </section>
-
-        <section className="py-12">
-          <h2 className="text-3xl font-bold text-white text-center mb-8">
-            Find Your Pet's Perfect Meal Match
-          </h2>
-          <div className="flex justify-center space-x-4 mb-8 flex-wrap gap-2">
-            {['dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'].map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category as PetCategory)}
-                className={`px-4 py-2 rounded-full font-semibold capitalize transition ${
-                  selectedCategory === category
-                    ? 'bg-dark-green text-orange-400 shadow-md'
-                    : 'bg-surface-highlight text-gray-300 hover:bg-surface-lighter border border-white/10'
-                }`}
-              >
-                {category.replace('-', ' ')}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categoryRecipes.map((recipe) => (
-              <Link 
-                key={recipe.id} 
-                href={`/recipe/${recipe.id}`} 
-                className="block bg-surface rounded-xl shadow-lg border border-surface-highlight hover:shadow-2xl hover:border-orange-500/50 transition overflow-hidden group"
-              >
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-white truncate group-hover:text-orange-400 transition-colors">{recipe.name}</h3>
-                  <p className="text-sm text-gray-400 mt-1">⭐ {(recipe.rating || 0).toFixed(1)}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
         </section>
 
         <section className="py-12 border-t border-surface-highlight">

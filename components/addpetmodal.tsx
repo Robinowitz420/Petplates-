@@ -12,6 +12,8 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
+  weight?: string;
+  activityLevel?: 'high' | 'medium' | 'low';
   savedRecipes?: string[];
   names?: string[];
   healthConcerns?: string[];
@@ -24,12 +26,14 @@ interface Pet {
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
 type HealthConcern = 'none' | 'weight-management' | 'allergies' | 'joint-health' | 'digestive' | 'kidney' | 'dental';
+type ActivityLevel = 'high' | 'medium' | 'low';
 
 interface FormData {
   name: string;
   type: PetCategory | '';
   breed: string;
-  age: AgeGroup | '';
+  weight?: string;
+  activityLevel: ActivityLevel;
   healthConcerns: HealthConcern[];
 }
 
@@ -89,7 +93,8 @@ const initialFormData: FormData = {
   name: '',
   type: '',
   breed: '',
-  age: '',
+  weight: '',
+  activityLevel: 'medium',
   healthConcerns: [],
 };
 
@@ -109,9 +114,9 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
         setFormData({
           name: editingPet.name,
           type: editingPet.type as PetCategory,
-          breed: editingPet.breed,
-          age: editingPet.age as AgeGroup,
-          healthConcerns: editingPet.healthConcerns as HealthConcern[],
+          weight: editingPet.weight || '',
+          activityLevel: (editingPet.activityLevel as ActivityLevel) || 'medium',
+          healthConcerns: (editingPet.healthConcerns as HealthConcern[]) || [],
         });
       } else {
         setFormData(initialFormData);
@@ -161,30 +166,39 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
 
   const handleNext = () => {
     setError(null);
-    if (!formData.name || !formData.type || !formData.breed || !formData.age) {
-      setError('Please fill out all fields in Step 1.');
+    if (step === 1) {
+      if (!formData.name || !formData.type) {
+        setError('Please add a name and pet type.');
+        return;
+      }
+      setStep(2);
       return;
     }
-    setStep(2);
+    if (step === 2) {
+      if (!formData.breed) {
+        setError('Please pick a breed (or closest match).');
+        return;
+      }
+      setStep(3);
+      return;
+    }
+    if (step === 3) {
+      setStep(4);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Step 2 validation is simple, as healthConcerns array is initialized and auto-managed.
-    if (formData.healthConcerns.length === 0) {
-      setError('Please select at least one health concern (or "None").');
-      return;
-    }
-
     // Prepare the final Pet object
     const newPet: Pet = {
       ...formData,
       id: editingPet?.id || crypto.randomUUID(), // Use existing ID if editing, otherwise new UUID
       type: formData.type as string,
-      age: formData.age as string,
-      // Initialize the mealPlan array as required for the meal engine
+      // Defaults for downstream expectations
+      age: (editingPet?.age as string) || 'adult',
+      breed: formData.breed || (editingPet?.breed as string) || 'Mixed',
       mealPlan: editingPet?.mealPlan || [], 
     };
 
@@ -207,12 +221,13 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
           value={formData.name}
           onChange={handleChange}
           placeholder="e.g., Buster"
+          autoFocus
           className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150"
           required
         />
       </div>
 
-      {/* Pet Type (Meal Engine Criteria) */}
+      {/* Pet Type */}
       <div className="space-y-2">
         <label htmlFor="type" className="text-sm font-medium text-gray-300 block">Pet Type</label>
         <div className="grid grid-cols-5 gap-3">
@@ -260,51 +275,125 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
         )}
       </div>
 
-      {/* Breed (Meal Engine Criteria) */}
-      <div className="space-y-2">
-        <label htmlFor="breed" className="text-sm font-medium text-gray-300 block">Breed</label>
-        <select
-          id="breed"
-          name="breed"
-          value={formData.breed}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150 disabled:bg-surface disabled:text-gray-600"
-          disabled={!formData.type}
-          required
-        >
-          <option value="" disabled className="bg-surface text-gray-500">
-            {formData.type ? `Select ${formData.type}'s breed` : 'Select a Pet Type first'}
-          </option>
-          {availableBreeds.map(breed => (
-            <option key={breed} value={breed} className="bg-surface text-foreground">{breed}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Age Group (Meal Engine Criteria) */}
-      <div className="space-y-2">
-        <label htmlFor="age" className="text-sm font-medium text-gray-300 block">Age Group</label>
-        <select
-          id="age"
-          name="age"
-          value={formData.age}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150"
-          required
-        >
-          <option value="" disabled className="bg-surface text-gray-500">Select age group</option>
-          {ageGroups.map(group => (
-            <option key={group.value} value={group.value} className="bg-surface text-foreground">{group.label}</option>
-          ))}
-        </select>
-      </div>
-
       {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
       
       <div className="flex justify-end pt-4 border-t border-surface-highlight">
         <button
           type="button"
           onClick={handleNext}
+          className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 shadow-lg"
+        >
+          Next: Breed
+          <ChevronRight className="w-5 h-5 ml-2" />
+        </button>
+      </div>
+    </div>
+  );
+
+  // --- Step 2 JSX: Breed Selection ---
+  const Step2 = () => (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-foreground">2. Choose Breed</h3>
+      <p className="text-sm text-gray-400">Pick the closest match. If unsure, pick “Mixed”.</p>
+
+      <div className="grid grid-cols-1 gap-3 max-h-[320px] overflow-y-auto pr-1">
+        {[...(availableBreeds.length ? availableBreeds : ['Mixed'])].sort().map((breed) => {
+          const isSelected = formData.breed === breed;
+          return (
+            <button
+              key={breed}
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, breed }))}
+              className={`p-3 rounded-xl border-2 text-sm text-left transition-all duration-200 ${
+                isSelected
+                  ? 'border-primary-500 bg-primary-900/30 text-primary-200 shadow-md'
+                  : 'border-surface-highlight bg-surface-lighter text-gray-300 hover:border-primary-400/50 hover:bg-surface-highlight'
+              }`}
+            >
+              {breed}
+            </button>
+          );
+        })}
+      </div>
+
+      {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
+
+      <div className="flex justify-between pt-6 border-t border-surface-highlight">
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="flex items-center px-4 py-3 border-2 border-surface-highlight text-gray-300 font-medium rounded-xl hover:bg-surface-highlight transition-colors duration-150"
+        >
+          <ChevronLeft className="w-5 h-5 mr-2" />
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleNext}
+          className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 shadow-lg"
+        >
+          Next: Weight & Activity
+          <ChevronRight className="w-5 h-5 ml-2" />
+        </button>
+      </div>
+    </div>
+  );
+
+  // --- Step 3 JSX: Weight & Activity ---
+  const Step3 = () => (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-foreground">3. Weight & Activity</h3>
+      <p className="text-sm text-gray-400">These are informational only and not yet used for calculations.</p>
+
+      <div className="space-y-2">
+        <label htmlFor="weight" className="text-sm font-medium text-gray-300 block">Weight (any format)</label>
+        <input
+          id="weight"
+          name="weight"
+          type="text"
+          value={formData.weight || ''}
+          onChange={handleChange}
+          placeholder="e.g., 2.3 kg or 5 lbs"
+          className="w-full px-4 py-2 border border-surface-highlight bg-surface-lighter text-foreground rounded-xl focus:ring-primary-500 focus:border-primary-500 transition duration-150"
+        />
+      </div>
+
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-gray-300">Activity Level</p>
+        <div className="grid grid-cols-3 gap-3">
+          {(['low', 'medium', 'high'] as ActivityLevel[]).map((level) => {
+            const isSelected = formData.activityLevel === level;
+            const label = level === 'low' ? 'Low' : level === 'medium' ? 'Medium' : 'High';
+            return (
+              <button
+                key={level}
+                type="button"
+                onClick={() => setFormData((prev) => ({ ...prev, activityLevel: level }))}
+                className={`p-3 rounded-xl border-2 transition-all duration-200 ${
+                  isSelected
+                    ? 'border-primary-500 bg-primary-900/30 text-primary-200 shadow-md'
+                    : 'border-surface-highlight bg-surface-lighter text-gray-300 hover:border-primary-400/50 hover:bg-surface-highlight'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-6 border-t border-surface-highlight">
+        <button
+          type="button"
+          onClick={() => setStep(2)}
+          className="flex items-center px-4 py-3 border-2 border-surface-highlight text-gray-300 font-medium rounded-xl hover:bg-surface-highlight transition-colors duration-150"
+        >
+          <ChevronLeft className="w-5 h-5 mr-2" />
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={() => setStep(4)}
           className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 shadow-lg"
         >
           Next: Health Concerns
@@ -314,10 +403,10 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
     </div>
   );
 
-  // --- Step 2 JSX: Health Concerns ---
-  const Step2 = () => (
+  // --- Step 4 JSX: Health Concerns ---
+  const Step4 = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-foreground">2. Health & Dietary Needs</h3>
+      <h3 className="text-xl font-semibold text-foreground">4. Health Concerns</h3>
       <p className="text-sm text-gray-400">Select any concerns your pet currently has. This will tailor their meal plan recommendations.</p>
       
       <div className="grid grid-cols-2 gap-4">
@@ -355,7 +444,7 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
       <div className="flex justify-between pt-6 border-t border-surface-highlight">
         <button
           type="button"
-          onClick={() => setStep(1)}
+          onClick={() => setStep(3)}
           className="flex items-center px-4 py-3 border-2 border-surface-highlight text-gray-300 font-medium rounded-xl hover:bg-surface-highlight transition-colors duration-150"
         >
           <ChevronLeft className="w-5 h-5 mr-2" />
@@ -376,7 +465,12 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div 
         className="bg-surface rounded-2xl w-full max-w-lg shadow-2xl border border-surface-highlight relative transform transition-all duration-300 scale-100 opacity-100" 
         onClick={(e) => e.stopPropagation()}
@@ -397,13 +491,15 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
           </div>
 
           <form onSubmit={handleSubmit}>
-            {step === 1 ? <Step1 /> : <Step2 />}
+            {step === 1 ? <Step1 /> : step === 2 ? <Step2 /> : step === 3 ? <Step3 /> : <Step4 />}
           </form>
 
           {/* Step Indicator */}
           <div className="flex justify-center mt-6">
             <div className={`w-8 h-1 rounded-full mx-1 ${step === 1 ? 'bg-primary-600' : 'bg-gray-600'}`}></div>
             <div className={`w-8 h-1 rounded-full mx-1 ${step === 2 ? 'bg-primary-600' : 'bg-gray-600'}`}></div>
+            <div className={`w-8 h-1 rounded-full mx-1 ${step === 3 ? 'bg-primary-600' : 'bg-gray-600'}`}></div>
+            <div className={`w-8 h-1 rounded-full mx-1 ${step === 4 ? 'bg-primary-600' : 'bg-gray-600'}`}></div>
           </div>
         </div>
       </div>

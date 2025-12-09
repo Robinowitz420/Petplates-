@@ -235,9 +235,10 @@ export default function SavedRecipesPage() {
                 className="flex items-center p-4 bg-white rounded-xl shadow hover:shadow-md transition-shadow justify-between"
               >
                 <Link
-                  href={recipe.isCustom 
-                    ? `/profile/pet/${pet.id}/custom-meals`
-                    : `/recipe/${recipe.id}?petId=${pet.id}`
+                  href={
+                    recipe.isCustom
+                      ? `/profile/pet/${pet.id}/custom-meals/${recipe.id}`
+                      : `/recipe/${recipe.id}?petId=${pet.id}`
                   }
                   className="flex items-center flex-grow group"
                 >

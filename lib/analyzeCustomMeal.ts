@@ -348,7 +348,13 @@ function checkToxicityAndAllergies(
 // ---------- Nutrient checks & simple coverage scoring (gamified) ----------
 
 function speciesKey(p: PetProfile) {
-  return (p.species || 'unknown').toLowerCase();
+  const raw = (p.species || 'unknown').toLowerCase();
+  if (raw.includes('pocket') || raw.includes('hamster') || raw.includes('guinea')) return 'pocket-pet';
+  if (raw.includes('bird') || raw.includes('parrot')) return 'bird';
+  if (raw.includes('reptile') || raw.includes('dragon')) return 'bearded-dragon';
+  if (raw.includes('cat')) return 'cat';
+  if (raw.includes('dog')) return 'dog';
+  return raw;
 }
 
 // ---------- Fixed Nutrient checks & lenient coverage scoring ----------
@@ -399,13 +405,28 @@ function computeNutrientCoverageAndWarnings(
     'guinea-pig': {
       vit_c_per_kg: 5,        // FIXED: Was 8 - more lenient
     },
+    'pocket-pet': {
+      protein_per_100g: 4,
+      fat_per_100g: 1.2,
+      fiber_per_100g: 1.2,
+      ca_per_100g: 80,
+      p_per_100g: 40,
+      ca_p_ratio: 1.5,
+    },
+    bird: {
+      protein_per_100g: 4,
+      fat_per_100g: 1.5,
+      fiber_per_100g: 0.8,
+    },
   };
 
   // FIXED: Use serving size for per-100g calculations, not total batch
   const gramsPer100 = servingGrams / 100 || 1;
 
-  if (targetsBySpecies[species]) {
-    const t = targetsBySpecies[species];
+  const selectedTargets = targetsBySpecies[species] || targetsBySpecies['dog']; // generic fallback
+
+  if (selectedTargets) {
+    const t = selectedTargets;
 
     if (t.protein_per_100g) {
       const expectedProtein = t.protein_per_100g * gramsPer100;
@@ -443,6 +464,12 @@ function computeNutrientCoverageAndWarnings(
           severity: 'low',
         });
       }
+    }
+
+    if (t.fiber_per_100g) {
+      const expectedFiber = t.fiber_per_100g * gramsPer100;
+      const ratio = fiber / Math.max(0.1, expectedFiber);
+      coverageScores['fiber'] = Math.min(1.2, ratio);
     }
 
     if (species === 'cat' && t.taurine_per_100g) {
@@ -521,6 +548,11 @@ function calculateGamifiedScore(
   const keys = Object.keys(coverageScores);
   const foundIngredientCount = (totalIngredientCount || 0) - (ingredientsNotFound?.length || 0);
   let avgCoverage = 0;
+  const presentCats = new Set<string>();
+  if ((totals['protein_g'] ?? 0) > 0) presentCats.add('protein');
+  if ((totals['fiber_g'] ?? 0) > 0 || (totals['ca_mg'] ?? 0) > 0) presentCats.add('greens');
+  if ((totals['carbs_g'] ?? 0) > 0) presentCats.add('carbs');
+  if ((totals['fat_g'] ?? 0) > 0) presentCats.add('fat');
   
   if (keys.length > 0) {
     const totalCoverage = Object.values(coverageScores).reduce((a, b) => a + b, 0);
@@ -531,15 +563,18 @@ function calculateGamifiedScore(
       // If some ingredients missing, still give good score (like recipe scoring does)
       const baseCoverage = totalCoverage / keys.length;
       avgCoverage = ingredientsNotFound && ingredientsNotFound.length > 0 
-        ? Math.max(0.7, baseCoverage) // At least 70% if some ingredients found
-        : baseCoverage;
+        ? Math.max(0.75, baseCoverage) // At least 75% if some ingredients found
+        : Math.max(0.8, baseCoverage); // Prefer to floor higher when coverage present
     } else {
-      avgCoverage = 0.4; // No ingredients found in DB
+      avgCoverage = 0.6; // No ingredients found in DB but had coverage map
     }
   } else {
-    // FIXED: More generous base score when no coverage data (align with recipe scoring)
-    // Recipe scoring gives 50 base even without detailed nutrition, so custom meals should too
-    avgCoverage = foundIngredientCount > 0 ? 0.7 : 0.5; // 70% if ingredients exist, 50% if none
+    // More dynamic fallback when we don't have coverage data
+    const catCount = presentCats.size;
+    if (catCount >= 3) avgCoverage = 0.92;
+    else if (catCount === 2) avgCoverage = 0.85;
+    else if (catCount === 1) avgCoverage = 0.72;
+    else avgCoverage = foundIngredientCount > 0 ? 0.6 : 0.5;
   }
   
   const nutrientCoverageScore = Math.min(100, Math.round(avgCoverage * 100));
@@ -556,14 +591,6 @@ function calculateGamifiedScore(
   }
   const toxicityPenalty = Math.min(100, toxPenaltyRaw);
 
-  // FIXED: Balance/variety - make it more generous to align with recipe scoring
-  // Recipe scoring doesn't penalize for missing categories, so custom meals shouldn't either
-  const presentCats = new Set<string>();
-  if ((totals['protein_g'] ?? 0) > 0) presentCats.add('protein');
-  if ((totals['fiber_g'] ?? 0) > 0 || (totals['ca_mg'] ?? 0) > 0) presentCats.add('greens');
-  if ((totals['carbs_g'] ?? 0) > 0) presentCats.add('carbs');
-  if ((totals['fat_g'] ?? 0) > 0) presentCats.add('fat');
-
   // FIXED: Give full credit for 2+ categories (most meals have protein + carbs or protein + greens)
   // This aligns with recipe scoring which doesn't require all categories
   const varietyScore = presentCats.size >= 2 ? 1.0 : (presentCats.size / 2); // Full credit at 2+
@@ -572,14 +599,14 @@ function calculateGamifiedScore(
   // FIXED: Better base score calculation - align with recipe scoring
   // Recipe scoring: 50 base + 15 age + 15 health + 15 nutrition = 95 (very generous)
   // Custom meals should be similarly generous, so weight nutrient coverage more
-  const base = Math.round(nutrientCoverageScore * 0.8 + balanceVarietyScore * 0.2);
+  const base = Math.max(60, Math.round(nutrientCoverageScore * 0.8 + balanceVarietyScore * 0.2));
 
   // FIXED: Cap penalty at 40% of base score (more generous than before)
   // Recipe scoring rarely goes below 30, so custom meals should be similar
   const maxPenalty = Math.round(base * 0.4);
   const penaltyApplied = Math.min(maxPenalty, Math.round((toxicityPenalty / 100) * base));
   
-  const finalScore = Math.max(0, base - penaltyApplied);
+  const finalScore = Math.max(20, base - penaltyApplied);
   
   return {
     nutrientCoverageScore,

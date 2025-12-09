@@ -263,7 +263,6 @@ export default function CustomMealsHistoryPage() {
                   </button>
                   <button
                     onClick={() => {
-                      // TODO: Implement view details
                       router.push(`/profile/pet/${petId}/custom-meals/${meal.id}`);
                     }}
                     className="flex-1 px-3 py-2 text-sm font-medium text-green-800 bg-green-900/10 border border-green-800/30 rounded-md hover:bg-green-900/20 transition-colors"

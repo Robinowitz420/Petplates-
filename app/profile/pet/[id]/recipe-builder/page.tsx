@@ -700,10 +700,12 @@ export default function RecipeBuilderPage() {
   }
 
   // Prepare categories for wizard
+  const proteinRequired = !['pocket-pets', 'reptiles'].includes(normalizedSpeciesType);
+
   const wizardCategories = categorizedIngredients ? {
     proteins: {
       ...categorizedIngredients.proteins,
-      required: true
+      required: proteinRequired && categorizedIngredients.proteins.ingredients.length > 0
     },
     grains: {
       ...categorizedIngredients.grains,

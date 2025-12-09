@@ -262,6 +262,10 @@ export function getIngredientsForSpecies(species: string): string[] {
     possibleSubtypes.push('reptile_herbivore', 'reptile_insectivore', 'reptile_omnivore', 'reptile_carnivore');
   } else if (normalizedSpecies === 'pocket-pet') {
     possibleSubtypes.push('pocket_hay', 'pocket_varied', 'pocket_carnivore', 'pocket_insectivore');
+    // For pocket pets (herbivores/omnivores like hamsters, guinea pigs, rabbits),
+    // avoid auto-adding generated ingredients that may include meats (e.g., rabbit).
+    // Return only the curated list above.
+    return [...new Set(all)];
   }
   
   // Add generated ingredients that match any of the possible subtypes
