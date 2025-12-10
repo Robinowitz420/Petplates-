@@ -44,33 +44,21 @@ interface AddPetModalProps {
   editingPet?: Pet | null; // Added for completeness, to support future edit functionality
 }
 
-// --- Data Definitions (Provided by User) ---
+// --- Data Definitions ---
+import { getBreedNamesForSpecies } from '@/lib/data/speciesBreeds';
 
-const breedsByType: Record<PetCategory, string[]> = {
-  dogs: [
-    'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'French Bulldog', 'Bulldog', 'Poodle', 'Beagle', 
-    'Rottweiler', 'Yorkshire Terrier', 'German Shorthaired Pointer', 'Dachshund', 'Pembroke Welsh Corgi', 
-    'Australian Shepherd', 'Boxer', 'Great Dane', 'Siberian Husky', 'Doberman Pinscher', 
-    'Cavalier King Charles Spaniel', 'Miniature Schnauzer', 'Shih Tzu', 'Boston Terrier', 
-    'Bernese Mountain Dog', 'Pomeranian', 'Havanese', 'Shetland Sheepdog', 'Brittany', 
-    'English Springer Spaniel', 'Mastiff', 'Cocker Spaniel', 'Border Collie', 'Chihuahua', 'Mixed Breed'
-  ].sort(),
-  cats: [
-    'Persian', 'Maine Coon', 'Siamese', 'Ragdoll', 'Bengal', 'British Shorthair', 'Abyssinian', 
-    'Scottish Fold', 'Sphynx', 'American Shorthair', 'Russian Blue', 'Birman', 'Oriental', 
-    'Norwegian Forest Cat', 'Devon Rex', 'Burmese', 'Tonkinese', 'Exotic Shorthair', 
-    'Turkish Angora', 'Himalayan', 'Domestic Shorthair', 'Domestic Longhair', 'Mixed Breed'
-  ].sort(),
-  birds: [
-    'Budgie', 'Cockatiel', 'Canary', 'Finch', 'Lovebird', 'Parrot', 'Cockatoo', 'Conure', 'African Grey', 'Macaw'
-  ].sort(),
-  reptiles: [
-    'Bearded Dragon', 'Leopard Gecko', 'Ball Python', 'Corn Snake', 'Red-Eared Slider', 'Iguana', 'Crested Gecko'
-  ].sort(),
-  'pocket-pets': [
-    'Hamster', 'Guinea Pig', 'Rabbit', 'Gerbil', 'Chinchilla', 'Rat', 'Mouse', 'Ferret'
-  ].sort()
+// Get breeds from centralized source
+const getBreedsByType = (): Record<PetCategory, string[]> => {
+  return {
+    dogs: getBreedNamesForSpecies('dogs'),
+    cats: getBreedNamesForSpecies('cats'),
+    birds: getBreedNamesForSpecies('birds'),
+    reptiles: getBreedNamesForSpecies('reptiles'),
+    'pocket-pets': getBreedNamesForSpecies('pocket-pets'),
+  };
 };
+
+const breedsByType: Record<PetCategory, string[]> = getBreedsByType();
 
 const ageGroups = [
   { value: 'baby', label: 'Baby/Puppy/Kitten (0-1 year)' },
@@ -126,8 +114,8 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
 
   const availableBreeds = useMemo(() => {
     if (!formData.type) return [];
-    // The cast below is safe because formData.type is checked against PetCategory keys
-    return breedsByType[formData.type as PetCategory];
+    // Get breeds from centralized source
+    return getBreedNamesForSpecies(formData.type as PetCategory);
   }, [formData.type]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -466,13 +454,15 @@ export default function AddPetModal({ isOpen, onClose, onSubmit, editingPet }: A
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 overflow-y-auto backdrop-blur-sm flex items-center justify-center p-4"
+      style={{ backgroundColor: '#0f2c0f' }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div 
-        className="bg-surface rounded-2xl w-full max-w-lg shadow-2xl border border-surface-highlight relative transform transition-all duration-300 scale-100 opacity-100" 
+        className="rounded-2xl w-full max-w-lg shadow-2xl border relative transform transition-all duration-300 scale-100 opacity-100" 
+        style={{ backgroundColor: '#1a3d2e', borderColor: '#2d5a47', borderWidth: '2px' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 sm:p-8">

@@ -18,6 +18,8 @@ export interface ScoreResult {
   reasoning: ScoreReasoning;
   conflictCount: number; // number of avoid rule conflicts
   hasHydrationSupport: boolean; // for kidney/urinary
+  summaryReasoning?: string;
+  recommendations?: string[];
 }
 
 const commonAllergens = [
@@ -372,6 +374,8 @@ export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
     },
     conflictCount: result.reasoning.warnings.length,
     hasHydrationSupport: false,
+    summaryReasoning: result.summaryReasoning,
+    recommendations: result.reasoning.recommendations,
   };
 }
 

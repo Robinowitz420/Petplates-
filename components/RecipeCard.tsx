@@ -6,6 +6,7 @@ import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
 import { CompatibilityBadge } from './CompatibilityBadge';
 import { rateRecipeForPet, type Pet } from '@/lib/utils/petRatingSystem';
+import { scoreRecipeImproved } from '@/lib/scoreRecipe';
 import RecipeScoreModal from './RecipeScoreModal';
 
 
@@ -19,6 +20,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
 
   // Calculate compatibility rating if pet is provided
   const compatibilityRating = pet ? rateRecipeForPet(recipe, pet as Pet) : null;
+  const explainScore = pet ? scoreRecipeImproved(recipe as any, pet as any) : null;
 
   return (
     <>
@@ -41,6 +43,31 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
           <p className="text-gray-400 text-sm mb-4 line-clamp-2">
             {recipe.description}
           </p>
+
+          {/* Explainable scoring */}
+          {explainScore?.summaryReasoning && (
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-4">
+              <div className="flex items-start gap-2">
+                <span className="text-lg">ℹ️</span>
+                <p className="text-sm text-blue-900">{explainScore.summaryReasoning}</p>
+              </div>
+            </div>
+          )}
+          {explainScore?.recommendations && explainScore.recommendations.length > 0 && (
+            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-4">
+              <div className="flex items-start gap-2">
+                <span className="text-lg">💡</span>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-amber-900 mb-2">Suggestions:</h4>
+                  <ul className="text-sm text-amber-800 space-y-1">
+                    {explainScore.recommendations.map((rec, i) => (
+                      <li key={i}>• {rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
 
 
           {/* Meta Information */}

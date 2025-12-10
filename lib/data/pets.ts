@@ -1,62 +1,12 @@
 import { Breed, AgeGroup, HealthConcern } from '../types';
+import { getBreedsForSpecies } from './speciesBreeds';
 
-export const dogBreeds: Breed[] = [
-  { id: 'labrador', name: 'Labrador Retriever', category: 'dogs' },
-  { id: 'german-shepherd', name: 'German Shepherd', category: 'dogs' },
-  { id: 'golden-retriever', name: 'Golden Retriever', category: 'dogs' },
-  { id: 'bulldog', name: 'Bulldog', category: 'dogs' },
-  { id: 'beagle', name: 'Beagle', category: 'dogs' },
-  { id: 'poodle', name: 'Poodle', category: 'dogs' },
-  { id: 'rottweiler', name: 'Rottweiler', category: 'dogs' },
-  { id: 'yorkshire', name: 'Yorkshire Terrier', category: 'dogs' },
-  { id: 'chihuahua', name: 'Chihuahua', category: 'dogs' },
-  { id: 'husky', name: 'Siberian Husky', category: 'dogs' },
-];
-
-export const catBreeds: Breed[] = [
-  { id: 'persian', name: 'Persian', category: 'cats' },
-  { id: 'maine-coon', name: 'Maine Coon', category: 'cats' },
-  { id: 'siamese', name: 'Siamese', category: 'cats' },
-  { id: 'ragdoll', name: 'Ragdoll', category: 'cats' },
-  { id: 'bengal', name: 'Bengal', category: 'cats' },
-  { id: 'british-shorthair', name: 'British Shorthair', category: 'cats' },
-  { id: 'abyssinian', name: 'Abyssinian', category: 'cats' },
-  { id: 'sphynx', name: 'Sphynx', category: 'cats' },
-  { id: 'scottish-fold', name: 'Scottish Fold', category: 'cats' },
-  { id: 'domestic-shorthair', name: 'Domestic Shorthair', category: 'cats' },
-];
-
-export const birdTypes: Breed[] = [
-  { id: 'budgie', name: 'Budgerigar (Parakeet)', category: 'birds' },
-  { id: 'cockatiel', name: 'Cockatiel', category: 'birds' },
-  { id: 'lovebird', name: 'Lovebird', category: 'birds' },
-  { id: 'parrot', name: 'Parrot', category: 'birds' },
-  { id: 'cockatoo', name: 'Cockatoo', category: 'birds' },
-  { id: 'canary', name: 'Canary', category: 'birds' },
-  { id: 'finch', name: 'Finch', category: 'birds' },
-  { id: 'conure', name: 'Conure', category: 'birds' },
-];
-
-export const reptileTypes: Breed[] = [
-  { id: 'bearded-dragon', name: 'Bearded Dragon', category: 'reptiles' },
-  { id: 'leopard-gecko', name: 'Leopard Gecko', category: 'reptiles' },
-  { id: 'ball-python', name: 'Ball Python', category: 'reptiles' },
-  { id: 'red-eared-slider', name: 'Red-Eared Slider Turtle', category: 'reptiles' },
-  { id: 'corn-snake', name: 'Corn Snake', category: 'reptiles' },
-  { id: 'iguana', name: 'Green Iguana', category: 'reptiles' },
-  { id: 'chameleon', name: 'Chameleon', category: 'reptiles' },
-];
-
-export const pocketPetTypes: Breed[] = [
-  { id: 'hamster', name: 'Hamster', category: 'pocket-pets' },
-  { id: 'guinea-pig', name: 'Guinea Pig', category: 'pocket-pets' },
-  { id: 'rabbit', name: 'Rabbit', category: 'pocket-pets' },
-  { id: 'ferret', name: 'Ferret', category: 'pocket-pets' },
-  { id: 'chinchilla', name: 'Chinchilla', category: 'pocket-pets' },
-  { id: 'gerbil', name: 'Gerbil', category: 'pocket-pets' },
-  { id: 'mouse', name: 'Mouse', category: 'pocket-pets' },
-  { id: 'rat', name: 'Rat', category: 'pocket-pets' },
-];
+// Re-export from centralized source for backward compatibility
+export const dogBreeds: Breed[] = getBreedsForSpecies('dogs');
+export const catBreeds: Breed[] = getBreedsForSpecies('cats');
+export const birdTypes: Breed[] = getBreedsForSpecies('birds');
+export const reptileTypes: Breed[] = getBreedsForSpecies('reptiles');
+export const pocketPetTypes: Breed[] = getBreedsForSpecies('pocket-pets');
 
 export const ageGroups: AgeGroup[] = [
   { value: 'baby', label: 'Baby' },
@@ -117,3 +67,6 @@ export const breeds = {
   reptiles: reptileTypes,
   'pocket-pets': pocketPetTypes,
 };
+
+// Re-export centralized functions for convenience
+export { getBreedsForSpecies, getBreedNamesForSpecies, getAllSpecies } from './speciesBreeds';

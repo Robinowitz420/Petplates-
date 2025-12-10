@@ -123,7 +123,7 @@ export function ShoppingList({ ingredients, recipeName = 'this recipe', userId }
               }}
               className="flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-all duration-200 text-sm font-semibold whitespace-nowrap flex-shrink-0 relative z-10 hover:shadow-md"
             >
-              Buy on Amazon
+              Buy
               <ExternalLink size={14} />
             </a>
           </div>
@@ -144,12 +144,12 @@ export function ShoppingList({ ingredients, recipeName = 'this recipe', userId }
           {isOpening ? (
             <span className="flex items-center justify-center gap-3">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              Opening {openedCount}/{totalItems} tabs...
+              Opening...
             </span>
           ) : (
             <span className="flex items-center justify-center gap-3">
               <ShoppingCart size={20} />
-              🛒 Open All {totalItems} Items in Amazon
+              🛒 Buy All
             </span>
           )}
         </button>
@@ -259,10 +259,10 @@ export function BuyAllButton({ ingredients, userId }: { ingredients: Ingredient[
       {isOpening ? (
         <span className="flex items-center justify-center gap-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-          Opening {openedCount}/{ingredients.length} tabs...
+          Opening...
         </span>
       ) : (
-        `🛒 Buy All ${ingredients.length} Items on Amazon`
+        `🛒 Buy All`
       )}
     </button>
   );

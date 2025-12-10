@@ -522,6 +522,7 @@ export default function RecipeDetailPage() {
         allergies: ratingPet.allergies || [],
       };
       const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
+      const improvedExplain = scoreRecipeImproved(recipe as any, pet as any);
       // Convert to compatible format
       // Generate reason text that includes issues for better keyword matching
       const getReasonWithIssues = (factor: typeof enhanced.factors.ingredientSafety) => {
@@ -536,6 +537,8 @@ export default function RecipeDetailPage() {
         compatibility: enhanced.grade === 'A+' || enhanced.grade === 'A' ? 'excellent' :
                        enhanced.grade === 'B+' || enhanced.grade === 'B' ? 'good' :
                        enhanced.grade === 'C+' || enhanced.grade === 'C' ? 'fair' : 'poor',
+        summaryReasoning: improvedExplain?.summaryReasoning,
+        explainRecommendations: improvedExplain?.recommendations || [],
         breakdown: {
           petTypeMatch: { 
             score: enhanced.factors.ingredientSafety.score,
@@ -907,6 +910,30 @@ export default function RecipeDetailPage() {
                         Why
                       </div>
                     </Tooltip>
+                  </div>
+                )}
+
+                {scoreForQueryPet?.summaryReasoning && (
+                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-4">
+                    <div className="flex items-start gap-2">
+                      <span className="text-lg">ℹ️</span>
+                      <p className="text-sm text-blue-900">{scoreForQueryPet.summaryReasoning}</p>
+                    </div>
+                  </div>
+                )}
+                {scoreForQueryPet?.explainRecommendations && scoreForQueryPet.explainRecommendations.length > 0 && (
+                  <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-4">
+                    <div className="flex items-start gap-2">
+                      <span className="text-lg">💡</span>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-amber-900 mb-2">Suggestions:</h4>
+                        <ul className="text-sm text-amber-800 space-y-1">
+                          {scoreForQueryPet.explainRecommendations.map((rec: string, i: number) => (
+                            <li key={i}>• {rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
 

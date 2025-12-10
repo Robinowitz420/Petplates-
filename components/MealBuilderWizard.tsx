@@ -95,28 +95,29 @@ export default function MealBuilderWizard({
   };
 
   const wizardContent = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: '#0f2c0f' }}>
+      <div className="rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col" style={{ backgroundColor: '#1a3d2e' }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#2d5a47' }}>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-100">
               Create Meal for {petName}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-300 mt-1">
               Step {currentStep + 1} of {stepOrder.length}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:opacity-80 rounded-full transition-colors"
+            style={{ backgroundColor: '#2d5a47' }}
           >
-            <X size={20} className="text-gray-600" />
+            <X size={20} className="text-gray-200" />
           </button>
         </div>
 
         {/* Progress Bar */}
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div className="px-6 py-4 border-b" style={{ backgroundColor: '#1a3d2e', borderColor: '#2d5a47' }}>
           <div className="flex gap-2">
             {stepOrder.map((key, index) => {
               const category = categories[key];
@@ -137,10 +138,10 @@ export default function MealBuilderWizard({
                       }`}
                     />
                     {isCompleted && !isActive && (
-                      <Check size={16} className="text-green-600 flex-shrink-0" />
+                      <Check size={16} className="text-green-400 flex-shrink-0" />
                     )}
                   </div>
-                  <div className="text-xs text-gray-600 mt-1 truncate">
+                  <div className="text-xs text-gray-300 mt-1 truncate">
                     {category.icon} {category.name}
                   </div>
                 </div>
@@ -153,15 +154,15 @@ export default function MealBuilderWizard({
         <div className="flex-1 overflow-y-auto p-6">
           <div className="text-center mb-6">
             <div className="text-4xl mb-2">{currentCategory.icon}</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-1">
+            <h3 className="text-xl font-semibold text-gray-100 mb-1">
               {currentCategory.name}
             </h3>
-            <p className="text-sm text-gray-600">{currentCategory.description}</p>
+            <p className="text-sm text-gray-300">{currentCategory.description}</p>
             {isRequired && hasIngredients && (
-              <p className="text-xs text-red-600 mt-2">* Required</p>
+              <p className="text-xs text-red-400 mt-2">* Required</p>
             )}
             {isRequired && !hasIngredients && (
-              <p className="text-xs text-yellow-600 mt-2">⚠ No ingredients available - you can skip this step</p>
+              <p className="text-xs text-yellow-400 mt-2">⚠ No ingredients available - you can skip this step</p>
             )}
           </div>
 
@@ -193,29 +194,31 @@ export default function MealBuilderWizard({
                     onClick={() => handleSelect(ingredient)}
                     className={`p-4 rounded-lg border-2 text-left transition-all relative ${
                       isSelected
-                        ? 'border-primary-600 bg-primary-50'
+                        ? 'border-green-500'
                         : isRecommended
-                        ? 'border-yellow-400 bg-yellow-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-yellow-400'
+                        : 'border-gray-600 hover:border-gray-500'
                     }`}
+                    style={{
+                      backgroundColor: isSelected ? '#2d5a47' : isRecommended ? '#3d4a2e' : '#1a3d2e',
+                      color: '#e5e7eb'
+                    }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {isRecommended && (
-                          <Star size={16} className="text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                          <Star size={16} className="text-yellow-400 fill-yellow-400 flex-shrink-0" />
                         )}
-                        <span className={`text-sm font-medium truncate ${
-                          isRecommended ? 'text-gray-900' : 'text-gray-900'
-                        }`}>
+                        <span className="text-sm font-medium truncate text-gray-100">
                           {ingredient}
                         </span>
                       </div>
                       {isSelected && (
-                        <Check size={18} className="text-primary-600 flex-shrink-0 ml-2" />
+                        <Check size={18} className="text-green-400 flex-shrink-0 ml-2" />
                       )}
                     </div>
                     {isRecommended && (
-                      <div className="text-xs text-yellow-700 mt-1">
+                      <div className="text-xs text-yellow-300 mt-1">
                         Recommended
                       </div>
                     )}
@@ -227,11 +230,16 @@ export default function MealBuilderWizard({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-6 border-t" style={{ borderColor: '#2d5a47', backgroundColor: '#1a3d2e' }}>
           <button
             onClick={handleBack}
             disabled={currentStep === 0}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors border-2"
+            style={{
+              backgroundColor: '#2d5a47',
+              borderColor: '#3d6a57',
+              color: '#e5e7eb'
+            }}
           >
             <ChevronLeft size={16} />
             Back
@@ -241,7 +249,10 @@ export default function MealBuilderWizard({
             <button
               onClick={handleNext}
               disabled={!canProceed}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{
+                backgroundColor: '#16a34a'
+              }}
             >
               {isLastStep ? 'Complete' : 'Next'}
               {!isLastStep && <ChevronRight size={16} />}

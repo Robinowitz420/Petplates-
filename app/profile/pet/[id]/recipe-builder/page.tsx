@@ -692,9 +692,9 @@ export default function RecipeBuilderPage() {
 
   if (!pet) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800"></div>
-        <span className="ml-3 text-gray-600">Loading pet data...</span>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0f2c0f' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400"></div>
+        <span className="ml-3 text-gray-300">Loading pet data...</span>
       </div>
     );
   }
@@ -731,10 +731,10 @@ export default function RecipeBuilderPage() {
       <>
         {/* Species Coverage Badge */}
         {normalizedSpeciesType && (
-          <div className="bg-white border-b border-gray-200 px-4 py-2">
+          <div className="border-b px-4 py-2" style={{ backgroundColor: '#1a3d2e', borderColor: '#2d5a47' }}>
             <div className="max-w-7xl mx-auto flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Ingredient Coverage:</span>
+                <span className="text-sm text-gray-300">Ingredient Coverage:</span>
                 <span className={`px-2 py-1 rounded text-xs font-semibold ${
                   speciesCoverageLevel === 'full' ? 'bg-green-100 text-green-800' :
                   speciesCoverageLevel === 'beta' ? 'bg-yellow-100 text-yellow-800' :
@@ -761,7 +761,7 @@ export default function RecipeBuilderPage() {
           petName={pet.names[0] || 'Pet'}
           recommendedIngredients={recommendedIngredientNames}
         />
-        <div className="min-h-screen bg-gray-50" />
+        <div className="min-h-screen" style={{ backgroundColor: '#0f2c0f' }} />
       </>
     );
   }
@@ -805,12 +805,13 @@ export default function RecipeBuilderPage() {
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-                <h2 className="text-xl font-bold text-gray-900">Add More Ingredients</h2>
+                <h2 className="text-xl font-bold text-gray-100">Add More Ingredients</h2>
                 <button
                   onClick={() => setShowAddMore(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:opacity-80 rounded-full transition-colors"
+                  style={{ backgroundColor: '#2d5a47' }}
                 >
-                  <X size={20} className="text-gray-600" />
+                  <X size={20} className="text-gray-200" />
                 </button>
               </div>
               <div className="p-6">
@@ -818,8 +819,8 @@ export default function RecipeBuilderPage() {
                 {suggestedIngredients.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm font-semibold text-gray-700">Recommended Additions:</span>
-                      <span className="text-xs text-gray-500">Click to add quickly</span>
+                      <span className="text-sm font-semibold text-gray-200">Recommended Additions:</span>
+                      <span className="text-xs text-gray-400">Click to add quickly</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {suggestedIngredients
@@ -892,12 +893,13 @@ export default function RecipeBuilderPage() {
 
   // Fallback: show original builder (shouldn't reach here normally)
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0f2c0f' }}>
       <div className="text-center">
-        <p className="text-gray-600 mb-4">Starting meal builder...</p>
+        <p className="text-gray-300 mb-4">Starting meal builder...</p>
         <button
           onClick={() => setShowWizard(true)}
-          className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-900"
+          className="px-4 py-2 text-white rounded-md hover:opacity-90"
+          style={{ backgroundColor: '#16a34a' }}
         >
           Start Wizard
         </button>

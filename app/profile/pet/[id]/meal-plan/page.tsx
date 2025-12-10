@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, RefreshCw, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { recipes } from '@/lib/data/recipes-complete';
 import type { Recipe, CustomMeal } from '@/lib/types';
 import { VETTED_PRODUCTS } from '@/lib/data/vetted-products';
@@ -48,6 +48,38 @@ const buildEvenPlan = (meals: Recipe[]) => {
     rotation.push(...meals);
   }
   return rotation.slice(0, totalSlots);
+};
+
+const shuffleMealsNoRepeats = (meals: Recipe[], totalSlots: number) => {
+  if (meals.length === 0) return [];
+  const poolBase = [...meals];
+  const rotation: Recipe[] = [];
+
+  const shuffle = (arr: Recipe[]) => {
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  let pool = shuffle([...poolBase]);
+
+  while (rotation.length < totalSlots) {
+    if (pool.length === 0) {
+      pool = shuffle([...poolBase]);
+    }
+    const next = pool.pop() as Recipe;
+    // Avoid duplicate within the same day (pair of two)
+    if (rotation.length % 2 === 1 && rotation[rotation.length - 1].id === next.id) {
+      // Put it back to the front and try another
+      pool.unshift(next);
+      continue;
+    }
+    rotation.push(next);
+  }
+
+  return rotation;
 };
 
 export default function MealPlanPage() {
@@ -167,6 +199,20 @@ export default function MealPlanPage() {
     setWeeklyPlan(generatePlan(allMeals));
   };
 
+  const handleRandomize = () => {
+    const totalSlots = DAYS.length * 2;
+    const rotation = shuffleMealsNoRepeats(allMeals, totalSlots);
+    const plan: { day: string; meals: Recipe[] }[] = [];
+    for (let i = 0; i < DAYS.length; i += 1) {
+      const breakfastIndex = i * 2;
+      const dinnerIndex = breakfastIndex + 1;
+      const breakfast = rotation[breakfastIndex];
+      const dinner = rotation[dinnerIndex];
+      plan.push({ day: DAYS[i], meals: [breakfast, dinner] });
+    }
+    setWeeklyPlan(plan);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -237,7 +283,6 @@ export default function MealPlanPage() {
               Back to pets
             </button>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <p className="text-sm uppercase tracking-wide text-gray-500 font-semibold">
                 Weekly Meal Prep
@@ -249,15 +294,8 @@ export default function MealPlanPage() {
                 Two meals per day. No repeats on the same day. Each saved meal gets equal play.
               </p>
             </div>
-            <button
-              onClick={handleRegenerate}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-800 text-white font-semibold hover:bg-green-900"
-            >
-              <RefreshCw size={18} />
-              Regenerate Plan
-            </button>
           </div>
-        </div>
+        
 
         <div className="grid grid-cols-7 gap-2">
           {weeklyPlan.map((dayPlan, index) => (
@@ -396,6 +434,21 @@ export default function MealPlanPage() {
               {customMeals.length > 0 && ` + ${customMeals.length} custom meal${customMeals.length !== 1 ? 's' : ''}`}
             </p>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-4">
+          <button
+            onClick={handleRandomize}
+            className="btn btn-success btn-sm"
+          >
+            Randomize Week
+          </button>
+          <Link
+            href={`/pets/${petId}/nutrition`}
+            className="btn btn-success btn-sm"
+          >
+            View Nutrition Dashboard
+          </Link>
         </div>
       </div>
     </div>

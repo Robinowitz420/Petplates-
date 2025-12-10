@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { Plus, Edit, Trash2, ShoppingCart } from 'lucide-react';
 import { getPrimaryName } from '@/lib/utils/petUtils';
 import type { Pet } from '@/lib/types';
@@ -121,67 +122,15 @@ const savePetsToLocalStorage = (userId: string, pets: Pet[]) => {
 // 2. DATA CONSTANTS
 // =================================================================
 
+import { getBreedNamesForSpecies } from '@/lib/data/speciesBreeds';
+
+// Get breeds from centralized source
 const PET_BREEDS: Record<PetCategory, string[]> = {
-  dogs: [
-    'Labrador Retriever',
-    'German Shepherd',
-    'Poodle',
-    'Bulldog',
-    'Beagle',
-    'Pomeranian',
-    'Dachshund',
-    'Chihuahua',
-    'Great Dane',
-    'Other',
-  ],
-  cats: [
-    'Domestic Shorthair',
-    'Maine Coon',
-    'Ragdoll',
-    'Siamese',
-    'Persian',
-    'Bengal',
-    'Sphynx',
-    'British Shorthair',
-    'Abyssinian',
-    'Other',
-  ],
-  birds: [
-    'Parakeet',
-    'Cockatiel',
-    'African Grey',
-    'Macaw',
-    'Cockatoo',
-    'Finch',
-    'Canary',
-    'Lovebird',
-    'Quaker Parrot',
-    'Other',
-  ],
-  reptiles: [
-    'Bearded Dragon',
-    'Ball Python',
-    'Leopard Gecko',
-    'Corn Snake',
-    'Red-Eared Slider',
-    'Chameleon',
-    'Monitor Lizard',
-    'Blue-Tongued Skink',
-    'Iguana',
-    'Other',
-  ],
-  'pocket-pets': [
-    'Rabbit',
-    'Guinea Pig',
-    'Hamster',
-    'Gerbil',
-    'Rat',
-    'Mouse',
-    'Chinchilla',
-    'Hedgehog',
-    'Ferret',
-    'Other',
-  ],
+  dogs: [...getBreedNamesForSpecies('dogs'), 'Other'],
+  cats: [...getBreedNamesForSpecies('cats'), 'Other'],
+  birds: [...getBreedNamesForSpecies('birds'), 'Other'],
+  reptiles: [...getBreedNamesForSpecies('reptiles'), 'Other'],
+  'pocket-pets': [...getBreedNamesForSpecies('pocket-pets'), 'Other'],
 };
 
 // Health concerns are now handled by HealthConcernsDropdown component
@@ -633,7 +582,7 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
     },
     [recipeNameMap]
   );
-  const buildWeeklyPlan = useCallback(
+const buildWeeklyPlan = useCallback(
     (saved: string[], offset: number): WeeklyPlanEntry[] => {
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
       if (!Array.isArray(saved) || saved.length < 2) {
@@ -654,6 +603,32 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
     },
     []
   );
+
+  const shuffleMealsNoRepeats = (meals: any[], totalSlots: number) => {
+    if (meals.length === 0) return [];
+    const base = [...meals];
+    const rotation: any[] = [];
+    const shuffle = (arr: any[]) => {
+      for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+    let pool = shuffle([...base]);
+    while (rotation.length < totalSlots) {
+      if (pool.length === 0) {
+        pool = shuffle([...base]);
+      }
+      const next = pool.pop();
+      if (rotation.length % 2 === 1 && rotation[rotation.length - 1]?.id === next?.id) {
+        pool.unshift(next);
+        continue;
+      }
+      rotation.push(next);
+    }
+    return rotation;
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -734,6 +709,19 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
     }
     setPlanWeekly(nextPlan);
   }, [allMealsForPlan]);
+
+  const handleRandomizePlan = () => {
+    if (allMealsForPlan.length === 0) return;
+    const totalSlots = DAYS.length * 2;
+    const rotation = shuffleMealsNoRepeats(allMealsForPlan, totalSlots);
+    const nextPlan: { day: string; meals: any[] }[] = [];
+    for (let i = 0; i < DAYS.length; i += 1) {
+      const breakfastIndex = i * 2;
+      const dinnerIndex = breakfastIndex + 1;
+      nextPlan.push({ day: DAYS[i], meals: [rotation[breakfastIndex], rotation[dinnerIndex]] });
+    }
+    setPlanWeekly(nextPlan);
+  };
 
   const handleAddPet = useCallback(
     (newPet: any) => {
@@ -928,12 +916,12 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
         {isOpening ? (
           <>
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            Opening {openedCount}/{totalIngredients} tabs...
+            Opening...
           </>
         ) : (
           <>
             <ShoppingCart size={20} />
-            Buy All {totalIngredients} Ingredients for Weekly Plan
+            Buy All
           </>
         )}
       </button>
@@ -1110,7 +1098,7 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
                       </div>
 
                     <div className="mt-4">
-                      <div className="flex gap-2 border-b border-surface-highlight pb-2">
+                      <div className="flex gap-0 border-b-2 border-surface-highlight">
                         {['bio', 'saved', 'plan'].map((tab) => {
                           const label = tab === 'bio' ? 'Bio' : tab === 'saved' ? 'Saved Meals' : 'Meal Plan';
                           const isActive = activeTab === tab;
@@ -1118,11 +1106,12 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
                             <button
                               key={tab}
                               onClick={() => setActiveTab(tab as any)}
-                              className={`relative px-4 py-2 text-sm font-semibold rounded-md transition ${
+                              className={`relative px-6 py-3 text-sm font-semibold transition-all duration-200 ${
                                 isActive
-                                  ? 'bg-dark-green text-orange-300 border border-orange-400 shadow-sm'
-                                  : 'bg-surface-highlight text-gray-300 hover:bg-surface-lighter border border-surface-highlight'
+                                  ? 'text-orange-400 border-b-3 border-orange-400 bg-transparent'
+                                  : 'text-gray-400 hover:text-gray-300 bg-transparent border-b-3 border-transparent'
                               }`}
+                              style={isActive ? { borderBottomWidth: '3px' } : { borderBottomWidth: '3px' }}
                               aria-selected={isActive}
                               role="tab"
                             >
@@ -1322,7 +1311,7 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
                                                     alert('No ingredient links available for this recipe.');
                                                   }
                                                 }}
-                                                className="inline-flex items-center gap-1 text-xxs px-2 py-1 rounded border border-primary-500 text-primary-200 hover:bg-primary-900/30 transition-colors"
+                                                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black"
                                                 title="Buy ingredients"
                                               >
                                                 <ShoppingCart size={12} />
@@ -1404,6 +1393,22 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
                             {planWeekly.length > 0 && (
                               <div className="pt-2">
                                 <BuyAllMealPlanIngredientsButton weeklyPlan={planWeekly as any} petId={activePet?.id || ''} />
+                              </div>
+                            )}
+                            {planWeekly.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-4">
+                                <button
+                                  onClick={handleRandomizePlan}
+                                  className="btn btn-success btn-sm"
+                                >
+                                  Randomize Week
+                                </button>
+                                <Link
+                                  href={`/pets/${activePet?.id}/nutrition`}
+                                  className="btn btn-success btn-sm"
+                                >
+                                  View Nutrition Dashboard
+                                </Link>
                               </div>
                             )}
                           </div>

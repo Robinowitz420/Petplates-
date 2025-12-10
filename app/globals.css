@@ -83,7 +83,8 @@ body {
 
   /* Secondary Button - Adjusted for Dark Mode */
   .btn-secondary {
-    @apply bg-surface border-2 border-surface-highlight text-gray-200;
+    @apply bg-surface border-surface-highlight text-gray-200;
+    border-width: 3px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
@@ -97,7 +98,7 @@ body {
   .btn-success {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: #0f2c0f;
-    border: 2px solid #f97316;
+    border: 3px solid #f97316;
     box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
@@ -111,8 +112,8 @@ body {
   .btn-danger {
     background: transparent;
     color: #ef4444;
-    border: 2px solid #ef4444;
-    outline: 2px solid #ef4444;
+    border: 3px solid #ef4444;
+    outline: 3px solid #ef4444;
     outline-offset: 2px;
     box-shadow: none;
   }
@@ -129,8 +130,8 @@ body {
   .btn-warning {
     background: #0f2c0f;
     color: #f97316;
-    border: 2px solid #f97316;
-    outline: 2px solid #0f2c0f;
+    border: 3px solid #f97316;
+    outline: 3px solid #0f2c0f;
     outline-offset: 2px;
     box-shadow: 0 6px 20px rgba(15, 44, 15, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
@@ -160,8 +161,8 @@ body {
   .btn-darkgreen {
     background: #0f2c0f;
     color: #f97316;
-    border: 2px solid #f97316;
-    outline: 2px solid #0f2c0f;
+    border: 3px solid #f97316;
+    outline: 3px solid #0f2c0f;
     outline-offset: 2px;
     box-shadow: 0 6px 20px rgba(15, 44, 15, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
@@ -181,7 +182,8 @@ body {
 
   /* Ghost Button - Adjusted for Dark Mode */
   .btn-ghost {
-    @apply bg-transparent border-2 border-surface-highlight text-gray-300;
+    @apply bg-transparent border-surface-highlight text-gray-300;
+    border-width: 3px;
     box-shadow: none;
   }
 

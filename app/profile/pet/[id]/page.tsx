@@ -534,7 +534,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedMealsToRender.map((meal) => {
             const recipe = meal.recipe;
             const explanation = meal.explanation;
@@ -547,14 +547,14 @@ useEffect(() => {
               onMouseLeave={() => setHoveredRecipe(null)}
             >
               <Link href={`/recipe/${recipeId}?petId=${petId}`}>
-                <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-lg hover:border-orange-500/30 transition-all">
-                  <div className="p-3">
-                    <h3 className="text-base font-bold text-foreground mb-1 line-clamp-1">{recipe.name}</h3>
-                    <p className="text-gray-400 text-xs mb-2 line-clamp-2">
+                <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-lg hover:border-orange-500/30 transition-all h-full flex flex-col">
+                  <div className="p-6 flex-1 flex flex-col">
+                    <h3 className="text-xl font-bold text-foreground mb-3">{recipe.name}</h3>
+                    <p className="text-gray-300 text-sm mb-4 flex-1">
                       {recipe.description}
                     </p>
                     {explanation && (
-                      <p className="text-xs text-gray-300 bg-surface-highlight rounded-lg p-2 mb-2 line-clamp-2 border border-white/5">
+                      <p className="text-sm text-gray-300 bg-surface-highlight rounded-lg p-3 mb-3 border border-white/5">
                         {explanation}
                       </p>
                     )}
@@ -594,38 +594,34 @@ useEffect(() => {
                         />
                       </div>
                     )}
-                    <div className="h-4"></div>
+                  </div>
+                  <div className="px-6 pb-4 pt-2 border-t border-surface-highlight">
+                    {(() => {
+                      const isSaved = savedRecipeIds.has(recipeId);
+                      return (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleSaveRecipe(recipeId, recipe.name);
+                          }}
+                          disabled={isSaved}
+                          className={`w-full px-4 py-2 rounded-md shadow-md transition-colors flex items-center justify-center gap-2 text-sm font-semibold ${
+                            isSaved
+                              ? 'bg-green-600 text-white cursor-not-allowed'
+                              : 'bg-green-800 text-white hover:bg-green-900'
+                          }`}
+                        >
+                          {isSaved ? '✓ Added to Saved Meals' : (
+                            <>
+                              <Plus className="h-4 w-4" /> Add Meal
+                            </>
+                          )}
+                        </button>
+                      );
+                    })()}
                   </div>
                 </div>
               </Link>
-
-              {(() => {
-                const isSaved = savedRecipeIds.has(recipeId);
-                return (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSaveRecipe(recipeId, recipe.name);
-                    }}
-                    disabled={isSaved}
-                    className={`absolute bottom-2 left-2 px-2 py-0.5 rounded-md shadow-md transition-colors flex items-center gap-1 text-xs ${
-                      hoveredRecipe === recipeId || isSaved
-                        ? 'opacity-100'
-                        : 'opacity-0 group-hover:opacity-100'
-                    } transition-opacity ${
-                      isSaved
-                        ? 'bg-green-600 text-white cursor-not-allowed'
-                        : 'bg-green-800 text-white hover:bg-green-900'
-                    }`}
-                  >
-                    {isSaved ? '✓ Added' : (
-                      <>
-                        <Plus className="h-3 w-3" /> +Add Meal
-                      </>
-                    )}
-                  </button>
-                );
-              })()}
             </div>
           )})}
         </div>

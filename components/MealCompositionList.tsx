@@ -77,7 +77,7 @@ export default function MealCompositionList({
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-all duration-200 text-sm font-semibold whitespace-nowrap hover:shadow-md"
                     >
-                      Buy on Amazon
+                      Buy
                       <ExternalLink size={14} />
                     </a>
                   )}

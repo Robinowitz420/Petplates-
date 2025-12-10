@@ -36,13 +36,20 @@ const healthConcernOptions = [
   { id: 'dental', name: 'Dental Health' },
 ];
 
-const breedsByType = {
-  dogs: ['Labrador', 'Golden Retriever', 'German Shepherd', 'Beagle', 'Poodle', 'Bulldog', 'Yorkshire Terrier', 'Chihuahua', 'Husky', 'Rottweiler'],
-  cats: ['Persian', 'Maine Coon', 'Siamese', 'Ragdoll', 'Bengal', 'British Shorthair', 'Sphynx', 'Scottish Fold'],
-  birds: ['Budgie', 'Cockatiel', 'Lovebird', 'Parrot', 'Cockatoo', 'Canary', 'Finch', 'Conure'],
-  reptiles: ['Bearded Dragon', 'Leopard Gecko', 'Ball Python', 'Red-Eared Slider', 'Corn Snake', 'Iguana', 'Chameleon'],
-  'pocket-pets': ['Guinea Pig', 'Rabbit', 'Hamster', 'Ferret', 'Chinchilla', 'Gerbil', 'Mouse', 'Rat'],
+import { getBreedNamesForSpecies } from '@/lib/data/speciesBreeds';
+
+// Get breeds from centralized source
+const getBreedsByType = () => {
+  return {
+    dogs: getBreedNamesForSpecies('dogs'),
+    cats: getBreedNamesForSpecies('cats'),
+    birds: getBreedNamesForSpecies('birds'),
+    reptiles: getBreedNamesForSpecies('reptiles'),
+    'pocket-pets': getBreedNamesForSpecies('pocket-pets'),
+  };
 };
+
+const breedsByType = getBreedsByType();
 
 export default function ProfileSelector() {
   const [pets, setPets] = useState([

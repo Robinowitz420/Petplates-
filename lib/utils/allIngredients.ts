@@ -26,12 +26,14 @@ export interface AllIngredients {
   };
   birds: {
     seeds: string[];
+    nuts: string[]; // Added for large parrots
     vegetables: string[];
     fruits: string[];
     supplements: string[];
   };
   reptiles: {
     insects: string[];
+    whole_prey: string[]; // Added for snakes
     vegetables: string[];
     fruits: string[];
   };
@@ -41,6 +43,7 @@ export interface AllIngredients {
     pellets: string[];
     fruits: string[];
     hamster_additions: string[];
+    sugar_glider_special: string[]; // Added for gliders
   };
 }
 
@@ -147,6 +150,10 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Amaranth Seeds', 'Buckwheat (hulled)', 'Barley (hulled)', 'Wheat (hulled)',
       'Rice (hulled)', 'Corn (cracked)', 'Poppy Seeds', 'Teff Seeds', 'Wild Bird Mix'
     ],
+    nuts: [
+      'Walnuts (in shell)', 'Almonds', 'Brazil Nuts', 'Pecans', 'Macadamia Nuts', 
+      'Hazelnuts', 'Pine Nuts', 'Cashews', 'Pistachios', 'Peanuts (unsalted, roasted)'
+    ],
     vegetables: [
       'Carrots (grated)', 'Broccoli', 'Spinach', 'Kale', 'Bell Peppers', 'Zucchini',
       'Sweet Potato (cooked)', 'Peas', 'Corn (fresh)', 'Lettuce (romaine)', 'Endive',
@@ -174,6 +181,10 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Dubia Roaches', 'Crickets', 'Mealworms', 'Superworms', 'Black Soldier Fly Larvae', 'Hornworms',
       'Silkworms', 'Waxworms', 'Butterworms', 'Phoenix Worms', 'Earthworms', 'Grasshoppers',
       'Locusts', 'Mantids', 'Fruit Flies', 'Pinhead Crickets', 'Small Dubia Roaches'
+    ],
+    whole_prey: [
+      'Pinkie Mice (frozen/thawed)', 'Fuzzy Mice', 'Hopper Mice', 'Adult Mice',
+      'Rat Pups', 'Adult Rats', 'Day-Old Chicks', 'Quail', 'Feeder Fish (Guppies)', 'Silversides'
     ],
     vegetables: [
       'Collard Greens', 'Mustard Greens', 'Turnip Greens', 'Dandelion Greens', 'Butternut Squash',
@@ -226,6 +237,10 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Hemp Seeds', 'Sesame Seeds', 'Popcorn (plain)', 'Whole Wheat Pasta (cooked)',
       'Brown Rice (cooked)', 'Quinoa (cooked)', 'Amaranth (cooked)', 'Buckwheat (cooked)',
       'Millet (cooked)', 'Barley (cooked)', 'Oats (cooked)', 'Corn (cooked)', 'Peas (cooked)'
+    ],
+    sugar_glider_special: [
+      'Nectar Mix (commercial)', 'Gum Arabic', 'Eucalyptus Leaves', 'Acacia Gum', 
+      'Bee Pollen', 'Manuka Honey', 'Calcium Carbonate (Glider-safe)'
     ]
   }
 };
@@ -398,4 +413,3 @@ export function getIngredientDisplayName(compositionKey: string, species?: strin
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
-

@@ -276,8 +276,20 @@ function scoreNutritionalAdequacy(
             score -= Math.min(deviation * 25, 30);
           }
         }
-        if ((recipe.ingredients || []).length < 5) {
-          score -= 10;
+        
+        const breed = (pet.breed || '').toLowerCase();
+        // Macaws and African Greys need higher fat (nuts)
+        const highFatNeeds = ['macaw', 'grey', 'african grey'].some(b => breed.includes(b));
+        
+        if (highFatNeeds) {
+           if (nutrition.fat < 10) score -= 10; // Penalty for low fat in large parrots
+        } else {
+           // Small birds (parakeets)
+           if (nutrition.fat > 12) score -= 5; // Penalty for too much fat
+        }
+
+        if ((recipe.ingredients || []).length < 3) {
+          score -= 5;
         }
         break;
       }
@@ -289,20 +301,37 @@ function scoreNutritionalAdequacy(
             score -= Math.min(deviation * 25, 30);
           }
         }
-        // Herbivore/carnivore heuristic based on breed keywords
+        // Expanded Herbivore/carnivore heuristic
         const breed = (pet.breed || '').toLowerCase();
         const herbivore = ['iguana', 'tortoise', 'uromastyx'].some(b => breed.includes(b));
-        const carnivore = ['snake', 'monitor', 'tegu'].some(b => breed.includes(b));
+        // Add 'boa', 'python', 'king' for snakes
+        const carnivore = ['snake', 'monitor', 'tegu', 'boa', 'python', 'king'].some(b => breed.includes(b));
+        
         if (herbivore && nutrition.protein > 25) score -= 12;
-        if (carnivore && nutrition.protein < 25) score -= 12;
+        // Carnivores need HIGH protein
+        if (carnivore) {
+            if (nutrition.protein < 30) score -= 15;
+            if (nutrition.fat < 10) score -= 5;
+        } 
         break;
       }
       case 'pocket-pet': {
-        if (nutrition.fiber < 15) {
-          score -= Math.min((15 - nutrition.fiber) * 2, 20);
-        }
-        if (nutrition.protein > 20) {
-          score -= Math.min((nutrition.protein - 20) * 1.5, 18);
+        const breed = (pet.breed || '').toLowerCase();
+        // Sugar gliders & omnivores need less fiber than rabbits
+        const isLowFiber = ['sugar', 'glider', 'hamster', 'rat', 'mouse', 'ferret'].some(b => breed.includes(b));
+        
+        if (isLowFiber) {
+            // They need protein/fruit, not hay
+            if (nutrition.fiber > 10) score -= 5; // gentle penalty
+            if (nutrition.protein < 12) score -= 10;
+        } else {
+            // Rabbits/Guinea Pigs (Hay eaters)
+            if (nutrition.fiber < 15) {
+              score -= Math.min((15 - nutrition.fiber) * 2, 20);
+            }
+            if (nutrition.protein > 20) {
+              score -= Math.min((nutrition.protein - 20) * 1.5, 18);
+            }
         }
         break;
       }
