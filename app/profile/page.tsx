@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import HealthConcernsDropdown from '@/components/HealthConcernsDropdown';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { getMascotFaceForPetType } from '@/lib/utils/emojiMapping';
-import AddPetModal from '@/components/AddPetModal';
+import AddPetModal from '@/components/CreatePetModal';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import type { CustomMeal } from '@/lib/types';
 import { recipes } from '@/lib/data/recipes-complete';
