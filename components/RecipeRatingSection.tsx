@@ -126,18 +126,18 @@ export const RecipeRatingSection: React.FC<RecipeRatingSectionProps> = ({
   const hasUserAlreadyRated = userId ? hasUserRated(userId, recipeId) : false;
 
   return (
-    <div className={`bg-white rounded-xl shadow-md p-6 ${className}`}>
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">Recipe Ratings</h3>
+    <div className={`bg-surface rounded-2xl shadow-lg p-3 border-l-4 border-green-500 border border-surface-highlight ${className}`}>
+      <h3 className="text-base font-bold text-green-300 mb-3">Pet Reviews</h3>
 
       {/* Overall Rating Summary */}
-      <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-3 mb-3 p-2 bg-green-900/20 rounded-lg border border-green-700/30">
         <div className="text-center">
-          <div className="text-4xl font-bold text-gray-900">
+          <div className="text-xl font-bold text-green-300">
             {ratingData.averageRating.toFixed(1)}
           </div>
-          <StarRating rating={ratingData.averageRating} size="lg" />
-          <div className="text-sm text-gray-600 mt-1">
-            {ratingData.totalReviews} {ratingData.totalReviews === 1 ? 'rating' : 'ratings'}
+          <StarRating rating={ratingData.averageRating} size="sm" />
+          <div className="text-xs text-green-400 mt-1">
+            {ratingData.totalReviews} {ratingData.totalReviews === 1 ? 'review' : 'reviews'}
           </div>
         </div>
 
@@ -151,8 +151,8 @@ export const RecipeRatingSection: React.FC<RecipeRatingSectionProps> = ({
       </div>
 
       {/* User Rating Section */}
-      <div className="border-t border-gray-200 pt-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="border-t border-surface-highlight pt-4">
+        <h4 className="text-sm font-semibold text-gray-300 mb-3">
           {hasUserAlreadyRated ? 'Your Rating' : 'Rate This Recipe'}
         </h4>
 
@@ -160,7 +160,7 @@ export const RecipeRatingSection: React.FC<RecipeRatingSectionProps> = ({
           <div className="space-y-4">
             {hasUserAlreadyRated ? (
               <div className="flex items-center gap-3">
-                <span className="text-gray-700">You rated this recipe:</span>
+                <span className="text-gray-300 text-sm">You rated this recipe:</span>
                 <InteractiveStarRating
                   currentRating={userCurrentRating || 0}
                   onRatingChange={handleRatingSubmit}
@@ -168,9 +168,9 @@ export const RecipeRatingSection: React.FC<RecipeRatingSectionProps> = ({
                 />
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="space-y-3">
-                  <p className="text-gray-600">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <p className="text-gray-300 text-sm">
                     How would you rate "{recipeName}"?
                   </p>
                   <InteractiveStarRating
@@ -182,15 +182,15 @@ export const RecipeRatingSection: React.FC<RecipeRatingSectionProps> = ({
                 </div>
 
                 {/* Detailed Review Toggle */}
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-green-700/30 pt-2">
                   <button
                     onClick={() => setShowDetailedReview(!showDetailedReview)}
-                    className="flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
+                    className="flex items-center gap-1.5 text-green-400 hover:text-green-300 font-medium text-xs"
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-3.5 h-3.5" />
                     {showDetailedReview ? 'Hide' : 'Add'} Detailed Review
                   </button>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-[10px] text-gray-500 mt-0.5">
                     Help improve this recipe for other pet parents
                   </p>
                 </div>

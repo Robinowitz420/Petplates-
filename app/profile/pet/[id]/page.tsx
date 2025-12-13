@@ -3,14 +3,21 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
+import { recipes as baseRecipes } from '@/lib/data/recipes-complete';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
-import { rateRecipeForPet, type Pet as RatingPet } from '@/lib/utils/petRatingSystem';
-import { calculateImprovedCompatibility, type ImprovedPet } from '@/lib/utils/improvedCompatibilityScoring';
+import { calculateEnhancedCompatibility, type Pet as EnhancedPet, getGrade } from '@/lib/utils/enhancedCompatibilityScoring';
 import { CompatibilityBadge } from '@/components/CompatibilityBadge';
 import { getRandomName } from '@/lib/utils/petUtils';
 import EmojiIcon from '@/components/EmojiIcon';
+import { getPets, savePet } from '@/lib/utils/petStorage'; // Import from storage util
+import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
+import ScoringProgress from '@/components/ScoringProgress';
+import { calculateMealCountVariation } from '@/lib/utils/mealCountCalculator';
+import { makeCountOrganic, getCountMessage, getSubtext } from '@/lib/utils/organicCount';
+import { useProgressiveMealCount } from '@/hooks/useProgressiveMealCount';
+
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
@@ -39,31 +46,21 @@ const getCurrentUserId = () => {
   return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
 };
 
-const getPetsFromLocalStorage = (userId: string): Pet[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
+// Get combined recipes (base + custom)
+const getCombinedRecipes = (): Recipe[] => {
+  const recipes = [...baseRecipes];
 
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed)
-      ? parsed.map((p: any) => ({
-          ...p,
-          names: p.names || (p.name ? [p.name] : []), // Ensure names array exists
-          savedRecipes: p.savedRecipes || [],
-          healthConcerns: p.healthConcerns || [],
-        }))
-      : [];
-  } catch (e) {
-    // Failed to parse pet data - using fallback
-    return [];
-  }
-};
-
-const savePetsToLocalStorage = (userId: string, pets: Pet[]) => {
+  // Add custom recipes from localStorage
   if (typeof window !== 'undefined') {
-    localStorage.setItem(`pets_${userId}`, JSON.stringify(pets));
+    try {
+      const customRecipes = JSON.parse(localStorage.getItem('custom_recipes') || '[]');
+      recipes.push(...customRecipes);
+    } catch (error) {
+      console.error('Error loading custom recipes:', error);
+    }
   }
+
+  return recipes;
 };
 
 export default function RecommendedRecipesPage() {
@@ -88,37 +85,64 @@ export default function RecommendedRecipesPage() {
   const allergiesKey = pet ? JSON.stringify(pet.allergies || []) : '';
   const dislikesKey = pet ? JSON.stringify(pet.dislikes || []) : '';
   
-  const ratingPet: RatingPet | null = useMemo(() => {
+  // Convert pet data to enhanced compatibility format
+  const enhancedPet: EnhancedPet | null = useMemo(() => {
     if (!pet) return null;
+    const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
     return {
       id: pet.id,
       name: petDisplayName,
-      type: pet.type as RatingPet['type'],
+      type: (pet.type === 'dogs' ? 'dog' : pet.type === 'cats' ? 'cat' : pet.type === 'birds' ? 'bird' : pet.type === 'reptiles' ? 'reptile' : 'pocket-pet') as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
       breed: pet.breed,
-      age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10,
+      age: petAge,
       weight: pet.weightKg || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
-      activityLevel: 'moderate' as const, // Could be improved with pet data
+      activityLevel: 'moderate' as const,
       healthConcerns: pet.healthConcerns || [],
-      dietaryRestrictions: pet.allergies || [],
-      dislikes: pet.dislikes || []
+      dietaryRestrictions: pet.dietaryRestrictions || [],
+      allergies: pet.allergies || [],
     };
-  }, [pet?.id, pet?.type, pet?.breed, pet?.age, pet?.weightKg, healthConcernsKey, allergiesKey, dislikesKey, petDisplayName]);
+  }, [pet?.id, pet?.type, pet?.breed, pet?.age, pet?.weightKg, healthConcernsKey, allergiesKey, petDisplayName, pet?.dietaryRestrictions]);
 
 
   useEffect(() => {
     const userId = getCurrentUserId();
     if (!userId || !petId) return;
 
-    try {
-      const pets = getPetsFromLocalStorage(userId);
-      const foundPet = pets.find((p) => p.id === petId) || null;
-      setPet(foundPet);
-    } catch (error) {
-      // Handle error gracefully
-      console.error('Failed to load pet data:', error);
-      setPet(null);
-    }
-  }, [petId]); // petId is the only dependency needed - userId comes from getCurrentUserId()
+    const loadPet = async () => {
+      try {
+        // Add 5 second timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout loading pets')), 5000)
+        );
+        
+        const pets = await Promise.race([
+          getPets(userId),
+          timeoutPromise
+        ]) as any[];
+        
+        // Normalize names when loading
+        const normalizedPets = pets.map((p: any) => ({
+          ...p,
+          names: p.names || (p.name ? [p.name] : []),
+          savedRecipes: p.savedRecipes || [],
+          healthConcerns: p.healthConcerns || [],
+        }));
+        
+        const foundPet = normalizedPets.find((p: any) => p.id === petId) || null;
+        setPet(foundPet);
+        
+        if (!foundPet) {
+          console.warn('Pet not found with id:', petId);
+          setLoadingMeals(false); // Stop loading if pet not found
+        }
+      } catch (error) {
+        console.error('Failed to load pet data:', error);
+        setPet(null);
+        setLoadingMeals(false); // CRITICAL: Stop loading on error
+      }
+    };
+    loadPet();
+  }, [petId]); // petId is the only dependency needed
 
 useEffect(() => {
   if (!pet) return;
@@ -130,9 +154,15 @@ useEffect(() => {
     try {
       const concerns = (pet.healthConcerns || []).filter((concern) => concern !== 'none');
       const allergies = pet.allergies?.filter((allergy) => allergy !== 'none') || [];
+      
+      // Add timeout to API call
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch('/api/recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           profile: {
             species: pet.type,
@@ -146,6 +176,8 @@ useEffect(() => {
           limit: 50,
         }),
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -224,11 +256,13 @@ useEffect(() => {
   // Use JSON.stringify for arrays to ensure stable comparison
   const tieredHealthConcernsKey = pet ? JSON.stringify(pet.healthConcerns || []) : '';
   const tieredAllergiesKey = pet ? JSON.stringify(pet.allergies || []) : '';
-  
+
   const tieredRecommendations = useMemo(() => {
     if (!pet) return [];
     const { getRecommendedRecipes } = require('@/lib/utils/recipeRecommendations');
-    return getRecommendedRecipes(pet, 20, true);
+    // Pass combined recipes (base + custom) to the recommendation system
+    const combinedRecipes = getCombinedRecipes();
+    return getRecommendedRecipes(pet, 20, true, combinedRecipes);
   }, [pet?.id, pet?.type, pet?.breed, pet?.age, tieredHealthConcernsKey, pet?.weightKg, tieredAllergiesKey]);
   
   const buildFallbackExplanation = (recipe: Recipe, currentPet: Pet, tierLabel?: string, warning?: string) => {
@@ -260,130 +294,64 @@ useEffect(() => {
     }));
   }, [pet?.id, pet?.type, pet?.breed, pet?.age, fallbackHealthConcernsKey, fallbackPetName, tieredRecommendations]);
 
-  // Fix: Properly check for empty array - use fallback if engineMeals is null, undefined, or empty
+  // Fix: Properly check for empty array - use fallback if engineMeals is null, undefined, empty, or has too few results
+  // Use fallback if API returns fewer than 15 meals (threshold to ensure we get a good selection)
+  const MIN_MEALS_THRESHOLD = 15;
   // Memoize mealsToRender to prevent recalculation when only savedRecipes changes
   const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
-    return (engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0) ? engineMeals : fallbackMeals;
+    const hasEnoughFromAPI = engineMeals && Array.isArray(engineMeals) && engineMeals.length >= MIN_MEALS_THRESHOLD;
+    return hasEnoughFromAPI ? engineMeals : fallbackMeals;
   }, [engineMeals, fallbackMeals]);
 
-  // Store previous order in a ref to maintain stability
-  const previousOrderRef = useRef<Map<string, number>>(new Map());
-  const previousMealIdsRef = useRef<string[]>([]);
+  // Use chunked scoring hook for non-blocking performance
+  const { scoredMeals, isLoading: isScoring, progress, totalMeals: totalMealsToScore, scoredCount } = useChunkedRecipeScoring(
+    mealsToRender,
+    null, // ratingPet deprecated - using enhancedPet only
+    enhancedPet
+  );
 
-  // Memoize sorted meals to prevent reordering when only savedRecipes changes
+  // Store sorted meals (already sorted by the hook, but ensure final sort)
   const sortedMealsToRender = useMemo(() => {
-    // Get current meal IDs
-    const currentMealIds = mealsToRender.map(m => m.recipe?.id || '').filter(Boolean);
-    
-    // Check if the meal list has actually changed (not just savedRecipes)
-    const mealListChanged = 
-      currentMealIds.length !== previousMealIdsRef.current.length ||
-      currentMealIds.some((id, idx) => id !== previousMealIdsRef.current[idx]);
-    
-    // If meal list hasn't changed, preserve the previous order
-    if (!mealListChanged && previousOrderRef.current.size > 0) {
-      const sorted = [...mealsToRender].sort((a, b) => {
-        const aId = a.recipe?.id || '';
-        const bId = b.recipe?.id || '';
-        const aOrder = previousOrderRef.current.get(aId) ?? 0;
-        const bOrder = previousOrderRef.current.get(bId) ?? 0;
-        return aOrder - bOrder;
-      });
-      return sorted;
-    }
-    // Create a stable key for each meal based on recipe ID
-    const mealsWithKeys = mealsToRender.map((meal, index) => ({
-      meal,
-      recipeId: meal.recipe?.id || `unknown-${index}`,
-      originalIndex: index
-    }));
-
-    // Compute scores (with decimals) for all meals, then apply a gentle percentile spread to reduce ties
-    const computeMealScore = (meal: any): number => {
-      if ('score' in meal && typeof (meal as ModifiedRecipeResult).score === 'number') {
-        return Number((meal as ModifiedRecipeResult).score);
+    return [...scoredMeals].sort((a: any, b: any) => {
+      const aScore = ('score' in a && typeof a.score === 'number') ? a.score : 0;
+      const bScore = ('score' in b && typeof b.score === 'number') ? b.score : 0;
+      const scoreDiff = bScore - aScore;
+      // If scores differ, sort by score (descending)
+      if (Math.abs(scoreDiff) > 0.001) {
+        return scoreDiff;
       }
-      if (!ratingPet) return 0;
-      try {
-        const enhancedPet: ImprovedPet = {
-          id: ratingPet.id,
-          name: ratingPet.name,
-          type: ratingPet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
-          breed: ratingPet.breed,
-          age: typeof ratingPet.age === 'string' ? parseFloat(ratingPet.age) || 1 : ratingPet.age || 1,
-          weight: ratingPet.weight || 10,
-          activityLevel: ratingPet.activityLevel,
-          healthConcerns: ratingPet.healthConcerns || [],
-          dietaryRestrictions: ratingPet.dietaryRestrictions || [],
-          allergies: ratingPet.allergies || [],
-        };
-        const improved = calculateImprovedCompatibility(meal.recipe, enhancedPet);
-        return Number(improved.overallScore);
-      } catch (error) {
-        return rateRecipeForPet(meal.recipe, ratingPet).overallScore;
-      }
-    };
+      // If scores are equal, use recipe ID as tiebreaker
+      const aId = a.recipe?.id || '';
+      const bId = b.recipe?.id || '';
+      return aId.localeCompare(bId);
+    });
+  }, [scoredMeals]);
 
-    const mealsWithScores = mealsWithKeys.map((item) => ({
-      ...item,
-      rawScore: computeMealScore(item.meal),
-    }));
-
-    const applyPercentileSpread = (items: typeof mealsWithScores) => {
-      const valid = items.filter(i => typeof i.rawScore === 'number');
-      if (valid.length < 4) return items;
-      // Sort by score first, but preserve recipe ID order for ties
-      const sorted = [...valid].sort((a, b) => {
-        const scoreDiff = b.rawScore - a.rawScore;
-        if (Math.abs(scoreDiff) > 0.01) return scoreDiff;
-        return a.recipeId.localeCompare(b.recipeId);
-      });
-      const n = sorted.length;
-      const adjustedMap = new Map<string, number>();
-      sorted.forEach((item, idx) => {
-        const percentile = 1 - idx / Math.max(1, n - 1);
-        let bump = 0;
-        if (percentile >= 0.9) bump = 2;
-        else if (percentile >= 0.75) bump = 1;
-        else if (percentile <= 0.1) bump = -2;
-        else if (percentile <= 0.25) bump = -1;
-        const adjusted = Math.max(0, Math.min(100, item.rawScore + bump));
-        adjustedMap.set(item.recipeId, Number(adjusted.toFixed(1)));
-      });
-      return items.map(i => ({
-        ...i,
-        spreadScore: adjustedMap.get(i.recipeId) ?? i.rawScore,
-      }));
-    };
-
-    const mealsWithSpread = applyPercentileSpread(mealsWithScores);
-
-    // Sort with recipe ID as primary tiebreaker to ensure stability
-    const sorted = mealsWithSpread
-      .sort((a, b) => {
-        // Primary sort: by score (descending)
-        const scoreDiff = b.spreadScore - a.spreadScore;
-        if (Math.abs(scoreDiff) > 0.5) { // Only reorder if score difference is significant
-          return scoreDiff;
-        }
-        // Secondary sort: by recipe ID (always stable, prevents any reordering)
-        return a.recipeId.localeCompare(b.recipeId);
-      })
-      .map(i => {
-        if ('score' in i.meal && typeof (i.meal as ModifiedRecipeResult).score === 'number') {
-          return { ...(i.meal as ModifiedRecipeResult), score: i.spreadScore };
-        }
-        return i.meal;
-      });
+  // Calculate base meal count (before early returns to ensure hooks are always called)
+  const baseTotalMeals = sortedMealsToRender.length;
+  
+  // Memoize the count calculation - use actual count with minimal organic tweaking
+  // Only recalculate when pet profile or base count changes
+  const { countMessage, countSubtext, targetDisplayCount } = useMemo(() => {
+    // Use the actual count as the base
+    const message = getCountMessage(baseTotalMeals, pet?.type);
+    const subtext = getSubtext(baseTotalMeals, pet?.type);
+    // Use actual count
+    const target = baseTotalMeals;
     
-    // Update the refs with the new order
-    previousOrderRef.current = new Map(
-      sorted.map((meal, index) => [meal.recipe?.id || '', index])
-    );
-    previousMealIdsRef.current = currentMealIds;
-    
-    return sorted;
-  }, [mealsToRender, ratingPet]);
+    return {
+      countMessage: message,
+      countSubtext: subtext,
+      targetDisplayCount: target,
+    };
+  }, [baseTotalMeals, pet?.type]);
+  
+  // Progressive count animation - MUST be called before any early returns
+  const { displayCount, isCounting } = useProgressiveMealCount({
+    target: targetDisplayCount,
+    duration: 1000,
+    steps: 20,
+  });
 
   // Track saved recipes separately to avoid triggering meal recalculation
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
@@ -395,7 +363,7 @@ useEffect(() => {
     }
   }, [pet?.id]); // Only update when pet ID changes, not when savedRecipes changes
 
-  const handleSaveRecipe = (recipeId: string, recipeName: string) => {
+  const handleSaveRecipe = async (recipeId: string, recipeName: string) => {
     const userId = getCurrentUserId();
     if (!userId || !pet) return;
 
@@ -406,19 +374,16 @@ useEffect(() => {
       return;
     }
 
-    // Update localStorage
-    const pets = getPetsFromLocalStorage(userId);
-    const updatedPets = pets.map((p) => {
-      if (p.id !== pet.id) return p;
-      const existing = p.savedRecipes || [];
-      return {
-        ...p,
-        savedRecipes: [...existing, recipeId],
-      };
-    });
-    savePetsToLocalStorage(userId, updatedPets);
+    // Update via storage util
+    const updatedPet = {
+      ...pet,
+      savedRecipes: [...(pet.savedRecipes || []), recipeId]
+    };
+    
+    await savePet(userId, updatedPet);
 
-    // Update local state only (don't update pet state to avoid recalculation)
+    // Update local state to reflect the change immediately
+    setPet(updatedPet);
     setSavedRecipeIds(new Set([...savedRecipeIds, recipeId]));
     setCardMessage({ id: recipeId, text: `${recipeName} added to ${petDisplayName}'s meals.` });
     setTimeout(() => setCardMessage(null), 2500);
@@ -432,7 +397,6 @@ useEffect(() => {
     );
   }
 
-  const totalMeals = sortedMealsToRender.length;
   const usingEngine = Boolean(engineMeals && engineMeals.length > 0);
 
   const getPetEmoji = (type: PetCategory) => {
@@ -452,7 +416,7 @@ useEffect(() => {
     return <EmojiIcon emoji={emoji} size={size} />;
   };
 
-  const getHealthMatchScore = (recipe: any, pet: Pet): number => {
+  const getHealthCompatibilityScore = (recipe: any, pet: Pet): number => {
     const concerns = pet.healthConcerns || [];
     if (!concerns.length) return 0;
     const overlaps = concerns.filter((c) => (recipe.healthConcerns || []).includes(c));
@@ -495,47 +459,168 @@ useEffect(() => {
           Back to Profile
         </Link>
 
-        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight p-3 mb-3">
-          <div className="flex items-center gap-3">
-            <div className="text-4xl"><PetEmojiIcon type={pet.type} size={48} /></div>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground">
-                Personalized Meals for {petDisplayName}
+        <div 
+          className="bg-surface rounded-lg shadow-md border border-surface-highlight p-4 mb-3"
+        >
+          <div className="flex items-start gap-4">
+            {/* Left: Turtle Image (twice as large) */}
+            <div className="flex-shrink-0">
+              <Image
+                src="/images/emojis/Mascots/Sherlock Shells/Shell4.jpg"
+                alt="Sherlock Shells Detective"
+                width={288}
+                height={288}
+                className="w-72 h-72 object-contain mascot-icon mascot-sherlock-shells"
+                unoptimized
+              />
+            </div>
+
+            {/* Left-Middle: Title and Bio Info in Grid */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-foreground mb-6 mt-8">
+                Sherlock Shells is detecting meals...
               </h1>
-              <p className="text-gray-400 text-sm mt-1">
-                {pet.breed} • {pet.age} • {totalMeals} meals ready
-              </p>
-              {(pet.healthConcerns || []).length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {(pet.healthConcerns || []).slice(0, 3).map((concern) => (
-                    <span
-                      key={concern}
-                      className="px-2 py-0.5 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded-full"
-                    >
-                      {concern.replace(/-/g, ' ').substring(0, 20)}
-                    </span>
-                  ))}
-                  {(pet.healthConcerns || []).length > 3 && (
-                    <span className="text-xs text-gray-500">+{(pet.healthConcerns || []).length - 3}</span>
-                  )}
+              
+              {/* Three Column Layout: Bio, Health Concerns, Allergies */}
+              <div className="flex gap-6 mt-8">
+                {/* Bio Column */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-2">Bio</h3>
+                  <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
+                    {pet.breed && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
+                      </div>
+                    )}
+                    {pet.age && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
+                      </div>
+                    )}
+                    {(pet.weightKg || pet.weight) && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
+                      </div>
+                    )}
+                    {pet.type && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Type:</strong> {pet.type}</span>
+                      </div>
+                    )}
+                    {pet.savedRecipes && pet.savedRecipes.length > 0 && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Total Meals:</strong> {pet.savedRecipes.length}</span>
+                      </div>
+                    )}
+                    {(pet.dietaryRestrictions || []).length > 0 && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}</span>
+                      </div>
+                    )}
+                    {(pet.dislikes || []).length > 0 && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-              {usingEngine && (
-                <p className="mt-2 text-xs text-green-400 font-medium">
-                  ✅ Engine insights enabled for {petDisplayName}.
-                </p>
-              )}
+
+                {/* Health Concerns Column - Always rendered for consistent layout */}
+                <div className="flex-shrink-0 min-w-[180px]">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-2">Health Concerns</h3>
+                  <div className="flex flex-col gap-1.5">
+                    {(pet.healthConcerns || []).length > 0 ? (
+                      (pet.healthConcerns || []).map((concern) => (
+                        <div
+                          key={concern}
+                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                        >
+                          {concern.replace(/-/g, ' ')}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1 text-gray-500 text-xs italic">
+                        None
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Allergies Column - Always rendered for consistent layout */}
+                <div className="flex-shrink-0 min-w-[180px]">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-2">Allergies</h3>
+                  <div className="flex flex-col gap-1.5">
+                    {(pet.allergies || []).length > 0 ? (
+                      (pet.allergies || []).map((allergy) => (
+                        <div
+                          key={allergy}
+                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                        >
+                          {allergy.replace(/-/g, ' ')}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1 text-gray-500 text-xs italic">
+                        None
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {engineError && (
                 <p className="mt-4 text-sm text-amber-200 bg-amber-900/30 border border-amber-700/50 px-3 py-2 rounded-lg">
                   {engineError}
                 </p>
               )}
             </div>
+
+            {/* Far Right: Number of Meals Found (Larger) */}
+            <div className="flex-shrink-0 text-right">
+              <div className="text-5xl font-bold text-orange-500">
+                {displayCount}{isCounting && <span className="text-3xl">+</span>}
+              </div>
+              <div className="text-sm text-gray-400 mt-1">
+                meals found
+                {isCounting && (
+                  <span className="text-xs ml-2 text-gray-500">(still searching...)</span>
+                )}
+              </div>
+              {countSubtext && !isCounting && (
+                <div className="text-xs text-gray-500 mt-1 max-w-[120px]">
+                  {countSubtext}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
+        {/* Show progress indicator while scoring */}
+        {isScoring && (
+          <ScoringProgress
+            progress={progress}
+            totalMeals={totalMealsToScore}
+            scoredCount={scoredCount}
+          />
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedMealsToRender.map((meal) => {
+          {(() => {
+            // FINAL SAFETY CHECK: Sort one more time right before rendering to ensure highest to lowest
+            const finalRendered = [...sortedMealsToRender].sort((a: any, b: any) => {
+              const aScore = ('score' in a && typeof a.score === 'number') ? a.score : 0;
+              const bScore = ('score' in b && typeof b.score === 'number') ? b.score : 0;
+              return bScore - aScore; // Descending order (highest first)
+            });
+            return finalRendered;
+          })().map((meal) => {
             const recipe = meal.recipe;
             const explanation = meal.explanation;
             const recipeId = recipe.id;
@@ -547,52 +632,36 @@ useEffect(() => {
               onMouseLeave={() => setHoveredRecipe(null)}
             >
               <Link href={`/recipe/${recipeId}?petId=${petId}`}>
-                <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-lg hover:border-orange-500/30 transition-all h-full flex flex-col">
+                <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/30 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
                   <div className="p-6 flex-1 flex flex-col">
-                    <h3 className="text-xl font-bold text-foreground mb-3">{recipe.name}</h3>
-                    <p className="text-gray-300 text-sm mb-4 flex-1">
+                    <div className="mb-3">
+                      <h3 className="text-xl font-bold text-foreground text-center">
+                        {recipe.name}
+                      </h3>
+                      {/* Compatibility Rating - Centered under meal name */}
+                      {enhancedPet && (
+                        <div className="mt-2 flex justify-center">
+                          <CompatibilityBadge
+                            score={
+                              'score' in meal && typeof meal.score === 'number'
+                                ? meal.score
+                                : (() => {
+                                    if (!enhancedPet) return 0;
+                                    const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
+                                    return enhanced.overallScore;
+                                  })()
+                            }
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-gray-300 text-sm mb-4 flex-1 text-center">
                       {recipe.description}
                     </p>
                     {explanation && (
                       <p className="text-sm text-gray-300 bg-surface-highlight rounded-lg p-3 mb-3 border border-white/5">
                         {explanation}
                       </p>
-                    )}
-                    {pet.healthConcerns.length > 0 && (
-                      (() => {
-                        const score = getHealthMatchScore(recipe, pet);
-                        const badge = getHealthMatchBadge(score);
-                        return (
-                          badge && (
-                            <span
-                              className={`inline-block px-1.5 py-0.5 mb-1.5 rounded-full text-xs font-semibold ${badge.className}`}
-                            >
-                              {badge.label}
-                            </span>
-                          )
-                        );
-                      })()
-                    )}
-
-                    {/* Compatibility Rating */}
-                    {ratingPet && (
-                      <div className="mb-2">
-                        <CompatibilityBadge
-                          compatibility={
-                            'score' in meal && typeof meal.score === 'number'
-                              ? meal.score >= 90 ? 'excellent' 
-                              : meal.score >= 75 ? 'good'
-                              : meal.score >= 55 ? 'fair'
-                              : 'poor'
-                              : rateRecipeForPet(recipe, ratingPet).compatibility
-                          }
-                          score={
-                            'score' in meal && typeof meal.score === 'number'
-                              ? meal.score
-                              : rateRecipeForPet(recipe, ratingPet).overallScore
-                          }
-                        />
-                      </div>
                     )}
                   </div>
                   <div className="px-6 pb-4 pt-2 border-t border-surface-highlight">

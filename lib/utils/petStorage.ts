@@ -1,36 +1,74 @@
 // lib/utils/petStorage.ts
-// Abstracted pet storage layer for easy migration to Firebase/Supabase
+// Abstracted pet storage layer - Migrated to Firestore
+// Note: All operations are now ASYNCHRONOUS
 
-import type { Pet } from './petUtils';
-
-/**
- * Data contract for pet storage operations.
- * Currently uses localStorage, but can be swapped to Firebase/Supabase without changing callers.
- */
+import { Pet } from '@/lib/types'; // Updated import to use shared type
+import * as firestoreService from '@/lib/services/firestoreService';
 
 /**
  * Retrieves all pets for a given user.
  * 
- * @param userId - User identifier (Clerk user ID or localStorage key)
- * @returns Array of Pet objects, or empty array if none found
- * 
- * @contract
- * - Input: userId (string)
- * - Output: Pet[] (always returns array, never null/undefined)
- * - Side effects: Reads from localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @param userId - User identifier
+ * @returns Promise<Pet[]>
  */
-export function getPets(userId: string): Pet[] {
-  if (typeof window === 'undefined') return [];
+export async function getPets(userId: string): Promise<Pet[]> {
+  if (!userId) return [];
   
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-  
-  try {
-    return JSON.parse(stored);
-  } catch {
+  // TEMPORARY: Skip Firestore entirely if no Firebase config
+  const hasFirebase = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!hasFirebase) {
+    console.log('Firebase not configured - using localStorage only');
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`pets_${userId}`);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch {
+          return [];
+        }
+      }
+    }
     return [];
   }
+  
+  // Try Firestore first
+  try {
+    const pets = await firestoreService.getPets(userId);
+    if (pets.length > 0) return pets;
+    
+    // Auto-migration: If Firestore is empty but localStorage has data, upload it
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`pets_${userId}`);
+      if (stored) {
+        try {
+          const localPets: Pet[] = JSON.parse(stored);
+          if (localPets.length > 0) {
+            console.log('Migrating local pets to Firestore...');
+            // Upload all local pets
+            await Promise.all(localPets.map(p => firestoreService.savePet(userId, p)));
+            return localPets;
+          }
+        } catch (e) {
+          console.error('Migration failed:', e);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Firestore getPets failed, falling back to localStorage if available', e);
+  }
+
+  // Fallback to localStorage for smooth migration/offline (optional)
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(`pets_${userId}`);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return [];
+      }
+    }
+  }
+  return [];
 }
 
 /**
@@ -38,27 +76,62 @@ export function getPets(userId: string): Pet[] {
  * 
  * @param userId - User identifier
  * @param pet - Pet object to save
- * @returns void
- * 
- * @contract
- * - Input: userId (string), pet (Pet)
- * - Output: void
- * - Side effects: Writes to localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<void>
  */
-export function savePet(userId: string, pet: Pet): void {
-  if (typeof window === 'undefined') return;
+export async function savePet(userId: string, pet: Pet): Promise<void> {
+  if (!userId) return;
   
-  const pets = getPets(userId);
-  const existingIndex = pets.findIndex(p => p.id === pet.id);
-  
-  if (existingIndex >= 0) {
-    pets[existingIndex] = pet;
-  } else {
-    pets.push(pet);
+  // TEMPORARY: Skip Firestore entirely if no Firebase config
+  const hasFirebase = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!hasFirebase) {
+    console.log('Firebase not configured - saving to localStorage only');
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`pets_${userId}`);
+      let localPets: Pet[] = [];
+      try {
+        localPets = stored ? JSON.parse(stored) : [];
+      } catch {
+        localPets = [];
+      }
+      // Update or add the pet
+      const index = localPets.findIndex(p => p.id === pet.id);
+      if (index >= 0) {
+        localPets[index] = pet;
+      } else {
+        localPets.push(pet);
+      }
+      localStorage.setItem(`pets_${userId}`, JSON.stringify(localPets));
+      
+      // Dispatch custom event for same-tab updates
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: pet.id } }));
+      }
+    }
+    return;
   }
   
-  localStorage.setItem(`pets_${userId}`, JSON.stringify(pets));
+  // Save to Firestore
+  await firestoreService.savePet(userId, pet);
+  
+  // Also sync to localStorage for backup/offline compatibility
+  if (typeof window !== 'undefined') {
+    const pets = await getPets(userId); // Recalculate or just append?
+    // Optimization: Just update local array without refetching if possible, but simplest is to fetch-update-save logic
+    // Let's mimic old sync logic for localStorage mirror
+    const stored = localStorage.getItem(`pets_${userId}`);
+    let localPets: Pet[] = stored ? JSON.parse(stored) : [];
+    
+    const index = localPets.findIndex(p => p.id === pet.id);
+    if (index >= 0) {
+      localPets[index] = pet;
+    } else {
+      localPets.push(pet);
+    }
+    localStorage.setItem(`pets_${userId}`, JSON.stringify(localPets));
+    
+    // Dispatch custom event for same-tab updates
+    window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: pet.id } }));
+  }
 }
 
 /**
@@ -66,20 +139,41 @@ export function savePet(userId: string, pet: Pet): void {
  * 
  * @param userId - User identifier
  * @param petId - Pet ID to delete
- * @returns void
- * 
- * @contract
- * - Input: userId (string), petId (string)
- * - Output: void
- * - Side effects: Writes to localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<void>
  */
-export function deletePet(userId: string, petId: string): void {
-  if (typeof window === 'undefined') return;
+export async function deletePet(userId: string, petId: string): Promise<void> {
+  if (!userId) return;
   
-  const pets = getPets(userId);
-  const filtered = pets.filter(p => p.id !== petId);
-  localStorage.setItem(`pets_${userId}`, JSON.stringify(filtered));
+  // TEMPORARY: Skip Firestore entirely if no Firebase config
+  const hasFirebase = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!hasFirebase) {
+    console.log('Firebase not configured - deleting from localStorage only');
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`pets_${userId}`);
+      if (stored) {
+        try {
+          const pets: Pet[] = JSON.parse(stored);
+          const filtered = pets.filter(p => p.id !== petId);
+          localStorage.setItem(`pets_${userId}`, JSON.stringify(filtered));
+        } catch (e) {
+          console.error('Error deleting pet from localStorage:', e);
+        }
+      }
+    }
+    return;
+  }
+  
+  await firestoreService.deletePet(userId, petId);
+  
+  // Sync localStorage
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(`pets_${userId}`);
+    if (stored) {
+      const pets: Pet[] = JSON.parse(stored);
+      const filtered = pets.filter(p => p.id !== petId);
+      localStorage.setItem(`pets_${userId}`, JSON.stringify(filtered));
+    }
+  }
 }
 
 /**
@@ -87,16 +181,9 @@ export function deletePet(userId: string, petId: string): void {
  * 
  * @param userId - User identifier
  * @param petId - Pet ID to retrieve
- * @returns Pet object or null if not found
- * 
- * @contract
- * - Input: userId (string), petId (string)
- * - Output: Pet | null
- * - Side effects: Reads from localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<Pet | null>
  */
-export function getPet(userId: string, petId: string): Pet | null {
-  const pets = getPets(userId);
+export async function getPet(userId: string, petId: string): Promise<Pet | null> {
+  const pets = await getPets(userId);
   return pets.find(p => p.id === petId) || null;
 }
-

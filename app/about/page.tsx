@@ -1,4 +1,15 @@
 import { Award, Heart, Users, CheckCircle, ChefHat } from 'lucide-react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us - Vet-Approved Pet Meal Prep',
+  description: 'Learn how Paw & Plate provides AAFCO & WSAVA compliant meal plans for dogs, cats, birds, reptiles, and pocket pets. Free personalized nutrition planning.',
+  keywords: ['about pet meal prep', 'vet approved pet food', 'AAFCO compliant', 'pet nutrition platform'],
+  openGraph: {
+    title: 'About Paw & Plate - Vet-Approved Pet Meal Prep',
+    description: 'AAFCO & WSAVA compliant meal plans for all pet types. Free personalized nutrition planning.',
+  },
+};
 
 export default function AboutPage() {
   return (

@@ -1,3 +1,99 @@
+/* ============================================
+   IMAGE FILTER NEUTRALIZATION
+   Prevent unwanted filters from being applied to images
+   BUT allow explicit inline filter styles to work
+   ============================================ */
+
+/* Override Tailwind CSS filter variables for images and all parent containers */
+img,
+img *,
+* img {
+  --tw-blur: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-brightness: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-contrast: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-grayscale: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-hue-rotate: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-invert: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-saturate: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-sepia: var(--tw-empty, /*!*/ /*!*/) !important;
+  --tw-drop-shadow: var(--tw-empty, /*!*/ /*!*/) !important;
+}
+
+/* Only prevent filters on images that don't have explicit inline filter styles */
+img:not([style*="filter"]) {
+  filter: none !important;
+  -webkit-filter: none !important;
+  isolation: isolate !important;
+}
+
+/* Prevent Tailwind filter utility classes from affecting images */
+img.blur,
+img.invert,
+img.brightness,
+img.contrast,
+img.grayscale,
+img.hue-rotate,
+img.saturate,
+img.sepia {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Prevent parent containers with Tailwind filter classes from affecting images */
+.blur img,
+.invert img,
+.brightness img,
+.contrast img,
+.grayscale img,
+.hue-rotate img,
+.saturate img,
+.sepia img {
+  filter: none !important;
+  -webkit-filter: none !important;
+  isolation: isolate !important;
+}
+
+/* Prevent any filter inheritance from parent containers */
+img {
+  isolation: isolate !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Specific fix for mascot images - ensure they can use filters if needed */
+img[src*="Sherlock"],
+img[src*="Harvest"],
+img[src*="Mascots"] {
+  mix-blend-mode: normal !important;
+  isolation: isolate !important;
+  forced-color-adjust: none !important;
+  -webkit-forced-color-adjust: none !important;
+}
+
+/* Specific fix for badge images - prevent color inversion */
+img[src*="ElvenBadges"],
+img[src*="/images/ElvenBadges/"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  isolation: isolate !important;
+  mix-blend-mode: normal !important;
+  forced-color-adjust: none !important;
+  -webkit-forced-color-adjust: none !important;
+}
+
+/* Also target Next.js Image components that render badge images */
+.next-image img[src*="ElvenBadges"],
+img[src*="ElvenBadges"][class*="object-contain"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Utility class for badge images */
+.no-invert-badge {
+  filter: none !important;
+  -webkit-filter: none !important;
+  isolation: isolate !important;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,7 +124,7 @@ body {
 @layer components {
   /* Base Button Styles */
   .btn {
-    @apply relative inline-flex items-center justify-center font-semibold transition-all duration-200 ease-out;
+    @apply relative inline-flex items-center justify-center font-semibold transition-colors duration-200 ease-out;
     @apply border-0 outline-none cursor-pointer;
     @apply select-none active:scale-95;
     border-radius: 12px;
@@ -63,33 +159,35 @@ body {
     min-height: 60px;
   }
 
-  /* Primary Button - Gradient */
+  /* Primary Button - Green with Orange Border */
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #0f2c0f;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: 3px solid #f97316;
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .btn-primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(72, 187, 120, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
   }
 
   .btn-primary:active {
     transform: translateY(0);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
   }
 
   /* Secondary Button - Adjusted for Dark Mode */
   .btn-secondary {
-    @apply bg-surface border-surface-highlight text-gray-200;
-    border-width: 3px;
+    @apply bg-surface text-gray-200;
+    border: 3px solid #f97316;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   .btn-secondary:hover {
-    @apply bg-surface-highlight text-white border-white/20;
+    @apply bg-surface-highlight text-white;
+    border-color: #f97316;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
@@ -148,11 +246,13 @@ body {
   .btn-info {
     background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
     color: #0f2c0f;
+    border: 3px solid #f97316;
     box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .btn-info:hover {
     background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    border-color: #f97316;
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(66, 153, 225, 0.5), 0 6px 15px rgba(0, 0, 0, 0.2);
   }
@@ -182,13 +282,14 @@ body {
 
   /* Ghost Button - Adjusted for Dark Mode */
   .btn-ghost {
-    @apply bg-transparent border-surface-highlight text-gray-300;
-    border-width: 3px;
+    @apply bg-transparent text-gray-300;
+    border: 3px solid #f97316;
     box-shadow: none;
   }
 
   .btn-ghost:hover {
-    @apply bg-surface-highlight text-white border-white/20;
+    @apply bg-surface-highlight text-white;
+    border-color: #f97316;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
@@ -416,70 +517,3 @@ body {
   }
 }
 
-/* Prevent emoji image color inversion */
-img[alt*="🐕"],
-img[alt*="🐈"],
-img[alt*="🐦"],
-img[alt*="🦎"],
-img[alt*="🐰"],
-img[alt*="🐹"],
-img[alt*="🐾"],
-img[alt*="❤️"],
-img[alt*="🎂"],
-img[alt*="⚖️"],
-img[alt*="⭐"],
-img[alt*="✨"],
-img[alt*="✅"],
-img[alt*="⚠️"],
-img[alt*="👍"],
-img[alt*="🏆"] {
-  filter: none !important;
-  -webkit-filter: none !important;
-  mix-blend-mode: normal !important;
-  color-scheme: normal !important;
-}
-
-/* Prevent any parent filters from affecting emoji images */
-.emoji-wrapper,
-[class*="emoji"] {
-  filter: none !important;
-  -webkit-filter: none !important;
-}
-
-/* Prevent parent filters from affecting all mascot images (except inverted ones) */
-img[src*="Mascots"]:not(.mascot-icon.mascot-puppy-prepper):not(.mascot-icon.mascot-professor-purrfessor),
-img[alt*="mascot"]:not(.mascot-icon.mascot-puppy-prepper):not(.mascot-icon.mascot-professor-purrfessor) {
-  filter: none !important;
-  -webkit-filter: none !important;
-  mix-blend-mode: normal !important;
-}
-
-/* Prevent dark mode from inverting mascot images */
-.mascot-icon.mascot-puppy-prepper,
-.mascot-icon.mascot-professor-purrfessor,
-nav .mascot-icon.mascot-puppy-prepper,
-nav img.mascot-icon.mascot-puppy-prepper,
-img[src*="Prep Puppy"],
-img[src*="Prep%20Puppy"],
-img[src*="ProfessorPurffesor"],
-img[alt*="puppy-prepper"],
-img[alt*="professor-purrfessor"] {
-  color-scheme: light !important;
-  forced-color-adjust: none !important;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-/* Fix color inversion on puppy and cat mascot images (HIGH SPECIFICITY - MUST BE LAST) */
-.mascot-icon.mascot-puppy-prepper,
-.mascot-icon.mascot-professor-purrfessor,
-nav .mascot-icon.mascot-puppy-prepper,
-nav img.mascot-icon.mascot-puppy-prepper,
-img[src*="Prep Puppy"],
-img[src*="Prep%20Puppy"],
-img[src*="ProfessorPurffesor"],
-img[alt*="puppy-prepper"],
-img[alt*="professor-purrfessor"] {
-  filter: invert(1) !important;
-  -webkit-filter: invert(1) !important;
-}

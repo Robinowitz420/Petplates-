@@ -29,7 +29,18 @@ function isGenericIngredient(name: string): boolean {
   );
 }
 
+// Helper function to convert recipe.category to species string for getVettedProduct
+function getSpeciesFromRecipeCategory(category?: string): string | undefined {
+  if (!category) return undefined;
+  // recipe.category is like 'dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'
+  // This matches the species parameter format
+  return category;
+}
+
 function vetRecipe(recipe: any) {
+  // Derive species from recipe category
+  const species = getSpeciesFromRecipeCategory(recipe.category);
+  
   const updatedIngredients = recipe.ingredients.map((ing: any) => {
     const ingName = ing.name || '';
     
@@ -42,15 +53,15 @@ function vetRecipe(recipe: any) {
       };
     }
 
-    // Try to get vetted product
-    const vetted = getVettedProduct(ingName);
+    // Try to get vetted product (pass species for species-aware matching)
+    const vetted = getVettedProduct(ingName, species);
     
     if (vetted) {
       return {
         ...ing,
         name: ingName, // Keep original name for recipe
         productName: vetted.productName, // Add product name
-        amazonLink: vetted.amazonLink, // Use vetted link
+        asinLink: vetted.asinLink, // Use vetted link
         vetNote: vetted.vetNote,
         isVetted: true
       };

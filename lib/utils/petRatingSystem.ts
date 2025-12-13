@@ -396,7 +396,8 @@ export function rateRecipeForPet(recipe: any, pet: Pet): CompatibilityRating {
   const speciesScore = calculateSpeciesSpecificScore(recipe, safePet);
 
   // 4. Health Compatibility (25%)
-  let healthScore = 90;
+  // Fix: Start at 100 for pets with no health concerns, not 90
+  let healthScore = safePet.healthConcerns.length === 0 ? 100 : 90;
 
   // Use recipe tags if available, otherwise fallback to ingredient inference
   const effectiveHealthTags = (recipe.healthConcerns && recipe.healthConcerns.length > 0)

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Bookmark } from 'lucide-react';
 
 interface BlogPost {
@@ -244,11 +245,14 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         </header>
 
         {/* Featured Image */}
-        <div className="mb-8">
-          <img
+        <div className="mb-8 relative w-full h-64 md:h-96">
+          <Image
             src={blogPost.image}
             alt={blogPost.title}
-            className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
+            fill
+            className="object-cover rounded-lg shadow-lg"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
           />
         </div>
 

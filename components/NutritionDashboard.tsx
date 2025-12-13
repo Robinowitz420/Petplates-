@@ -99,7 +99,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
               </p>
               <p className="text-xs text-gray-500">{getStatusText(summary.avgFiber, targets.fiberRange)}</p>
             </div>
-            <Target className="w-8 h-8 text-purple-500" />
+            <Target className="w-8 h-8 text-orange-500" />
           </div>
         </div>
       </div>

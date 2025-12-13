@@ -365,16 +365,17 @@ function computeNutrientCoverageAndWarnings(
   totalGrams: number,
   recommendedServingGrams?: number, // NEW: Use recommended serving for warnings
 ) {
+  // Nutritional warnings have been removed - return empty array
+  // Keep coverage scores for scoring purposes only
   const warnings: WarningItem[] = [];
   const coverageScores: Record<string, number> = {}; // 0..1 for each tracked nutrient
 
   const species = speciesKey(pet);
 
-  // FIXED: Calculate warnings based on recommended serving size, not total batch
-  // This prevents contradictions between warnings and portion recommendations
+  // Calculate coverage scores for scoring purposes only (no warnings generated)
   const servingGrams = recommendedServingGrams && recommendedServingGrams > 0 
     ? recommendedServingGrams 
-    : totalGrams; // Fallback to total batch if no serving size provided
+    : totalGrams;
   
   // Scale nutrients to per-serving values
   const servingRatio = totalGrams > 0 ? servingGrams / totalGrams : 1;
@@ -384,26 +385,24 @@ function computeNutrientCoverageAndWarnings(
   const ca = (totals['ca_mg'] ?? 0) * servingRatio;
   const p = (totals['p_mg'] ?? 0) * servingRatio;
   const taurine = (totals['taurine_mg'] ?? 0) * servingRatio;
-  const vitC = (totals['vit_c_mg'] ?? 0) * servingRatio;
 
-  // FIXED: Much more lenient targets - actual realistic meal compositions
   const targetsBySpecies: Record<string, Record<string, number>> = {
     dog: {
-      protein_per_100g: 5,    // FIXED: Was 8 - now realistic for mixed meals
-      fat_per_100g: 2,        // FIXED: Was 4 - allows lean meals
-      fiber_per_100g: 0.5,    // FIXED: Was 1 - fiber is often low in fresh meals
+      protein_per_100g: 5,
+      fat_per_100g: 2,
+      fiber_per_100g: 0.5,
     },
     cat: {
-      protein_per_100g: 8,    // FIXED: Was 15 - realistic for mixed meals
-      fat_per_100g: 3,        // FIXED: Was 6 - allows leaner meals
-      taurine_per_100g: 20,   // FIXED: Was 40 - more achievable target
+      protein_per_100g: 8,
+      fat_per_100g: 3,
+      taurine_per_100g: 20,
     },
     'bearded-dragon': {
-      ca_p_ratio: 1.0,        // FIXED: Was 1.2 - more lenient
-      ca_per_100g: 100,       // FIXED: Was 150 - more achievable
+      ca_p_ratio: 1.0,
+      ca_per_100g: 100,
     },
     'guinea-pig': {
-      vit_c_per_kg: 5,        // FIXED: Was 8 - more lenient
+      vit_c_per_kg: 5,
     },
     'pocket-pet': {
       protein_per_100g: 4,
@@ -420,10 +419,8 @@ function computeNutrientCoverageAndWarnings(
     },
   };
 
-  // FIXED: Use serving size for per-100g calculations, not total batch
   const gramsPer100 = servingGrams / 100 || 1;
-
-  const selectedTargets = targetsBySpecies[species] || targetsBySpecies['dog']; // generic fallback
+  const selectedTargets = targetsBySpecies[species] || targetsBySpecies['dog'];
 
   if (selectedTargets) {
     const t = selectedTargets;
@@ -431,39 +428,13 @@ function computeNutrientCoverageAndWarnings(
     if (t.protein_per_100g) {
       const expectedProtein = t.protein_per_100g * gramsPer100;
       const ratio = prot / Math.max(1, expectedProtein);
-      
-      // FIXED: Much more generous scoring curve
-      // 0% target = 0 score
-      // 50% target = 0.5 score
-      // 100% target = 1.0 score
-      // 150% target = 1.2 score (bonus!)
-      coverageScores['protein'] = Math.min(1.5, ratio); // Allow up to 150% bonus
-      
-      // Only warn if VERY low (below 40% of target)
-      // FIXED: Warning now references per-serving values to match recommendations
-      if (prot < expectedProtein * 0.4) {
-        warnings.push({
-          message: `Protein is quite low for ${pet.species} (${prot.toFixed(1)}g per ${Math.round(servingGrams)}g serving, target ~${expectedProtein.toFixed(1)}g).`,
-          severity: 'medium',
-        });
-      }
+      coverageScores['protein'] = Math.min(1.5, ratio);
     }
 
     if (t.fat_per_100g) {
       const expectedFat = t.fat_per_100g * gramsPer100;
       const ratio = fat / Math.max(0.1, expectedFat);
-      
-      // FIXED: Same generous curve as protein
       coverageScores['fat'] = Math.min(1.5, ratio);
-      
-      // Only warn if very low
-      // FIXED: Warning now references per-serving values
-      if (fat < expectedFat * 0.4) {
-        warnings.push({
-          message: `Fat content is low (${fat.toFixed(1)}g per ${Math.round(servingGrams)}g serving). Consider adding healthy fats like fish oil.`,
-          severity: 'low',
-        });
-      }
     }
 
     if (t.fiber_per_100g) {
@@ -475,57 +446,14 @@ function computeNutrientCoverageAndWarnings(
     if (species === 'cat' && t.taurine_per_100g) {
       const expectedTaurine = t.taurine_per_100g * gramsPer100;
       const ratio = taurine / Math.max(1, expectedTaurine);
-      
-      // FIXED: More lenient for taurine
       coverageScores['taurine'] = Math.min(1.5, ratio);
-      
-      // Only warn if below 30% (cats NEED taurine but it's in many proteins)
-      // FIXED: Warning now references per-serving values
-      if (taurine < expectedTaurine * 0.3) {
-        warnings.push({
-          message: `Taurine is low for a cat diet (${taurine.toFixed(1)}mg per ${Math.round(servingGrams)}g serving). Add taurine supplement or more heart/liver.`,
-          severity: 'high',
-        });
-      }
     }
 
     if (species === 'bearded-dragon' && typeof p === 'number' && p > 0) {
       const ratio = ca / p;
       const desired = t.ca_p_ratio;
-      
-      // FIXED: More lenient Ca:P ratio scoring
-      if (ratio < desired * 0.7) { // Only warn if below 70% of target
-        warnings.push({
-          message: `Ca:P ratio is ${ratio.toFixed(2)}. Bearded dragons prefer higher calcium relative to phosphorus (target: ${desired}).`,
-          severity: ratio < desired * 0.5 ? 'high' : 'medium',
-        });
-      }
-      
-      // Give full credit if within 70% of target
       coverageScores['ca_p'] = Math.min(1.2, (ratio / desired) * 1.2);
     }
-  }
-
-  // Generic excess checks (FIXED: now per-serving, not total batch)
-  const vitDPerServing = (totals['vit_d_IU'] ?? 0) * servingRatio;
-  const vitAPerServing = (totals['vit_a_IU'] ?? 0) * servingRatio;
-  
-  // Daily safe limits (IU per day for typical pets)
-  const vitDSafeLimit = 20000; // IU per day
-  const vitASafeLimit = 100000; // IU per day
-  
-  if (vitDPerServing > vitDSafeLimit) {
-    warnings.push({
-      message: `Vitamin D is very high (${Math.round(vitDPerServing)} IU per ${Math.round(servingGrams)}g serving) and may be toxic at large doses.`,
-      severity: 'high',
-    });
-  }
-
-  if (vitAPerServing > vitASafeLimit) {
-    warnings.push({
-      message: `Vitamin A is very high (${Math.round(vitAPerServing)} IU per ${Math.round(servingGrams)}g serving) — repeated feeding could cause hypervitaminosis A.`,
-      severity: 'high',
-    });
   }
 
   return { coverageScores, warnings };
@@ -796,13 +724,10 @@ export function generateCustomMealAnalysis(petProfile: PetProfile, selections: I
   const recommendedServingGrams = computeRecommendedServingGrams(totals, totalGrams, petProfile);
 
   // Nutrient warnings from species heuristics (now uses recommended serving size)
-  const { coverageScores, warnings: nutrientHeuristicWarnings } = computeNutrientCoverageAndWarnings(petProfile, totals, totalGrams, recommendedServingGrams);
+  const { coverageScores } = computeNutrientCoverageAndWarnings(petProfile, totals, totalGrams, recommendedServingGrams);
 
-  // Combine nutrient warnings and inclusion warnings into standard structure
-  const nutrientWarnings: WarningItem[] = [
-    ...nutrientHeuristicWarnings.map(w => ({ message: w.message, severity: w.severity || 'medium' })),
-    ...inclusionWarnings, // Add max inclusion percentage warnings
-  ];
+  // Nutritional warnings have been removed - return empty array
+  const nutrientWarnings: WarningItem[] = [];
 
   // Scoring (pass ingredientsNotFound for better scoring)
   const scoreInfo = calculateGamifiedScore(petProfile, totals, totalGrams, toxicityWarnings, allergyWarnings, nutrientWarnings, ingredientsNotFound, safeSelections.length);
@@ -830,15 +755,9 @@ export function generateCustomMealAnalysis(petProfile: PetProfile, selections: I
   }
 
   // Convert nutrientWarnings to legacy deficiencies/excesses format
+  // (empty since warnings have been removed)
   const deficiencies: string[] = [];
   const excesses: string[] = [];
-  nutrientWarnings.forEach(w => {
-    if (w.message.toLowerCase().includes('low') || w.message.toLowerCase().includes('deficient')) {
-      deficiencies.push(w.message);
-    } else if (w.message.toLowerCase().includes('high') || w.message.toLowerCase().includes('excess')) {
-      excesses.push(w.message);
-    }
-  });
 
   // Final MealAnalysis object
   const analysis: MealAnalysis = {

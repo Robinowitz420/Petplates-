@@ -1,53 +1,84 @@
 // lib/utils/firebaseConfig.ts
-// Firebase configuration and initialization
-// Uses global variables injected at runtime (for security)
+// Firebase configuration and initialization with proper error handling
 
-import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getFirestore, type Firestore } from 'firebase/firestore';
-import { getAuth, type Auth } from 'firebase/auth';
+import { initializeApp, type FirebaseApp, getApps } from 'firebase/app';
+import { getFirestore, type Firestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth, type Auth, connectAuthEmulator } from 'firebase/auth';
 
-// Global variables (injected via script tags or environment)
-declare const __app_id: string;
-declare const __firebase_config: string;
-declare const __initial_auth_token: string;
+// Firebase configuration from environment variables
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
 
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
 let auth: Auth | null = null;
+let initializationError: Error | null = null;
+
+/**
+ * Check if Firebase is properly configured
+ */
+function isFirebaseConfigured(): boolean {
+  return !!(
+    firebaseConfig.apiKey &&
+    firebaseConfig.authDomain &&
+    firebaseConfig.projectId
+  );
+}
 
 /**
  * Initialize Firebase services
  * Returns null if Firebase is not configured
  */
 export function initializeFirebase(): { app: FirebaseApp; db: Firestore; auth: Auth } | null {
-  if (typeof window === 'undefined') return null; // Server-side
+  // Server-side check
+  if (typeof window === 'undefined') return null;
+  
+  // Return existing instance
+  if (app && db && auth) {
+    return { app, db, auth };
+  }
   
   try {
-    // Check if Firebase config is available
-    const firebaseConfig = typeof __firebase_config !== 'undefined' 
-      ? JSON.parse(__firebase_config) 
-      : null;
-    
-    if (!firebaseConfig) {
-      // Firebase config not available - using localStorage fallback
+    // Check if Firebase is configured
+    if (!isFirebaseConfigured()) {
+      console.warn('Firebase not configured - using localStorage fallback');
       return null;
     }
     
-    // Initialize if not already initialized
-    if (!app) {
+    // Use existing app or initialize new one
+    if (getApps().length === 0) {
       app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
-      auth = getAuth(app);
+    } else {
+      app = getApps()[0];
     }
     
-    // TypeScript guard: ensure all services are initialized
-    if (!app || !db || !auth) {
-      return null;
+    // Initialize Firestore
+    db = getFirestore(app);
+    
+    // Initialize Auth
+    auth = getAuth(app);
+    
+    // Connect to emulators in development
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
+      try {
+        connectFirestoreEmulator(db, 'localhost', 8080);
+        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+        console.log('Connected to Firebase emulators');
+      } catch (e) {
+        // Emulators already connected or not available
+      }
     }
     
     return { app, db, auth };
   } catch (error) {
-    // Firebase initialization failed - using localStorage fallback
+    initializationError = error as Error;
+    console.error('Firebase initialization failed:', error);
     return null;
   }
 }
@@ -63,9 +94,22 @@ export function getFirebaseServices(): { app: FirebaseApp; db: Firestore; auth: 
 }
 
 /**
- * Get app ID from global variable
+ * Get app ID from environment
  */
 export function getAppId(): string {
-  return typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+  return process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'pet-plates-app';
 }
 
+/**
+ * Check if Firebase is available
+ */
+export function isFirebaseAvailable(): boolean {
+  return getFirebaseServices() !== null;
+}
+
+/**
+ * Get initialization error if any
+ */
+export function getInitializationError(): Error | null {
+  return initializationError;
+}

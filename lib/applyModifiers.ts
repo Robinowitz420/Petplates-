@@ -72,8 +72,8 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
 
       // Add supplements required by the modifier
       for (const supplement of modifier.add) {
-        // Check if there's a vetted product for this supplement
-        const vettedProduct = getVettedProduct(supplement.name);
+        // Check if there's a vetted product for this supplement (pass pet.type for species filtering, preferBudget=true for cost control)
+        const vettedProduct = getVettedProduct(supplement.name, pet.type, true);
         addedIngredients.push({
           name: vettedProduct?.productName || supplement.name,
           benefit: supplement.benefit,
@@ -100,7 +100,8 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
   // 2. Map Ingredients to Vetted Products (The core fix)
   // This is the new logic that replaces generic ingredients with specific vetted products
   modifiedRecipe.ingredients = modifiedRecipe.ingredients.map(ing => {
-    const vettedProduct = getVettedProduct(ing.name);
+    // Pass pet.type for species-aware product matching, preferBudget=true for cost control
+    const vettedProduct = getVettedProduct(ing.name, pet.type, true);
     if (vettedProduct) {
         // Overwrite the generic ingredient details with the Vetted Product details
         return {
@@ -121,7 +122,8 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
   // 3. Map Supplements to Vetted Products (ensure all buy links are vetted)
   if ((modifiedRecipe as any).supplements) {
     (modifiedRecipe as any).supplements = (modifiedRecipe as any).supplements.map((supplement: any) => {
-      const vettedProduct = getVettedProduct(supplement.name);
+      // Pass pet.type for species-aware product matching, preferBudget=true for cost control
+      const vettedProduct = getVettedProduct(supplement.name, pet.type, true);
       if (vettedProduct) {
         return {
           ...supplement,
@@ -147,12 +149,13 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
   };
 }
 
-export function generateModifiedRecommendations({ profile, recipeIds, limit }: { profile: PetNutritionProfile, recipeIds: string[], limit: number }): ModifiedRecipeResult[] {
+export function generateModifiedRecommendations({ profile, recipeIds, limit, minCompatibilityScore = 30 }: { profile: PetNutritionProfile, recipeIds: string[], limit: number, minCompatibilityScore?: number }): ModifiedRecipeResult[] {
     console.log('🔍 generateModifiedRecommendations called:', {
         species: profile.species,
         ageGroup: profile.ageGroup,
         healthConcerns: profile.healthConcerns,
-        limit
+        limit,
+        minCompatibilityScore
     });
     
     // NOTE: 'recipes' is imported from './data/recipes-complete'
@@ -210,17 +213,25 @@ export function generateModifiedRecommendations({ profile, recipeIds, limit }: {
         };
         const petRating = scoreRecipeImproved(recipe, petForScoring);
         if (idx < 3) { // Log first 3 for debugging
-            console.log(`  Recipe "${recipe.name}": ${petRating.matchScore}% (${petRating.reasoning.goodMatches.length} matches, ${petRating.reasoning.conflicts.length} conflicts)`);
+            console.log(`  Recipe "${recipe.name}": ${petRating.compatibilityScore || petRating.matchScore}% (${petRating.reasoning.goodMatches.length} matches, ${petRating.reasoning.conflicts.length} conflicts)`);
         }
         return { recipe, petRating };
     });
 
-    // 2. Sort by score and take the top N
-    const topScored = scoredRecipes
-        .sort((a, b) => b.petRating.matchScore - a.petRating.matchScore)
+    // 2. Filter by minimum compatibility threshold
+    const filteredByThreshold = scoredRecipes.filter(({ petRating }) => {
+        const score = petRating.compatibilityScore || petRating.matchScore;
+        return score >= minCompatibilityScore;
+    });
+    
+    console.log(`📊 Filtered ${scoredRecipes.length} recipes to ${filteredByThreshold.length} above threshold (${minCompatibilityScore}%)`);
+    
+    // 3. Sort by score and take the top N
+    const topScored = filteredByThreshold
+        .sort((a, b) => (b.petRating.compatibilityScore || b.petRating.matchScore) - (a.petRating.compatibilityScore || a.petRating.matchScore))
         .slice(0, limit);
 
-    // 3. Apply modifiers to the top N recipes
+    // 4. Apply modifiers to the top N recipes
     const results = topScored.map(({ recipe, petRating }) => {
         // Convert PetNutritionProfile to pet object format expected by applyModifiers
         const petForModifiers = {
@@ -275,7 +286,7 @@ export function generateModifiedRecommendations({ profile, recipeIds, limit }: {
             shoppingList,
             explanation: '', // avoid noisy banner text
             weeklyPlan: [], // TODO: implement weekly plan
-            score: petRating.matchScore,
+            score: petRating.compatibilityScore || petRating.matchScore,
         };
     });
 

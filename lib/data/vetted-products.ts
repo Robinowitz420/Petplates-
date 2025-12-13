@@ -19,6 +19,19 @@ interface VettedProduct {
   category?: 'Meat' | 'Supplement' | 'Carb' | 'Vegetable' | 'Oil' | 'Seed' | 'Fruit' | 'Insect' | 'Hay' | 'Pellet';
   // Commission rate estimate for prioritization
   commissionRate?: number;
+  // Species compatibility: 'dogs', 'cats', 'both', or array of specific species
+  // If undefined, product is considered species-neutral (backward compatibility)
+  species?: 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets' | 'both' | string[];
+  // Cost tier classification for budget-aware product selection
+  // budget: Under $15, standard: $15-30, premium: Over $30
+  costTier?: 'budget' | 'standard' | 'premium';
+  // Current price information (fetched from Amazon)
+  price?: {
+    amount: number;        // Current price in USD
+    currency: string;      // 'USD'
+    lastUpdated: string;   // ISO date string
+    unit?: string;         // Optional: 'per lb', 'per oz', etc.
+  };
 }
 
 // Map: [Generic Ingredient Name (lowercase)] -> VettedProduct
@@ -31,6 +44,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-quality, human-grade chicken breast that maintains nutritional value through freeze-drying.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:46:50.423Z'
+    }
   },
   'ground turkey': {
     productName: 'Diestel Free Range Ground Turkey',
@@ -38,6 +59,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Premium free-range turkey with optimal protein-to-fat ratio for canine health.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:46:54.959Z'
+    }
   },
   'ground beef (lean)': {
     productName: 'US Wellness Meats Pet Burger',
@@ -45,6 +74,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Grass-fed, human-grade beef with controlled fat content for weight management.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.9,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:46:59.487Z'
+    }
   },
   'ground lamb': {
     productName: 'Raw Paws Lamb Recipe Rolls',
@@ -52,6 +89,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Novel protein source ideal for dogs with chicken or beef allergies.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 37.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:04.185Z'
+    }
   },
   'salmon (boneless)': {
     productName: 'A Better Treat Freeze Dried Salmon',
@@ -60,6 +105,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Wild-caught salmon providing essential omega-3 fatty acids for skin, coat, and joint health.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:08.804Z'
+    }
   },
   'chicken breast': {
     productName: 'Bell & Evans Boneless Chicken Breast',
@@ -67,6 +120,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Air-chilled chicken breast with superior moisture retention and protein quality.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.22,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:13.402Z'
+    }
   },
   'chicken thighs': {
     productName: 'Bell & Evans Boneless Chicken Thighs',
@@ -74,6 +135,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Higher fat content than breast meat, providing more calories and flavor.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:17.992Z'
+    }
   },
   'turkey breast': {
     productName: 'Fresh Is Best Freeze Dried Turkey Tenders',
@@ -81,6 +150,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Lean turkey breast maintaining natural nutrients through gentle freeze-drying.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 13.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:22.762Z'
+    }
   },
   'beef liver': {
     productName: 'Fresh Is Best Freeze Dried Beef Liver',
@@ -88,6 +165,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Rich source of vitamin A, iron, and B vitamins essential for canine health.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:27.552Z'
+    }
   },
   'chicken liver': {
     productName: 'Fresh Is Best Freeze Dried Chicken Livers',
@@ -95,6 +180,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Concentrated nutrition with high vitamin content and natural enzymes.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.29,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:32.285Z'
+    }
   },
   'chicken hearts': {
     productName: 'Vital Essentials Freeze Dried Chicken Hearts',
@@ -102,6 +195,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Excellent taurine source and natural chews for dental health.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:36.945Z'
+    }
   },
   'sardines (canned in water)': {
     productName: 'Wild Planet Sardines in Water No Salt',
@@ -109,6 +210,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Omega-3 rich fish with edible bones providing natural calcium and phosphorus.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:41.989Z'
+    }
   },
   'eggs': {
     productName: 'Whole Life Pet Freeze Dried Diced Eggs',
@@ -116,6 +225,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complete protein source with all essential amino acids and natural vitamins.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 53.19,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:46.815Z'
+    }
   },
   'turkey giblets': {
     productName: 'Vital Essentials Freeze Dried Turkey Giblets',
@@ -123,6 +240,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural organ meat mix providing comprehensive nutrition and enzymes.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:51.513Z'
+    }
   },
   'chicken giblets': {
     productName: 'Fresh Is Best Freeze Dried Chicken Giblets',
@@ -130,6 +255,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Traditional organ meat blend with heart, liver, and gizzard for complete nutrition.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:47:56.190Z'
+    }
   },
   'duck breast': {
     productName: 'Fresh Is Best Freeze Dried Duck Breast',
@@ -137,6 +270,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Novel protein with healthy fat profile and rich flavor dogs love.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:00.969Z'
+    }
   },
   'venison': {
     productName: 'Fresh Is Best Freeze Dried Venison Bites',
@@ -144,6 +285,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Lean game meat ideal for dogs with allergies or weight management needs.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.9,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:05.490Z'
+    }
   },
   'rabbit meat': {
     productName: 'Evanger\'s Rabbit Grain Free Cans',
@@ -151,6 +300,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Hypoallergenic novel protein perfect for elimination diet trials.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 37.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:10.314Z'
+    }
   },
   'quail': {
     productName: 'Wholesome Beast Freeze Dried Quail Chicks',
@@ -158,6 +315,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Small game bird providing novel protein and natural calcium from bones.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:14.932Z'
+    }
   },
   'ground pork (lean)': {
     productName: 'Momentum Freeze Dried Pork Tenderloin',
@@ -165,6 +330,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Lean pork alternative for dogs that tolerate it, with good palatability.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:19.692Z'
+    }
   },
   'turkey necks': {
     productName: 'Northwest Naturals Freeze Dried Turkey Necks',
@@ -172,6 +345,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural chews providing dental benefits and natural nutrients.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:24.343Z'
+    }
   },
 
   // === CARBS, VEGETABLES & FATS (Dogs & Cats) ===
@@ -181,6 +362,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Whole grain rice providing complex carbohydrates and fiber for digestive health.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:29.023Z'
+    }
   },
   'white rice': {
     productName: 'Nishiki Premium Medium Grain White Rice',
@@ -188,6 +377,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Easily digestible carbohydrate source for dogs with sensitive stomachs.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.48,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:33.750Z'
+    }
   },
   'quinoa': {
     productName: 'Bob\'s Red Mill Organic White Quinoa',
@@ -195,6 +392,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complete protein grain with all essential amino acids and gluten-free.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 74.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:38.310Z'
+    }
   },
   'sweet potato': {
     productName: 'Farmer\'s Market Organic Sweet Potato Puree',
@@ -202,6 +407,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complex carbohydrate with beta-carotene and fiber for digestive health.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 68.35,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:43.264Z'
+    }
   },
   'pumpkin puree': {
     productName: 'Farmer\'s Market Organic Pumpkin Puree',
@@ -209,6 +422,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural soluble fiber for digestive health and stool regulation.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 43.11,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:48.126Z'
+    }
   },
   'butternut squash': {
     productName: 'Farmer\'s Market Organic Butternut Squash Puree',
@@ -216,6 +437,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Low-glycemic carbohydrate with beta-carotene and antioxidants.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 52.89,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:52.886Z'
+    }
   },
   'lentils': {
     productName: 'Bob\'s Red Mill Organic Red Lentils',
@@ -223,6 +452,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Plant-based protein and fiber source for balanced nutrition.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 13.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:48:57.775Z'
+    }
   },
   'chickpeas': {
     productName: 'Goya Organic Chickpeas No Salt',
@@ -230,6 +467,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Protein-rich legume providing complex carbohydrates and minerals.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 15.68,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:02.539Z'
+    }
   },
   'black beans': {
     productName: 'Eden Organic Black Beans No Salt',
@@ -237,6 +482,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-fiber legume with antioxidants and plant-based protein.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:07.346Z'
+    }
   },
   'green peas': {
     productName: 'Nature\'s Touch Frozen Organic Green Peas',
@@ -244,6 +497,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural source of plant protein and digestive fiber.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:11.915Z'
+    }
   },
   'carrots': {
     productName: 'Nature\'s Touch Frozen Organic Carrots',
@@ -251,6 +512,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Beta-carotene rich vegetable supporting immune and vision health.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:16.499Z'
+    }
   },
   'spinach': {
     productName: 'Earthbound Farm Organic Spinach Frozen',
@@ -258,6 +527,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Iron-rich leafy green providing vitamins K, A, and folate.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:21.085Z'
+    }
   },
   'broccoli': {
     productName: 'Cascadian Farm Organic Broccoli Florets',
@@ -265,6 +542,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Cruciferous vegetable with antioxidants and vitamin C.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 89.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:25.907Z'
+    }
   },
   'zucchini': {
     productName: 'Nature\'s Touch Frozen Organic Zucchini',
@@ -272,6 +557,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Low-calorie vegetable providing hydration and minerals.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:30.767Z'
+    }
   },
   'kale': {
     productName: 'Earthbound Farm Organic Kale',
@@ -279,6 +572,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-dense leafy green with calcium and antioxidants.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 82.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:35.263Z'
+    }
   },
   'celery': {
     productName: 'Earthbound Farm Organic Celery',
@@ -286,6 +587,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Low-calorie crunchy vegetable providing hydration and fiber.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 82.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:39.664Z'
+    }
   },
   'brussels sprouts': {
     productName: 'Cascadian Farm Organic Brussels Sprouts',
@@ -293,6 +602,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Cruciferous vegetable with sulforaphane for antioxidant support.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:44.082Z'
+    }
   },
   'asparagus': {
     productName: 'Cascadian Farm Organic Asparagus Spears',
@@ -300,6 +617,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Diuretic vegetable supporting urinary tract health.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.37,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:48.630Z'
+    }
   },
   'parsley': {
     productName: 'McCormick Culinary Parsley Flakes',
@@ -307,6 +632,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh herb providing chlorophyll and natural breath freshening.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.77,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:53.478Z'
+    }
   },
   'cucumber': {
     productName: 'Nature\'s Touch Frozen Organic Cucumber',
@@ -314,6 +647,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Hydrating vegetable with natural electrolytes.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:49:57.862Z'
+    }
   },
   'lettuce (romaine)': {
     productName: 'Organic Girl Romaine Lettuce',
@@ -321,6 +662,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Leafy green providing hydration and vitamin K.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:02.405Z'
+    }
   },
   'arugula': {
     productName: 'Organic Girl Baby Arugula',
@@ -328,6 +677,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Peppery leafy green with calcium and antioxidants.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:06.919Z'
+    }
   },
   'endive': {
     productName: 'Organic Endive Greens',
@@ -335,6 +692,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bitter leafy green supporting liver health and digestion.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 46.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:11.704Z'
+    }
   },
   'escarole': {
     productName: 'Organic Escarole Greens',
@@ -342,6 +707,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Mild leafy green providing folate and vitamin K.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:16.480Z'
+    }
   },
   'dandelion greens': {
     productName: 'Organic Dandelion Greens',
@@ -349,6 +722,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural diuretic supporting kidney and liver health.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21.11,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:21.350Z'
+    }
   },
   'collard greens': {
     productName: 'Organic Collard Greens',
@@ -356,6 +737,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Calcium-rich leafy green for bone and dental health.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.50,
+      currency: 'USD',
+      lastUpdated: '2025-01-13T00:00:00.000Z'
+    }
   },
   'mustard greens': {
     productName: 'Organic Mustard Greens',
@@ -363,6 +752,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Spicy leafy green with antioxidants and vitamin K.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.79,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:30.265Z'
+    }
   },
   'turnip greens': {
     productName: 'Organic Turnip Greens',
@@ -370,6 +767,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-dense greens with calcium and antioxidants.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.41,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:34.689Z'
+    }
   },
   'beet greens': {
     productName: 'Organic Beet Greens',
@@ -377,6 +782,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Iron-rich greens supporting red blood cell production.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:39.361Z'
+    }
   },
   'radish greens': {
     productName: 'Organic Radish Greens',
@@ -384,6 +797,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Peppery greens providing vitamin C and minerals.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:43.808Z'
+    }
   },
   'coconut oil': {
     productName: 'Nutiva Organic Virgin Coconut Oil',
@@ -391,6 +812,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Medium-chain triglycerides for quick energy and cognitive support.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.45,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:48.628Z'
+    }
   },
   'olive oil': {
     productName: 'California Olive Ranch Extra Virgin Olive Oil',
@@ -398,6 +827,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Monounsaturated fats with antioxidants for skin and coat health.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 50.32,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:53.799Z'
+    }
   },
   'salmon oil': {
     productName: 'Grizzly Salmon Plus Omega-3 Oil',
@@ -406,6 +843,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Concentrated omega-3 fatty acids for joint, skin, and heart health.',
     category: 'Oil',
     commissionRate: 0.08
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 43.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:50:58.582Z'
+    }
   },
   'flaxseed oil': {
     productName: 'Barlean\'s Organic Flax Oil',
@@ -413,6 +858,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Plant-based omega-3 source for skin and coat conditioning.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 25.19,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:03.516Z'
+    }
   },
   'fish oil': {
     productName: 'Nordic Naturals Omega-3 Pet',
@@ -420,6 +873,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Purified fish oil with optimal EPA/DHA ratio for canine health.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.91,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:08.406Z'
+    }
   },
 
   // === SUPPLEMENTS (Dogs & Cats) ===
@@ -429,6 +890,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Essential amino acid for heart health and vision support in cats.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 12.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:13.306Z'
+    }
   },
   'calcium carbonate': {
     productName: 'NOW Supplements Calcium Carbonate Powder',
@@ -436,6 +905,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Highly bioavailable calcium source for bone health and metabolic balance.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:18.266Z'
+    }
   },
   'vitamin e': {
     productName: 'Solgar Vitamin E 400 IU',
@@ -443,6 +920,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Antioxidant vitamin supporting immune function and skin health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 18.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:23.124Z'
+    }
   },
   'b-complex': {
     productName: 'Thorne B-Complex #12',
@@ -450,6 +935,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complete B vitamin complex for energy metabolism and nervous system health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:28.041Z'
+    }
   },
   'probiotic powder': {
     productName: 'Purina FortiFlora Probiotic Supplement',
@@ -457,6 +950,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Veterinarian-recommended probiotic for digestive health and immune support.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 33.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:32.894Z'
+    }
   },
   'psyllium husk': {
     productName: 'Organic India Whole Husk Psyllium',
@@ -464,13 +965,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Soluble fiber for digestive health and hairball prevention in cats.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 17.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:37.725Z'
+    }
   },
   'joint supplement': {
     productName: 'Cosequin DS Plus MSM for Dogs',
     asinLink: 'https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20',
     vetNote: 'Veterinarian-formulated glucosamine supplement for joint health and mobility.',
     category: 'Supplement',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'premium',
+
+    price: {
+      amount: 36.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:42.585Z'
+    }
   },
   'omega-3 capsules': {
     productName: 'Nordic Naturals Omega-3 Pet Capsules',
@@ -478,6 +995,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Purified fish oil capsules providing EPA/DHA for skin, coat, and joint health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 45.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:47.416Z'
+    }
   },
   'digestive enzymes': {
     productName: 'NaturVet Digestive Enzymes Plus Probiotics',
@@ -485,6 +1010,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Enzyme blend supporting digestion of proteins, fats, and carbohydrates.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.92,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:52.322Z'
+    }
   },
   'hairball paste': {
     productName: 'Tomlyn Laxatone Hairball Remedy',
@@ -492,13 +1025,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Veterinarian-formulated paste for hairball prevention and digestive health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:51:57.071Z'
+    }
   },
   'chicken broth': {
     productName: 'Brutus Bone Broth for Dogs No Salt',
     asinLink: 'https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20',
     vetNote: 'Concentrated bone broth providing collagen, glucosamine, and natural electrolytes.',
     category: 'Supplement',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'premium',
+
+    price: {
+      amount: 30.48,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:02.004Z'
+    }
   },
   'vitamin e oil': {
     productName: 'NOW Solutions Vitamin E Oil',
@@ -506,6 +1055,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural vitamin E oil for topical skin health and antioxidant support.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:06.746Z'
+    }
   },
 
   // === BIRDS ===
@@ -515,6 +1072,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-quality millet spray for parrots and hookbills.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 11.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:11.566Z'
+    }
   },
   'canary seed': {
     productName: 'Lafeber\'s Parrot Food Canary Seed',
@@ -522,6 +1087,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Traditional canary seed mix for small birds.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:16.396Z'
+    }
   },
   'niger seed': {
     productName: 'Lafeber\'s Parrot Food Niger Seed',
@@ -529,6 +1102,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Thistle seed attracting finches and small songbirds.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:21.154Z'
+    }
   },
   'oat groats': {
     productName: 'Lafeber\'s Parrot Food Oat Groats',
@@ -536,6 +1117,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Whole oat groats for larger parrots and hookbills.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:25.839Z'
+    }
   },
   'hemp seeds': {
     productName: 'Lafeber\'s Parrot Food Hemp Seed',
@@ -543,6 +1132,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-rich hemp seeds for feather health.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:30.495Z'
+    }
   },
   'flaxseeds': {
     productName: 'Lafeber\'s Parrot Food Flax Seed',
@@ -550,6 +1147,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Omega-3 rich flax seeds for skin and feather health.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:35.165Z'
+    }
   },
   'sesame seeds': {
     productName: 'Lafeber\'s Parrot Food Sesame Seed',
@@ -557,6 +1162,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Calcium-rich sesame seeds for bone health.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:39.810Z'
+    }
   },
   'chia seeds': {
     productName: 'Lafeber\'s Parrot Food Chia Seed',
@@ -564,6 +1177,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Hydrating chia seeds providing omega-3s and fiber.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:44.334Z'
+    }
   },
   'quinoa (cooked)': {
     productName: 'Lafeber\'s Parrot Food Cooked Quinoa',
@@ -571,6 +1192,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complete protein grain for avian nutrition.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:49.228Z'
+    }
   },
   'rapeseed': {
     productName: 'Lafeber\'s Parrot Food Rapeseed',
@@ -578,6 +1207,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Canola/rapeseed for additional dietary variety.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:54.052Z'
+    }
   },
   'sunflower seeds (small amounts)': {
     productName: 'Lafeber\'s Parrot Food Sunflower Seed',
@@ -585,6 +1222,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-fat seeds to be fed in moderation.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:52:58.686Z'
+    }
   },
   'pumpkin seeds': {
     productName: 'Lafeber\'s Parrot Food Pumpkin Seed',
@@ -592,6 +1237,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-dense seeds with natural deworming properties.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:03.279Z'
+    }
   },
   'bell peppers': {
     productName: 'Earthbound Farm Organic Bell Peppers',
@@ -599,6 +1252,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Vitamin C rich peppers for immune health.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:07.717Z'
+    }
   },
   'corn (fresh)': {
     productName: 'Cascadian Farm Organic Corn on the Cob',
@@ -606,6 +1267,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh corn providing carbohydrates and antioxidants.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.79,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:12.176Z'
+    }
   },
   'apples (no seeds)': {
     productName: 'Organic Honeycrisp Apples',
@@ -613,6 +1282,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Vitamin-rich fruit providing natural sugars and fiber.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:16.660Z'
+    }
   },
   'blueberries': {
     productName: 'Driscoll\'s Organic Blueberries',
@@ -620,6 +1297,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Antioxidant-rich berries for immune and cognitive health.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 36.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:21.369Z'
+    }
   },
   'strawberries': {
     productName: 'Driscoll\'s Organic Strawberries',
@@ -627,6 +1312,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Vitamin C rich berries providing natural hydration.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 7.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:25.843Z'
+    }
   },
   'mango': {
     productName: 'Organic Mango',
@@ -634,6 +1327,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Tropical fruit providing beta-carotene and vitamin C.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.46,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:30.365Z'
+    }
   },
   'banana': {
     productName: 'Organic Bananas',
@@ -641,6 +1342,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Potassium-rich fruit for electrolyte balance.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:34.963Z'
+    }
   },
   'grapes (chopped)': {
     productName: 'Organic Red Seedless Grapes',
@@ -648,6 +1357,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Hydrating fruit providing natural antioxidants.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.5,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:39.458Z'
+    }
   },
   'papaya': {
     productName: 'Organic Papaya',
@@ -655,6 +1372,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Digestive enzyme-rich fruit for gut health.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.39,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:44.000Z'
+    }
   },
   'melon': {
     productName: 'Organic Cantaloupe Melon',
@@ -662,6 +1387,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-water content fruit for hydration.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.57,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:48.451Z'
+    }
   },
   'egg (hard-boiled)': {
     productName: 'Vital Essentials Freeze Dried Egg Yolk Treats',
@@ -669,6 +1402,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Calcium and protein-rich egg treats for birds.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:53.442Z'
+    }
   },
   'pellets (fortified)': {
     productName: 'Lafeber\'s Parrot Food Pellets',
@@ -676,6 +1417,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complete nutrition pellets formulated for avian health.',
     category: 'Pellet',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 47.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:53:57.999Z'
+    }
   },
   'cuttlebone': {
     productName: 'Lafeber\'s Parrot Food Cuttlebone',
@@ -683,6 +1432,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural calcium source for beak and bone health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:02.666Z'
+    }
   },
   'honey (tiny amounts)': {
     productName: 'Local Raw Honey',
@@ -690,6 +1447,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural sweetener and antimicrobial properties (use sparingly).',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 17.48,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:07.362Z'
+    }
   },
   'peanut butter (unsalted, tiny amounts)': {
     productName: 'Teddie All Natural Peanut Butter',
@@ -697,6 +1462,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Healthy fat source for foraging enrichment (unsalted only).',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:11.988Z'
+    }
   },
 
   // === REPTILES ===
@@ -706,6 +1479,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-quality feeder insects with optimal calcium-to-phosphorus ratio.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.9,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:16.800Z'
+    }
   },
   'crickets': {
     productName: 'Fluker\'s Live Crickets',
@@ -713,6 +1494,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Standard feeder insects gut-loaded for nutritional value.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:21.586Z'
+    }
   },
   'mealworms': {
     productName: 'Fluker\'s Freeze Dried Mealworms',
@@ -720,6 +1509,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Dried mealworms providing fat and protein for insectivorous reptiles.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:26.431Z'
+    }
   },
   'superworms': {
     productName: 'Josh\'s Frogs Live Superworms',
@@ -727,6 +1524,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Larger feeder insects for bigger reptiles and amphibians.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 25.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:30.992Z'
+    }
   },
   'black soldier fly larvae': {
     productName: 'Grubblies Black Soldier Fly Larvae',
@@ -734,6 +1539,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Sustainable, high-calcium feeder insects with excellent nutrition.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:35.539Z'
+    }
   },
   'hornworms': {
     productName: 'Josh\'s Frogs Live Hornworms',
@@ -741,6 +1554,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Moisture-rich feeder insects ideal for tropical species.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 15.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:40.038Z'
+    }
   },
   'acorn squash': {
     productName: 'Organic Acorn Squash',
@@ -748,6 +1569,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-rich squash providing beta-carotene and fiber.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:44.492Z'
+    }
   },
   'figs': {
     productName: 'Organic Dried Figs',
@@ -755,6 +1584,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Calcium-rich dried fruit for omnivorous reptiles.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 27.8,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:49.396Z'
+    }
   },
 
   // === POCKET PETS ===
@@ -764,6 +1601,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-quality timothy hay for proper dental health and digestion.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:54.261Z'
+    }
   },
   'meadow hay': {
     productName: 'Small Pet Select Meadow Hay',
@@ -771,6 +1616,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-rich meadow hay providing essential fiber.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 36.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:54:58.942Z'
+    }
   },
   'orchard grass hay': {
     productName: 'Oxbow Animal Health Orchard Grass Hay',
@@ -778,6 +1631,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Premium orchard grass hay for optimal small animal nutrition.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:03.558Z'
+    }
   },
   'alfalfa hay': {
     productName: 'Kaytee Natural Alfalfa Hay',
@@ -785,6 +1646,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Calcium-rich alfalfa hay for young or pregnant small animals.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 28.93,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:08.164Z'
+    }
   },
   'romaine lettuce': {
     productName: 'Organic Girl Romaine Lettuce',
@@ -792,6 +1661,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Hydrating leafy green providing vitamins and minerals.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:12.887Z'
+    }
   },
   'cilantro': {
     productName: 'Organic Cilantro',
@@ -799,6 +1676,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh herb providing natural antioxidants and flavor.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:17.766Z'
+    }
   },
   'basil': {
     productName: 'Organic Basil',
@@ -806,6 +1691,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Aromatic herb providing antioxidants and natural flavor enhancement.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.5,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:22.415Z'
+    }
   },
 
   // === COMPREHENSIVE VETTED PRODUCTS (128 ingredients from sourcing guide) ===
@@ -815,6 +1708,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Vital Essentials or Raw Paws Pet Food. Freeze-dried for convenience and safety.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:27.056Z'
+    }
   },
   'lamb liver': {
     productName: 'Stella & Chewy\'s Freeze Dried Lamb Liver',
@@ -822,6 +1723,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Northwest Naturals or Stella & Chewy\'s. Freeze-dried organ meat.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 15.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:31.989Z'
+    }
   },
   'duck liver': {
     productName: 'Vital Essentials Freeze Dried Duck Liver',
@@ -829,6 +1738,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Vital Essentials freeze-dried duck liver treat.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 59.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:36.929Z'
+    }
   },
   'chicken necks': {
     productName: 'Raw Paws Pet Food Raw Chicken Necks',
@@ -836,6 +1753,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Raw Paws Pet Food or My Pet Carnivore. Raw chicken necks for dental health.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 22.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:41.686Z'
+    }
   },
   'turkey thighs': {
     productName: 'Boneless Skinless Turkey Thighs',
@@ -843,6 +1768,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Human-grade source from butcher or grocery store.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:46.270Z'
+    }
   },
   'ground duck': {
     productName: 'Raw Paws Pet Food Raw Ground Duck',
@@ -850,6 +1783,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Raw Paws Pet Food or Darwins Pet Food. Frozen/raw ground duck.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:51.155Z'
+    }
   },
   'ground lamb (lean)': {
     productName: 'Lean Ground Lamb Meat',
@@ -857,6 +1798,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Human-grade lean ground lamb from quality source.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 11.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:55:55.587Z'
+    }
   },
   'ground herring': {
     productName: 'K9 Natural Hoki Fish Blend',
@@ -864,6 +1813,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'K9 Natural hoki/fish blend for pets.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 37.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:00.545Z'
+    }
   },
   'ground mackerel': {
     productName: 'Northwest Naturals Raw Fish Blend',
@@ -871,6 +1828,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Northwest Naturals raw fish blend.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 15.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:05.291Z'
+    }
   },
   'mackerel (canned)': {
     productName: 'Wild Planet Canned Mackerel',
@@ -878,6 +1843,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Wild Planet or Safe Catch. Canned in water, no salt added.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 35.52,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:09.986Z'
+    }
   },
   'herring (canned)': {
     productName: 'Crown Prince Canned Herring',
@@ -885,6 +1858,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Crown Prince or Season. Canned in water, no salt added.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:14.974Z'
+    }
   },
   'chicken sausage (no additives)': {
     productName: 'Applegate Naturals Chicken Sausage',
@@ -892,6 +1873,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Niman Ranch or Applegate. Read labels carefully for nitrates/sugar.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:19.480Z'
+    }
   },
   'turkey sausage (no additives)': {
     productName: 'Applegate Naturals Turkey Sausage',
@@ -899,6 +1888,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Applegate Naturals. Read labels carefully.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:24.001Z'
+    }
   },
   'ground pork (lean, small amounts)': {
     productName: 'Lean Ground Pork',
@@ -906,6 +1903,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Human-grade lean ground pork.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:28.611Z'
+    }
   },
   'regular potato': {
     productName: 'Fresh Russet Potatoes',
@@ -913,6 +1918,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Human-grade standard russet potato.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.15,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:33.292Z'
+    }
   },
   'walnut oil': {
     productName: 'La Tourangelle Walnut Oil',
@@ -920,6 +1933,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'La Tourangelle or NOW Foods. Cold-pressed, human-grade.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 8.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:38.038Z'
+    }
   },
   'black currant oil': {
     productName: 'NOW Foods Black Currant Seed Oil',
@@ -927,6 +1948,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Life-Flo. Capsules often best.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:42.792Z'
+    }
   },
   'almond oil': {
     productName: 'Viva Naturals Sweet Almond Oil',
@@ -934,6 +1963,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Viva Naturals. Cold-pressed, edible grade.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 18.46,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:47.604Z'
+    }
   },
   'sunflower oil': {
     productName: 'High Oleic Sunflower Oil Cold Pressed',
@@ -941,6 +1978,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Goya or BetterBody Foods. High oleic, cold-pressed.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 51.85,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:52.300Z'
+    }
   },
   'chia seed oil': {
     productName: 'Healthworks Organic Chia Seed Oil',
@@ -948,6 +1993,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Healthworks or Organic Veda. Cold-pressed.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.46,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:56:56.757Z'
+    }
   },
   'herring oil': {
     productName: 'Nordic Naturals Pet Herring Oil',
@@ -955,6 +2008,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nordic Naturals Pet or Grizzly Pet Products.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.91,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:01.793Z'
+    }
   },
   'anchovy oil': {
     productName: 'Carlson Labs Fish Oil Anchovy',
@@ -962,6 +2023,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nordic Naturals Pet or Carlson Labs.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:06.500Z'
+    }
   },
   'evening primrose oil': {
     productName: 'Nature\'s Way Evening Primrose Oil',
@@ -969,6 +2038,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Nature\'s Way. Capsules often best.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 17.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:11.379Z'
+    }
   },
   'mackerel oil': {
     productName: 'Jarrow Formulas Fish Oil Supplement',
@@ -976,13 +2053,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nordic Naturals Pet or Jarrow Formulas.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:16.222Z'
+    }
   },
   'sardine oil': {
     productName: 'Zesty Paws Sardine Oil for Dogs',
     asinLink: 'https://www.amazon.com/dp/B0CXKHT5K2?tag=robinfrench-20',
     vetNote: 'Zesty Paws or Grizzly Salmon Oil.',
     category: 'Oil',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'standard',
+
+    price: {
+      amount: 29.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:20.966Z'
+    }
   },
   'borage oil': {
     productName: 'NOW Foods Borage Oil Softgels',
@@ -990,6 +2083,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Barleans. Cold-pressed.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:25.485Z'
+    }
   },
   'sesame oil': {
     productName: 'Spectrum Cold Pressed Sesame Oil',
@@ -997,6 +2098,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Chosen Foods or Spectrum. Toasted or un-toasted.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 10.84,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:30.466Z'
+    }
   },
   'avocado oil': {
     productName: 'Chosen Foods Pure Avocado Oil',
@@ -1004,6 +2113,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Chosen Foods or La Tourangelle. Pure avocado oil.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 40.91,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:34.935Z'
+    }
   },
   'avocado oil (tiny amounts)': {
     productName: 'Chosen Foods Pure Avocado Oil',
@@ -1011,6 +2128,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Chosen Foods or La Tourangelle. Pure avocado oil.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 40.91,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:39.404Z'
+    }
   },
   'wheat germ oil': {
     productName: 'NOW Foods Wheat Germ Oil Liquid',
@@ -1018,6 +2143,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Solgar. High potency liquid.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 30.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:44.060Z'
+    }
   },
   'krill oil': {
     productName: 'Kori Krill Oil Pure Supplement',
@@ -1025,6 +2158,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Viva Labs or Kori Krill Oil. Pure krill oil supplement.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 78.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:48.832Z'
+    }
   },
   'algae oil (dha)': {
     productName: 'Nordic Naturals Algae Omega DHA',
@@ -1032,6 +2173,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nordic Naturals Algae Omega or Ovega-3. Vegan DHA.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 33.11,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:53.790Z'
+    }
   },
   'omega-3 oil': {
     productName: 'Grizzly Salmon Oil for Pets',
@@ -1039,6 +2188,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Grizzly Salmon Oil or Nordic Naturals Pet.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 43.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:57:58.533Z'
+    }
   },
   'kelp powder': {
     productName: 'NOW Foods Organic Kelp Powder',
@@ -1046,6 +2203,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Starwest Botanicals. Organic kelp powder.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 13.29,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:03.385Z'
+    }
   },
   'joint health powder': {
     productName: 'Nutramax Dasuquin Joint Health Powder',
@@ -1053,6 +2218,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutramax Dasuquin or VetriScience Glycoflex.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 43.8,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:08.122Z'
+    }
   },
   'amino acid supplement': {
     productName: 'Purina Pro Plan Amino Acid Supplement',
@@ -1060,6 +2233,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Purina Pro Plan Veterinary Diets amino acid supplement.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:12.855Z'
+    }
   },
   'calcium supplement': {
     productName: 'Thomas Labs Calcium Carbonate Powder',
@@ -1067,6 +2248,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods Calcium Carbonate or Thomas Labs Calciboost.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 7.12,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:17.738Z'
+    }
   },
   'spirulina powder': {
     productName: 'Vimergy Organic Spirulina Powder',
@@ -1074,6 +2263,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Vimergy. Organic, high purity.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.89,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:22.564Z'
+    }
   },
   'electrolyte powder': {
     productName: 'ReptoBoost Electrolyte Powder',
@@ -1081,6 +2278,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'ReptoBoost or Pedialyte. Unflavored, read labels.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 37.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:27.368Z'
+    }
   },
   'vitamin d3 drops': {
     productName: 'Ddrops Liquid Vitamin D3 Drops',
@@ -1088,6 +2293,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'NOW Foods or Ddrops. 1000 IU per drop.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.45,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:32.356Z'
+    }
   },
   'brewer\'s yeast': {
     productName: 'Bob\'s Red Mill Brewer\'s Yeast Flakes',
@@ -1102,6 +2315,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Anthony\'s Goods. Raw hulled buckwheat groats.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:42.291Z'
+    }
   },
   'buckwheat (tiny amounts)': {
     productName: 'Bob\'s Red Mill Raw Hulled Buckwheat Groats',
@@ -1109,6 +2330,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Anthony\'s Goods. Raw hulled buckwheat groats.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:47.053Z'
+    }
   },
   'buckwheat (hulled)': {
     productName: 'Anthony\'s Goods Hulled Buckwheat Groats',
@@ -1116,6 +2345,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Anthony\'s Goods. Hulled buckwheat groats.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 24.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:51.848Z'
+    }
   },
   'sorghum': {
     productName: 'Bob\'s Red Mill Whole Grain Sorghum',
@@ -1123,6 +2360,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Shiloh Farms. Whole grain sorghum.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.33,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:58:56.471Z'
+    }
   },
   'barley': {
     productName: 'Bob\'s Red Mill Hulled Barley Grain',
@@ -1130,6 +2375,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill hulled barley grain.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.92,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:01.320Z'
+    }
   },
   'barley (cooked, minimal)': {
     productName: 'Bob\'s Red Mill Hulled Barley Grain',
@@ -1137,6 +2390,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill hulled barley grain.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:06.108Z'
+    }
   },
   'barley (hulled)': {
     productName: 'Bob\'s Red Mill Hulled Barley Grain',
@@ -1144,6 +2405,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill hulled barley grain.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:10.692Z'
+    }
   },
   'millet': {
     productName: 'Bob\'s Red Mill Whole Grain Millet',
@@ -1151,6 +2420,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Organic Grains. Whole grain millet.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.33,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:15.280Z'
+    }
   },
   'millet (tiny amounts)': {
     productName: 'Bob\'s Red Mill Whole Grain Millet',
@@ -1158,6 +2435,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Organic Grains. Whole grain millet.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.32,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:20.051Z'
+    }
   },
   'farro': {
     productName: 'Bob\'s Red Mill Farro Grain',
@@ -1165,6 +2450,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Thrive Market. Farro grain.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.33,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:24.562Z'
+    }
   },
   'bulgur': {
     productName: 'Bob\'s Red Mill Fine Bulgur Wheat',
@@ -1172,6 +2465,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Ziyad. Fine bulgur wheat.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.42,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:29.455Z'
+    }
   },
   'amaranth (tiny amounts)': {
     productName: 'Bob\'s Red Mill Whole Grain Amaranth Seed',
@@ -1179,6 +2480,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Anthony\'s Goods. Whole grain amaranth seed.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 44.1,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:34.311Z'
+    }
   },
   'amaranth seeds': {
     productName: 'Bob\'s Red Mill Whole Grain Amaranth Seed',
@@ -1186,6 +2495,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Anthony\'s Goods. Whole grain amaranth seed.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 44.1,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:39.129Z'
+    }
   },
   'teff seeds': {
     productName: 'Bob\'s Red Mill Whole Grain Teff Seeds',
@@ -1193,6 +2510,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill whole grain teff seeds.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.33,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:43.761Z'
+    }
   },
   'wheat (hulled)': {
     productName: 'Bob\'s Red Mill Whole Hulled Wheat Berries',
@@ -1200,6 +2525,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or SpeltLife. Whole hulled wheat berries.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 8.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:48.590Z'
+    }
   },
   'oat bran (small amounts)': {
     productName: 'Bob\'s Red Mill Pure Oat Bran Cereal',
@@ -1207,6 +2540,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Quaker. Pure oat bran cereal.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.74,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:53.569Z'
+    }
   },
   'oatmeal (cooked, small amounts)': {
     productName: 'Quaker Rolled Oats Old Fashioned',
@@ -1214,6 +2555,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Quaker. Rolled oats old fashioned.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 59.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T20:59:58.329Z'
+    }
   },
   'corn (cracked)': {
     productName: 'Scratch and Peck Cracked Corn Non-GMO',
@@ -1221,6 +2570,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Scratch and Peck Feeds or Purina. Cracked corn non-GMO.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 27.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:03.238Z'
+    }
   },
   'safflower seeds': {
     productName: 'Wagner\'s Pure Safflower Seed Bird Food',
@@ -1228,6 +2585,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Wagner\'s or Kaytee. Pure safflower seed bird food.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.02,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:07.947Z'
+    }
   },
   'nyjer seeds': {
     productName: 'Wagner\'s Nyjer Seed Bird Food',
@@ -1235,6 +2600,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Wagner\'s or Kaytee. Nyjer seed bird food.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 15.61,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:12.678Z'
+    }
   },
   'bok choi': {
     productName: 'Fresh Baby Bok Choy',
@@ -1242,6 +2615,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:17.337Z'
+    }
   },
   'bok choy (small amounts)': {
     productName: 'Fresh Baby Bok Choy',
@@ -1249,6 +2630,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:21.875Z'
+    }
   },
   'navy beans (mashed)': {
     productName: 'Goya Canned Navy Beans Low Sodium',
@@ -1256,6 +2645,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Goya or Bush\'s. Canned navy beans, low sodium, rinse well.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.39,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:26.427Z'
+    }
   },
   'kidney beans (mashed)': {
     productName: 'Goya Canned Dark Red Kidney Beans Low Sodium',
@@ -1263,6 +2660,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Goya or Bush\'s. Canned dark red kidney beans, low sodium, rinse well.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.59,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:31.008Z'
+    }
   },
   'kidney beans (mashed, tiny amounts)': {
     productName: 'Goya Canned Dark Red Kidney Beans Low Sodium',
@@ -1270,6 +2675,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Goya or Bush\'s. Canned dark red kidney beans, low sodium, rinse well.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.59,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:35.581Z'
+    }
   },
   'pinto beans (mashed)': {
     productName: 'Bush\'s Canned Pinto Beans Low Sodium',
@@ -1277,6 +2690,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Goya or Bush\'s. Canned pinto beans, low sodium, rinse well.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.32,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:40.288Z'
+    }
   },
   'purslane': {
     productName: 'Fresh Purslane Leaves',
@@ -1284,6 +2705,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:45.040Z'
+    }
   },
   'purslane (small amounts)': {
     productName: 'Fresh Purslane Leaves',
@@ -1291,6 +2720,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:49.880Z'
+    }
   },
   'miner\'s lettuce': {
     productName: 'Miner\'s Lettuce Seeds for Planting',
@@ -1305,6 +2742,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Bob\'s Red Mill or Spectrum. Organic ground flaxseed meal.',
     category: 'Seed',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 11.42,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:00:59.653Z'
+    }
   },
   'fennel': {
     productName: 'Fresh Fennel Bulb',
@@ -1312,6 +2757,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:04.302Z'
+    }
   },
   'delicata squash': {
     productName: 'Fresh Delicata Squash',
@@ -1319,6 +2772,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:08.746Z'
+    }
   },
   'yellow squash': {
     productName: 'Fresh Yellow Summer Squash',
@@ -1326,6 +2787,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.94,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:13.363Z'
+    }
   },
   'leeks': {
     productName: 'Fresh Leeks',
@@ -1333,6 +2802,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:17.884Z'
+    }
   },
   'shallots': {
     productName: 'Fresh Shallots',
@@ -1340,6 +2817,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:22.358Z'
+    }
   },
   'tomatoes (small amounts)': {
     productName: 'Fresh Ripe Vine Tomatoes',
@@ -1347,6 +2832,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.06,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:26.909Z'
+    }
   },
   'napa cabbage': {
     productName: 'Fresh Napa Cabbage',
@@ -1354,6 +2847,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.96,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:31.424Z'
+    }
   },
   'napa cabbage (small amounts)': {
     productName: 'Fresh Napa Cabbage',
@@ -1361,6 +2862,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:35.907Z'
+    }
   },
   'artichokes': {
     productName: 'Fresh Artichoke Hearts',
@@ -1368,6 +2877,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 8.72,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:40.510Z'
+    }
   },
   'frisee': {
     productName: 'Fresh Frisee Lettuce',
@@ -1375,6 +2892,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:44.839Z'
+    }
   },
   'radicchio': {
     productName: 'Fresh Radicchio Lettuce',
@@ -1382,6 +2907,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:49.536Z'
+    }
   },
   'red cabbage': {
     productName: 'Fresh Red Cabbage Head',
@@ -1389,6 +2922,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:54.104Z'
+    }
   },
   'green cabbage': {
     productName: 'Fresh Green Cabbage Head',
@@ -1396,6 +2937,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:01:58.558Z'
+    }
   },
   'swiss chard': {
     productName: 'Fresh Swiss Chard',
@@ -1403,6 +2952,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:03.086Z'
+    }
   },
   'swiss chard (cooked, tiny amounts)': {
     productName: 'Fresh Swiss Chard',
@@ -1410,6 +2967,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:07.730Z'
+    }
   },
   'lettuce (romaine, small amounts)': {
     productName: 'Fresh Romaine Lettuce Hearts',
@@ -1417,6 +2982,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:12.166Z'
+    }
   },
   'red leaf lettuce': {
     productName: 'Fresh Red Leaf Lettuce',
@@ -1424,6 +2997,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:16.673Z'
+    }
   },
   'mache': {
     productName: 'Fresh Mache Lamb\'s Lettuce',
@@ -1431,6 +3012,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.39,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:21.348Z'
+    }
   },
   'alfalfa sprouts (small amounts)': {
     productName: 'Fresh Alfalfa Sprouts',
@@ -1438,6 +3027,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 13.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:25.940Z'
+    }
   },
   'cat grass (wheatgrass)': {
     productName: 'SmartyKat Cat Grass Growing Kit Wheatgrass',
@@ -1445,6 +3042,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'SmartyKat or Catit. Cat Grass growing kit wheatgrass.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:30.763Z'
+    }
   },
   'squash (cooked)': {
     productName: 'Fresh Butternut Squash',
@@ -1452,6 +3057,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 1.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:35.236Z'
+    }
   },
   'lamb\'s quarters': {
     productName: 'Lamb\'s Quarters Seeds',
@@ -1466,6 +3079,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 18.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:44.545Z'
+    }
   },
   'ginger (small amounts)': {
     productName: 'Simply Organic Fresh Ginger Root',
@@ -1473,6 +3094,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'McCormick or Simply Organic. Organic ginger root fresh.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:49.197Z'
+    }
   },
   'turmeric': {
     productName: 'Simply Organic Pure Turmeric Powder',
@@ -1480,6 +3109,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Simply Organic or Tummydrops. Pure turmeric powder.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:54.163Z'
+    }
   },
   'rosemary': {
     productName: 'Frontier Co-op Dried Organic Rosemary',
@@ -1487,6 +3124,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Simply Organic or Frontier Co-op. Dried organic rosemary.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 15.75,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:02:59.048Z'
+    }
   },
   'sage': {
     productName: 'Simply Organic Dried Sage Leaf',
@@ -1494,6 +3139,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Simply Organic or Frontier Co-op. Dried sage leaf.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 329.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:03.477Z'
+    }
   },
   'mint': {
     productName: 'Fresh Mint Leaves',
@@ -1501,6 +3154,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce or Mountain Rose Herbs. Fresh mint leaves.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.48,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:08.008Z'
+    }
   },
   'garlic chives': {
     productName: 'Fresh Garlic Chives',
@@ -1508,6 +3169,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:12.540Z'
+    }
   },
   'raisins (unsweetened)': {
     productName: 'Sun-Maid Organic Raisins Unsweetened',
@@ -1515,6 +3184,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Sun-Maid or Trader Joe\'s. Organic raisins unsweetened no oil.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 10.43,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:17.641Z'
+    }
   },
   'plums (pitted)': {
     productName: 'Fresh Plums Pitted',
@@ -1522,6 +3199,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 35.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:22.560Z'
+    }
   },
   'apricots (pitted)': {
     productName: 'NOW Foods Dried Apricots Unsulphured',
@@ -1529,6 +3214,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce or NOW Foods. Dried apricots unsulphured no sugar.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.55,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:27.321Z'
+    }
   },
   'kiwi': {
     productName: 'Fresh Kiwi Fruit',
@@ -1536,6 +3229,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.48,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:31.814Z'
+    }
   },
   'mulberries': {
     productName: 'Terrasoul Dried Mulberries Organic',
@@ -1543,6 +3244,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Navitas Organics or Terrasoul Superfoods. Dried mulberries organic.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:36.579Z'
+    }
   },
   'raspberries': {
     productName: 'Fresh Raspberries Organic',
@@ -1550,6 +3259,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.59,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:41.252Z'
+    }
   },
   'cranberries': {
     productName: 'NOW Foods Dried Cranberries Unsweetened',
@@ -1557,6 +3274,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce or NOW Foods. Dried cranberries unsweetened.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 16.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:45.886Z'
+    }
   },
   'pineapple (small amounts)': {
     productName: 'Fresh Pineapple Fruit',
@@ -1564,6 +3289,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:50.298Z'
+    }
   },
   'pears (no seeds)': {
     productName: 'Fresh Pears No Seeds',
@@ -1571,6 +3304,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market.',
     category: 'Fruit',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 8.8,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:54.777Z'
+    }
   },
   'pinhead crickets': {
     productName: 'Josh\'s Frogs Live Pinhead Crickets',
@@ -1578,6 +3319,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Josh\'s Frogs or Fluker\'s. Live pinhead crickets.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 24.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:03:59.322Z'
+    }
   },
   'locusts': {
     productName: 'Exo Terra Canned Locusts Reptile Food',
@@ -1585,6 +3334,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Rainbow Mealworms or Exo Terra. Canned locusts reptile food.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 6.62,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:04.065Z'
+    }
   },
   'butterworms': {
     productName: 'Rainbow Mealworms Live Butterworms',
@@ -1592,6 +3349,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Josh\'s Frogs or Rainbow Mealworms. Live butterworms.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 28.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:08.665Z'
+    }
   },
   'grasshoppers': {
     productName: 'Fluker\'s Dried Grasshoppers Reptile Food',
@@ -1599,6 +3364,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fluker\'s or Exo Terra. Dried grasshoppers reptile food.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 8.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:13.583Z'
+    }
   },
   'small dubia roaches': {
     productName: 'Small Live Dubia Roaches Feeder',
@@ -1606,6 +3379,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'DubiaRoaches.com or Josh\'s Frogs. Small live dubia roaches feeder.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.9,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:18.331Z'
+    }
   },
   'silkworms': {
     productName: 'Live Silkworms Reptile Food',
@@ -1613,6 +3394,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Coastal Silkworms or SilkwormShop. Live silkworms reptile food.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.34,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:22.952Z'
+    }
   },
   'earthworms': {
     productName: 'Uncle Jim\'s Live Earthworms',
@@ -1620,6 +3409,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Uncle Jim\'s Worm Farm. Live earthworms.',
     category: 'Insect',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 17.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:27.764Z'
+    }
   },
   'wheat hay': {
     productName: 'Oxbow Wheat Hay Small Animal',
@@ -1627,6 +3424,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Oxbow Animal Health or Small Pet Select. Wheat hay small animal.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:32.581Z'
+    }
   },
   'fescue hay': {
     productName: 'Small Pet Select Fescue Hay',
@@ -1634,6 +3439,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Small Pet Select fescue hay.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:37.376Z'
+    }
   },
   'oat hay': {
     productName: 'Oxbow Oat Hay Small Animal',
@@ -1641,6 +3454,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Oxbow Animal Health or Small Pet Select. Oat hay small animal.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 8.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:42.190Z'
+    }
   },
   'bluegrass hay': {
     productName: 'Small Pet Select Bluegrass Hay',
@@ -1648,6 +3469,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Small Pet Select bluegrass hay.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:46.822Z'
+    }
   },
   'straw (wheat/pine)': {
     productName: 'Oxbow Wheat Straw Bedding',
@@ -1655,6 +3484,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Kaytee or Oxbow. Wheat straw bedding.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:51.497Z'
+    }
   },
   'dried grass': {
     productName: 'Kaytee Dried Natural Grass Small Animal',
@@ -1662,6 +3499,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Kaytee or Timothy Grass. Dried natural grass small animal.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 5.29,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:04:56.470Z'
+    }
   },
   'bermuda hay': {
     productName: 'Standlee Premium Bermuda Hay',
@@ -1669,6 +3514,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Oxbow Animal Health or Standlee Hay. Premium bermuda hay.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 36.8,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:00.772Z'
+    }
   },
   'barley hay': {
     productName: 'Standlee Barley Hay',
@@ -1676,6 +3529,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Small Pet Select or Standlee Hay. Barley hay.',
     category: 'Hay',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:05.786Z'
+    }
   },
   'guinea pig pellets (with vitamin c)': {
     productName: 'Oxbow Essentials Cavy Cuisine Guinea Pig Pellets',
@@ -1683,6 +3544,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Oxbow Essentials Cavy Cuisine or Sherwood. Guinea pig pellets with vitamin C.',
     category: 'Pellet',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 36.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:10.639Z'
+    }
   },
   'rabbit pellets (high fiber)': {
     productName: 'Oxbow Essentials Rabbit Food High Fiber',
@@ -1690,6 +3559,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Oxbow Essentials Rabbit Food. Adult rabbit pellets high fiber.',
     category: 'Pellet',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21.67,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:15.479Z'
+    }
   },
   'hamster pellets (higher protein)': {
     productName: 'Oxbow Essentials Hamster Food Higher Protein',
@@ -1697,6 +3574,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Higgins Sunburst or Oxbow Essentials. Hamster food higher protein.',
     category: 'Pellet',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:20.304Z'
+    }
   },
   'wild bird mix': {
     productName: 'Lyric Wild Bird Mix No Filler',
@@ -1704,6 +3589,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Lyric or Kaytee. Wild bird mix no filler.',
     category: 'Pellet',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.02,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:24.990Z'
+    }
   },
 
   // === MISSING INGREDIENTS - Added to complete coverage ===
@@ -1713,6 +3606,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Immune-supporting beta-glucans from yeast or mushrooms for enhanced immune function.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 134.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:29.791Z'
+    }
   },
   'biotin': {
     productName: 'NOW Supplements Biotin 5000 mcg',
@@ -1720,13 +3621,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'B-complex vitamin essential for healthy skin, coat, and metabolic function.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:34.707Z'
+    }
   },
   'bone broth (low sodium)': {
     productName: 'Brutus Bone Broth for Dogs Low Sodium',
     asinLink: 'https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20',
     vetNote: 'Concentrated bone broth providing collagen, glucosamine, and natural electrolytes without excess sodium.',
     category: 'Supplement',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'premium',
+
+    price: {
+      amount: 30.48,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:39.622Z'
+    }
   },
   'cauliflower': {
     productName: 'Fresh Organic Cauliflower',
@@ -1734,6 +3651,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Low-calorie vegetable rich in fiber and vitamins.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:44.196Z'
+    }
   },
   'chicory root': {
     productName: 'NOW Supplements Inulin Prebiotic Fiber',
@@ -1741,6 +3666,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Prebiotic fiber from chicory root supporting healthy gut bacteria and digestive function.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:48.888Z'
+    }
   },
   'chondroitin sulfate': {
     productName: 'Cosequin DS Plus MSM with Chondroitin',
@@ -1748,6 +3681,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Veterinarian-formulated joint supplement with chondroitin for cartilage health and mobility.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 36.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:53.676Z'
+    }
   },
   'cranberry extract': {
     productName: 'NOW Supplements Cranberry Extract 5000 mg',
@@ -1755,6 +3696,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Concentrated cranberry extract supporting urinary tract health and preventing bacterial adhesion.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:05:58.616Z'
+    }
   },
   'curcumin (turmeric extract)': {
     productName: 'NOW Supplements Curcumin with BioPerine',
@@ -1762,6 +3711,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Anti-inflammatory curcumin from turmeric with enhanced absorption for joint and immune support.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 26.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:03.526Z'
+    }
   },
   'd-mannose': {
     productName: 'NOW Supplements D-Mannose Powder',
@@ -1769,6 +3726,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Natural sugar compound supporting urinary tract health by preventing bacterial adhesion.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 39.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:08.330Z'
+    }
   },
   'egg yolks': {
     productName: 'Vital Farms Pasture-Raised Eggs',
@@ -1776,6 +3741,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'High-quality eggs from pasture-raised hens, rich in protein, healthy fats, and essential nutrients.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 10.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:12.913Z'
+    }
   },
   'eggplant': {
     productName: 'Fresh Organic Eggplant',
@@ -1783,6 +3756,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Low-calorie vegetable with fiber and antioxidants.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:17.448Z'
+    }
   },
   'eggshells (crushed)': {
     productName: 'NOW Supplements Calcium Carbonate Powder',
@@ -1790,13 +3771,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Crushed eggshells provide natural calcium carbonate. Can be prepared at home from organic eggs or use calcium supplement.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:22.464Z'
+    }
   },
   'fish broth (no salt)': {
     productName: 'Brutus Fish Broth for Dogs No Salt',
     asinLink: 'https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20',
     vetNote: 'Concentrated fish broth providing omega-3s, collagen, and natural flavor without added salt.',
     category: 'Supplement',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'standard',
+
+    price: {
+      amount: 16.65,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:27.442Z'
+    }
   },
   'fructooligosaccharides (fos)': {
     productName: 'NOW Supplements FOS Prebiotic Fiber',
@@ -1804,6 +3801,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Prebiotic fiber supporting beneficial gut bacteria growth and digestive health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:32.045Z'
+    }
   },
   'glucosamine sulfate': {
     productName: 'Cosequin DS Plus MSM Glucosamine',
@@ -1811,6 +3816,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Veterinarian-formulated glucosamine sulfate for joint cartilage health and mobility support.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 36.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:36.710Z'
+    }
   },
   'green beans': {
     productName: 'Fresh Organic Green Beans',
@@ -1818,6 +3831,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Low-calorie vegetable rich in fiber and vitamins.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 25.56,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:41.437Z'
+    }
   },
   'green beans (cooked)': {
     productName: 'Fresh Organic Green Beans',
@@ -1825,6 +3846,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Steam or boil until tender for optimal digestibility.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 25.56,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:46.007Z'
+    }
   },
   'hairball control paste': {
     productName: 'Tomlyn Laxatone Hairball Remedy',
@@ -1832,6 +3861,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Veterinarian-formulated paste for hairball prevention and digestive health in cats.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 23.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:50.872Z'
+    }
   },
   'hyaluronic acid': {
     productName: 'NOW Supplements Hyaluronic Acid 100 mg',
@@ -1839,6 +3876,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Joint health supplement supporting cartilage hydration and joint lubrication.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 18.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:06:55.692Z'
+    }
   },
   'inulin (prebiotic)': {
     productName: 'NOW Supplements Inulin Prebiotic Fiber',
@@ -1846,6 +3891,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Prebiotic fiber from chicory root supporting healthy gut bacteria and digestive function.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 29.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:00.337Z'
+    }
   },
   'jerusalem artichoke': {
     productName: 'Fresh Jerusalem Artichoke Sunchokes',
@@ -1853,13 +3906,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Prebiotic-rich root vegetable supporting gut health.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 22.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:04.838Z'
+    }
   },
   'joint health supplement': {
     productName: 'Cosequin DS Plus MSM for Dogs',
     asinLink: 'https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20',
     vetNote: 'Veterinarian-formulated joint supplement with glucosamine, chondroitin, and MSM for joint health and mobility.',
     category: 'Supplement',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'premium',
+
+    price: {
+      amount: 36.97,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:09.362Z'
+    }
   },
   'l-carnitine powder': {
     productName: 'NOW Supplements L-Carnitine 500 mg',
@@ -1867,6 +3936,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Amino acid supporting heart health, energy metabolism, and weight management.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:14.304Z'
+    }
   },
   'lysine powder': {
     productName: 'NOW Supplements L-Lysine 1000 mg',
@@ -1874,6 +3951,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Essential amino acid supporting immune function, collagen production, and overall health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 13.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:19.324Z'
+    }
   },
   'malabar spinach': {
     productName: 'Fresh Malabar Spinach Leaves',
@@ -1881,6 +3966,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Nutrient-rich leafy green with vitamins and minerals.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 34,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:23.821Z'
+    }
   },
   'mannanoligosaccharides (mos)': {
     productName: 'NOW Supplements MOS Prebiotic',
@@ -1888,6 +3981,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Prebiotic supplement supporting beneficial gut bacteria and immune function.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 17.4,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:28.938Z'
+    }
   },
   'milk thistle': {
     productName: 'NOW Supplements Milk Thistle 150 mg',
@@ -1895,6 +3996,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Liver-supporting herb with antioxidant properties for hepatic health and detoxification.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 10.4,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:33.821Z'
+    }
   },
   'new zealand spinach': {
     productName: 'Fresh New Zealand Spinach',
@@ -1902,6 +4011,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Nutrient-rich leafy green alternative to traditional spinach.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 4.49,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:38.722Z'
+    }
   },
   'niacinamide': {
     productName: 'NOW Supplements Niacinamide 500 mg',
@@ -1909,6 +4026,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'B-vitamin (B3) supporting energy metabolism, skin health, and nervous system function.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 12.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:43.676Z'
+    }
   },
   'oats (rolled)': {
     productName: 'Bob\'s Red Mill Old Fashioned Rolled Oats',
@@ -1916,6 +4041,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Whole grain rolled oats providing fiber, B vitamins, and sustained energy. Cook thoroughly before serving.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.44,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:48.631Z'
+    }
   },
   'peas': {
     productName: 'Fresh Organic Green Peas',
@@ -1923,6 +4056,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Protein-rich legume with fiber and vitamins.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:53.364Z'
+    }
   },
   'peas (mashed)': {
     productName: 'Fresh Organic Green Peas',
@@ -1930,6 +4071,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Steam and mash for optimal digestibility.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:07:57.848Z'
+    }
   },
   'pectin (from apples)': {
     productName: 'NOW Supplements Apple Pectin Powder',
@@ -1937,6 +4086,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Soluble fiber from apples supporting digestive health and blood sugar regulation.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 9.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:02.860Z'
+    }
   },
   'pumpkin seed oil': {
     productName: 'NOW Solutions Pumpkin Seed Oil',
@@ -1944,6 +4101,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Omega-3 and omega-6 rich oil supporting urinary health, skin, and coat condition.',
     category: 'Oil',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 21.98,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:07.591Z'
+    }
   },
   'quail eggs': {
     productName: 'Fresh Quail Eggs',
@@ -1951,6 +4116,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Small nutrient-dense eggs from quail, rich in protein, healthy fats, and essential nutrients.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 18.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:12.122Z'
+    }
   },
   'quercetin': {
     productName: 'NOW Supplements Quercetin with Bromelain',
@@ -1958,6 +4131,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Antioxidant flavonoid supporting immune function, allergy relief, and anti-inflammatory benefits.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 37.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:16.972Z'
+    }
   },
   'rice (hulled)': {
     productName: 'Lundberg Organic Brown Rice',
@@ -1965,6 +4146,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Whole grain brown rice with hull removed, providing fiber, B vitamins, and sustained energy.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 2.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:21.670Z'
+    }
   },
   'romanesco broccoli': {
     productName: 'Fresh Romanesco Broccoli',
@@ -1972,6 +4161,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Nutrient-rich cruciferous vegetable with vitamins C and K.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:26.110Z'
+    }
   },
   's-adenosyl methionine (sam-e)': {
     productName: 'NOW Supplements SAM-e 200 mg',
@@ -1979,6 +4176,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Methyl donor supporting liver health, joint function, and mood regulation.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 40.25,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:31.107Z'
+    }
   },
   'sardines (in water)': {
     productName: 'Wild Planet Sardines in Water No Salt',
@@ -1986,6 +4191,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Wild-caught sardines canned in water without added salt. Rich in omega-3s, calcium, and protein.',
     category: 'Meat',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 41.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:36.179Z'
+    }
   },
   'snap peas': {
     productName: 'Fresh Organic Snap Peas',
@@ -1993,6 +4206,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Edible-pod peas rich in fiber and vitamins.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:40.695Z'
+    }
   },
   'snow peas': {
     productName: 'Fresh Organic Snow Peas',
@@ -2000,6 +4221,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Flat-podded peas with tender texture and mild flavor.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:45.145Z'
+    }
   },
   'snow peas (mashed)': {
     productName: 'Fresh Organic Snow Peas',
@@ -2007,6 +4236,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Steam and mash for optimal digestibility.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'premium',
+
+    price: {
+      amount: 64.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:49.515Z'
+    }
   },
   'split peas': {
     productName: 'Bob\'s Red Mill Split Peas',
@@ -2014,6 +4251,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Dried split peas providing protein, fiber, and B vitamins. Soak and cook thoroughly before serving.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:54.184Z'
+    }
   },
   'split peas (mashed)': {
     productName: 'Bob\'s Red Mill Split Peas',
@@ -2021,6 +4266,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Dried split peas providing protein, fiber, and B vitamins. Cook and mash for optimal digestibility.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:08:58.721Z'
+    }
   },
   'sugar snap peas': {
     productName: 'Fresh Organic Sugar Snap Peas',
@@ -2028,6 +4281,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Sweet, crisp peas with edible pods rich in fiber.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:03.193Z'
+    }
   },
   'sugar snap peas (mashed)': {
     productName: 'Fresh Organic Sugar Snap Peas',
@@ -2035,13 +4296,29 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Steam and mash for optimal digestibility.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 20.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:07.623Z'
+    }
   },
   'turkey broth (no salt)': {
     productName: 'Brutus Turkey Broth for Dogs No Salt',
     asinLink: 'https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20',
     vetNote: 'Concentrated turkey broth providing protein, collagen, and natural flavor without added salt.',
     category: 'Supplement',
-    commissionRate: 0.03
+    commissionRate: 0.03,
+    species: 'dogs',
+    costTier: 'standard',
+
+    price: {
+      amount: 16.65,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:12.294Z'
+    }
   },
   'vitamin b complex': {
     productName: 'Thorne B-Complex #12',
@@ -2049,6 +4326,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Complete B vitamin complex for energy metabolism, nervous system health, and overall vitality.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:17.134Z'
+    }
   },
   'vitamin c (small amounts)': {
     productName: 'NOW Supplements Vitamin C 1000 mg',
@@ -2056,6 +4341,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Antioxidant vitamin supporting immune function and collagen production. Use in small amounts as directed.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 17.95,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:22.054Z'
+    }
   },
   'watercress': {
     productName: 'Fresh Organic Watercress',
@@ -2063,6 +4356,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Nutrient-dense leafy green with vitamins A, C, and K.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:26.582Z'
+    }
   },
   'watercress (small amounts)': {
     productName: 'Fresh Organic Watercress',
@@ -2070,6 +4371,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Fresh produce from grocery store or farmers market. Use in small amounts due to strong flavor and oxalate content.',
     category: 'Vegetable',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 3.99,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:31.021Z'
+    }
   },
   'wheat germ': {
     productName: 'Bob\'s Red Mill Wheat Germ',
@@ -2077,6 +4386,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Nutrient-dense wheat germ providing vitamin E, B vitamins, and healthy fats for skin and coat health.',
     category: 'Supplement',
     commissionRate: 0.03
+,
+    costTier: 'budget',
+
+    price: {
+      amount: 14.33,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:35.709Z'
+    }
   },
   'wild rice': {
     productName: 'Lundberg Organic Wild Rice',
@@ -2084,6 +4401,14 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     vetNote: 'Whole grain wild rice providing protein, fiber, and B vitamins. Cook thoroughly before serving.',
     category: 'Carb',
     commissionRate: 0.03
+,
+    costTier: 'standard',
+
+    price: {
+      amount: 19.5,
+      currency: 'USD',
+      lastUpdated: '2025-12-12T21:09:40.679Z'
+    }
   },
 };
 
@@ -2237,29 +4562,266 @@ function normalizeIngredientName(name: string): string {
 }
 
 /**
+ * Classify product cost tier based on price
+ */
+function classifyCostTier(price: number): 'budget' | 'standard' | 'premium' {
+  if (price < 15) return 'budget';
+  if (price < 30) return 'standard';
+  return 'premium';
+}
+
+/**
  * Looks up a generic ingredient and returns the vetted product details if available.
  * @param genericName The generic ingredient name (e.g., "Ground Turkey").
+ * @param species Optional species for species-aware filtering.
+ * @param preferBudget If true, prioritize budget-tier products when multiple options exist.
  */
-export function getVettedProduct(genericName: string): VettedProduct | undefined {
+export function getVettedProduct(
+  genericName: string,
+  species?: 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets' | string,
+  preferBudget?: boolean
+): VettedProduct | undefined {
   const normalizedName = genericName.toLowerCase().trim();
   
+  // If preferBudget is true, collect all compatible products and filter by tier
+  if (preferBudget) {
+    const candidates: VettedProduct[] = [];
+    
+    // Try exact match
+    let product = VETTED_PRODUCTS[normalizedName];
+    if (product && isProductCompatibleWithSpecies(product, species)) {
+      candidates.push(product);
+    }
+    
+    // Try normalized match
+    const normalized = normalizeIngredientName(genericName);
+    product = VETTED_PRODUCTS[normalized];
+    if (product && isProductCompatibleWithSpecies(product, species)) {
+      if (!candidates.some(c => c.asinLink === product.asinLink)) {
+        candidates.push(product);
+      }
+    }
+    
+    // Try reverse lookup by productName
+    const productByReverseLookup = Object.values(VETTED_PRODUCTS).find(
+      p => p.productName.toLowerCase() === normalizedName && isProductCompatibleWithSpecies(p, species)
+    );
+    if (productByReverseLookup && !candidates.some(c => c.asinLink === productByReverseLookup.asinLink)) {
+      candidates.push(productByReverseLookup);
+    }
+    
+    // If we have candidates, prioritize budget tier
+    if (candidates.length > 0) {
+      // Get prices and classify tiers
+      const withTiers = candidates.map(p => ({
+        product: p,
+        price: p.price?.amount || 999, // High price if missing
+        tier: p.costTier || classifyCostTier(p.price?.amount || 999),
+      }));
+      
+      // Sort: budget first, then standard, then premium
+      withTiers.sort((a, b) => {
+        const tierOrder: Record<'budget' | 'standard' | 'premium', number> = { budget: 0, standard: 1, premium: 2 };
+        const tierDiff = tierOrder[a.tier] - tierOrder[b.tier];
+        if (tierDiff !== 0) return tierDiff;
+        // If same tier, prefer lower price
+        return a.price - b.price;
+      });
+      
+      return withTiers[0]?.product;
+    }
+    
+    // No candidates found
+    return undefined;
+  }
+  
+  // Original logic (no budget preference)
   // First try exact match
-  const exactMatch = VETTED_PRODUCTS[normalizedName];
-  if (exactMatch) {
-    // Exact match found - no logging needed in production
-    return exactMatch;
+  let product = VETTED_PRODUCTS[normalizedName];
+  if (product) {
+    // Check species compatibility
+    if (!isProductCompatibleWithSpecies(product, species)) {
+      return undefined;
+    }
+    return product;
   }
 
   // Then try normalized match
   const normalized = normalizeIngredientName(genericName);
-  const normalizedMatch = VETTED_PRODUCTS[normalized];
+  product = VETTED_PRODUCTS[normalized];
   
-  if (normalizedMatch) {
-    // Normalized match found - no logging needed in production
-    return normalizedMatch;
+  if (product) {
+    // Check species compatibility
+    if (!isProductCompatibleWithSpecies(product, species)) {
+      return undefined;
+    }
+    return product;
+  }
+  
+  // Try reverse lookup by productName (for branded names)
+  const productByReverseLookup = Object.values(VETTED_PRODUCTS).find(
+    p => p.productName.toLowerCase() === normalizedName
+  );
+  if (productByReverseLookup) {
+    // Check species compatibility
+    if (!isProductCompatibleWithSpecies(productByReverseLookup, species)) {
+      return undefined;
+    }
+    return productByReverseLookup;
   }
   
   // No match found - silently return undefined (product not available)
+  return undefined;
+}
+
+/**
+ * Check if a product is compatible with the specified species
+ */
+function isProductCompatibleWithSpecies(
+  product: VettedProduct,
+  species?: string
+): boolean {
+  // If no species specified, allow product (backward compatibility)
+  // Log warning in development to track missing species wiring
+  if (!species) {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.warn(`[getVettedProduct] No species specified for lookup, allowing product: ${product.productName}`);
+    }
+    return true;
+  }
+  
+  // If product has no species field, allow it (backward compatibility)
+  if (!product.species) {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.warn(`[getVettedProduct] Product has no species field, allowing: ${product.productName}`);
+    }
+    // Still run defensive name check even if no species field
+    return !hasSpeciesMismatchInName(product.productName, species);
+  }
+  
+  // Normalize species for comparison
+  const normalizedSpecies = species.toLowerCase();
+  
+  // Check species compatibility
+  if (product.species === 'both') {
+    return true;
+  }
+  
+  if (typeof product.species === 'string') {
+    if (product.species.toLowerCase() === normalizedSpecies) {
+      return !hasSpeciesMismatchInName(product.productName, species);
+    }
+    return false;
+  }
+  
+  if (Array.isArray(product.species)) {
+    const isCompatible = product.species.some(
+      s => s.toLowerCase() === normalizedSpecies
+    );
+    if (isCompatible) {
+      return !hasSpeciesMismatchInName(product.productName, species);
+    }
+    return false;
+  }
+  
+  // Unknown species format, reject to be safe
+  return false;
+}
+
+/**
+ * Defensive check: reject products with species mismatch in product name
+ * This catches data inconsistencies where productName says "for Dogs" but species field might be wrong
+ */
+function hasSpeciesMismatchInName(productName: string, species: string): boolean {
+  const nameLower = productName.toLowerCase();
+  const speciesLower = species.toLowerCase();
+  
+  // Check for explicit "for Dogs" / "for Cats" patterns
+  if (speciesLower === 'cats') {
+    if (nameLower.includes('for dogs') || 
+        nameLower.includes('for dog') ||
+        (nameLower.includes('dog food') && !nameLower.includes('cat'))) {
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.warn(`[Species Mismatch] Rejecting product "${productName}" for cats (contains "for Dogs" or "dog food")`);
+      }
+      return true;
+    }
+  }
+  
+  if (speciesLower === 'dogs') {
+    if (nameLower.includes('for cats') || 
+        nameLower.includes('for cat') ||
+        (nameLower.includes('cat food') && !nameLower.includes('dog'))) {
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.warn(`[Species Mismatch] Rejecting product "${productName}" for dogs (contains "for Cats" or "cat food")`);
+      }
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Reverse lookup: Get the generic ingredient name from a specific product name
+ * This is useful when we have a productName and need to find the generic ingredient key
+ * to enable budget-aware product selection
+ * @param productName The specific branded product name
+ * @returns The generic ingredient name (key) or undefined
+ */
+export function getGenericIngredientName(productName: string): string | undefined {
+  const normalizedProductName = productName.toLowerCase().trim();
+  
+  // Search through all vetted products to find a match
+  for (const [genericKey, product] of Object.entries(VETTED_PRODUCTS)) {
+    if (product.productName.toLowerCase() === normalizedProductName) {
+      return genericKey;
+    }
+  }
+  
+  // Also try partial matches (in case productName is a subset)
+  for (const [genericKey, product] of Object.entries(VETTED_PRODUCTS)) {
+    const productNameLower = product.productName.toLowerCase();
+    if (productNameLower.includes(normalizedProductName) || normalizedProductName.includes(productNameLower)) {
+      // Prefer exact matches, but return first partial if no exact found
+      return genericKey;
+    }
+  }
+  
+  return undefined;
+}
+
+/**
+ * Gets a vetted product by productName or ASIN link (useful when you have a branded name or link)
+ * @param nameOrLink The generic name, product name, or ASIN link
+ * @returns The vetted product or undefined
+ */
+export function getVettedProductByAnyIdentifier(
+  nameOrLink: string,
+  species?: 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets' | string,
+  preferBudget?: boolean
+): VettedProduct | undefined {
+  // First try the standard lookup (handles generic names and product names)
+  const standardMatch = getVettedProduct(nameOrLink, species, preferBudget);
+  if (standardMatch) {
+    return standardMatch;
+  }
+  
+  // Try matching by ASIN in the link
+  const asinMatch = nameOrLink.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+  if (asinMatch) {
+    const asin = asinMatch[1];
+    const productByAsin = Object.values(VETTED_PRODUCTS).find(
+      product => {
+        const productAsin = product.asinLink.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+        return productAsin && productAsin[1] === asin;
+      }
+    );
+    if (productByAsin) {
+      return productByAsin;
+    }
+  }
+  
   return undefined;
 }
 
@@ -2331,6 +4893,94 @@ export function generateAmazonCartUrl(ingredientNames: string[]): string | null 
   const cartUrl = `https://www.amazon.com/gp/aws/cart/add.html?AssociateTag=robinfrench-20&ASIN.1=${asinList[0]}${asinList.slice(1).map((asin, index) => `&ASIN.${index + 2}=${asin}&Quantity.${index + 2}=1`).join('')}&Quantity.1=1`;
 
   return cartUrl;
+}
+
+/**
+ * Gets the cheapest vetted product by price.
+ * @param category Optional category filter (e.g., 'Meat', 'Vegetable').
+ * @returns Object with ingredient name, product, and price, or null if no products with prices found.
+ */
+export function getCheapestProduct(category?: VettedProduct['category']): { ingredient: string; product: VettedProduct; price: number } | null {
+  let products = Object.entries(VETTED_PRODUCTS)
+    .filter(([_, product]) => product.price && product.price.amount > 0)
+    .map(([ingredient, product]) => ({ ingredient, product, price: product.price!.amount }));
+  
+  if (category) {
+    products = products.filter(({ product }) => product.category === category);
+  }
+  
+  if (products.length === 0) return null;
+  
+  return products.reduce((cheapest, current) => 
+    current.price < cheapest.price ? current : cheapest
+  );
+}
+
+/**
+ * Gets the most expensive vetted product by price.
+ * @param category Optional category filter (e.g., 'Meat', 'Vegetable').
+ * @returns Object with ingredient name, product, and price, or null if no products with prices found.
+ */
+export function getMostExpensiveProduct(category?: VettedProduct['category']): { ingredient: string; product: VettedProduct; price: number } | null {
+  let products = Object.entries(VETTED_PRODUCTS)
+    .filter(([_, product]) => product.price && product.price.amount > 0)
+    .map(([ingredient, product]) => ({ ingredient, product, price: product.price!.amount }));
+  
+  if (category) {
+    products = products.filter(({ product }) => product.category === category);
+  }
+  
+  if (products.length === 0) return null;
+  
+  return products.reduce((mostExpensive, current) => 
+    current.price > mostExpensive.price ? current : mostExpensive
+  );
+}
+
+/**
+ * Gets products sorted by price (ascending).
+ * @param category Optional category filter.
+ * @param limit Optional limit on number of results.
+ * @returns Array of objects with ingredient name, product, and price.
+ */
+export function getProductsByPriceAscending(category?: VettedProduct['category'], limit?: number): Array<{ ingredient: string; product: VettedProduct; price: number }> {
+  let products = Object.entries(VETTED_PRODUCTS)
+    .filter(([_, product]) => product.price && product.price.amount > 0)
+    .map(([ingredient, product]) => ({ ingredient, product, price: product.price!.amount }))
+    .sort((a, b) => a.price - b.price);
+  
+  if (category) {
+    products = products.filter(({ product }) => product.category === category);
+  }
+  
+  if (limit) {
+    products = products.slice(0, limit);
+  }
+  
+  return products;
+}
+
+/**
+ * Gets products sorted by price (descending).
+ * @param category Optional category filter.
+ * @param limit Optional limit on number of results.
+ * @returns Array of objects with ingredient name, product, and price.
+ */
+export function getProductsByPriceDescending(category?: VettedProduct['category'], limit?: number): Array<{ ingredient: string; product: VettedProduct; price: number }> {
+  let products = Object.entries(VETTED_PRODUCTS)
+    .filter(([_, product]) => product.price && product.price.amount > 0)
+    .map(([ingredient, product]) => ({ ingredient, product, price: product.price!.amount }))
+    .sort((a, b) => b.price - a.price);
+  
+  if (category) {
+    products = products.filter(({ product }) => product.category === category);
+  }
+  
+  if (limit) {
+    products = products.slice(0, limit);
+  }
+  
+  return products;
 }
 
 /**

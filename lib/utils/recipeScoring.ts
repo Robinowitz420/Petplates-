@@ -19,7 +19,8 @@ export interface Pet {
 }
 
 export interface ScoreResult {
-  matchScore: number; // 0-100
+  compatibilityScore: number; // 0-100 (formerly matchScore)
+  matchScore: number; // 0-100 (deprecated - use compatibilityScore)
   stars: number; // 1-5
   reasoning: {
     goodMatches: string[];
@@ -70,6 +71,7 @@ export function scoreRecipe(recipe: Recipe, pet: Pet): ScoreResult {
   // 1. Species Match (Required Gate - 0 if wrong species)
   if (recipe.category !== pet.species) {
     return {
+      compatibilityScore: 0,
       matchScore: 0,
       stars: 1,
       reasoning: {
@@ -155,7 +157,8 @@ export function scoreRecipe(recipe: Recipe, pet: Pet): ScoreResult {
   else stars = 1;
 
   return {
-    matchScore: score,
+    compatibilityScore: score,
+    matchScore: score, // Keep for backward compatibility
     stars,
     reasoning: {
       goodMatches,

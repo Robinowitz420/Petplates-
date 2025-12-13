@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, startTransition } from 'react';
 import Link from 'next/link';
 import { Plus, Edit, Trash2, ShoppingCart } from 'lucide-react';
 import { getPrimaryName } from '@/lib/utils/petUtils';
@@ -8,16 +8,31 @@ import type { Pet } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import HealthConcernsDropdown from '@/components/HealthConcernsDropdown';
 import { useVillageStore } from '@/lib/state/villageStore';
-import { getMascotFaceForPetType } from '@/lib/utils/emojiMapping';
+import { getMascotFaceForPetType, getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import AddPetModal from '@/components/CreatePetModal';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
+import { getPets, savePet, deletePet } from '@/lib/utils/petStorage'; // Import from storage util
 import type { CustomMeal } from '@/lib/types';
-import { recipes } from '@/lib/data/recipes-complete';
-import { rateRecipeForPet, type Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+// Lazy load recipes to avoid blocking initial page load
+let recipesCache: any[] | null = null;
+const loadRecipes = async () => {
+  if (recipesCache) return recipesCache;
+  const recipesModule = await import('@/lib/data/recipes-complete');
+  recipesCache = recipesModule.recipes;
+  return recipesCache;
+};
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
 import Image from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
+import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
+import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
+import { calculateEnhancedCompatibility, calculateRecipeNutrition, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
+import type { Recipe } from '@/lib/types';
+import { checkAllBadges } from '@/lib/utils/badgeChecker';
+import PetBadges from '@/components/PetBadges';
+import BadgeToggle from '@/components/BadgeToggle';
+import Tooltip from '@/components/Tooltip';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -83,40 +98,6 @@ type ProfilePet = Pet;
 
 // Simulated user id (replace with Clerk user.id in real auth)
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
-
-const getPetsFromLocalStorage = (userId: string): ProfilePet[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed)
-        ? parsed.map((p: any) => ({
-            ...p,
-            // Ensure names is always an array, filter out empty strings
-            names: Array.isArray(p.names) 
-              ? p.names.filter((n: string) => n && n.trim() !== '')
-              : (p.name ? [p.name] : []),
-            savedRecipes: p.savedRecipes || [],
-            healthConcerns: p.healthConcerns || [],
-            weight: p.weight || '',
-            allergies: p.allergies || [],
-          }))
-        : [];
-    } catch (e) {
-      // Failed to parse pet data - using empty array
-      return [];
-    }
-  }
-  return [];
-};
-
-const savePetsToLocalStorage = (userId: string, pets: Pet[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(`pets_${userId}`, JSON.stringify(pets));
-  }
-};
 
 // =================================================================
 // 2. DATA CONSTANTS
@@ -554,6 +535,9 @@ export default function MyPetsPage() {
   const [planOffset, setPlanOffset] = useState(0);
 const [planWeekly, setPlanWeekly] = useState<{ day: string; meals: any[] }[]>([]);
 const [swapTarget, setSwapTarget] = useState<{ dayIdx: number; mealIdx: number } | null>(null);
+  const [recipes, setRecipes] = useState<any[]>([]);
+const [recipesLoading, setRecipesLoading] = useState(false);
+  const [badgeRefreshKey, setBadgeRefreshKey] = useState(0);
 const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activePetId) : null), [activePetId, pets]);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -566,22 +550,29 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
     message: '',
     onConfirm: () => {},
   });
-  const recipeNameMap = useMemo(() => {
-    const map = new Map<string, string>();
-    recipes.forEach((r) => {
-      if (r?.id) {
-        map.set(r.id, r.name || r.shortName || formatRecipeName(r.id));
-      }
-    });
-    return map;
-  }, []);
-  const getRecipeName = useCallback(
-    (id: string) => {
-      if (!id) return 'Unnamed Meal';
-      return recipeNameMap.get(id) || formatRecipeName(id);
-    },
-    [recipeNameMap]
-  );
+  // Load recipes lazily when first needed (not on initial page load)
+  useEffect(() => {
+    if (recipes.length === 0 && !recipesLoading) {
+      setRecipesLoading(true);
+      loadRecipes().then((loadedRecipes) => {
+        setRecipes(loadedRecipes);
+        setRecipesLoading(false);
+      }).catch(() => {
+        setRecipesLoading(false);
+      });
+    }
+  }, [recipes.length, recipesLoading]);
+
+  // Lazy recipe name lookup - loads recipes on-demand to avoid blocking initial render
+  const getRecipeName = useCallback((id: string) => {
+    if (!id) return 'Unnamed Meal';
+    // If recipes not loaded yet, return formatted name (will update when recipes load)
+    if (recipes.length === 0) {
+      return formatRecipeName(id);
+    }
+    const recipe = recipes.find(r => r.id === id);
+    return recipe?.name || recipe?.shortName || formatRecipeName(id);
+  }, [recipes]);
 const buildWeeklyPlan = useCallback(
     (saved: string[], offset: number): WeeklyPlanEntry[] => {
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -634,38 +625,207 @@ const buildWeeklyPlan = useCallback(
     setIsClient(true);
   }, []);
 
+  // Load pets function - reusable
+  const loadPets = useCallback(async () => {
+    const loadedPets = await getPets(userId);
+    // Normalize names: convert name field to names array if needed
+    const normalizedPets = loadedPets.map((p: Pet) => ({
+      ...p,
+      names: p.names && Array.isArray(p.names) && p.names.length > 0
+        ? p.names.filter((n: string) => n && n.trim() !== '')
+        : (p.name && typeof p.name === 'string' && p.name.trim() !== ''
+            ? [p.name.trim()]
+            : ['Unnamed Pet']),
+    }));
+    setPets(normalizedPets);
+  }, [userId]);
+
+  // Load custom meals when active pet changes - deferred until pet is actually selected
+  const loadCustomMeals = useCallback(async () => {
+    if (activePetId && userId) {
+      const meals = await getCustomMeals(userId, activePetId);
+      // Use startTransition for non-critical state updates to avoid blocking UI
+      startTransition(() => {
+        setCustomMeals(meals);
+      });
+      // Note: loadPets() is called by the petsUpdated event handler, so we don't need to call it here
+      // This avoids race conditions and redundant calls
+    } else {
+      startTransition(() => {
+        setCustomMeals([]);
+      });
+    }
+  }, [activePetId, userId]);
+
+  // Load saved active pet ID from localStorage on mount (before pets load)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('last_user_id', userId);
+      
+      // Load saved active pet ID - this will be validated once pets are loaded
+      const savedActivePetId = localStorage.getItem(`active_pet_id_${userId}`);
+      if (savedActivePetId) {
+        setActivePetId(savedActivePetId);
+      }
+    }
+  }, [userId]);
+
   // Load pets and expose user id for other pages (recipe detail, etc.)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('last_user_id', userId);
     }
-    setPets(getPetsFromLocalStorage(userId));
+    
+    // Initial load - only critical data (pets list)
+    loadPets();
+
     // Initialize village store with userId
     setUserId(userId);
-  }, [userId, setUserId]);
+  }, [userId, setUserId, loadPets]);
+
+  // Refresh pets when page becomes visible (user returns to tab)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Page became visible, refresh pets
+        loadPets();
+      }
+    };
+
+    const handleFocus = () => {
+      // Window regained focus, refresh pets
+      loadPets();
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      // Refresh if pets storage was modified (cross-tab/window)
+      if (e.key === `pets_${userId}`) {
+        loadPets();
+      }
+    };
+
+    const handlePetsUpdated = (e: CustomEvent) => {
+      // Refresh if pets were updated (same-tab)
+      if (e.detail?.userId === userId) {
+        loadPets();
+        // If the updated pet is the active pet, also refresh custom meals
+        // Use the current activePetId from closure, don't include loadCustomMeals in deps
+        if (e.detail?.petId === activePetId && activePetId) {
+          // Call getCustomMeals directly - use startTransition for non-critical updates
+          getCustomMeals(userId, activePetId).then(meals => {
+            startTransition(() => {
+              setCustomMeals(meals);
+            });
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('petsUpdated', handlePetsUpdated as EventListener);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('petsUpdated', handlePetsUpdated as EventListener);
+    };
+  }, [userId, loadPets, activePetId]);
 
   useEffect(() => {
     if (pets.length === 0) {
       setActivePetId(null);
       setActiveTab('bio');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(`active_pet_id_${userId}`);
+      }
       return;
     }
+    
+    // Check if current activePetId still exists in pets list
     const stillExists = pets.some((p) => p.id === activePetId);
     if (activePetId && !stillExists) {
+      // Current selection no longer exists, clear it
       setActivePetId(null);
       setActiveTab('bio');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(`active_pet_id_${userId}`);
+      }
     }
-  }, [pets, activePetId]);
+    
+    // If no pet is selected and we have pets, check localStorage first
+    if (!activePetId && pets.length > 0) {
+      if (typeof window !== 'undefined') {
+        const savedActivePetId = localStorage.getItem(`active_pet_id_${userId}`);
+        const savedPetExists = savedActivePetId && pets.some((p) => p.id === savedActivePetId);
+        if (savedPetExists) {
+          // Restore saved selection
+          setActivePetId(savedActivePetId);
+        } else {
+          // Only auto-select first pet if no valid saved selection exists
+          // Don't save this auto-selection to localStorage (only user selections are saved)
+          setActivePetId(pets[0].id);
+        }
+      } else {
+        setActivePetId(pets[0].id);
+      }
+    }
+  }, [pets, activePetId, userId]);
 
-  // Load custom meals when active pet changes
+  // Defer custom meals loading - only load when a pet is actually selected and viewed
+  // Don't load on initial mount if no pet is active (saves initial load time)
   useEffect(() => {
-    if (activePetId && userId) {
-      const meals = getCustomMeals(userId, activePetId);
-      setCustomMeals(meals);
+    // Only load if we have an active pet ID (pet is selected)
+    if (activePetId) {
+      loadCustomMeals();
     } else {
+      // Clear custom meals if no pet is selected
       setCustomMeals([]);
     }
-  }, [activePetId, userId]);
+  }, [activePetId, loadCustomMeals]);
+
+  // Listen for custom meal updates
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleCustomMealsUpdated = (e: CustomEvent) => {
+      // Refresh if custom meals were updated for the active pet
+      if (e.detail?.userId === userId && e.detail?.petId === activePetId && activePetId) {
+        // Call getCustomMeals directly to avoid dependency on loadCustomMeals callback
+        // Use startTransition for non-critical updates
+        getCustomMeals(userId, activePetId).then(meals => {
+          startTransition(() => {
+            setCustomMeals(meals);
+          });
+        });
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      // Refresh if custom meals storage was modified (cross-tab/window)
+      if (activePetId && e.key === `custom_meals_${userId}_${activePetId}`) {
+        // Call getCustomMeals directly to avoid dependency on loadCustomMeals callback
+        // Use startTransition for non-critical updates
+        getCustomMeals(userId, activePetId).then(meals => {
+          startTransition(() => {
+            setCustomMeals(meals);
+          });
+        });
+      }
+    };
+
+    window.addEventListener('customMealsUpdated', handleCustomMealsUpdated as EventListener);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('customMealsUpdated', handleCustomMealsUpdated as EventListener);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [userId, activePetId]);
 
   // Build weekly plan for Plan tab (merge saved recipes + custom meals)
   const allMealsForPlan = useMemo(() => {
@@ -726,11 +886,17 @@ const buildWeeklyPlan = useCallback(
   const handleAddPet = useCallback(
     (newPet: any) => {
       // Ensure names array is properly formatted and has at least one name
-      const cleanedNames = Array.isArray(newPet.names)
+      // First, try to get names from names array
+      let cleanedNames = Array.isArray(newPet.names)
         ? newPet.names.filter((n: string) => n && n.trim() !== '')
         : [];
       
-      // If no names after cleaning, set a default
+      // If no names array, check for singular name field (from CreatePetModal)
+      if (cleanedNames.length === 0 && newPet.name && typeof newPet.name === 'string' && newPet.name.trim() !== '') {
+        cleanedNames = [newPet.name.trim()];
+      }
+      
+      // If still no names after cleaning, set a default
       if (cleanedNames.length === 0) {
         cleanedNames.push('Unnamed Pet');
       }
@@ -738,6 +904,8 @@ const buildWeeklyPlan = useCallback(
       const petWithSavedRecipes = { 
         ...newPet,
         names: cleanedNames, // Use cleaned names
+        // Remove singular name field if it exists (we're using names array now)
+        name: undefined,
         savedRecipes: newPet.savedRecipes || [] 
       };
       
@@ -755,7 +923,11 @@ const buildWeeklyPlan = useCallback(
           updatedPets = [...prevPets, petWithSavedRecipes];
         }
 
-        savePetsToLocalStorage(userId, updatedPets);
+        // Save each pet async
+        updatedPets.forEach(pet => {
+          savePet(userId, pet).catch(err => console.error('Failed to save pet:', err));
+        });
+        
         return updatedPets;
       });
     },
@@ -767,6 +939,16 @@ const buildWeeklyPlan = useCallback(
     setIsModalOpen(true);
   }, []);
 
+  // Memoize modal handlers to prevent re-renders
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
+
+  const handleSubmitPet = useCallback((pet: Pet) => {
+    handleAddPet(pet);
+    setEditingPet(null);
+  }, [handleAddPet]);
+
   const handleDeletePet = useCallback((petId: string) => {
     const pet = pets.find(p => p.id === petId);
     const petName = pet ? getPrimaryName(pet.names || []) : 'this pet';
@@ -775,10 +957,11 @@ const buildWeeklyPlan = useCallback(
       isOpen: true,
       title: 'Delete Pet',
       message: `Are you sure you want to delete ${petName}? This action cannot be undone.`,
-      onConfirm: () => {
+      onConfirm: async () => {
+        await deletePet(userId, petId);
+        
         setPets(prevPets => {
           const updatedPets = prevPets.filter(p => p.id !== petId);
-          savePetsToLocalStorage(userId, updatedPets);
           if (activePetId === petId) {
             setActivePetId(null);
             setActiveTab('bio');
@@ -789,31 +972,53 @@ const buildWeeklyPlan = useCallback(
     });
   }, [userId, activePetId, pets]);
 
-  const handleRemoveSavedMeal = useCallback((recipeId: string) => {
+  const handleRemoveSavedMeal = useCallback(async (recipeId: string) => {
     if (!activePetId) return;
     
     // If it's a custom meal, also delete it from custom meals storage
     if (recipeId.startsWith('custom_')) {
-      const { deleteCustomMeal } = require('@/lib/utils/customMealStorage');
-      deleteCustomMeal(userId, activePetId, recipeId);
+      const { deleteCustomMeal } = await import('@/lib/utils/customMealStorage');
+      await deleteCustomMeal(userId, activePetId, recipeId);
       // Update local custom meals state
       setCustomMeals(prev => prev.filter(m => m.id !== recipeId));
     }
     
-    setPets(prevPets => {
-      const updatedPets = prevPets.map(p => {
-        if (p.id === activePetId) {
-          return {
-            ...p,
-            savedRecipes: (p.savedRecipes || []).filter(id => id !== recipeId)
-          };
-        }
-        return p;
-      });
-      savePetsToLocalStorage(userId, updatedPets);
-      return updatedPets;
-    });
-  }, [userId, activePetId]);
+    const petToUpdate = pets.find(p => p.id === activePetId);
+    if (petToUpdate) {
+      const updatedPet = {
+        ...petToUpdate,
+        savedRecipes: (petToUpdate.savedRecipes || []).filter(id => id !== recipeId)
+      };
+      
+      await savePet(userId, updatedPet);
+      
+      setPets(prevPets => prevPets.map(p => 
+        p.id === activePetId ? updatedPet : p
+      ));
+      
+      // Check badges after recipe is removed
+      if (activePet) {
+        const uniqueMealIds = new Set<string>();
+        planWeekly.forEach(day => {
+          day.meals.forEach(meal => {
+            if (meal && meal.id) uniqueMealIds.add(meal.id);
+          });
+        });
+        const mealPlanCount = uniqueMealIds.size;
+        const savedRecipesCount = updatedPet.savedRecipes?.length || 0;
+        const weeklyPlanCompleted = false;
+        
+        checkAllBadges(userId, activePet.id, {
+          action: 'recipe_removed',
+          mealPlanCount,
+          savedRecipesCount,
+          weeklyPlanCompleted,
+        }).catch(err => {
+          console.error('Failed to check badges:', err);
+        });
+      }
+    }
+  }, [userId, activePetId, pets, planWeekly, activePet]);
 
   // Component to buy all ingredients from meal plan
   const BuyAllMealPlanIngredientsButton = ({ weeklyPlan, petId }: { weeklyPlan: { day: string; meals: (string | null)[] }[]; petId: string }) => {
@@ -832,7 +1037,7 @@ const buildWeeklyPlan = useCallback(
           if (mealId) {
             const recipe = recipes.find(r => r.id === mealId);
             if (recipe && recipe.ingredients) {
-              recipe.ingredients.forEach(ing => {
+              recipe.ingredients.forEach((ing: any) => {
                 // Try to get vetted product link first
                 const vettedProduct = getVettedProduct(ing.name);
                 const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink || (ing as any).asinLink;
@@ -887,7 +1092,7 @@ const buildWeeklyPlan = useCallback(
           if (mealId) {
             const recipe = recipes.find(r => r.id === mealId);
             if (recipe && recipe.ingredients) {
-              recipe.ingredients.forEach(ing => {
+              recipe.ingredients.forEach((ing: any) => {
                 const vettedProduct = getVettedProduct(ing.name);
                 const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink || (ing as any).asinLink;
                 if (link) links.add(link);
@@ -1000,12 +1205,19 @@ const buildWeeklyPlan = useCallback(
                       onClick={() => {
                         setActivePetId(pet.id);
                         setActiveTab('bio');
+                        // Persist selection to localStorage
+                        if (typeof window !== 'undefined') {
+                          localStorage.setItem(`active_pet_id_${userId}`, pet.id);
+                        }
                       }}
-                      className={`w-full flex items-center gap-3 rounded-xl border px-3 py-2 text-left transition ${
+                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left transition-all duration-200 ease-out ${
                         activePetId === pet.id
-                          ? 'border-green-800 bg-green-900/20 text-white'
-                          : 'border-surface-highlight bg-surface-highlight/60 text-foreground hover:border-green-800 hover:bg-surface-highlight'
+                          ? 'bg-green-900/20 text-white'
+                          : 'bg-surface-highlight/60 text-foreground hover:bg-surface-highlight hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg'
                       }`}
+                      style={{
+                        border: activePetId === pet.id ? '3px solid #f97316' : '3px solid rgba(249, 115, 22, 0.5)'
+                      }}
                     >
                       <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-surface flex items-center justify-center flex-shrink-0">
                         <Image
@@ -1033,68 +1245,98 @@ const buildWeeklyPlan = useCallback(
             {activePet ? (
               <div className="bg-surface border border-surface-highlight rounded-2xl shadow-xl p-5">
                       <div className="flex items-start justify-between gap-3 flex-wrap">
-                        <div className="flex items-center gap-3">
-                          <div className="w-14 h-14 rounded-full overflow-hidden border border-white/10 bg-surface-highlight flex items-center justify-center">
-                            <Image
-                              src={getMascotFaceForPetType(activePet.type as PetCategory)}
-                          alt={`${getPrimaryName(activePet.names || []) || 'Pet'} mascot`}
-                              width={56}
-                              height={56}
-                              className="object-cover"
-                              unoptimized
-                            />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold">
-                              {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
-                            </h2>
-                            <div className="text-sm text-gray-400 capitalize">
-                              {activePet.type} {activePet.age ? `• ${activePet.age}` : '• age n/a'}
-                              {activePet.weight ? ` • ${activePet.weight}` : ''}
-                              {activePet.breed ? ` • ${activePet.breed}` : ''}
-                            </div>
-                            {Array.isArray(activePet.healthConcerns) &&
-                              activePet.healthConcerns.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                  {activePet.healthConcerns.slice(0, 4).map((c) => (
-                                    <span
-                                      key={c}
-                                      className="px-2 py-0.5 text-xs rounded-full bg-orange-900/40 text-orange-200 border border-orange-700/50"
-                                    >
-                                      {c.replace(/-/g, ' ')}
-                                    </span>
-                                  ))}
-                                  {activePet.healthConcerns.length > 4 && (
-                                    <span className="text-xs text-gray-500">
-                                      +{activePet.healthConcerns.length - 4}
-                                    </span>
-                                  )}
-                                </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="relative float-left mr-4 mb-2" style={{ shapeOutside: 'circle(50%)', width: '168px', height: '168px' }}>
+                            <svg className="absolute -top-8 left-0 pointer-events-none" width="168" height="40" style={{ overflow: 'visible' }}>
+                              <defs>
+                                <path id={`textPath-${activePet.id}`} d="M 10,35 Q 84,15 158,35" fill="none" />
+                              </defs>
+                              <text className="text-xs" fill="#9ca3af" fontSize="12">
+                                <textPath href={`#textPath-${activePet.id}`} startOffset="50%">
+                                  <tspan textAnchor="middle">Click to upload photo</tspan>
+                                </textPath>
+                              </text>
+                            </svg>
+                            <label className="w-42 h-42 rounded-full overflow-hidden border border-white/10 bg-surface-highlight flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity group" style={{ width: '168px', height: '168px' }}>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      const imageDataUrl = reader.result as string;
+                                      const updatedPet = { ...activePet, image: imageDataUrl };
+                                      savePet(userId, updatedPet);
+                                      setPets(prevPets => prevPets.map(p => p.id === activePet.id ? updatedPet : p));
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                              {activePet.image ? (
+                                <img
+                                  src={activePet.image}
+                                  alt={getPrimaryName(activePet.names || []) || 'Pet'}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <Image
+                                  src={getProfilePictureForPetType(activePet.type as PetCategory)}
+                                  alt={`${getPrimaryName(activePet.names || []) || 'Pet'} mascot`}
+                                  width={168}
+                                  height={168}
+                                  className="object-cover"
+                                  unoptimized
+                                  style={activePet.type === 'cats' || activePet.type === 'cat' ? { transform: 'scale(1.5)', transformOrigin: 'center', objectPosition: 'center' } : undefined}
+                                />
                               )}
-                            {Array.isArray(activePet.allergies) &&
-                              activePet.allergies.length > 0 && (
-                                <div className="mt-2 text-xs text-amber-200">
-                                  Allergies: {activePet.allergies.join(', ')}
-                                </div>
-                              )}
+                            </label>
                           </div>
                         </div>
-                        {activeTab === 'bio' && (
-                          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => handleEditPet(activePet)}
-              className="btn btn-secondary btn-sm"
-            >
-              Edit
-            </button>
-                            <button
-                              onClick={() => handleDeletePet(activePet.id)}
-                              className="btn btn-darkgreen btn-sm"
-                            >
-                              Delete
-                            </button>
+                        <div className="flex flex-col gap-3">
+                          {/* Pet name and Edit/Delete buttons row */}
+                          <div className="flex items-center justify-between gap-3 w-[600px]">
+                            <h2 className="text-3xl font-bold">
+                              {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
+                            </h2>
+                            {activeTab === 'bio' && (
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  onClick={() => handleEditPet(activePet)}
+                                  className="btn btn-success btn-sm"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePet(activePet.id)}
+                                  className="btn btn-darkgreen btn-sm"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
                           </div>
-                        )}
+                          {/* Badges Section - moved to far right, maintaining current height */}
+                          <div className="p-4 border border-surface-highlight rounded-lg bg-surface-highlight/30 min-h-[140px] w-[600px]">
+                            <div className="flex items-center justify-between mb-3">
+                              <Tooltip 
+                                content={`Available Badges:\n\n1. Perfect Match\n   Awarded when you hit a 100% compatibility score.\n\n2. Feast Architect\n   Unlocked by building a layered or multi‑step meal plan.\n\n3. Week Whisker (Progressive)\n   Bronze: Complete 1 weekly plan\n   Silver: Complete 10 weekly plans\n   Gold: Complete 50 weekly plans\n\n4. Purchase Champion (Progressive)\n   Bronze: 1 purchase\n   Silver: 10 purchases\n   Gold: 20 purchases\n   Platinum: 30 purchases\n   Diamond: 40 purchases\n   Sultan: 50+ purchases`}
+                                wide={true}
+                              >
+                                <div className="text-sm font-semibold text-gray-400 cursor-help hover:text-gray-300 transition-colors">Badges</div>
+                              </Tooltip>
+                            </div>
+                            <PetBadges key={badgeRefreshKey} petId={activePet.id} userId={userId} />
+                            <BadgeToggle 
+                              petId={activePet.id} 
+                              userId={userId} 
+                              onBadgeChange={() => setBadgeRefreshKey((prev: number) => prev + 1)}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                     <div className="mt-4">
@@ -1105,7 +1347,13 @@ const buildWeeklyPlan = useCallback(
                           return (
                             <button
                               key={tab}
-                              onClick={() => setActiveTab(tab as any)}
+                              onClick={() => {
+                                setActiveTab(tab as any);
+                                // Refresh pets when switching to saved tab to ensure latest data
+                                if (tab === 'saved') {
+                                  loadPets();
+                                }
+                              }}
                               className={`relative px-6 py-3 text-sm font-semibold transition-all duration-200 ${
                                 isActive
                                   ? 'text-orange-400 border-b-3 border-orange-400 bg-transparent'
@@ -1123,28 +1371,82 @@ const buildWeeklyPlan = useCallback(
 
                       <div className="mt-3">
                         {activeTab === 'bio' && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                            <div className="space-y-1">
-                              <div className="text-gray-300">Age: <span className="text-white capitalize">{activePet.age || 'Not set'}</span></div>
-                              <div className="text-gray-300">Breed: <span className="text-white">{activePet.breed || 'Not set'}</span></div>
-                              <div className="text-gray-300">Weight: <span className="text-white">{activePet.weight || 'Not set'}</span></div>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="text-gray-300">
-                                Health Concerns:{' '}
-                                <span className="text-white">
-                                  {Array.isArray(activePet.healthConcerns) && activePet.healthConcerns.length
-                                    ? activePet.healthConcerns.join(', ')
-                                    : 'None'}
-                                </span>
+                          <div className="flex gap-6">
+                            {/* Bio Column */}
+                            <div className="flex-1 min-w-0">
+                              <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
+                                {activePet.breed && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span><strong className="text-gray-200">Breed:</strong> {activePet.breed}</span>
+                                  </div>
+                                )}
+                                {activePet.age && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span><strong className="text-gray-200">Age:</strong> {activePet.age}</span>
+                                  </div>
+                                )}
+                                {(activePet.weight || activePet.weightKg) && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span><strong className="text-gray-200">Weight:</strong> {activePet.weightKg ? `${activePet.weightKg}kg` : activePet.weight}</span>
+                                  </div>
+                                )}
+                                {(activePet.dietaryRestrictions || []).length > 0 && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(activePet.dietaryRestrictions || []).join(', ')}</span>
+                                  </div>
+                                )}
+                                {(activePet.dislikes || []).length > 0 && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span><strong className="text-gray-200">Dislikes:</strong> {(activePet.dislikes || []).join(', ')}</span>
+                                  </div>
+                                )}
                               </div>
-                              <div className="text-gray-300">
-                                Allergies:{' '}
-                                <span className="text-white">
-                                  {Array.isArray(activePet.allergies) && activePet.allergies.length
-                                    ? activePet.allergies.join(', ')
-                                    : 'None'}
-                                </span>
+                            </div>
+
+                            {/* Health Concerns Column - Always rendered for consistent layout */}
+                            <div className="flex-shrink-0 min-w-[180px]">
+                              <h3 className="text-sm font-semibold text-gray-300 mb-2">Health Concerns</h3>
+                              <div className="flex flex-col gap-1.5">
+                                {(activePet.healthConcerns || []).length > 0 ? (
+                                  (activePet.healthConcerns || []).map((concern) => (
+                                    <div
+                                      key={concern}
+                                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                                    >
+                                      {concern.replace(/-/g, ' ')}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="px-2 py-1 text-gray-500 text-xs italic">
+                                    None
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Allergies Column - Always rendered for consistent layout */}
+                            <div className="flex-shrink-0 min-w-[180px]">
+                              <h3 className="text-sm font-semibold text-gray-300 mb-2">Allergies</h3>
+                              <div className="flex flex-col gap-1.5">
+                                {(activePet.allergies || []).length > 0 ? (
+                                  (activePet.allergies || []).map((allergy) => (
+                                    <div
+                                      key={allergy}
+                                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                                    >
+                                      {allergy.replace(/-/g, ' ')}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="px-2 py-1 text-gray-500 text-xs italic">
+                                    None
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1167,65 +1469,105 @@ const buildWeeklyPlan = useCallback(
                               if (combinedIds.length === 0) {
                                 return (
                                   <div className="text-gray-400 text-sm">
-                                    No saved meals yet. Use “Find Meals” to add some.
+                                    No saved meals yet. Use "Find Meals" to add some.
                                   </div>
                                 );
                               }
 
                               return (
-                                <div className="max-h-64 overflow-y-auto pr-1">
-                                  <ul className="space-y-1 text-sm">
+                                <div className="max-h-[480px] overflow-y-auto pr-2 space-y-2">
                                   {combinedIds.map((rid) => {
                                     const isCustomMeal = rid.startsWith('custom_');
                                     const recipe = isCustomMeal ? null : recipes.find((r) => r.id === rid);
                                     const customMeal = isCustomMeal ? customMeals.find((m) => m.id === rid) : null;
                                     const mealName = isCustomMeal ? customMeal?.name || 'Custom Meal' : getRecipeName(rid);
-                                    const rating = recipe?.rating ?? 0;
-                                    const compat = isCustomMeal ? customMeal?.analysis?.score : undefined;
+                                    const mealData = isCustomMeal ? customMeal : recipe;
 
-                                    // Calculate compatibility for regular recipes
-                                    let regularCompat: number | undefined;
-                                    if (recipe && activePet && !isCustomMeal) {
-                                      const petForRating: RatingPet = {
-                                        id: activePet.id,
-                                        name: activePet.name || activePet.names?.[0] || 'Unknown',
-                                        type: activePet.type as any,
-                                        age: activePet.age as any,
-                                        breed: activePet.breed || '',
-                                        weight: activePet.weight ? Number(activePet.weight) : undefined,
-                                        activityLevel: (activePet.activityLevel as 'sedentary' | 'moderate' | 'active' | 'very-active') || 'moderate',
-                                        dietaryRestrictions: activePet.dietaryRestrictions || [],
-                                        healthConcerns: activePet.healthConcerns || [],
-                                        allergies: activePet.allergies || [],
-                                        savedRecipes: activePet.savedRecipes || [],
-                                        names: activePet.names || [],
-                                        weightKg: activePet.weight ? Number(activePet.weight) || undefined : undefined,
-                                      };
-                                      const result = rateRecipeForPet(recipe as any, petForRating);
-                                      regularCompat = result?.overallScore;
+                                    // Calculate compatibility score
+                                    let compatibilityScore: number | null = null;
+                                    if (activePet && mealData) {
+                                      try {
+                                        const enhancedPet: EnhancedPet = {
+                                          id: activePet.id,
+                                          name: getPrimaryName(activePet.names || []) || 'Pet',
+                                          type: activePet.type === 'dogs' ? 'dog' : activePet.type === 'cats' ? 'cat' : activePet.type === 'birds' ? 'bird' : activePet.type === 'reptiles' ? 'reptile' : 'pocket-pet',
+                                          breed: activePet.breed || '',
+                                          age: activePet.age === 'baby' ? 0.5 : activePet.age === 'young' ? 2 : activePet.age === 'adult' ? 5 : 10,
+                                          weight: activePet.weightKg || 10,
+                                          activityLevel: 'moderate',
+                                          healthConcerns: activePet.healthConcerns || [],
+                                          dietaryRestrictions: activePet.allergies || [],
+                                          allergies: activePet.allergies || [],
+                                        };
+                                        const result = calculateEnhancedCompatibility(mealData as Recipe, enhancedPet);
+                                        compatibilityScore = result.overallScore;
+                                      } catch (error) {
+                                        console.error('Error calculating compatibility:', error);
+                                        compatibilityScore = null;
+                                      }
                                     }
 
                                     return (
-                                      <li key={rid} className="bg-surface-highlight rounded px-2 py-1 flex items-center justify-between gap-2">
-                                        <a
-                                          href={
-                                            isCustomMeal
-                                              ? `/profile/pet/${activePet.id}/custom-meals/${rid}`
-                                              : `/recipe/${rid}?petId=${activePet.id}`
-                                          }
-                                          className="text-primary-300 hover:text-primary-100 text-xs underline underline-offset-2 truncate flex-1"
-                                        >
-                                          {mealName}
-                                        </a>
-                                        <div className="flex items-center gap-2 whitespace-nowrap">
-                                          {!isCustomMeal && <span className="text-amber-300 text-xs">★ {rating.toFixed(1)}</span>}
-                                          {typeof (regularCompat ?? compat) === 'number' && (
-                                            <span className="text-green-300 text-xs">Meal Score: {regularCompat ?? compat}%</span>
+                                      <div key={rid} className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto_auto] items-center gap-4">
+                                        <div className="min-w-0">
+                                          <button
+                                            onClick={() => {
+                                              window.location.href = `/recipe/${rid}?petId=${activePet.id}`;
+                                            }}
+                                            className="text-primary-300 hover:text-primary-100 text-sm font-semibold break-words text-left px-3 py-2 rounded transition-colors bg-surface border border-orange-500/50 hover:border-orange-500 hover:bg-surface-highlight/50"
+                                          >
+                                            {mealName}
+                                          </button>
+                                        </div>
+                                        <div className="flex items-center justify-center min-w-[60px]">
+                                          {compatibilityScore !== null && (
+                                            <div className={`text-sm font-bold rounded-full w-10 h-10 flex items-center justify-center border-2 ${
+                                              compatibilityScore >= 80 
+                                                ? 'text-green-400 border-green-400' 
+                                                : compatibilityScore >= 60 
+                                                ? 'text-yellow-400 border-yellow-400' 
+                                                : 'text-red-400 border-red-400'
+                                            }`}>
+                                              {compatibilityScore}%
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                          {mealData && (mealData as any).ingredients && (
+                                            <button
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                const cartItems = ((mealData as any).ingredients || [])
+                                                  .map((ing: any, idx: number) => {
+                                                    const genericName = (ing.name || '').toLowerCase().trim();
+                                                    const vettedProduct = VETTED_PRODUCTS[genericName];
+                                                    const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
+                                                    if (link) {
+                                                      const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
+                                                      if (asinMatch) {
+                                                        return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
+                                                      }
+                                                    }
+                                                    return null;
+                                                  })
+                                                  .filter(Boolean);
+                                                if (cartItems.length > 0) {
+                                                  const cartUrl = ensureCartUrlSellerId(`https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`);
+                                                  window.open(cartUrl, '_blank');
+                                                } else {
+                                                  alert('No ingredient links available for this recipe.');
+                                                }
+                                              }}
+                                              className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
+                                              title="Buy ingredients"
+                                            >
+                                              <ShoppingCart size={14} />
+                                              Buy
+                                            </button>
                                           )}
                                           <button
                                             onClick={(e) => {
                                               e.preventDefault();
-                                              e.stopPropagation();
                                               setConfirmModal({
                                                 isOpen: true,
                                                 title: 'Remove Meal',
@@ -1235,18 +1577,15 @@ const buildWeeklyPlan = useCallback(
                                                 },
                                               });
                                             }}
-                                            className="ml-2 p-1 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors"
+                                            className="btn btn-success btn-sm"
                                             title="Remove meal"
                                           >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
+                                            Remove
                                           </button>
                                         </div>
-                                      </li>
+                                      </div>
                                     );
                                   })}
-                                  </ul>
                                 </div>
                               );
                             })()}
@@ -1271,68 +1610,219 @@ const buildWeeklyPlan = useCallback(
                           <div className="space-y-4 text-sm">
                             {planWeekly.length > 0 ? (
                               <>
+                                {/* Weekly Nutritional Coverage Summary */}
+                                {(() => {
+                                  if (!activePet) return null;
+                                  
+                                  // Calculate weekly nutrition totals
+                                  const calculateMealNutrition = (meal: any): { protein: number; fat: number; fiber: number; calcium: number; phosphorus: number; calories: number } => {
+                                    // Use calculateRecipeNutrition directly to get actual nutrition values
+                                    try {
+                                      const nutrition = calculateRecipeNutrition(meal as Recipe);
+                                      return {
+                                        protein: nutrition.protein || 0,
+                                        fat: nutrition.fat || 0,
+                                        fiber: nutrition.fiber || 0,
+                                        calcium: nutrition.calcium || 0,
+                                        phosphorus: nutrition.phosphorus || 0,
+                                        calories: nutrition.calories || 0,
+                                      };
+                                    } catch {
+                                      return { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0, calories: 0 };
+                                    }
+                                  };
+                                  
+                                  const weeklyTotals = planWeekly.reduce((acc, day) => {
+                                    day.meals.forEach(meal => {
+                                      const nutrition = calculateMealNutrition(meal);
+                                      acc.protein += nutrition.protein;
+                                      acc.fat += nutrition.fat;
+                                      acc.fiber += nutrition.fiber;
+                                      acc.calcium += nutrition.calcium;
+                                      acc.phosphorus += nutrition.phosphorus;
+                                      acc.calories += nutrition.calories;
+                                    });
+                                    return acc;
+                                  }, { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0, calories: 0 });
+                                  
+                                  // Average per day (divide by 7)
+                                  const dailyAvg = {
+                                    protein: weeklyTotals.protein / 7,
+                                    fat: weeklyTotals.fat / 7,
+                                    fiber: weeklyTotals.fiber / 7,
+                                    calcium: weeklyTotals.calcium / 7,
+                                    phosphorus: weeklyTotals.phosphorus / 7,
+                                    calories: weeklyTotals.calories / 7,
+                                  };
+                                  
+                                  // Get pet requirements
+                                  const petType = activePet.type as keyof typeof nutritionalGuidelines;
+                                  const ageGroup = activePet.age === 'baby' ? 'puppy' : activePet.age === 'senior' ? 'senior' : 'adult';
+                                  const requirements = nutritionalGuidelines[petType]?.[ageGroup] || nutritionalGuidelines[petType]?.adult;
+                                  
+                                  if (!requirements) return null;
+                                  
+                                  // Calculate coverage scores (0-100)
+                                  const calculateCoverage = (value: number, min: number, max: number): number => {
+                                    if (value < min) return (value / min) * 50; // Below min: 0-50
+                                    if (value > max) return 100 - Math.min((value - max) / max * 50, 50); // Above max: 50-100
+                                    return 50 + ((value - min) / (max - min)) * 50; // In range: 50-100
+                                  };
+                                  
+                                  const proteinScore = calculateCoverage(dailyAvg.protein, requirements.protein.min, requirements.protein.max);
+                                  const fatScore = calculateCoverage(dailyAvg.fat, requirements.fat.min, requirements.fat.max);
+                                  const fiberScore = requirements.fiber ? calculateCoverage(dailyAvg.fiber, requirements.fiber.min, requirements.fiber.max) : 100;
+                                  const calciumScore = requirements.calcium ? calculateCoverage(dailyAvg.calcium, requirements.calcium.min, requirements.calcium.max) : 100;
+                                  const phosphorusScore = requirements.phosphorus ? calculateCoverage(dailyAvg.phosphorus, requirements.phosphorus.min, requirements.phosphorus.max) : 100;
+                                  
+                                  const overallScore = Math.round((proteinScore + fatScore + fiberScore + calciumScore + phosphorusScore) / 5);
+                                  
+                                  return (
+                                    <div className="mb-4 p-3 bg-surface-highlight rounded-lg border border-surface-highlight flex items-center gap-3">
+                                      <h3 className="text-base font-semibold text-foreground">Compatibility score for the week:</h3>
+                                      <div className={`text-xl font-bold ${overallScore >= 80 ? 'text-green-400' : overallScore >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                                        {overallScore}%
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
                                 <div className="max-h-[480px] overflow-y-auto pr-2 space-y-3">
-                                  {planWeekly.map((dayPlan, index) => (
-                                    <div key={dayPlan.day} className="bg-surface-highlight rounded-lg border border-surface-highlight px-3 py-2">
-                                      <div className="text-white font-semibold mb-2">{dayPlan.day}</div>
-                                      <div className="space-y-2">
-                                        {dayPlan.meals.map((meal, mealIndex) => (
-                                          <div key={meal.id + mealIndex} className="p-2 rounded bg-surface-lighter border border-white/5">
-                                            <a
-                                              href={meal.category === 'custom'
-                                                ? `/profile/pet/${activePet.id}/custom-meals/${meal.id}`
-                                                : `/recipe/${meal.id}?petId=${activePet.id}`}
-                                              className="text-primary-300 hover:text-primary-100 text-sm font-semibold block break-words"
-                                            >
-                                              {meal.name}
-                                            </a>
-                                            <div className="flex flex-wrap gap-1 mt-1">
+                                  {planWeekly.map((dayPlan, index) => {
+                                    // Calculate day score for this day's meals
+                                    const calculateDayScore = (meals: any[]): number => {
+                                      if (!activePet || meals.length === 0) return 0;
+                                      
+                                      const calculateMealNutrition = (meal: any): { protein: number; fat: number; fiber: number; calcium: number; phosphorus: number } => {
+                                        // Use calculateRecipeNutrition directly to get actual nutrition values
+                                        try {
+                                          const nutrition = calculateRecipeNutrition(meal as Recipe);
+                                          return {
+                                            protein: nutrition.protein || 0,
+                                            fat: nutrition.fat || 0,
+                                            fiber: nutrition.fiber || 0,
+                                            calcium: nutrition.calcium || 0,
+                                            phosphorus: nutrition.phosphorus || 0,
+                                          };
+                                        } catch {
+                                          return { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0 };
+                                        }
+                                      };
+                                      
+                                      const dayTotals = meals.reduce((acc, meal) => {
+                                        const nutrition = calculateMealNutrition(meal);
+                                        acc.protein += nutrition.protein;
+                                        acc.fat += nutrition.fat;
+                                        acc.fiber += nutrition.fiber;
+                                        acc.calcium += nutrition.calcium;
+                                        acc.phosphorus += nutrition.phosphorus;
+                                        return acc;
+                                      }, { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0 });
+                                      
+                                      // Average per meal (divide by number of meals)
+                                      const mealAvg = {
+                                        protein: dayTotals.protein / meals.length,
+                                        fat: dayTotals.fat / meals.length,
+                                        fiber: dayTotals.fiber / meals.length,
+                                        calcium: dayTotals.calcium / meals.length,
+                                        phosphorus: dayTotals.phosphorus / meals.length,
+                                      };
+                                      
+                                      const petType = activePet.type as keyof typeof nutritionalGuidelines;
+                                      const ageGroup = activePet.age === 'baby' ? 'puppy' : activePet.age === 'senior' ? 'senior' : 'adult';
+                                      const requirements = nutritionalGuidelines[petType]?.[ageGroup] || nutritionalGuidelines[petType]?.adult;
+                                      
+                                      if (!requirements) return 0;
+                                      
+                                      const calculateCoverage = (value: number, min: number, max: number): number => {
+                                        if (value < min) return (value / min) * 50;
+                                        if (value > max) return 100 - Math.min((value - max) / max * 50, 50);
+                                        return 50 + ((value - min) / (max - min)) * 50;
+                                      };
+                                      
+                                      const proteinScore = calculateCoverage(mealAvg.protein, requirements.protein.min, requirements.protein.max);
+                                      const fatScore = calculateCoverage(mealAvg.fat, requirements.fat.min, requirements.fat.max);
+                                      const fiberScore = requirements.fiber ? calculateCoverage(mealAvg.fiber, requirements.fiber.min, requirements.fiber.max) : 100;
+                                      const calciumScore = requirements.calcium ? calculateCoverage(mealAvg.calcium, requirements.calcium.min, requirements.calcium.max) : 100;
+                                      const phosphorusScore = requirements.phosphorus ? calculateCoverage(mealAvg.phosphorus, requirements.phosphorus.min, requirements.phosphorus.max) : 100;
+                                      
+                                      return Math.round((proteinScore + fatScore + fiberScore + calciumScore + phosphorusScore) / 5);
+                                    };
+                                    
+                                    const dayScore = calculateDayScore(dayPlan.meals);
+                                    
+                                    return (
+                                      <div key={dayPlan.day} className="rounded-lg border border-surface-highlight px-3 py-2">
+                                        <div className="text-white font-semibold mb-2 flex items-center gap-2">
+                                          {dayPlan.day}
+                                          <div className={`text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border ${
+                                            dayScore >= 80 
+                                              ? 'text-green-400 border-green-400' 
+                                              : dayScore >= 60 
+                                              ? 'text-yellow-400 border-yellow-400' 
+                                              : 'text-red-400 border-red-400'
+                                          }`}>
+                                            {dayScore}%
+                                          </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                          {dayPlan.meals.map((meal, mealIndex) => (
+                                            <div key={meal.id + mealIndex} className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4">
                                               <button
-                                                onClick={(e) => {
-                                                  e.preventDefault();
-                                                  const cartItems = (meal.ingredients || [])
-                                                    .map((ing: any, idx: number) => {
-                                                      const genericName = (ing.name || '').toLowerCase().trim();
-                                                      const vettedProduct = VETTED_PRODUCTS[genericName];
-                                                      const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
-                                                      if (link) {
-                                                        const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
-                                                        if (asinMatch) {
-                                                          return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
-                                                        }
+                                                onClick={() => {
+                                                  window.location.href = `/recipe/${meal.id}?petId=${activePet.id}`;
+                                                }}
+                                                className="text-primary-300 hover:text-primary-100 text-sm font-semibold break-words text-left px-3 py-2 rounded transition-colors bg-surface border border-orange-500/50 hover:border-orange-500 hover:bg-surface-highlight/50"
+                                              >
+                                                {meal.name}
+                                              </button>
+                                              <div className="flex items-center gap-2 flex-shrink-0">
+                                            <button
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                const cartItems = (meal.ingredients || [])
+                                                  .map((ing: any, idx: number) => {
+                                                    const genericName = (ing.name || '').toLowerCase().trim();
+                                                    const vettedProduct = VETTED_PRODUCTS[genericName];
+                                                    const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
+                                                    if (link) {
+                                                      const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
+                                                      if (asinMatch) {
+                                                        return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
                                                       }
-                                                      return null;
-                                                    })
-                                                    .filter(Boolean);
-                                                  if (cartItems.length > 0) {
-                                                    const cartUrl = `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`;
-                                                    window.open(cartUrl, '_blank');
-                                                  } else {
-                                                    alert('No ingredient links available for this recipe.');
-                                                  }
-                                                }}
-                                                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black"
-                                                title="Buy ingredients"
-                                              >
-                                                <ShoppingCart size={12} />
-                                                Buy
-                                              </button>
-                                              <button
-                                                onClick={(e) => {
-                                                  e.preventDefault();
-                                                  setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
-                                                }}
-                                                className="inline-flex items-center gap-1 text-xxs px-2 py-1 rounded border border-gray-400 text-gray-200 hover:bg-surface transition-colors"
-                                                title="Edit this slot"
-                                              >
-                                                Edit
-                                              </button>
+                                                    }
+                                                    return null;
+                                                  })
+                                                  .filter(Boolean);
+                                                if (cartItems.length > 0) {
+                                                  const cartUrl = ensureCartUrlSellerId(`https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`);
+                                                  window.open(cartUrl, '_blank');
+                                                } else {
+                                                  alert('No ingredient links available for this recipe.');
+                                                }
+                                              }}
+                                              className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
+                                              title="Buy ingredients"
+                                            >
+                                              <ShoppingCart size={14} />
+                                              Buy
+                                            </button>
+                                            <button
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
+                                              }}
+                                              className="btn btn-success btn-sm"
+                                              title="Edit this slot"
+                                            >
+                                              Edit
+                                            </button>
                                             </div>
                                           </div>
                                         ))}
+                                        </div>
                                       </div>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                                 {swapTarget && (
                                   <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
@@ -1391,8 +1881,41 @@ const buildWeeklyPlan = useCallback(
                               <div className="text-gray-400">Add at least one saved or custom meal to generate a weekly plan.</div>
                             )}
                             {planWeekly.length > 0 && (
-                              <div className="pt-2">
+                              <div className="pt-2 flex gap-2 items-center">
                                 <BuyAllMealPlanIngredientsButton weeklyPlan={planWeekly as any} petId={activePet?.id || ''} />
+                                <button
+                                  onClick={async () => {
+                                    if (!activePet) return;
+                                    
+                                    // Mark plan as completed
+                                    const updatedPet = {
+                                      ...activePet,
+                                      completedMealPlans: (activePet.completedMealPlans || 0) + 1,
+                                    };
+                                    await savePet(userId, updatedPet);
+                                    setPets(prevPets => prevPets.map(p => p.id === activePet.id ? updatedPet : p));
+                                    
+                                    // Check badges
+                                    const uniqueMealIds = new Set<string>();
+                                    planWeekly.forEach(day => {
+                                      day.meals.forEach(meal => {
+                                        if (meal && meal.id) uniqueMealIds.add(meal.id);
+                                      });
+                                    });
+                                    
+                                    await checkAllBadges(userId, activePet.id, {
+                                      action: 'meal_plan_completed',
+                                      mealPlanCount: uniqueMealIds.size,
+                                      savedRecipesCount: activePet.savedRecipes?.length || 0,
+                                      weeklyPlanCompleted: true,
+                                      completionCount: updatedPet.completedMealPlans || 1,
+                                    });
+                                  }}
+                                  className="btn btn-success btn-sm"
+                                  title="Mark this weekly plan as completed (saved and locked)"
+                                >
+                                  ✓ Lock Plan
+                                </button>
                               </div>
                             )}
                             {planWeekly.length > 0 && (
@@ -1430,13 +1953,8 @@ const buildWeeklyPlan = useCallback(
 
         <AddPetModal
           isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-          }}
-          onSubmit={(pet) => {
-            handleAddPet(pet);
-            setEditingPet(null);
-          }}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitPet}
           editingPet={editingPet}
         />
 
@@ -1448,7 +1966,7 @@ const buildWeeklyPlan = useCallback(
           message={confirmModal.message}
           confirmText="Delete"
           cancelText="Cancel"
-          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isDeleteModal={true}
         />
       </div>
     </div>

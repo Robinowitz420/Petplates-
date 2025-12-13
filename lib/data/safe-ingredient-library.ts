@@ -22,15 +22,18 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
     proteins: [
       'chicken breast', 'chicken thighs', 'turkey', 'beef', 'lamb', 
       'salmon', 'whitefish', 'duck', 'venison', 'bison', 'pork',
+      'anchovies', 'cod', 'herring', // Budget fish alternatives
       'eggs', 'cottage cheese', 'greek yogurt', 'sardines', 'mackerel',
       'quail', 'rabbit', 'turkey liver', 'chicken liver', 'beef liver',
-      'chicken hearts', 'beef kidney'
+      'chicken hearts', 'beef heart', 'turkey hearts', 'pork liver', // Budget organ meats
+      'beef kidney', 'green tripe' // Budget probiotic protein source
     ],
     vegetables: [
       'sweet potato', 'pumpkin', 'carrots', 'green beans', 'peas',
       'broccoli', 'spinach', 'kale', 'zucchini', 'butternut squash',
       'brussels sprouts', 'cauliflower', 'celery', 'cucumber',
       'asparagus', 'beets', 'bok choy', 'cabbage', 'collard greens',
+      'parsnips', 'turnips', 'bell peppers', 'swiss chard', // Budget vegetable options
       'parsley', 'cilantro', 'basil'
     ],
     fruits: [
@@ -56,8 +59,11 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
     proteins: [ // Cats need MORE protein, less carbs
       'chicken breast', 'chicken thighs', 'turkey', 'duck',
       'salmon', 'tuna', 'sardines', 'mackerel', 'whitefish',
+      'anchovies', 'herring', // Budget fish options, high in omega-3 and taurine
       'beef', 'lamb', 'rabbit', 'quail', 'venison',
-      'chicken liver', 'chicken hearts', 'turkey liver',
+      'chicken liver', 'chicken hearts', 'turkey liver', 'turkey hearts', // Budget taurine sources
+      'beef heart', 'pork heart', // Critical budget taurine sources (cats need 10%+ heart muscle)
+      'beef spleen', 'pork kidney', // Budget organ variety
       'eggs', 'cottage cheese'
     ],
     vegetables: [ // Cats need VERY LITTLE, but safe options:
@@ -83,7 +89,7 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
     seeds: [
       'millet', 'canary seed', 'oats', 'quinoa', 'buckwheat',
       'flax seeds', 'chia seeds', 'hemp seeds', 'sunflower seeds (limited)',
-      'pumpkin seeds', 'sesame seeds'
+      'pumpkin seeds', 'sesame seeds', 'niger seed', 'nyjer seed' // Budget seed options
     ],
     vegetables: [
       'leafy greens', 'kale', 'collard greens', 'mustard greens',
@@ -98,14 +104,15 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
     ],
     proteins: [
       'cooked eggs', 'cooked chicken (small amounts)',
-      'cooked fish (small amounts)', 'mealworms', 'crickets'
+      'cooked fish (small amounts)', 'mealworms', 'crickets',
+      'waxworms', 'silkworms' // Budget insect protein options
     ],
     legumes: [
       'lentils (cooked)', 'chickpeas (cooked)', 'black beans (cooked)',
       'kidney beans (cooked)'
     ],
     supplements: [
-      'cuttlebone', 'mineral block', 'calcium powder',
+      'cuttlebone', 'mineral block', 'calcium powder', 'oyster shell', // Budget calcium alternative
       'spirulina', 'bee pollen'
     ]
   },
@@ -116,7 +123,8 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
       'collard greens', 'mustard greens', 'turnip greens',
       'dandelion greens', 'kale', 'bok choy', 'endive',
       'escarole', 'butternut squash', 'acorn squash',
-      'bell peppers', 'green beans', 'snap peas'
+      'bell peppers', 'green beans', 'snap peas',
+      'mulberry leaves' // Budget leafy green option
     ],
     fruits: [
       'papaya', 'mango', 'berries', 'figs', 'melon',
@@ -124,8 +132,9 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
     ],
     proteins: [
         'crickets', 'dubia roaches', 'mealworms', 'superworms',
-        'silkworms', 'hornworms', 'cooked chicken (small amounts)',
-        'cooked eggs', 'whole prey (mice, rats)', 'ground turkey', 'beef heart'
+        'silkworms', 'hornworms', 'black soldier fly larvae', // Budget feeder option
+        'cooked chicken (small amounts)', 'cooked eggs', 'whole prey (mice, rats)', 
+        'ground turkey', 'beef heart'
     ],
     supplements: [
       'calcium powder', 'vitamin D3', 'cuttlebone'
@@ -140,7 +149,8 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
       vegetables: [
         'carrots', 'broccoli', 'cucumber', 'bell peppers',
         'spinach', 'cauliflower', 'peas', 'corn', 'kale', 'parsley',
-        'romaine lettuce', 'cilantro', 'green beans', 'arugula', 'bok choy', 'mint'
+        'romaine lettuce', 'cilantro', 'green beans', 'arugula', 'bok choy', 'mint',
+        'radicchio', 'watercress' // Budget leafy green options
       ],
       fruits: [
         'apples', 'bananas', 'berries', 'melon', 'grapes (limited)', 
@@ -153,10 +163,11 @@ export const SAFE_INGREDIENT_LIBRARY: Record<string, SafePool> = {
         'sunflower seeds', 'pumpkin seeds', 'flax seeds'
       ],
       hay: [
-        'timothy hay', 'orchard grass', 'meadow hay', 'oat hay'
+        'timothy hay', 'orchard grass', 'meadow hay', 'oat hay',
+        'alfalfa hay' // For young rabbits/guinea pigs, common and affordable
       ],
       supplements: [
-        'vitamin C drops'
+        'vitamin C drops', 'rose hips' // Budget vitamin C source for guinea pigs
       ]
   }
 };

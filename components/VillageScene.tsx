@@ -79,7 +79,7 @@ export default function VillageScene({
             </div>
             <div className="w-32 bg-gray-200 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-[width] duration-500 ease-out will-change-[width]"
                 style={{ width: `${(progress / 10) * 100}%` }}
               />
             </div>

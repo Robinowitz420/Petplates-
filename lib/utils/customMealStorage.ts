@@ -1,55 +1,47 @@
 // lib/utils/customMealStorage.ts
-// Abstracted custom meal storage layer for easy migration to Firebase/Supabase
+// Abstracted custom meal storage layer - Migrated to Firestore
+// Note: All operations are now ASYNCHRONOUS
 
-import type { CustomMeal } from '@/lib/types';
-import type { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
-
-// Helper to get pets from localStorage
-const getPetsFromLocalStorage = (userId: string): any[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
-  }
-};
-
-// Helper to save pets to localStorage
-const savePetsToLocalStorage = (userId: string, pets: any[]): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(`pets_${userId}`, JSON.stringify(pets));
-  }
-};
-
-/**
- * Data contract for custom meal storage operations.
- * Currently uses localStorage, but can be swapped to Firebase/Supabase without changing callers.
- */
+import { CustomMeal } from '@/lib/types';
+import { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
+import * as firestoreService from '@/lib/services/firestoreService';
+import { getPets, savePet } from './petStorage';
+import { checkAllBadges } from './badgeChecker';
 
 /**
  * Retrieves all custom meals for a given pet.
  * 
- * @param userId - User identifier (Clerk user ID or localStorage key)
+ * @param userId - User identifier
  * @param petId - Pet identifier
- * @returns Array of CustomMeal objects, or empty array if none found
- * 
- * @contract
- * - Input: userId (string), petId (string)
- * - Output: CustomMeal[] (always returns array, never null/undefined)
- * - Side effects: Reads from localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<CustomMeal[]>
  */
-export function getCustomMeals(userId: string, petId: string): CustomMeal[] {
-  if (typeof window === 'undefined') return [];
+export async function getCustomMeals(userId: string, petId: string): Promise<CustomMeal[]> {
+  if (!userId || !petId) return [];
   
-  const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
-  if (!stored) return [];
+  // TEMPORARY: Skip Firestore entirely if no Firebase config
+  const hasFirebase = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!hasFirebase) {
+    console.log('Firebase not configured - loading custom meals from localStorage only');
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+      try {
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }
   
   try {
-    return JSON.parse(stored);
-  } catch {
+    return await firestoreService.getCustomMeals(userId, petId);
+  } catch (e) {
+    console.warn('Firestore getCustomMeals failed', e);
+    // Fallback to localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+      return stored ? JSON.parse(stored) : [];
+    }
     return [];
   }
 }
@@ -62,26 +54,15 @@ export function getCustomMeals(userId: string, petId: string): CustomMeal[] {
  * @param mealName - Name of the meal
  * @param ingredients - Array of ingredient selections
  * @param analysis - Meal analysis results
- * @returns The saved CustomMeal object with generated ID
- * 
- * @contract
- * - Input: userId, petId, mealName, ingredients, analysis
- * - Output: CustomMeal (with generated id, createdAt, updatedAt)
- * - Side effects: Writes to localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<CustomMeal>
  */
-export function saveCustomMeal(
+export async function saveCustomMeal(
   userId: string,
   petId: string,
   mealName: string,
   ingredients: IngredientSelection[],
   analysis: MealAnalysis
-): CustomMeal {
-  if (typeof window === 'undefined') {
-    throw new Error('Cannot save meal on server side');
-  }
-  
-  const meals = getCustomMeals(userId, petId);
+): Promise<CustomMeal> {
   const now = new Date().toISOString();
   
   const customMeal: CustomMeal = {
@@ -100,11 +81,7 @@ export function saveCustomMeal(
       nutrients: analysis.nutrients,
       totalRecipeGrams: analysis.totalRecipeGrams,
       recommendedServingGrams: analysis.recommendedServingGrams,
-      breakdown: {
-        nutrientCoverageScore: analysis.breakdown.nutrientCoverageScore,
-        toxicityPenalty: analysis.breakdown.toxicityPenalty,
-        balanceVarietyScore: analysis.breakdown.balanceVarietyScore,
-      },
+      breakdown: analysis.breakdown,
       toxicityWarnings: analysis.toxicityWarnings.map(w => ({
         message: w.message,
         severity: w.severity,
@@ -127,24 +104,80 @@ export function saveCustomMeal(
     },
   };
   
-  meals.push(customMeal);
-  localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(meals));
-  
-  // Also add the custom meal ID to the pet's savedRecipes array
-  const pets = getPetsFromLocalStorage(userId);
-  const updatedPets = pets.map((pet: any) => {
-    if (pet.id === petId) {
+  // TEMPORARY: Skip Firestore entirely if no Firebase config
+  const hasFirebase = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!hasFirebase) {
+    console.log('Firebase not configured - saving custom meal to localStorage only');
+    
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+      const meals = stored ? JSON.parse(stored) : [];
+      meals.push(customMeal);
+      localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(meals));
+    }
+    
+    // Also add the custom meal ID to the pet's savedRecipes array
+    const pets = await getPets(userId);
+    const pet = pets.find(p => p.id === petId);
+    
+    if (pet) {
       const savedRecipes = pet.savedRecipes || [];
       if (!savedRecipes.includes(customMeal.id)) {
-        return {
+        const updatedPet = {
           ...pet,
           savedRecipes: [...savedRecipes, customMeal.id],
         };
+        await savePet(userId, updatedPet);
       }
     }
-    return pet;
-  });
-  savePetsToLocalStorage(userId, updatedPets);
+    
+    // Dispatch custom event for same-tab updates
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('customMealsUpdated', { 
+        detail: { userId, petId, mealId: customMeal.id } 
+      }));
+    }
+    
+    // Check badges (Nutrient Navigator if score is 100)
+    // Note: analysis.score might be a different metric, we'll check compatibility score separately
+    // For now, we'll check badges when the meal is viewed/scored elsewhere
+    // This is a placeholder - actual compatibility scoring happens in MealCompleteView
+    
+    return customMeal;
+  }
+  
+  // Save to Firestore
+  await firestoreService.saveCustomMeal(userId, customMeal);
+  
+  // Also add the custom meal ID to the pet's savedRecipes array
+  // We need to fetch the pet, update it, and save it back
+  const pets = await getPets(userId);
+  const pet = pets.find(p => p.id === petId);
+  
+  if (pet) {
+    const savedRecipes = pet.savedRecipes || [];
+    if (!savedRecipes.includes(customMeal.id)) {
+      const updatedPet = {
+        ...pet,
+        savedRecipes: [...savedRecipes, customMeal.id],
+      };
+      await savePet(userId, updatedPet);
+    }
+  }
+  
+  // Backup to localStorage for safety
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+    const meals = stored ? JSON.parse(stored) : [];
+    meals.push(customMeal);
+    localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(meals));
+    
+    // Dispatch custom event for same-tab updates
+    window.dispatchEvent(new CustomEvent('customMealsUpdated', { 
+      detail: { userId, petId, mealId: customMeal.id } 
+    }));
+  }
   
   return customMeal;
 }
@@ -155,33 +188,68 @@ export function saveCustomMeal(
  * @param userId - User identifier
  * @param petId - Pet identifier
  * @param mealId - Meal ID to delete
- * @returns void
- * 
- * @contract
- * - Input: userId (string), petId (string), mealId (string)
- * - Output: void
- * - Side effects: Writes to localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<void>
  */
-export function deleteCustomMeal(userId: string, petId: string, mealId: string): void {
-  if (typeof window === 'undefined') return;
-  
-  const meals = getCustomMeals(userId, petId);
-  const filtered = meals.filter(m => m.id !== mealId);
-  localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(filtered));
-  
-  // Also remove the custom meal ID from the pet's savedRecipes array
-  const pets = getPetsFromLocalStorage(userId);
-  const updatedPets = pets.map((pet: any) => {
-    if (pet.id === petId) {
-      return {
-        ...pet,
-        savedRecipes: (pet.savedRecipes || []).filter((id: string) => id !== mealId),
-      };
+export async function deleteCustomMeal(userId: string, petId: string, mealId: string): Promise<void> {
+  // TEMPORARY: Skip Firestore entirely if no Firebase config
+  const hasFirebase = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!hasFirebase) {
+    console.log('Firebase not configured - deleting custom meal from localStorage only');
+    
+    // Delete from localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+      if (stored) {
+        try {
+          const meals: any[] = JSON.parse(stored);
+          const filtered = meals.filter(m => m.id !== mealId);
+          localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(filtered));
+        } catch (e) {
+          console.error('Error deleting custom meal from localStorage:', e);
+        }
+      }
     }
-    return pet;
-  });
-  savePetsToLocalStorage(userId, updatedPets);
+    
+    // Also remove from pet's savedRecipes
+    const pets = await getPets(userId);
+    const pet = pets.find(p => p.id === petId);
+    
+    if (pet) {
+      const savedRecipes = pet.savedRecipes || [];
+      const updatedPet = {
+        ...pet,
+        savedRecipes: savedRecipes.filter(id => id !== mealId),
+      };
+      await savePet(userId, updatedPet);
+    }
+    
+    return;
+  }
+  
+  await firestoreService.deleteCustomMeal(userId, mealId);
+  
+  // Also remove from pet's savedRecipes
+  const pets = await getPets(userId);
+  const pet = pets.find(p => p.id === petId);
+  
+  if (pet) {
+    const savedRecipes = pet.savedRecipes || [];
+    const updatedPet = {
+      ...pet,
+      savedRecipes: savedRecipes.filter(id => id !== mealId),
+    };
+    await savePet(userId, updatedPet);
+  }
+  
+  // Sync localStorage
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+    if (stored) {
+      const meals: any[] = JSON.parse(stored);
+      const filtered = meals.filter(m => m.id !== mealId);
+      localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(filtered));
+    }
+  }
 }
 
 /**
@@ -190,16 +258,10 @@ export function deleteCustomMeal(userId: string, petId: string, mealId: string):
  * @param userId - User identifier
  * @param petId - Pet identifier
  * @param mealId - Meal ID to retrieve
- * @returns CustomMeal object or null if not found
- * 
- * @contract
- * - Input: userId (string), petId (string), mealId (string)
- * - Output: CustomMeal | null
- * - Side effects: Reads from localStorage (will be Firebase in future)
- * - Migration: Change implementation only, signature stays same
+ * @returns Promise<CustomMeal | null>
  */
-export function getCustomMeal(userId: string, petId: string, mealId: string): CustomMeal | null {
-  const meals = getCustomMeals(userId, petId);
+export async function getCustomMeal(userId: string, petId: string, mealId: string): Promise<CustomMeal | null> {
+  const meals = await getCustomMeals(userId, petId);
   return meals.find(m => m.id === mealId) || null;
 }
 
@@ -210,22 +272,32 @@ export function getCustomMeal(userId: string, petId: string, mealId: string): Cu
  * @param petId - Pet identifier
  * @param mealId - Meal ID to update
  * @param newName - New name for the meal
- * @returns void
+ * @returns Promise<void>
  */
-export function updateCustomMealName(
+export async function updateCustomMealName(
   userId: string,
   petId: string,
   mealId: string,
   newName: string
-): void {
-  if (typeof window === 'undefined') return;
-  
-  const meals = getCustomMeals(userId, petId);
-  const meal = meals.find(m => m.id === mealId);
+): Promise<void> {
+  const meal = await getCustomMeal(userId, petId, mealId);
   if (meal) {
     meal.name = newName;
     meal.updatedAt = new Date().toISOString();
-    localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(meals));
+    await firestoreService.saveCustomMeal(userId, meal);
+    
+    // Sync localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`custom_meals_${userId}_${petId}`);
+      if (stored) {
+        const meals: any[] = JSON.parse(stored);
+        const localMeal = meals.find(m => m.id === mealId);
+        if (localMeal) {
+          localMeal.name = newName;
+          localMeal.updatedAt = meal.updatedAt;
+          localStorage.setItem(`custom_meals_${userId}_${petId}`, JSON.stringify(meals));
+        }
+      }
+    }
   }
 }
-

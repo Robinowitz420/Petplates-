@@ -9,6 +9,12 @@ const config: Config = {
   safelist: [
     'text-[#0f2c0f]',
   ],
+  darkMode: false, // Explicitly disable dark mode
+  corePlugins: {
+    // Disable filter utilities to prevent any filter-related CSS from being generated
+    filter: false,
+    backdropFilter: false,
+  },
   theme: {
     extend: {
       colors: {

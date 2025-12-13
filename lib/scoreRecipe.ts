@@ -3,9 +3,9 @@ import { dogModifiers } from './data/nutrition-dog-modifiers';
 import { catModifiers } from './data/nutrition-cat-modifiers';
 import { matchesSpecies } from './utils/recipeRecommendations';
 import {
-  calculateImprovedCompatibility,
-  type ImprovedPet,
-} from './utils/improvedCompatibilityScoring';
+  calculateEnhancedCompatibility,
+  type Pet as EnhancedPet,
+} from './utils/enhancedCompatibilityScoring';
 
 export interface ScoreReasoning {
   goodMatches: string[];
@@ -13,7 +13,8 @@ export interface ScoreReasoning {
 }
 
 export interface ScoreResult {
-  matchScore: number; // 0-100
+  compatibilityScore: number; // 0-100 (formerly matchScore)
+  matchScore: number; // 0-100 (deprecated - use compatibilityScore)
   stars: number; // 1-5
   reasoning: ScoreReasoning;
   conflictCount: number; // number of avoid rule conflicts
@@ -199,7 +200,7 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
   // Species gate: use matchesSpecies to support subtype matching for exotics
   if (!matchesSpecies(recipe, pet)) {
     reasoning.conflicts.push('Different species - not suitable');
-    return { matchScore: 0, stars: 1, reasoning, conflictCount: 1, hasHydrationSupport };
+    return { compatibilityScore: 0, matchScore: 0, stars: 1, reasoning, conflictCount: 1, hasHydrationSupport };
   }
 
   // Debug logging (only in development)
@@ -286,7 +287,7 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
     reasoning.conflicts.push(`Contains potential allergen: ${allergyTrigger}`);
     conflictCount += 1;
     // allergy override: near-zero
-    return { matchScore: 0, stars: 1, reasoning, conflictCount, hasHydrationSupport };
+    return { compatibilityScore: 0, matchScore: 0, stars: 1, reasoning, conflictCount, hasHydrationSupport };
   }
 
   // Nutrient fit: +15 if nutritional info present and assumed within AAFCO range
@@ -340,10 +341,10 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
   if (score < 0) score = 0;
 
   // Map into 0..100 proportionally
-  const matchScore = Math.round((score / possible) * 100);
-  const stars = mapScoreToStars(matchScore);
+  const compatibilityScore = Math.round((score / possible) * 100);
+  const stars = mapScoreToStars(compatibilityScore);
 
-  return { matchScore, stars, reasoning, conflictCount, hasHydrationSupport };
+  return { compatibilityScore, matchScore: compatibilityScore, stars, reasoning, conflictCount, hasHydrationSupport };
 }
 
 /**
@@ -351,31 +352,33 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
  * Keeps the original ScoreResult shape for drop-in use.
  */
 export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
-  const improvedPet: ImprovedPet = {
+  const enhancedPet: EnhancedPet = {
     id: pet.id,
     name: pet.name,
-    type: pet.type,
+    type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
     breed: pet.breed,
-    age: pet.age,
-    weight: pet.weight || pet.weightKg,
+    age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
+    weight: pet.weight || pet.weightKg || 10,
     activityLevel: pet.activityLevel,
     healthConcerns: pet.healthConcerns || [],
     dietaryRestrictions: pet.dietaryRestrictions || [],
     allergies: pet.allergies || [],
   };
 
-  const result = calculateImprovedCompatibility(recipe, improvedPet);
+  const result = calculateEnhancedCompatibility(recipe, enhancedPet);
+  const stars = Math.round(result.overallScore / 20);
   return {
-    matchScore: result.overallScore,
-    stars: result.stars,
+    compatibilityScore: result.overallScore,
+    matchScore: result.overallScore, // Keep for backward compatibility
+    stars: stars,
     reasoning: {
-      goodMatches: result.reasoning.strengths,
-      conflicts: result.reasoning.warnings,
+      goodMatches: result.detailedBreakdown.healthBenefits,
+      conflicts: result.detailedBreakdown.warnings,
     },
-    conflictCount: result.reasoning.warnings.length,
+    conflictCount: result.detailedBreakdown.warnings.length,
     hasHydrationSupport: false,
-    summaryReasoning: result.summaryReasoning,
-    recommendations: result.reasoning.recommendations,
+    summaryReasoning: `Compatibility score: ${result.overallScore}% (${result.grade})`,
+    recommendations: result.detailedBreakdown.recommendations,
   };
 }
 

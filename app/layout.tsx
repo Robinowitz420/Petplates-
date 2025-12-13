@@ -9,8 +9,76 @@ import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Paw & Plate - Meal prep made easy, for ALL your pets!",
-  description: "Meal prep made easy, for ALL your pets! Personalized, vet-approved nutrition for dogs, cats, birds, reptiles, and pocket pets.",
+  metadataBase: new URL('https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app'),
+  title: {
+    default: "Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets",
+    template: "%s | Paw & Plate"
+  },
+  description: "Free vet-approved meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO & WSAVA compliant.",
+  keywords: [
+    "homemade dog food",
+    "homemade cat food", 
+    "DIY pet meals",
+    "pet meal prep",
+    "fresh pet food recipes",
+    "vet approved pet food",
+    "custom pet nutrition",
+    "AAFCO pet food",
+    "bird food recipes",
+    "reptile diet plans",
+    "small pet nutrition",
+    "homemade pet food delivery",
+    "pet meal planner",
+    "healthy pet recipes",
+    "balanced dog nutrition",
+    "cat diet recipes"
+  ],
+  authors: [{ name: "Paw & Plate Team" }],
+  creator: "Paw & Plate",
+  publisher: "Paw & Plate",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app',
+    siteName: 'Paw & Plate',
+    title: 'Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
+    description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering. AAFCO & WSAVA compliant nutrition.',
+    images: [
+      {
+        url: '/images/emojis/Mascots/HeroPics/HeroBanner-v3.png',
+        width: 1200,
+        height: 630,
+        alt: 'Paw & Plate - Meal prep for all pets',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
+    description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering.',
+    images: ['/images/emojis/Mascots/HeroPics/HeroBanner-v3.png'],
+  },
+  alternates: {
+    canonical: 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app',
+  },
+  verification: {
+    // Add these later when you have accounts:
+    // google: 'your-google-verification-code',
+    // yandex: 'your-yandex-verification-code',
+    // bing: 'your-bing-verification-code',
+  },
+  category: 'Pet Care',
 };
 
 export default function RootLayout({
@@ -23,6 +91,33 @@ export default function RootLayout({
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
       <html lang="en">
+        <head>
+          {/* Additional SEO tags */}
+          <link rel="icon" href="/favicon.ico" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <meta name="theme-color" content="#043136" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          
+          {/* Schema.org markup for Google */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Paw & Plate",
+                "description": "Free vet-approved meal plans for dogs, cats, birds, reptiles, and pocket pets",
+                "url": "https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app",
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app/search?q={search_term_string}",
+                  "query-input": "required name=search_term_string"
+                }
+              })
+            }}
+          />
+        </head>
         <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
           <ErrorBoundaryWrapper>
             <Navigation />

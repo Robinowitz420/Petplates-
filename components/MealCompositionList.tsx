@@ -2,15 +2,12 @@
 
 import { X, ExternalLink } from 'lucide-react';
 import { IngredientSelection } from '@/lib/analyzeCustomMeal';
-import { getVettedProduct } from '@/lib/data/vetted-products';
+import { getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 
-// Add affiliate tag to Amazon URLs
-const addAffiliateTag = (url: string): string => {
-  if (!url) return url;
-  if (url.includes('tag=')) return url; // Already has tag
-  const tag = 'robinfrench-20';
-  const separator = url.includes('?') ? '&' : '?';
-  return `${url}${separator}tag=${tag}`;
+// Format price for display
+const formatPrice = (price: number) => {
+  return `$${price.toFixed(2)}`;
 };
 
 interface MealCompositionListProps {
@@ -40,9 +37,14 @@ export default function MealCompositionList({
             const displayName = getIngredientDisplayName(ing.key);
             const indicator = getCompatibilityIndicator?.(ing.key) || null;
             const ingredientName = displayName.toLowerCase();
-            const vettedProduct = getVettedProduct(ingredientName);
+            // Try multiple lookup methods
+            let vettedProduct = getVettedProduct(ingredientName);
+            if (!vettedProduct) {
+              vettedProduct = getVettedProductByAnyIdentifier(displayName);
+            }
             const purchaseLink = vettedProduct?.asinLink || vettedProduct?.purchaseLink;
             const hasPurchaseLink = !!purchaseLink;
+            const price = vettedProduct?.price?.amount;
             
             return (
               <div
@@ -64,15 +66,30 @@ export default function MealCompositionList({
                     <div className="font-medium text-gray-200 truncate">
                       {displayName}
                     </div>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                      <span>Current: {ing.grams}g</span>
+                      {recommendedAmounts[ing.key] && recommendedAmounts[ing.key] !== ing.grams && (
+                        <span className="text-orange-400 font-medium">
+                          Recommended: {recommendedAmounts[ing.key]}g
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Price Display */}
+                {price && (
+                  <div className="text-right mr-3">
+                    <div className="text-lg font-bold text-orange-400">{formatPrice(price)}</div>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {/* Buy Button */}
                   {hasPurchaseLink && (
                     <a
-                      href={addAffiliateTag(purchaseLink!)}
+                      href={ensureSellerId(purchaseLink!)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-all duration-200 text-sm font-semibold whitespace-nowrap hover:shadow-md"

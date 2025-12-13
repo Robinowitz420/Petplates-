@@ -66,9 +66,6 @@ export default function MascotAvatar({
         style={{ 
           display: 'inline-block', 
           verticalAlign: 'middle',
-          filter: 'none',
-          color: 'unset',
-          mixBlendMode: 'normal',
         }}
       >
         <Image
@@ -81,10 +78,6 @@ export default function MascotAvatar({
             display: 'inline-block', 
             verticalAlign: 'middle',
             imageRendering: 'crisp-edges',
-            filter: 'none',
-            color: 'unset',
-            mixBlendMode: 'normal',
-            WebkitFilter: 'none',
           }}
           unoptimized
         />

@@ -19,6 +19,7 @@ import CompatibilityPanel from '@/components/CompatibilityPanel';
 import SuggestedIngredients from '@/components/SuggestedIngredients';
 import MealBuilderWizard from '@/components/MealBuilderWizard';
 import MealCompleteView from '@/components/MealCompleteView';
+import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 
 // Style mapping for severity levels
 const severityStyles = {
@@ -144,7 +145,7 @@ const normalizeSpecies = (species: string): string => {
 };
 
 // Get filtered ingredients based on pet species - ONLY show species-specific ingredients
-const getAvailableIngredients = (species: string): string[] => {
+const getAvailableIngredients = (species: string, bannedIngredients?: string[]): string[] => {
   const normalizedSpecies = normalizeSpecies(species);
   const filters = SPECIES_INGREDIENT_FILTERS[normalizedSpecies as keyof typeof SPECIES_INGREDIENT_FILTERS];
 
@@ -176,15 +177,23 @@ const getAvailableIngredients = (species: string): string[] => {
   // Return all ingredient names (scraped names + universal ingredients)
   const mappedKeys = Array.from(allIngredientNames);
 
-  if (!filters) {
-    // Fallback - show species-specific ingredients only
-    return Array.from(mappedKeys).sort();
+  let filtered = mappedKeys;
+  
+  if (filters) {
+    // Filter out disallowed items
+    filtered = filtered.filter(ing => !filters.disallowed?.includes(ing));
+  }
+  
+  // Filter out banned ingredients (case-insensitive partial match)
+  if (bannedIngredients && bannedIngredients.length > 0) {
+    const bannedLower = bannedIngredients.map(b => b.toLowerCase());
+    filtered = filtered.filter(ing => {
+      const ingLower = ing.toLowerCase();
+      return !bannedLower.some(banned => ingLower.includes(banned) || banned.includes(ingLower));
+    });
   }
 
-  // Filter out disallowed items
-  return Array.from(mappedKeys).filter(ing =>
-    !filters.disallowed?.includes(ing)
-  ).sort();
+  return Array.from(filtered).sort();
 };
 
 // Categorize ingredients
@@ -378,7 +387,7 @@ export default function RecipeBuilderPage() {
   const blacklist = normalizedSpeciesType ? getBlacklistForSpecies(normalizedSpeciesType as any) : [];
   
   // Filter available ingredients through whitelist
-  const allAvailableIngredients = pet ? getAvailableIngredients(pet.type) : [];
+  const allAvailableIngredients = pet ? getAvailableIngredients(pet.type, (pet as any).bannedIngredients) : [];
   const whitelist = normalizedSpeciesType ? getWhitelistForSpecies(normalizedSpeciesType as any) : [];
   const availableIngredients = whitelist.length > 0 
     ? allAvailableIngredients.filter(ing => isWhitelisted(ing, normalizedSpeciesType as any))
@@ -473,60 +482,57 @@ export default function RecipeBuilderPage() {
     const loadPetData = async () => {
       if (typeof window !== 'undefined') {
         const userId = localStorage.getItem('last_user_id') || 'clerk_simulated_user_id_123';
-        const stored = localStorage.getItem(`pets_${userId}`);
-
-        if (stored) {
-          try {
-            const pets = JSON.parse(stored);
-            const foundPet = pets.find((p: Pet) => p.id === petId);
-            if (foundPet) {
-              setPet(foundPet);
-              // Show wizard on initial load if no ingredients selected
-              if (selectedIngredients.length === 0 && !wizardCompleted) {
-                setShowWizard(true);
-              }
-              
-              // Fetch recommended meals to extract ingredients
-              try {
-                const concerns = (foundPet.healthConcerns || []).filter((concern: string) => concern !== 'none');
-                const allergies = (foundPet as any).allergies?.filter((allergy: string) => allergy !== 'none') || [];
-                // Use random name from pet's names array
-                const petNames = Array.isArray(foundPet.names) ? foundPet.names.filter((n: string) => n && n.trim() !== '') : [];
-                const petDisplayName = petNames.length > 0 
-                  ? petNames[Math.floor(Math.random() * petNames.length)]
-                  : 'Your Pet';
-                
-                const response = await fetch('/api/recommendations', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    profile: {
-                      species: foundPet.type,
-                      ageGroup: foundPet.age,
-                      breed: foundPet.breed,
-                      weightKg: parseFloat(foundPet.weight?.replace(/[^0-9.]/g, '')) || 10,
-                      healthConcerns: concerns,
-                      allergies,
-                      petName: petDisplayName,
-                    },
-                    limit: 5, // Only need top 5 for ingredient extraction
-                  }),
-                });
-
-                if (response.ok) {
-                  const data = await response.json();
-                  if (data?.results && Array.isArray(data.results)) {
-                    setRecommendedMeals(data.results);
-                  }
-                }
-              } catch (error) {
-                // Failed to fetch recommended meals - using static suggestions
-                // Non-critical, continue without meal-based suggestions
-              }
+        
+        try {
+          const pets = await getPets(userId);
+          const foundPet = pets.find((p: any) => p.id === petId);
+          
+          if (foundPet) {
+            setPet(foundPet as unknown as Pet);
+            // Show wizard on initial load if no ingredients selected
+            if (selectedIngredients.length === 0 && !wizardCompleted) {
+              setShowWizard(true);
             }
-          } catch (error) {
-            // Error loading pet data - handled by error state
+            
+            // Fetch recommended meals... (rest of logic)
+            const concerns = (foundPet.healthConcerns || []).filter((concern: string) => concern !== 'none');
+            const allergies = (foundPet as any).allergies?.filter((allergy: string) => allergy !== 'none') || [];
+            // Use random name from pet's names array
+            const petNames = Array.isArray(foundPet.names) ? foundPet.names.filter((n: string) => n && n.trim() !== '') : [];
+            const petDisplayName = petNames.length > 0 
+              ? petNames[Math.floor(Math.random() * petNames.length)]
+              : 'Your Pet';
+            
+            try {
+              const response = await fetch('/api/recommendations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  profile: {
+                    species: foundPet.type,
+                    ageGroup: foundPet.age,
+                    breed: foundPet.breed,
+                    weightKg: parseFloat(foundPet.weight?.replace(/[^0-9.]/g, '')) || 10,
+                    healthConcerns: concerns,
+                    allergies,
+                    petName: petDisplayName,
+                  },
+                  limit: 5, // Only need top 5 for ingredient extraction
+                }),
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                if (data?.results && Array.isArray(data.results)) {
+                  setRecommendedMeals(data.results);
+                }
+              }
+            } catch (error) {
+              // Failed to fetch recommended meals
+            }
           }
+        } catch (error) {
+          console.error("Error loading pet:", error);
         }
       }
     };
@@ -535,12 +541,12 @@ export default function RecipeBuilderPage() {
   }, [petId]);
 
   // Handle wizard completion
-  const handleWizardComplete = (selections: { [category: string]: string | null }) => {
+  const handleWizardComplete = (selections: { [category: string]: string[] }) => {
     // Convert wizard selections to IngredientSelection format
     const ingredients: IngredientSelection[] = [];
     
-    Object.entries(selections).forEach(([category, ingredientName]) => {
-      if (ingredientName) {
+    Object.entries(selections).forEach(([category, ingredientNames]) => {
+      if (ingredientNames && ingredientNames.length > 0) {
         // Start with a reasonable default based on category
         let defaultGrams = 50;
         if (category === 'proteins') defaultGrams = 100; // More protein
@@ -549,9 +555,12 @@ export default function RecipeBuilderPage() {
         else if (category === 'fruits') defaultGrams = 20;
         else if (category === 'supplements') defaultGrams = 5;
         
-        ingredients.push({
-          key: ingredientName,
-          grams: defaultGrams
+        // Add all selected ingredients from this category
+        ingredientNames.forEach(ingredientName => {
+          ingredients.push({
+            key: ingredientName,
+            grams: defaultGrams
+          });
         });
       }
     });
@@ -700,7 +709,7 @@ export default function RecipeBuilderPage() {
   }
 
   // Prepare categories for wizard
-  const proteinRequired = !['pocket-pets', 'reptiles'].includes(normalizedSpeciesType);
+  const proteinRequired = !['pocket-pets', 'reptiles'].includes((normalizedSpeciesType || '').toLowerCase());
 
   const wizardCategories = categorizedIngredients ? {
     proteins: {
@@ -759,6 +768,7 @@ export default function RecipeBuilderPage() {
           onComplete={handleWizardComplete}
           categories={wizardCategories}
           petName={pet.names[0] || 'Pet'}
+          petType={normalizedSpeciesType || pet.type}
           recommendedIngredients={recommendedIngredientNames}
         />
         <div className="min-h-screen" style={{ backgroundColor: '#0f2c0f' }} />
@@ -784,7 +794,19 @@ export default function RecipeBuilderPage() {
           onRemove={removeIngredient}
           onAddMore={handleAddMore}
           onStartOver={handleStartOver}
-          getIngredientDisplayName={(key) => key}
+          petType={pet.type}
+          getIngredientDisplayName={(key) => {
+            // Normalize key to match vetted products
+            const normalized = key
+              .toLowerCase()
+              .replace(/_/g, ' ')      // chicken_breast → chicken breast
+              .replace(/-/g, ' ')      // chicken-breast → chicken breast
+              .trim();
+            
+            // Try to find display name in vetted products
+            const product = require('@/lib/data/vetted-products').getVettedProduct(normalized);
+            return product?.productName || normalized;
+          }}
           isFirstCreation={isFirstCreation}
           getCompatibilityIndicator={(key) => {
             if (!analysis) return null;

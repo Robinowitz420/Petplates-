@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run validate:recipes && next build",
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
@@ -14,7 +14,11 @@
     "vet:brands": "tsx scripts/generate-brand-suggestions.ts",
     "vet:amazon": "tsx scripts/run-amazon-scraper.ts",
     "add:vetted": "tsx scripts/add-all-vetted-products.ts",
-    "update:meal-images": "tsx scripts/update-recipe-meal-images.ts"
+    "update:meal-images": "tsx scripts/update-recipe-meal-images.ts",
+    "generate:recipes": "tsx scripts/generate-recipes.ts",
+    "validate:recipes": "tsx scripts/validate-recipes.ts",
+    "validate:links": "tsx scripts/validate-affiliate-links.ts",
+    "audit:links": "tsx scripts/audit-all-purchase-links.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",

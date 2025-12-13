@@ -200,3 +200,26 @@ export function getMascotFaceForPetType(petType: string): string {
   return typeToMascot[typeLower] || '/images/emojis/Mascots/Mascot-Emoji-Faces.png';
 }
 
+/**
+ * Get full profile picture image for a pet type
+ * Used for the large profile picture in profile cards (not thumbnails)
+ * Maps to full-body character images based on pet type
+ */
+export function getProfilePictureForPetType(petType: string): string {
+  const typeLower = (petType || '').toLowerCase();
+  const typeToProfilePic: Record<string, string> = {
+    'dogs': '/images/emojis/Mascots/PrepPuppy/PrepPuppy.jpg', // Yellow dog chef with spoon and bowl
+    'cats': '/images/emojis/Mascots/Proffessor Purfessor/PUrfessorDesk.jpg', // Black cat with glasses and lab coat at desk
+    'birds': '/images/emojis/Mascots/RobinRed-Route.jpg', // Orange bird with goggles and satchel
+    'reptiles': '/images/emojis/Mascots/Sherlock Shells/SherlockShells.jpg', // Green turtle detective with monocle
+    'pocket-pets': '/images/emojis/Mascots/Harvest Hamster/HHCarrot.jpg', // Brown beaver/hamster with carrot
+    // Handle singular forms
+    'dog': '/images/emojis/Mascots/PrepPuppy/PrepPuppy.jpg',
+    'cat': '/images/emojis/Mascots/Proffessor Purfessor/PUrfessorDesk.jpg',
+    'bird': '/images/emojis/Mascots/RobinRed-Route.jpg',
+    'reptile': '/images/emojis/Mascots/Sherlock Shells/SherlockShells.jpg',
+    'pocket-pet': '/images/emojis/Mascots/Harvest Hamster/HHCarrot.jpg',
+  };
+  return typeToProfilePic[typeLower] || '/images/emojis/Mascots/Mascot-Emoji-Faces.png';
+}
+

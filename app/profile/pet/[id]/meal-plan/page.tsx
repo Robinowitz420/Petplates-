@@ -6,8 +6,15 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { recipes } from '@/lib/data/recipes-complete';
 import type { Recipe, CustomMeal } from '@/lib/types';
-import { VETTED_PRODUCTS } from '@/lib/data/vetted-products';
+import { VETTED_PRODUCTS, getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
+import { getPets } from '@/lib/utils/petStorage'; // Import async storage
+import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
+
+// Format price for display
+const formatPrice = (price: number) => {
+  return `$${price.toFixed(2)}`;
+};
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
@@ -137,22 +144,38 @@ export default function MealPlanPage() {
   };
 
   useEffect(() => {
-    const userId = getCurrentUserId();
-    const pets = getPetsFromLocalStorage(userId);
-    const foundPet = pets.find((p) => p.id === petId) || null;
-    setPet(foundPet);
-    if (foundPet) {
-      // Load saved recipes
-      const savedRecipeMeals = (foundPet.savedRecipes || [])
-        .map((recipeId) => recipes.find((recipe) => recipe.id === recipeId))
-        .filter(Boolean) as Recipe[];
-      setSavedMeals(savedRecipeMeals);
-      
-      // Load custom meals
-      const customMealsList = getCustomMeals(userId, petId);
-      setCustomMeals(customMealsList);
-    }
-    setLoading(false);
+    const loadData = async () => {
+      const userId = getCurrentUserId();
+      try {
+        const pets = await getPets(userId);
+        const foundPet = pets.find((p: any) => p.id === petId) || null;
+        
+        if (foundPet) {
+          // Normalize pet profile
+          setPet({
+            id: foundPet.id,
+            name: foundPet.name || foundPet.names?.[0] || 'Pet',
+            savedRecipes: foundPet.savedRecipes || [],
+          });
+
+          // Load saved recipes
+          const savedRecipeMeals = (foundPet.savedRecipes || [])
+            .map((recipeId) => recipes.find((recipe) => recipe.id === recipeId))
+            .filter(Boolean) as Recipe[];
+          setSavedMeals(savedRecipeMeals);
+          
+          // Load custom meals
+          const customMealsList = await getCustomMeals(userId, petId);
+          setCustomMeals(customMealsList);
+        } else {
+          setPet(null);
+        }
+      } catch (error) {
+        console.error('Error loading meal plan data:', error);
+      }
+      setLoading(false);
+    };
+    loadData();
   }, [petId]);
 
   const generatePlan = (meals: Recipe[]) => {
@@ -309,10 +332,7 @@ export default function MealPlanPage() {
                 {dayPlan.meals.map((meal, mealIndex) => (
                   <div key={meal.id + mealIndex} className="text-center">
                     <Link
-                      href={meal.category === 'custom' 
-                        ? `/profile/pet/${petId}/custom-meals/${meal.id}`
-                        : `/recipe/${meal.id}?petId=${petId}`
-                      }
+                      href={`/recipe/${meal.id}?petId=${petId}`}
                       className="block hover:text-primary-600 transition-colors mb-1"
                     >
                       <p className="font-medium text-gray-900 text-xs leading-tight">
@@ -322,38 +342,68 @@ export default function MealPlanPage() {
                         )}
                       </p>
                     </Link>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const cartItems = meal.ingredients
-                          .map((ing, index) => {
-                            const genericName = ing.name.toLowerCase().trim();
-                            const vettedProduct = VETTED_PRODUCTS[genericName];
-                            const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
-                            if (link) {
-                              // Extract ASIN from /dp/ASIN format
-                              const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
-                              if (asinMatch) {
-                                return `ASIN.${index + 1}=${asinMatch[1]}&Quantity.${index + 1}=1`;
+                    <div className="flex flex-col items-center gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const cartItems = meal.ingredients
+                            .map((ing, index) => {
+                              const genericName = ing.name.toLowerCase().trim();
+                              const vettedProduct = VETTED_PRODUCTS[genericName];
+                              const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
+                              if (link) {
+                                // Extract ASIN from /dp/ASIN format
+                                const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
+                                if (asinMatch) {
+                                  return `ASIN.${index + 1}=${asinMatch[1]}&Quantity.${index + 1}=1`;
+                                }
                               }
-                            }
-                            return null;
-                          })
-                          .filter(Boolean);
+                              return null;
+                            })
+                            .filter(Boolean);
 
-                        if (cartItems.length > 0) {
-                          const cartUrl = `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`;
-                          window.open(cartUrl, '_blank');
-                        } else {
-                          alert('No ingredient links available for this recipe.');
-                        }
-                      }}
-                      className="inline-flex items-center gap-1 text-xs bg-green-600 text-black px-1 py-0.5 rounded hover:bg-green-700 transition-colors"
-                      title="Add all vetted ingredients to your Amazon cart"
-                    >
-                      <ShoppingCart size={8} />
-                      Buy
-                    </button>
+                          if (cartItems.length > 0) {
+                            const cartUrl = ensureCartUrlSellerId(`https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`);
+                            window.open(cartUrl, '_blank');
+                          } else {
+                            alert('No ingredient links available for this recipe.');
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 text-xs bg-green-600 text-black px-1 py-0.5 rounded hover:bg-green-700 transition-colors"
+                        title="Add all vetted ingredients to your Amazon cart"
+                      >
+                        <ShoppingCart size={8} />
+                        Buy
+                      </button>
+                      {/* Price Display */}
+                      {(() => {
+                        const mealTotalPrice = meal.ingredients?.reduce((sum, ing) => {
+                          const genericName = ing.name.toLowerCase().trim();
+                          const vettedProduct = VETTED_PRODUCTS[genericName];
+                          const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
+                          // Try multiple lookup methods
+                          let product = getVettedProduct(ing.name.toLowerCase());
+                          if (!product && vettedProduct) {
+                            product = vettedProduct;
+                          }
+                          if (!product) {
+                            product = getVettedProductByAnyIdentifier(ing.name);
+                          }
+                          if (!product && link) {
+                            product = getVettedProductByAnyIdentifier(link);
+                          }
+                          if (product?.price?.amount) {
+                            return sum + product.price.amount;
+                          }
+                          return sum;
+                        }, 0) || 0;
+                        return mealTotalPrice > 0 ? (
+                          <span className="text-[10px] text-green-700 font-semibold">
+                            {formatPrice(mealTotalPrice)}
+                          </span>
+                        ) : null;
+                      })()}
+                    </div>
                     <button
                       onClick={(e) => {
                         e.preventDefault();

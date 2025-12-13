@@ -1,6 +1,7 @@
 // lib/data/recipes-complete.ts
 // Auto-generated comprehensive recipe database
-// Auto-tagged on: 2025-12-03T17:05:04.843Z
+// Auto-tagged on: 2025-12-12T00:20:33.285Z
+// Names regenerated using enhanced naming system
 // Total recipes: 170
 
 import type { Recipe } from '../types';
@@ -8,8 +9,8 @@ import type { Recipe } from '../types';
 export const recipes: Recipe[] = [
   {
     "id": "dog-001",
-    "name": "Baked Buckwheat Duck Delight",
-    "shortName": "Duck Buckwheat",
+    "name": "Duck Hearts & Buckwheat Bowl",
+    "shortName": "Duck Hearts & Buc...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -126,8 +127,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-002",
-    "name": "Grilled Ground with Navy & Purslane",
-    "shortName": "Ground Navy",
+    "name": "Ground Rabbit Weight Control Formula",
+    "shortName": "Ground Rabbit & P...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -243,8 +244,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-003",
-    "name": "Baked Ground Miner's Feast",
-    "shortName": "Ground Kidney",
+    "name": "Complete Ground Lamb Formula",
+    "shortName": "Ground Lamb & Min...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -355,8 +356,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-004",
-    "name": "Special Duck & Navy Bowl",
-    "shortName": "Duck Navy",
+    "name": "Chef's Choice Duck Hearts Blend",
+    "shortName": "Duck Hearts & Gre...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -468,8 +469,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-005",
-    "name": "Special Quail Fennel Feast",
-    "shortName": "Quail Black",
+    "name": "Fresh Quail & Black Beans (mashed)",
+    "shortName": "Quail & Hemp Seeds",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -579,8 +580,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-006",
-    "name": "Homemade Chicken & Delicata Bowl",
-    "shortName": "Chicken Delicata",
+    "name": "Chicken Necks Weight Control Formula",
+    "shortName": "Chicken Necks & D...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -695,8 +696,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-007",
-    "name": "Traditional Ground & Chickpeas Bowl",
-    "shortName": "Ground Chickpeas",
+    "name": "Complete Ground Chicken Formula",
+    "shortName": "Ground Chicken & ...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -809,8 +810,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-008",
-    "name": "Herb-Infused Oats Chicken Delight",
-    "shortName": "Chicken Oats",
+    "name": "Rustic Chicken Necks Farmhouse Bowl",
+    "shortName": "Chicken Necks & O...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -921,8 +922,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-009",
-    "name": "Grilled Split Sardines Delight",
-    "shortName": "Sardines Split",
+    "name": "Fresh Sardines (canned in Water) & Split Peas",
+    "shortName": "Sardines (canned ...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1030,8 +1031,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-010",
-    "name": "Herb-Infused Beef Napa Feast",
-    "shortName": "Beef Sorghum",
+    "name": "Complete Beef Liver Formula",
+    "shortName": "Beef Liver & Sunf...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1144,8 +1145,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-011",
-    "name": "Quail & Zucchini Traditional Bowl",
-    "shortName": "Quail Quinoa",
+    "name": "Chef's Choice Quail Eggs Blend",
+    "shortName": "Quail Eggs & Quinoa",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1254,8 +1255,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-012",
-    "name": "Homemade Acorn Eggs Delight",
-    "shortName": "Eggs Acorn",
+    "name": "Eggs Garden Blend",
+    "shortName": "Eggs & Acorn Squash",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1366,8 +1367,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-013",
-    "name": "Beef & Yellow Grilled Bowl",
-    "shortName": "Beef Oats",
+    "name": "Balanced Beef Liver & Oats (rolled) Plate",
+    "shortName": "Beef Liver & Oats...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1482,8 +1483,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-014",
-    "name": "Baked Quail & White Bowl",
-    "shortName": "Quail White",
+    "name": "Nutrient-rich Quail Medley",
+    "shortName": "Quail & White Rice",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1594,8 +1595,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-015",
-    "name": "Grilled Chicken & Barley Bowl",
-    "shortName": "Chicken Barley",
+    "name": "Ultimate Chicken Hearts Feast",
+    "shortName": "Chicken Hearts & ...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1708,8 +1709,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-016",
-    "name": "Baked Chicken & White Bowl",
-    "shortName": "Chicken White",
+    "name": "Chicken Necks & White Rice Bowl",
+    "shortName": "Chicken Necks & W...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1824,8 +1825,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-017",
-    "name": "Grilled Lamb & Green Bowl",
-    "shortName": "Lamb Green",
+    "name": "Lamb Liver Weight Control Formula",
+    "shortName": "Lamb Liver & Gree...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -1936,8 +1937,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-018",
-    "name": "Steamed Farro Chicken Delight",
-    "shortName": "Chicken Farro",
+    "name": "Complete Chicken Breast Formula",
+    "shortName": "Chicken Breast & ...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2048,8 +2049,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-019",
-    "name": "Steamed Salmon & Chickpeas Bowl",
-    "shortName": "Salmon Chickpeas",
+    "name": "Chef's Choice Salmon (boneless) Blend",
+    "shortName": "Salmon (boneless)",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2163,8 +2164,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-020",
-    "name": "Turkey Brown Traditional Mix",
-    "shortName": "Turkey Brown",
+    "name": "Gentle Turkey Thighs Medley",
+    "shortName": "Turkey Thighs & B...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2274,8 +2275,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-021",
-    "name": "Herb-Infused Pumpkin Ground Delight",
-    "shortName": "Ground Pumpkin",
+    "name": "High-protein Ground Duck Power Bowl",
+    "shortName": "Ground Duck & Pum...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2388,8 +2389,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-022",
-    "name": "Fresh Sorghum Ground Delight",
-    "shortName": "Ground Sorghum",
+    "name": "Savory Ground Quail Kitchen Creation",
+    "shortName": "Ground Quail & Pu...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2499,8 +2500,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-023",
-    "name": "Herb-Infused Ground Sugar Feast",
-    "shortName": "Ground Bulgur",
+    "name": "Fresh Ground Duck & Bulgur",
+    "shortName": "Ground Duck",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2610,8 +2611,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-024",
-    "name": "Traditional Quail & Green Bowl",
-    "shortName": "Quail Green",
+    "name": "Quail Eggs Weight Control Formula",
+    "shortName": "Quail Eggs & Gree...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2721,8 +2722,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-025",
-    "name": "Homemade Quail Frisee Feast",
-    "shortName": "Quail Kidney",
+    "name": "Complete Quail Eggs Formula",
+    "shortName": "Quail Eggs & Frisee",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2835,8 +2836,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-026",
-    "name": "Grilled Duck Ginger Feast",
-    "shortName": "Duck Millet",
+    "name": "Rustic Duck Hearts Farmhouse Bowl",
+    "shortName": "Duck Hearts & Millet",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -2952,8 +2953,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-027",
-    "name": "Special Ground with Green & Radicchio",
-    "shortName": "Ground Green",
+    "name": "Ground Duck Garden Blend",
+    "shortName": "Ground Duck & Gre...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3063,8 +3064,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-028",
-    "name": "Traditional Quail & Barley Bowl",
-    "shortName": "Quail Barley",
+    "name": "Quail Eggs Weight Control Formula",
+    "shortName": "Quail Eggs & Barley",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3174,8 +3175,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-029",
-    "name": "Baked Sardines & Wild Bowl",
-    "shortName": "Sardines Wild",
+    "name": "Complete Sardines (canned in Water) Formula",
+    "shortName": "Sardines (canned ...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3285,8 +3286,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-030",
-    "name": "Ground Chickpeas Steamed Mix",
-    "shortName": "Ground Chickpeas",
+    "name": "Ground Turkey & Sesame Oil Bowl",
+    "shortName": "Ground Turkey & S...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3395,8 +3396,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-031",
-    "name": "Chicken & Frisee Traditional Bowl",
-    "shortName": "Chicken Kidney",
+    "name": "Chicken Liver Weight Control Formula",
+    "shortName": "Chicken Liver & F...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3509,8 +3510,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-032",
-    "name": "Homemade Lentils Chicken Delight",
-    "shortName": "Chicken Lentils",
+    "name": "Nutrient-rich Chicken Giblets Medley",
+    "shortName": "Chicken Giblets &...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3621,8 +3622,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-033",
-    "name": "Classic Pinto Ground Delight",
-    "shortName": "Ground Pinto",
+    "name": "Ultimate Ground Duck Feast",
+    "shortName": "Ground Duck & Ama...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3735,8 +3736,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-034",
-    "name": "Baked Eggs with Kidney & Peas",
-    "shortName": "Eggs Kidney",
+    "name": "Fresh Eggs & Kidney Beans (mashed)",
+    "shortName": "Eggs",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3846,8 +3847,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-035",
-    "name": "Classic Sorghum Lamb Delight",
-    "shortName": "Lamb Sorghum",
+    "name": "Lamb Liver Weight Control Formula",
+    "shortName": "Lamb Liver",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -3956,8 +3957,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-036",
-    "name": "Turkey Acorn Savory Mix",
-    "shortName": "Turkey Acorn",
+    "name": "Lean Turkey Thighs & Sunflower Oil Mix",
+    "shortName": "Turkey Thighs & S...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -4070,8 +4071,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-037",
-    "name": "Ground Regular Special Mix",
-    "shortName": "Ground Regular",
+    "name": "Golden Ground Pork (lean) & Amaranth Leaves Plate",
+    "shortName": "Ground Pork (lean...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -4186,8 +4187,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-038",
-    "name": "Savory Quinoa Turkey Delight",
-    "shortName": "Turkey Quinoa",
+    "name": "Turkey Thighs Quinoa Harmony",
+    "shortName": "Turkey Thighs & Q...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -4298,8 +4299,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-039",
-    "name": "Traditional Turkey Asparagus Feast",
-    "shortName": "Turkey Delicata",
+    "name": "Turkey Breast Weight Control Formula",
+    "shortName": "Turkey Breast & D...",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -4411,8 +4412,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "dog-040",
-    "name": "Classic Eggs Red Feast",
-    "shortName": "Eggs Pumpkin",
+    "name": "Savory Eggs Kitchen Creation",
+    "shortName": "Eggs & Pumpkin Puree",
     "category": "dogs",
     "breed": null,
     "ageGroup": [
@@ -4522,8 +4523,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-001",
-    "name": "Grilled Duck & Millet Feline Feast",
-    "shortName": "Duck Complete Cat Meal",
+    "name": "Lean Duck Hearts & Millet (tiny Amounts) Mix",
+    "shortName": "Duck Hearts & Mil...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -4668,8 +4669,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-002",
-    "name": "Duck Buckwheat Steamed Cat Meal",
-    "shortName": "Duck Complete Cat Meal",
+    "name": "Golden Duck Hearts & Buckwheat (tiny Amounts) Plate",
+    "shortName": "Duck Hearts & Buc...",
     "celebrityQuote": "Purr-fect portion, perfect nutrition.",
     "category": "cats",
     "breed": null,
@@ -4817,8 +4818,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-003",
-    "name": "Sardines & Spinach Baked Complete Meal",
-    "shortName": "Sardines Complete Cat Meal",
+    "name": "Sardines (in Water) With Spinach (cooked) Medley",
+    "shortName": "Sardines (in wate...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -4954,8 +4955,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-004",
-    "name": "Savory Ground & Oat Feline Feast",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Gentle Ground Beef (lean) Medley",
+    "shortName": "Ground Beef (lean...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -5081,8 +5082,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-005",
-    "name": "Classic Mackerel & Oat Feline Feast",
-    "shortName": "Mackerel Complete Cat Meal",
+    "name": "Complete Mackerel (canned) Formula",
+    "shortName": "Mackerel (canned)...",
     "celebrityQuote": "Meowly Cyrus: \"This salmon is a wrecking ball of flavor.\"",
     "category": "cats",
     "breed": null,
@@ -5235,8 +5236,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-006",
-    "name": "Homemade Lamb & Buckwheat Feline Feast",
-    "shortName": "Lamb Complete Cat Meal",
+    "name": "Savory Lamb Liver Kitchen Creation",
+    "shortName": "Lamb Liver & Buck...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -5382,8 +5383,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-007",
-    "name": "Chicken & Spinach Fresh Complete Meal",
-    "shortName": "Chicken Complete Cat Meal",
+    "name": "Fresh Chicken Sausage (no Additives) & Salmon Oil",
+    "shortName": "Chicken Sausage (...",
     "celebrityQuote": "Purr-fect portion, perfect nutrition.",
     "category": "cats",
     "breed": null,
@@ -5529,8 +5530,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-008",
-    "name": "Fresh Complete Ground Cat Nutrition",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Ground Beef (lean) Weight Control Formula",
+    "shortName": "Ground Beef (lean...",
     "celebrityQuote": "Purr-fect portion, perfect nutrition.",
     "category": "cats",
     "breed": null,
@@ -5662,8 +5663,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-009",
-    "name": "Herb-Infused Sardines & Oatmeal Feline Feast",
-    "shortName": "Sardines Complete Cat Meal",
+    "name": "Complete Sardines (in Water) Formula",
+    "shortName": "Sardines (in wate...",
     "celebrityQuote": "Meowly Cyrus: \"This salmon is a wrecking ball of flavor.\"",
     "category": "cats",
     "breed": null,
@@ -5805,8 +5806,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-010",
-    "name": "Special Complete Beef Cat Nutrition",
-    "shortName": "Beef Complete Cat Meal",
+    "name": "Fresh Beef Liver (small Amounts) & Lentils (mashed, Tiny ...",
+    "shortName": "Beef Liver (small...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -5945,8 +5946,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-011",
-    "name": "Grilled Venison & Canned Feline Feast",
-    "shortName": "Venison Complete Cat Meal",
+    "name": "Venison Weight Control Formula",
+    "shortName": "Venison & Canned ...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -6094,8 +6095,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-012",
-    "name": "Fresh Complete Ground Cat Nutrition",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Complete Ground Turkey Formula",
+    "shortName": "Ground Turkey & N...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -6236,8 +6237,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-013",
-    "name": "Homemade Complete Ground Cat Nutrition",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Chef's Choice Ground Chicken Blend",
+    "shortName": "Ground Chicken & ...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -6373,8 +6374,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-014",
-    "name": "Fresh Chicken & Chickpeas Feline Feast",
-    "shortName": "Chicken Complete Cat Meal",
+    "name": "Chicken Necks Garden Blend",
+    "shortName": "Chicken Necks & G...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -6511,8 +6512,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-015",
-    "name": "Ground & Radish Herb-Infused Complete Meal",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Ground Pork (lean, Small Amounts) Weight Control Formula",
+    "shortName": "Ground Pork (lean...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -6657,8 +6658,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-016",
-    "name": "Duck Oat Herb-Infused Cat Meal",
-    "shortName": "Duck Complete Cat Meal",
+    "name": "Complete Duck Liver Formula",
+    "shortName": "Duck Liver & Dand...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -6811,8 +6812,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-017",
-    "name": "Steamed Turkey Purslane Wellness Mix",
-    "shortName": "Turkey Complete Cat Meal",
+    "name": "Ultimate Turkey Sausage (no Additives) Feast",
+    "shortName": "Turkey Sausage (n...",
     "celebrityQuote": "Whisker-licking good nutrition.",
     "category": "cats",
     "breed": null,
@@ -6952,8 +6953,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-018",
-    "name": "Baked Duck with Dandelion Cat Delight",
-    "shortName": "Duck Complete Cat Meal",
+    "name": "Duck Liver With Acorn Squash (mashed, Minimal) Medley",
+    "shortName": "Duck Liver & Acor...",
     "celebrityQuote": "Feline fine dining at its best.",
     "category": "cats",
     "breed": null,
@@ -7091,8 +7092,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-019",
-    "name": "Herb-Infused Ground & Oat Feline Feast",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Ground Herring Weight Control Formula",
+    "shortName": "Ground Herring",
     "celebrityQuote": "Meowly Cyrus: \"This salmon is a wrecking ball of flavor.\"",
     "category": "cats",
     "breed": null,
@@ -7224,8 +7225,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-020",
-    "name": "Ground Lentils Steamed Cat Meal",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Chef's Choice Ground Lamb (lean) Blend",
+    "shortName": "Ground Lamb (lean)",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -7362,8 +7363,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-021",
-    "name": "Classic Ground with Snow Cat Delight",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Ground Mackerel With Butternut Squash (mashed, Minimal) M...",
+    "shortName": "Ground Mackerel &...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -7504,8 +7505,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-022",
-    "name": "Ground & Mustard Traditional Complete Meal",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Gentle Ground Herring Medley",
+    "shortName": "Ground Herring & ...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -7643,8 +7644,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-023",
-    "name": "Fresh Venison Celery Wellness Mix",
-    "shortName": "Venison Complete Cat Meal",
+    "name": "High-protein Venison Power Bowl",
+    "shortName": "Venison & Brown R...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -7789,8 +7790,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-024",
-    "name": "Ground & Peas Traditional Complete Meal",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Chef's Choice Ground Lamb (lean) Blend",
+    "shortName": "Ground Lamb (lean)",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -7920,8 +7921,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-025",
-    "name": "Classic Complete Ground Cat Nutrition",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Fresh Ground Venison & Split Peas (mashed)",
+    "shortName": "Ground Venison & ...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -8050,8 +8051,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-026",
-    "name": "Steamed Ground with Spinach Cat Delight",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Supportive Ground Duck Blend",
+    "shortName": "Ground Duck & Ama...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -8179,8 +8180,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-027",
-    "name": "Traditional Beef Snow Wellness Mix",
-    "shortName": "Beef Complete Cat Meal",
+    "name": "Complete Beef Liver (small Amounts) Formula",
+    "shortName": "Beef Liver (small...",
     "celebrityQuote": "Cat-approved culinary delights.",
     "category": "cats",
     "breed": null,
@@ -8319,8 +8320,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-028",
-    "name": "Lamb & Sugar Baked Complete Meal",
-    "shortName": "Lamb Complete Cat Meal",
+    "name": "Chef's Choice Lamb Liver Blend",
+    "shortName": "Lamb Liver & Zucc...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -8467,8 +8468,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-029",
-    "name": "Ground & Dandelion Classic Complete Meal",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Ground Turkey Garden Blend",
+    "shortName": "Ground Turkey & D...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -8608,8 +8609,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-030",
-    "name": "Savory Herring with Arugula Cat Delight",
-    "shortName": "Herring Complete Cat Meal",
+    "name": "Complete Herring (canned) Formula",
+    "shortName": "Herring (canned) ...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -8737,8 +8738,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-031",
-    "name": "Traditional Chicken with Sugar Cat Delight",
-    "shortName": "Chicken Complete Cat Meal",
+    "name": "Chef's Choice Chicken Thighs (boneless) Blend",
+    "shortName": "Chicken Thighs (b...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -8878,8 +8879,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-032",
-    "name": "Herb-Infused Complete Chicken Cat Nutrition",
-    "shortName": "Chicken Complete Cat Meal",
+    "name": "Chicken Liver & Chia Seed Oil Bowl",
+    "shortName": "Chicken Liver & C...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -9022,8 +9023,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-033",
-    "name": "Chicken & Green Herb-Infused Complete Meal",
-    "shortName": "Chicken Complete Cat Meal",
+    "name": "Chicken Necks Weight Control Formula",
+    "shortName": "Chicken Necks & G...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -9154,8 +9155,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-034",
-    "name": "Grilled Complete Ground Cat Nutrition",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Complete Ground Turkey Formula",
+    "shortName": "Ground Turkey & G...",
     "category": "cats",
     "breed": null,
     "ageGroup": [
@@ -9296,8 +9297,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-035",
-    "name": "Herb-Infused Sardines & Chickpeas Feline Feast",
-    "shortName": "Sardines Complete Cat Meal",
+    "name": "Chef's Choice Sardines (in Water) Blend",
+    "shortName": "Sardines (in wate...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -9430,8 +9431,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-036",
-    "name": "Traditional Sardines & Brown Feline Feast",
-    "shortName": "Sardines Complete Cat Meal",
+    "name": "Sardines (in Water) Garden Blend",
+    "shortName": "Sardines (in wate...",
     "celebrityQuote": "Cat-approved culinary delights.",
     "category": "cats",
     "breed": null,
@@ -9560,8 +9561,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-037",
-    "name": "Herring & Peas Traditional Complete Meal",
-    "shortName": "Herring Complete Cat Meal",
+    "name": "Weight Control Herring (canned) Recipe",
+    "shortName": "Herring (canned) ...",
     "celebrityQuote": "From alley cat to gourmet kitty.",
     "category": "cats",
     "breed": null,
@@ -9703,8 +9704,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-038",
-    "name": "Herb-Infused Ground Arugula Wellness Mix",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Complete Ground Lamb (lean) Formula",
+    "shortName": "Ground Lamb (lean...",
     "celebrityQuote": "Whisker-licking good nutrition.",
     "category": "cats",
     "breed": null,
@@ -9841,8 +9842,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-039",
-    "name": "Savory Rabbit Lettuce Wellness Mix",
-    "shortName": "Rabbit Complete Cat Meal",
+    "name": "Golden Rabbit Meat & Wheat Germ Oil Plate",
+    "shortName": "Rabbit Meat & Whe...",
     "celebrityQuote": "Purr-fect portion, perfect nutrition.",
     "category": "cats",
     "breed": null,
@@ -9982,8 +9983,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "cat-040",
-    "name": "Herb-Infused Ground Watercress Wellness Mix",
-    "shortName": "Ground Complete Cat Meal",
+    "name": "Gentle Ground Quail Medley",
+    "shortName": "Ground Quail & Mi...",
     "celebrityQuote": "Cat-tastic nutrition in every bowl.",
     "category": "cats",
     "breed": null,
@@ -10120,8 +10121,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-001",
-    "name": "Quinoa & Lettuce Fresh Feast",
-    "shortName": "Quinoa Bird Mix",
+    "name": "Feather Plucking/damage Protein Recipe",
+    "shortName": "Quinoa (cooked)",
     "celebrityQuote": "Wing and a prayer for perfect nutrition.",
     "category": "birds",
     "breed": null,
@@ -10229,8 +10230,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-002",
-    "name": "Homemade Avian Corn Mix",
-    "shortName": "Corn Bird Mix",
+    "name": "High-protein Protein Power Bowl",
+    "shortName": "Corn (cracked)",
     "celebrityQuote": "Tweet dreams are made of fresh seeds.",
     "category": "birds",
     "breed": null,
@@ -10336,8 +10337,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-003",
-    "name": "Nutrient-Rich Seed & Basil Mix",
-    "shortName": "Rice Bird Mix",
+    "name": "Chef's Choice Basil Blend",
+    "shortName": "Basil & Rice (hul...",
     "celebrityQuote": "Bird-brilliant nutrition for bright birds.",
     "category": "birds",
     "breed": null,
@@ -10452,8 +10453,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-004",
-    "name": "Millet Sesame Homemade Blend",
-    "shortName": "Millet Bird Mix",
+    "name": "Protein & Millet (white/red) Bowl",
+    "shortName": "Millet (white/red)",
     "celebrityQuote": "Polly wants proper nutrition too.",
     "category": "birds",
     "breed": null,
@@ -10561,8 +10562,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-005",
-    "name": "Wild & Cauliflower Feather-Boosting Feast",
-    "shortName": "Wild Bird Mix",
+    "name": "Balanced Wild Bird Mix & Amaranth Seeds Plate",
+    "shortName": "Wild Bird Mix & A...",
     "celebrityQuote": "Tweet about this tasty treat!",
     "category": "birds",
     "breed": null,
@@ -10670,8 +10671,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-006",
-    "name": "Vitamin-Packed Quinoa & Corn Mix",
-    "shortName": "Quinoa Bird Mix",
+    "name": "Nutrient-rich Snow Peas Medley",
+    "shortName": "Snow Peas & Quino...",
     "celebrityQuote": "Tweet dreams are made of fresh seeds.",
     "category": "birds",
     "breed": null,
@@ -10776,8 +10777,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-007",
-    "name": "Fresh Millet & Barley Mix",
-    "shortName": "Millet Bird Mix",
+    "name": "Ultimate Beet Greens Feast",
+    "shortName": "Beet Greens & Mil...",
     "celebrityQuote": "Feather-light but nutrient-dense.",
     "category": "birds",
     "breed": null,
@@ -10886,8 +10887,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-008",
-    "name": "Vitamin-Packed Avian Safflower Mix",
-    "shortName": "Safflower Bird Mix",
+    "name": "Plums (pitted) Garden Blend",
+    "shortName": "Plums (pitted) & ...",
     "celebrityQuote": "Tweet dreams are made of fresh seeds.",
     "category": "birds",
     "breed": null,
@@ -11006,8 +11007,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-009",
-    "name": "Feather-Boosting Avian Rice Mix",
-    "shortName": "Rice Bird Mix",
+    "name": "Aspergillosis (fungal) Egg (hard-boiled) Recipe",
+    "shortName": "Egg (hard-boiled)...",
     "celebrityQuote": "Chirp-worthy nutrition for happy birds.",
     "category": "birds",
     "breed": null,
@@ -11123,8 +11124,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-010",
-    "name": "Rice & Kale Fresh Feast",
-    "shortName": "Rice Bird Mix",
+    "name": "Rustic Protein Farmhouse Bowl",
+    "shortName": "Rice (hulled)",
     "celebrityQuote": "Wing and a prayer for perfect nutrition.",
     "category": "birds",
     "breed": null,
@@ -11232,8 +11233,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-011",
-    "name": "Nutrient-Rich Sunflower & Rapeseed Mix",
-    "shortName": "Sunflower Bird Mix",
+    "name": "Protein & Sunflower Seeds (small Amounts) Bowl",
+    "shortName": "Sunflower Seeds (...",
     "celebrityQuote": "Tweet dreams are made of fresh seeds.",
     "category": "birds",
     "breed": null,
@@ -11343,8 +11344,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-012",
-    "name": "Feather-Boosting Seed & Zucchini Mix",
-    "shortName": "pumpkin Bird Mix",
+    "name": "Arthritis Protein Recipe",
+    "shortName": "pumpkin",
     "celebrityQuote": "Beak-a-boo! Healthy and delicious.",
     "category": "birds",
     "breed": null,
@@ -11454,8 +11455,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-013",
-    "name": "Rapeseed Flaxseeds Fresh Blend",
-    "shortName": "Rapeseed Bird Mix",
+    "name": "High-protein Flaxseeds Power Bowl",
+    "shortName": "Flaxseeds & Rapeseed",
     "celebrityQuote": "Polly wants proper nutrition too.",
     "category": "birds",
     "breed": null,
@@ -11564,8 +11565,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-014",
-    "name": "Classic Seed & Bok Mix",
-    "shortName": "Canary Bird Mix",
+    "name": "Savory Bok Choi Kitchen Creation",
+    "shortName": "Bok Choi & Canary...",
     "celebrityQuote": "Tweet dreams are made of fresh seeds.",
     "category": "birds",
     "breed": null,
@@ -11671,8 +11672,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-015",
-    "name": "Classic Rice & Flaxseeds Mix",
-    "shortName": "Rice Bird Mix",
+    "name": "Fresh Flaxseeds & Rice (hulled)",
+    "shortName": "Flaxseeds & Rice ...",
     "celebrityQuote": "Bird-brilliant nutrition for bright birds.",
     "category": "birds",
     "breed": null,
@@ -11779,8 +11780,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-016",
-    "name": "Feather-Boosting Seed & Spinach Mix",
-    "shortName": "Amaranth Bird Mix",
+    "name": "Respiratory Infection Protein Recipe",
+    "shortName": "Amaranth Seeds",
     "celebrityQuote": "Feathered friend fuel for flight.",
     "category": "birds",
     "breed": null,
@@ -11888,8 +11889,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-017",
-    "name": "Vitamin-Packed Chia & Pumpkin Mix",
-    "shortName": "Chia Bird Mix",
+    "name": "High-protein Protein Power Bowl",
+    "shortName": "Chia Seeds",
     "celebrityQuote": "Beak-a-boo! Healthy and delicious.",
     "category": "birds",
     "breed": null,
@@ -11997,8 +11998,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-018",
-    "name": "Vitamin-Packed Barley & Chia Mix",
-    "shortName": "Barley Bird Mix",
+    "name": "Rustic Protein Farmhouse Bowl",
+    "shortName": "Barley (hulled)",
     "celebrityQuote": "Tweet about this tasty treat!",
     "category": "birds",
     "breed": null,
@@ -12104,8 +12105,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-019",
-    "name": "Feather-Boosting Avian Teff Mix",
-    "shortName": "Teff Bird Mix",
+    "name": "Protein & Teff Seeds Bowl",
+    "shortName": "Teff Seeds",
     "celebrityQuote": "From cage to gourmet - fresh and fun.",
     "category": "birds",
     "breed": null,
@@ -12211,8 +12212,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-020",
-    "name": "Fresh Seed & Kale Mix",
-    "shortName": "Canary Bird Mix",
+    "name": "Complete Honey (tiny Amounts) Formula",
+    "shortName": "Honey (tiny amoun...",
     "celebrityQuote": "Beak-a-boo! Healthy and delicious.",
     "category": "birds",
     "breed": null,
@@ -12322,8 +12323,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-021",
-    "name": "Pumpkin & Parsley Fresh Feast",
-    "shortName": "Pumpkin Bird Mix",
+    "name": "Rustic Protein Farmhouse Bowl",
+    "shortName": "Pumpkin Seeds",
     "celebrityQuote": "From cage to gourmet - fresh and fun.",
     "category": "birds",
     "breed": null,
@@ -12432,8 +12433,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-022",
-    "name": "Barley & Endive Vitamin-Packed Feast",
-    "shortName": "Barley Bird Mix",
+    "name": "Apricots (pitted) & Barley (hulled) Bowl",
+    "shortName": "Apricots (pitted)...",
     "celebrityQuote": "Feathered friend fuel for flight.",
     "category": "birds",
     "breed": null,
@@ -12551,8 +12552,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-023",
-    "name": "Fresh Millet & Chia Mix",
-    "shortName": "Millet Bird Mix",
+    "name": "Aspergillosis (fungal) Protein Recipe",
+    "shortName": "Millet (white/red)",
     "celebrityQuote": "Tweet dreams are made of fresh seeds.",
     "category": "birds",
     "breed": null,
@@ -12662,8 +12663,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-024",
-    "name": "Fresh Millet & Barley Mix",
-    "shortName": "Millet Bird Mix",
+    "name": "Nutrient-rich Cilantro Medley",
+    "shortName": "Cilantro & Millet...",
     "celebrityQuote": "Feather-light but nutrient-dense.",
     "category": "birds",
     "breed": null,
@@ -12773,8 +12774,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-025",
-    "name": "Classic Canary Bird Delight",
-    "shortName": "Canary Bird Mix",
+    "name": "Rustic Protein Farmhouse Bowl",
+    "shortName": "Canary Seed",
     "celebrityQuote": "Chirp-worthy nutrition for happy birds.",
     "category": "birds",
     "breed": null,
@@ -12883,8 +12884,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-026",
-    "name": "Canary Corn Fresh Blend",
-    "shortName": "Canary Bird Mix",
+    "name": "Protein & Canary Seed Bowl",
+    "shortName": "Canary Seed",
     "celebrityQuote": "Tweet about this tasty treat!",
     "category": "birds",
     "breed": null,
@@ -12993,8 +12994,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-027",
-    "name": "Vitamin-Packed Chia Bird Delight",
-    "shortName": "Chia Bird Mix",
+    "name": "Egg-related Problems Cilantro Recipe",
+    "shortName": "Cilantro & Chia S...",
     "celebrityQuote": "Feathered friend fuel for flight.",
     "category": "birds",
     "breed": null,
@@ -13112,8 +13113,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-028",
-    "name": "Homemade Nyjer Bird Delight",
-    "shortName": "Nyjer Bird Mix",
+    "name": "Lean Carrots (grated) & Nyjer Seeds Mix",
+    "shortName": "Carrots (grated) ...",
     "celebrityQuote": "Feather-light but nutrient-dense.",
     "category": "birds",
     "breed": null,
@@ -13217,8 +13218,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-029",
-    "name": "Fresh Seed & Sugar Mix",
-    "shortName": "Pumpkin Bird Mix",
+    "name": "Golden Sugar Snap Peas & Pumpkin Seeds Plate",
+    "shortName": "Sugar Snap Peas &...",
     "celebrityQuote": "Chirp-worthy nutrition for happy birds.",
     "category": "birds",
     "breed": null,
@@ -13334,8 +13335,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "bird-030",
-    "name": "Feather-Boosting Avian Canary Mix",
-    "shortName": "Canary Bird Mix",
+    "name": "Gentle Carrots (grated) Medley",
+    "shortName": "Carrots (grated) ...",
     "celebrityQuote": "Polly wants proper nutrition too.",
     "category": "birds",
     "breed": null,
@@ -13439,8 +13440,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-001",
-    "name": "Fresh Omnivore Pinhead Feast",
-    "shortName": "Dragon Feast",
+    "name": "Chef's Choice Pinhead Crickets Blend",
+    "shortName": "Pinhead Crickets ...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -13533,8 +13534,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-002",
-    "name": "Calcium-Dusted Insectivore Black Mix",
-    "shortName": "Gecko Feast",
+    "name": "Fresh Black Soldier Fly Larvae & Mix",
+    "shortName": "Black Soldier Fly...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-rific nutrition for happy herps.",
     "category": "reptiles",
@@ -13617,8 +13618,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-003",
-    "name": "Fresh Crickets & Greens Feast",
-    "shortName": "Dragon Feast",
+    "name": "Crickets Internal Parasites Formula",
+    "shortName": "Crickets & Acorn ...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-rific nutrition for happy herps.",
     "category": "reptiles",
@@ -13712,8 +13713,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-004",
-    "name": "Vitamin-Enriched Insectivore Mealworms Mix",
-    "shortName": "Gecko Feast",
+    "name": "Complete Mealworms Formula",
+    "shortName": "Mealworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Scale-tastic meals for reptilian royalty.",
     "category": "reptiles",
@@ -13797,8 +13798,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-005",
-    "name": "Calcium-Dusted Locusts & Greens Feast",
-    "shortName": "Dragon Feast",
+    "name": "Chef's Choice Locusts Blend",
+    "shortName": "Locusts & Zucchini",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -13891,8 +13892,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-006",
-    "name": "Vitamin-Enriched Insectivore Dubia Mix",
-    "shortName": "Gecko Feast",
+    "name": "Fresh Dubia Roaches & Mix",
+    "shortName": "Dubia Roaches",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Cold-blooded cuisine at its finest.",
     "category": "reptiles",
@@ -13975,8 +13976,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-007",
-    "name": "Superworms & Veggie Fresh Mix",
-    "shortName": "Dragon Feast",
+    "name": "Superworms Mouth Rot (stomatitis) Formula",
+    "shortName": "Superworms & Kale",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From rock to gourmet - fresh and fun.",
     "category": "reptiles",
@@ -14076,8 +14077,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-008",
-    "name": "Gut-Loaded Insectivore Butterworms Mix",
-    "shortName": "Gecko Feast",
+    "name": "Complete Butterworms Formula",
+    "shortName": "Butterworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Herp-derp delicious nutrition.",
     "category": "reptiles",
@@ -14162,8 +14163,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-009",
-    "name": "Hornworms Greens Calcium-Dusted Blend",
-    "shortName": "Dragon Feast",
+    "name": "Chef's Choice Hornworms Blend",
+    "shortName": "Hornworms & Aspar...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -14256,8 +14257,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-010",
-    "name": "Vitamin-Enriched Crickets Delight",
-    "shortName": "Gecko Feast",
+    "name": "Crickets Egg Retention Formula",
+    "shortName": "Crickets",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-approved culinary delights.",
     "category": "reptiles",
@@ -14341,8 +14342,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-011",
-    "name": "Crickets & Veggie Gut-Loaded Mix",
-    "shortName": "Dragon Feast",
+    "name": "Complete Crickets Formula",
+    "shortName": "Crickets & Turnip...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Cold-blooded cuisine at its finest.",
     "category": "reptiles",
@@ -14435,8 +14436,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-012",
-    "name": "Fresh Insectivore Superworms Mix",
-    "shortName": "Gecko Feast",
+    "name": "Chef's Choice Superworms Blend",
+    "shortName": "Superworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Scale-mail armor for healthy reptiles.",
     "category": "reptiles",
@@ -14520,8 +14521,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-013",
-    "name": "Grasshoppers & Veggie Calcium-Dusted Mix",
-    "shortName": "Dragon Feast",
+    "name": "Fresh Grasshoppers & Broccoli",
+    "shortName": "Grasshoppers & Br...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-approved culinary delights.",
     "category": "reptiles",
@@ -14620,8 +14621,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-014",
-    "name": "Nutrient-Dense Insectivore Black Mix",
-    "shortName": "Gecko Feast",
+    "name": "Black Soldier Fly Larvae Tail/foot Injuries Formula 01",
+    "shortName": "Black Soldier Fly...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Cold-blooded cuisine at its finest.",
     "category": "reptiles",
@@ -14705,8 +14706,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-015",
-    "name": "Fresh Omnivore Butterworms Feast",
-    "shortName": "Dragon Feast",
+    "name": "Complete Butterworms Formula",
+    "shortName": "Butterworms & Rom...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From rock to gourmet - fresh and fun.",
     "category": "reptiles",
@@ -14799,8 +14800,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-016",
-    "name": "Nutrient-Dense Dubia Reptile Feast",
-    "shortName": "Gecko Feast",
+    "name": "Chef's Choice Dubia Roaches Blend 01",
+    "shortName": "Dubia Roaches",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -14884,8 +14885,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-017",
-    "name": "Small & Veggie Nutrient-Dense Mix",
-    "shortName": "Dragon Feast",
+    "name": "Fresh Small Dubia Roaches & Rosemary",
+    "shortName": "Small Dubia Roaches",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -14978,8 +14979,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-018",
-    "name": "Gut-Loaded Dubia Reptile Feast",
-    "shortName": "Gecko Feast",
+    "name": "Dubia Roaches External Parasites (mites) Formula 02",
+    "shortName": "Dubia Roaches",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Cold-blooded cuisine at its finest.",
     "category": "reptiles",
@@ -15062,8 +15063,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-019",
-    "name": "Fresh Silkworms Garden Feast",
-    "shortName": "Dragon Feast",
+    "name": "Complete Silkworms Formula",
+    "shortName": "Silkworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From rock to gourmet - fresh and fun.",
     "category": "reptiles",
@@ -15156,8 +15157,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-020",
-    "name": "Vitamin-Enriched Crickets Insect Mix",
-    "shortName": "Gecko Feast",
+    "name": "Fresh Crickets & Mix 01",
+    "shortName": "Crickets",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Herp-derp delicious nutrition.",
     "category": "reptiles",
@@ -15241,8 +15242,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-021",
-    "name": "Mealworms & Veggie Vitamin-Enriched Mix",
-    "shortName": "Dragon Feast",
+    "name": "Mealworms Mouth Rot (stomatitis) Formula",
+    "shortName": "Mealworms & Red L...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-approved culinary delights.",
     "category": "reptiles",
@@ -15336,8 +15337,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-022",
-    "name": "Earthworms Gut-Loaded Insect Blend",
-    "shortName": "Gecko Feast",
+    "name": "Complete Earthworms Formula",
+    "shortName": "Earthworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Scale-tastic meals for reptilian royalty.",
     "category": "reptiles",
@@ -15420,8 +15421,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-023",
-    "name": "Small & Veggie Fresh Mix",
-    "shortName": "Dragon Feast",
+    "name": "Chef's Choice Small Dubia Roaches Blend",
+    "shortName": "Small Dubia Roaches",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-approved culinary delights.",
     "category": "reptiles",
@@ -15514,8 +15515,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-024",
-    "name": "Gut-Loaded Superworms Delight",
-    "shortName": "Gecko Feast",
+    "name": "Fresh Superworms & Mix 01",
+    "shortName": "Superworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -15599,8 +15600,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-025",
-    "name": "Nutrient-Dense Hornworms & Greens Feast",
-    "shortName": "Dragon Feast",
+    "name": "Hornworms Gout Formula",
+    "shortName": "Hornworms",
     "celebrityName": "Godzilla",
     "celebrityQuote": "From tank to gourmet dining.",
     "category": "reptiles",
@@ -15690,8 +15691,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-026",
-    "name": "Crickets Nutrient-Dense Insect Blend",
-    "shortName": "Gecko Feast",
+    "name": "Complete Crickets Formula 02",
+    "shortName": "Crickets",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Cold-blooded but hot on nutrition.",
     "category": "reptiles",
@@ -15774,8 +15775,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-027",
-    "name": "Earthworms Greens Calcium-Dusted Blend",
-    "shortName": "Dragon Feast",
+    "name": "Chef's Choice Earthworms Blend",
+    "shortName": "Earthworms & Broc...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Reptile-approved culinary delights.",
     "category": "reptiles",
@@ -15866,8 +15867,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-028",
-    "name": "Calcium-Dusted Insectivore Grasshoppers Mix",
-    "shortName": "Gecko Feast",
+    "name": "Fresh Grasshoppers & Mix",
+    "shortName": "Grasshoppers",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Herp-derp delicious nutrition.",
     "category": "reptiles",
@@ -15951,8 +15952,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-029",
-    "name": "Black & Veggie Calcium-Dusted Mix",
-    "shortName": "Dragon Feast",
+    "name": "Black Soldier Fly Larvae Metabolic Bone Disease Formula",
+    "shortName": "Black Soldier Fly...",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Cold-blooded but hot on nutrition.",
     "category": "reptiles",
@@ -16045,8 +16046,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "reptile-030",
-    "name": "Nutrient-Dense Small Reptile Feast",
-    "shortName": "Gecko Feast",
+    "name": "Chef's Choice Small Dubia Roaches Blend",
+    "shortName": "Small Dubia Roaches",
     "celebrityName": "Godzilla",
     "celebrityQuote": "Scale-tastic meals for reptilian royalty.",
     "category": "reptiles",
@@ -16129,8 +16130,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-001",
-    "name": "Fresh Watercress guinea pig Feast",
-    "shortName": "guinea pig Mix",
+    "name": "Complete Mulberries Formula",
+    "shortName": "Mulberries & Wate...",
     "celebrityQuote": "Small but mighty nutrition.",
     "category": "pocket-pets",
     "breed": null,
@@ -16246,8 +16247,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-002",
-    "name": "Vitamin-Boosted Wheat & Romaine Mix",
-    "shortName": "rabbit Mix",
+    "name": "Savory Rabbit Pellets (high Fiber) Kitchen Creation",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "Pocket-sized gourmet goodness.",
     "category": "pocket-pets",
     "breed": null,
@@ -16360,8 +16361,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-003",
-    "name": "Fiber-Focused Purslane hamster Feast",
-    "shortName": "hamster Mix",
+    "name": "Fresh Hamster Pellets (higher Protein) & Wheat Hay",
+    "shortName": "Hamster Pellets (...",
     "celebrityQuote": "Tiny but mighty nutritional power.",
     "category": "pocket-pets",
     "breed": null,
@@ -16472,8 +16473,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-004",
-    "name": "Nutrient-Rich Wheat Pocket Pet Mix",
-    "shortName": "guinea pig Mix",
+    "name": "Supportive Garlic Chives Blend",
+    "shortName": "Garlic Chives & W...",
     "celebrityQuote": "Pocket-sized gourmet goodness.",
     "category": "pocket-pets",
     "breed": null,
@@ -16594,8 +16595,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-005",
-    "name": "Nutrient-Rich Collard rabbit Feast",
-    "shortName": "rabbit Mix",
+    "name": "Complete Rabbit Pellets (high Fiber) Formula",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "Nibble-worthy nutrition for happy pets.",
     "category": "pocket-pets",
     "breed": null,
@@ -16716,8 +16717,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-006",
-    "name": "Fresh Mache hamster Feast",
-    "shortName": "hamster Mix",
+    "name": "Chef's Choice Hamster Pellets (higher Protein) Blend",
+    "shortName": "Hamster Pellets (...",
     "celebrityQuote": "From hutch to gourmet - fresh and fun.",
     "category": "pocket-pets",
     "breed": null,
@@ -16827,8 +16828,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-007",
-    "name": "Radicchio & Bluegrass Vitamin-Boosted Delight",
-    "shortName": "guinea pig Mix",
+    "name": "Protein & Grain Bowl",
+    "shortName": "Radicchio",
     "celebrityQuote": "Small but mighty nutrition.",
     "category": "pocket-pets",
     "breed": null,
@@ -16936,8 +16937,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-008",
-    "name": "Balanced rabbit Celery Mix",
-    "shortName": "rabbit Mix",
+    "name": "Rabbit Pellets (high Fiber) Obesity Formula",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "From hutch to gourmet - fresh and fun.",
     "category": "pocket-pets",
     "breed": null,
@@ -17055,8 +17056,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-009",
-    "name": "Vitamin-Boosted Bell hamster Feast",
-    "shortName": "hamster Mix",
+    "name": "Complete Basil Formula",
+    "shortName": "Basil & Straw (wh...",
     "celebrityQuote": "Tiny but mighty nutritional power.",
     "category": "pocket-pets",
     "breed": null,
@@ -17167,8 +17168,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-010",
-    "name": "Timothy Zucchini Fiber-Focused Blend",
-    "shortName": "guinea pig Mix",
+    "name": "Basil With Zucchini Medley",
+    "shortName": "Basil & Zucchini",
     "celebrityQuote": "From hutch to gourmet - fresh and fun.",
     "category": "pocket-pets",
     "breed": null,
@@ -17278,8 +17279,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-011",
-    "name": "Fresh Oat & Malabar Mix",
-    "shortName": "rabbit Mix",
+    "name": "Mint Abscesses Formula",
+    "shortName": "Mint & Malabar Sp...",
     "celebrityQuote": "Small but mighty nutrition.",
     "category": "pocket-pets",
     "breed": null,
@@ -17397,8 +17398,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-012",
-    "name": "Dried Green Fiber-Focused Blend",
-    "shortName": "hamster Mix",
+    "name": "Complete Shallots Formula",
+    "shortName": "Shallots & Green ...",
     "celebrityQuote": "Small animal, big nutrition needs.",
     "category": "pocket-pets",
     "breed": null,
@@ -17509,8 +17510,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-013",
-    "name": "Vitamin-Boosted Parsley guinea pig Feast",
-    "shortName": "guinea pig Mix",
+    "name": "Chef's Choice Leeks Blend",
+    "shortName": "Leeks & Parsley",
     "celebrityQuote": "Tiny but mighty nutritional power.",
     "category": "pocket-pets",
     "breed": null,
@@ -17620,8 +17621,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-014",
-    "name": "Nutrient-Rich Squash rabbit Feast",
-    "shortName": "rabbit Mix",
+    "name": "Fresh Rabbit Pellets (high Fiber) & Squash (cooked)",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "Tiny treats for terrific nutrition.",
     "category": "pocket-pets",
     "breed": null,
@@ -17730,8 +17731,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-015",
-    "name": "Squash & Meadow Vitamin-Boosted Delight",
-    "shortName": "hamster Mix",
+    "name": "Hamster Pellets (higher Protein) Bumblefoot Formula",
+    "shortName": "Hamster Pellets (...",
     "celebrityQuote": "Pocket-sized perfection in every bite.",
     "category": "pocket-pets",
     "breed": null,
@@ -17841,8 +17842,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-016",
-    "name": "Vitamin-Boosted Straw Pocket Pet Mix",
-    "shortName": "guinea pig Mix",
+    "name": "Lean Blueberries & Straw (wheat/pine) Mix",
+    "shortName": "Blueberries & Str...",
     "celebrityQuote": "Small animal, big nutrition needs.",
     "category": "pocket-pets",
     "breed": null,
@@ -17960,8 +17961,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-017",
-    "name": "Nutrient-Rich Amaranth rabbit Feast",
-    "shortName": "rabbit Mix",
+    "name": "Golden Rabbit Pellets (high Fiber) & Amaranth Leaves Plate",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "Small animal, big nutrition needs.",
     "category": "pocket-pets",
     "breed": null,
@@ -18079,8 +18080,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-018",
-    "name": "Nutrient-Rich Alfalfa Pocket Pet Mix",
-    "shortName": "hamster Mix",
+    "name": "Mint Garden Blend",
+    "shortName": "Mint & New Zealan...",
     "celebrityQuote": "From hutch to gourmet - fresh and fun.",
     "category": "pocket-pets",
     "breed": null,
@@ -18187,8 +18188,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-019",
-    "name": "Nutrient-Rich guinea pig Cilantro Mix",
-    "shortName": "guinea pig Mix",
+    "name": "Cilantro Pododermatitis Formula",
+    "shortName": "Cilantro & Arugula",
     "celebrityQuote": "Small animal, big nutrition needs.",
     "category": "pocket-pets",
     "breed": null,
@@ -18299,8 +18300,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-020",
-    "name": "Fiber-Focused Bell rabbit Feast",
-    "shortName": "rabbit Mix",
+    "name": "Savory Leeks Kitchen Creation",
+    "shortName": "Leeks & Barley Hay",
     "celebrityQuote": "Tiny treats for terrific nutrition.",
     "category": "pocket-pets",
     "breed": null,
@@ -18413,8 +18414,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-021",
-    "name": "Nutrient-Rich hamster Turnip Mix",
-    "shortName": "hamster Mix",
+    "name": "Hamster Pellets (higher Protein) Garden Blend",
+    "shortName": "Hamster Pellets (...",
     "celebrityQuote": "Pocket-sized gourmet goodness.",
     "category": "pocket-pets",
     "breed": null,
@@ -18521,8 +18522,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-022",
-    "name": "Fiber-Focused guinea pig Arugula Mix",
-    "shortName": "guinea pig Mix",
+    "name": "Cheek Pouch Impaction Protein Recipe",
+    "shortName": "Arugula",
     "celebrityQuote": "Nibble-worthy nutrition for happy pets.",
     "category": "pocket-pets",
     "breed": null,
@@ -18630,8 +18631,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-023",
-    "name": "Fiber-Focused Orchard & Bok Mix",
-    "shortName": "rabbit Mix",
+    "name": "Complete Bok Choi Formula",
+    "shortName": "Bok Choi & Dandel...",
     "celebrityQuote": "From hutch to gourmet - fresh and fun.",
     "category": "pocket-pets",
     "breed": null,
@@ -18743,8 +18744,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-024",
-    "name": "Fresh Meadow Pocket Pet Mix",
-    "shortName": "hamster Mix",
+    "name": "Chef's Choice Hamster Pellets (higher Protein) Blend",
+    "shortName": "Hamster Pellets (...",
     "celebrityQuote": "Pocket-sized perfection in every bite.",
     "category": "pocket-pets",
     "breed": null,
@@ -18865,8 +18866,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-025",
-    "name": "Nutrient-Rich Meadow Pocket Pet Mix",
-    "shortName": "guinea pig Mix",
+    "name": "Protein & Grain Bowl",
+    "shortName": "Broccoli",
     "celebrityQuote": "Tiny treats for terrific nutrition.",
     "category": "pocket-pets",
     "breed": null,
@@ -18973,8 +18974,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-026",
-    "name": "Fiber-Focused rabbit Turnip Mix",
-    "shortName": "rabbit Mix",
+    "name": "Rabbit Pellets (high Fiber) Gi Stasis Formula",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "Nibble-worthy nutrition for happy pets.",
     "category": "pocket-pets",
     "breed": null,
@@ -19083,8 +19084,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-027",
-    "name": "Balanced Straw Pocket Pet Mix",
-    "shortName": "hamster Mix",
+    "name": "Complete Cauliflower Formula",
+    "shortName": "Cauliflower & Str...",
     "celebrityQuote": "From hutch to gourmet - fresh and fun.",
     "category": "pocket-pets",
     "breed": null,
@@ -19193,8 +19194,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-028",
-    "name": "Vitamin-Boosted guinea pig Basil Mix",
-    "shortName": "guinea pig Mix",
+    "name": "Chef's Choice Basil Blend",
+    "shortName": "Basil & Napa Cabbage",
     "celebrityQuote": "Small animal, big nutrition needs.",
     "category": "pocket-pets",
     "breed": null,
@@ -19305,8 +19306,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-029",
-    "name": "Vitamin-Boosted Alfalfa Pocket Pet Mix",
-    "shortName": "rabbit Mix",
+    "name": "Rabbit Pellets (high Fiber) & Pumpkin (cooked) Bowl",
+    "shortName": "Rabbit Pellets (h...",
     "celebrityQuote": "Tiny but mighty nutritional power.",
     "category": "pocket-pets",
     "breed": null,
@@ -19417,8 +19418,8 @@ export const recipes: Recipe[] = [
   },
   {
     "id": "pocket-030",
-    "name": "Nutrient-Rich hamster Dandelion Mix",
-    "shortName": "hamster Mix",
+    "name": "Nutrient-rich Lamb's Quarters Medley",
+    "shortName": "Lamb's Quarters &...",
     "celebrityQuote": "Pocket-sized gourmet goodness.",
     "category": "pocket-pets",
     "breed": null,

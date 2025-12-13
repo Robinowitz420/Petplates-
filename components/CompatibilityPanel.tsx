@@ -65,7 +65,7 @@ export default function CompatibilityPanel({
         {/* Progress Bar */}
         <div className="w-full bg-white/50 rounded-full h-3 mb-2">
           <div
-            className={`h-3 rounded-full transition-all duration-500 ${
+            className={`h-3 rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
               analysis.score >= 80 ? 'bg-green-600' :
               analysis.score >= 60 ? 'bg-yellow-600' :
               'bg-red-600'

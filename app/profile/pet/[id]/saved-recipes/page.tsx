@@ -5,30 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HeartOff, ArrowLeft, Utensils, Clock, Trash2 } from 'lucide-react';
 import { recipes } from '@/lib/data/recipes-complete';
-import { getCustomMeals } from '@/lib/utils/customMealStorage';
-import type { CustomMeal } from '@/lib/types';
-
-// Keep pet types consistent with the rest of the app
-type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
-
-type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
-
-interface Pet {
-  id: string;
-  name?: string; // Legacy - prefer names array
-  names?: string[]; // New format
-  type: PetCategory;
-  breed: string;
-  age: AgeGroup;
-  healthConcerns?: string[];
-  dietaryRestrictions?: string[];
-  allergies?: string[];
-  dislikes?: string[];
-  // In profile/page.tsx this is string[] of recipe IDs
-  savedRecipes?: string[];
-  weight?: string;
-  weightKg?: number;
-}
+import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
+import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
+import type { CustomMeal, Pet } from '@/lib/types';
 
 // Same simulated user ID setup as profile/page.tsx
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
@@ -36,26 +15,6 @@ const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 const getCurrentUserId = () => {
   if (typeof window === 'undefined') return SIMULATED_USER_ID;
   return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
-};
-
-const getPetsFromLocalStorage = (userId: string): Pet[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-
-  if (!stored) return [];
-
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed)
-      ? parsed.map((p: any) => ({
-          ...p,
-          savedRecipes: p.savedRecipes || [],
-        }))
-      : [];
-  } catch (e) {
-    // Failed to parse pet data - using fallback
-    return [];
-  }
 };
 
 export default function SavedRecipesPage() {
@@ -66,8 +25,8 @@ export default function SavedRecipesPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
 
-  // Load pet and custom meals from localStorage
-  useEffect(() => {
+  // Load pet and custom meals - async function
+  const loadData = async () => {
     const uid = getCurrentUserId();
     setUserId(uid);
 
@@ -76,15 +35,55 @@ export default function SavedRecipesPage() {
       return;
     }
 
-    const pets = getPetsFromLocalStorage(uid);
-    const foundPet = pets.find((p) => p.id === petId);
-    setPet(foundPet || null);
+    const resolvedPetId = Array.isArray(petId) ? petId[0] : petId;
     
-    // Load custom meals for this pet
-    const meals = getCustomMeals(uid, Array.isArray(petId) ? petId[0] : petId);
-    setCustomMeals(meals);
-    
-    setIsLoading(false);
+    try {
+      // Load pets and find the current pet
+      const pets = await getPets(uid);
+      const foundPet = pets.find((p) => p.id === resolvedPetId);
+      setPet(foundPet || null);
+      
+      // Load custom meals for this pet
+      const meals = await getCustomMeals(uid, resolvedPetId);
+      setCustomMeals(meals);
+    } catch (error) {
+      console.error('Error loading pet data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load pet and custom meals from storage
+  useEffect(() => {
+    loadData();
+  }, [petId]);
+
+  // Listen for updates to pets and custom meals
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePetsUpdated = (e: CustomEvent) => {
+      // Refresh if pets were updated
+      if (e.detail?.userId === getCurrentUserId()) {
+        loadData();
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      // Refresh if pets or custom meals storage was modified (cross-tab/window)
+      const uid = getCurrentUserId();
+      if (e.key === `pets_${uid}` || e.key?.startsWith(`custom_meals_${uid}_`)) {
+        loadData();
+      }
+    };
+
+    window.addEventListener('petsUpdated', handlePetsUpdated as EventListener);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('petsUpdated', handlePetsUpdated as EventListener);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [petId]);
 
   // Map saved recipe IDs and custom meals to display format
@@ -94,10 +93,11 @@ export default function SavedRecipesPage() {
       name: string;
       dateAdded?: number;
       isCustom?: boolean;
+      compatibilityScore?: number;
     }[] = [];
     
     // Add regular recipes
-    if (pet) {
+    if (pet && pet.savedRecipes) {
       pet.savedRecipes.forEach((recipeId) => {
         const recipe = recipes.find((r) => r.id === recipeId);
         if (recipe) {
@@ -111,44 +111,35 @@ export default function SavedRecipesPage() {
       });
     }
     
-    // Add custom meals
+    // Add custom meals (with compatibility score)
     customMeals.forEach((meal) => {
       allMeals.push({
         id: meal.id,
         name: meal.name,
         dateAdded: meal.createdAt ? new Date(meal.createdAt).getTime() : undefined,
         isCustom: true,
+        compatibilityScore: meal.analysis?.score,
       });
     });
     
     return allMeals;
   }, [pet, customMeals]);
 
-  const handleRemoveRecipe = (recipeIdToRemove: string, isCustom: boolean = false) => {
+  const handleRemoveRecipe = async (recipeIdToRemove: string, isCustom: boolean = false) => {
     if (!userId || !pet) return;
 
     if (isCustom) {
       // Remove custom meal
-      const { deleteCustomMeal } = require('@/lib/utils/customMealStorage');
-      deleteCustomMeal(userId, pet.id, recipeIdToRemove);
+      await deleteCustomMeal(userId, pet.id, recipeIdToRemove);
       setCustomMeals(prev => prev.filter(m => m.id !== recipeIdToRemove));
     } else {
-      // Update the pet's savedRecipes array in localStorage
-      const pets = getPetsFromLocalStorage(userId);
-      const updatedPets = pets.map((p) =>
-        p.id === pet.id
-          ? {
-              ...p,
-              savedRecipes: (p.savedRecipes || []).filter((id: string) => id !== recipeIdToRemove),
-            }
-          : p
-      );
+      // Update the pet's savedRecipes array
+      const updatedPet: Pet = {
+        ...pet,
+        savedRecipes: (pet.savedRecipes || []).filter(id => id !== recipeIdToRemove),
+      };
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(`pets_${userId}`, JSON.stringify(updatedPets));
-      }
-
-      const updatedPet = updatedPets.find((p) => p.id === pet.id) || null;
+      await savePet(userId, updatedPet);
       setPet(updatedPet);
     }
   };
@@ -235,15 +226,11 @@ export default function SavedRecipesPage() {
                 className="flex items-center p-4 bg-white rounded-xl shadow hover:shadow-md transition-shadow justify-between"
               >
                 <Link
-                  href={
-                    recipe.isCustom
-                      ? `/profile/pet/${pet.id}/custom-meals/${recipe.id}`
-                      : `/recipe/${recipe.id}?petId=${pet.id}`
-                  }
+                  href={`/recipe/${recipe.id}?petId=${pet.id}`}
                   className="flex items-center flex-grow group"
                 >
-                  <div className="ml-0">
-                    <div className="flex items-center gap-2">
+                  <div className="ml-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-lg font-semibold text-gray-800 group-hover:text-primary-600 transition-colors">
                         {recipe.name}
                       </p>
@@ -252,9 +239,21 @@ export default function SavedRecipesPage() {
                           Custom
                         </span>
                       )}
+                      {recipe.isCustom && recipe.compatibilityScore !== undefined && (
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-100">
+                          <span className="text-xs font-medium text-gray-600">Score:</span>
+                          <span className={`text-xs font-bold ${
+                            recipe.compatibilityScore >= 80 ? 'text-green-600' :
+                            recipe.compatibilityScore >= 60 ? 'text-yellow-600' :
+                            'text-red-600'
+                          }`}>
+                            {recipe.compatibilityScore}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     {recipe.dateAdded && (
-                      <div className="flex items-center text-sm text-gray-500">
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
                         <Clock className="w-3 h-3 mr-1" />
                         <span>
                           Saved: {new Date(recipe.dateAdded).toLocaleDateString()}

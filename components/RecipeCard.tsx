@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
 import { CompatibilityBadge } from './CompatibilityBadge';
-import { rateRecipeForPet, type Pet } from '@/lib/utils/petRatingSystem';
-import { scoreRecipeImproved } from '@/lib/scoreRecipe';
+import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
+import type { Pet } from '@/lib/utils/petRatingSystem';
 import RecipeScoreModal from './RecipeScoreModal';
 
 
@@ -15,22 +15,59 @@ interface RecipeCardProps {
   pet?: Pet | null;
 }
 
+// Helper to convert grade to compatibility level
+function gradeToCompatibility(grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F'): 'excellent' | 'good' | 'fair' | 'poor' {
+  if (grade === 'A+' || grade === 'A') return 'excellent';
+  if (grade === 'B+' || grade === 'B') return 'good';
+  if (grade === 'C+' || grade === 'C') return 'fair';
+  return 'poor';
+}
+
 export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Calculate compatibility rating if pet is provided
-  const compatibilityRating = pet ? rateRecipeForPet(recipe, pet as Pet) : null;
-  const explainScore = pet ? scoreRecipeImproved(recipe as any, pet as any) : null;
+  const enhancedScore = pet ? (() => {
+    const enhancedPet: EnhancedPet = {
+      id: pet.id,
+      name: pet.name,
+      type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+      breed: pet.breed,
+      age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
+      weight: pet.weight || pet.weightKg || 10,
+      activityLevel: pet.activityLevel,
+      healthConcerns: pet.healthConcerns || [],
+      dietaryRestrictions: pet.dietaryRestrictions || [],
+      allergies: pet.allergies || [],
+    };
+    return calculateEnhancedCompatibility(recipe, enhancedPet);
+  })() : null;
+  
+  const compatibilityRating = enhancedScore ? {
+    overallScore: enhancedScore.overallScore,
+    compatibility: gradeToCompatibility(enhancedScore.grade),
+    breakdown: enhancedScore.factors,
+    warnings: enhancedScore.detailedBreakdown.warnings,
+    strengths: enhancedScore.detailedBreakdown.healthBenefits,
+    recommendations: enhancedScore.detailedBreakdown.recommendations,
+  } : null;
 
   return (
     <>
       <Link
         href={`/recipe/${recipe.id}${pet ? `?petId=${pet.id}` : ''}`}
-        className="group bg-surface rounded-lg shadow-md border border-surface-highlight hover:shadow-xl hover:border-orange-500/50 transition-all overflow-hidden"
+        className="group bg-surface rounded-lg shadow-md border border-surface-highlight hover:shadow-lg hover:border-orange-500/50 transition-shadow duration-200 overflow-hidden"
       >
         <div className="bg-surface-highlight px-4 py-3 border-b border-surface-highlight flex items-center justify-between">
-          <div className="text-xs font-semibold text-foreground uppercase tracking-wide">
-            {recipe.category}
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-semibold text-foreground uppercase tracking-wide">
+              {recipe.category}
+            </div>
+            {(recipe.needsReview === true || (recipe as any).usesFallbackNutrition) && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
+                ⚠️ Experimental / Topper Only
+              </span>
+            )}
           </div>
           <div className="text-[11px] text-gray-400">
             {recipe.servings} servings • {recipe.prepTime}
@@ -45,22 +82,22 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
           </p>
 
           {/* Explainable scoring */}
-          {explainScore?.summaryReasoning && (
+          {enhancedScore && (
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-4">
               <div className="flex items-start gap-2">
                 <span className="text-lg">ℹ️</span>
-                <p className="text-sm text-blue-900">{explainScore.summaryReasoning}</p>
+                <p className="text-sm text-blue-900">Compatibility score: {enhancedScore.overallScore}% ({enhancedScore.grade})</p>
               </div>
             </div>
           )}
-          {explainScore?.recommendations && explainScore.recommendations.length > 0 && (
+          {compatibilityRating?.recommendations && compatibilityRating.recommendations.length > 0 && (
             <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-4">
               <div className="flex items-start gap-2">
                 <span className="text-lg">💡</span>
                 <div className="flex-1">
                   <h4 className="font-semibold text-amber-900 mb-2">Suggestions:</h4>
                   <ul className="text-sm text-amber-800 space-y-1">
-                    {explainScore.recommendations.map((rec, i) => (
+                    {compatibilityRating.recommendations.map((rec, i) => (
                       <li key={i}>• {rec}</li>
                     ))}
                   </ul>

@@ -1,18 +1,34 @@
 import React from 'react';
 
+import { getScoreTier, type ScoreTier } from '@/lib/utils/enhancedCompatibilityScoring';
+
 interface CompatibilityBadgeProps {
-  compatibility: 'excellent' | 'good' | 'fair' | 'poor';
+  compatibility?: 'excellent' | 'good' | 'fair' | 'poor';
   score: number;
   className?: string;
+  isGoldStandard?: boolean;
+  hasPerfectMatches?: boolean;
 }
 
 export const CompatibilityBadge: React.FC<CompatibilityBadgeProps> = ({
   compatibility,
   score,
-  className = ''
+  className = '',
+  isGoldStandard = false,
+  hasPerfectMatches = true
 }) => {
+  // Use scoring tier system for better UX
+  const tier = getScoreTier(score);
+  
+  // Determine compatibility from score if not provided
+  const effectiveCompatibility = compatibility || (
+    score >= 95 ? 'excellent' :
+    score >= 85 ? 'good' :
+    score >= 70 ? 'fair' : 'poor'
+  );
+  
   const getBadgeStyles = () => {
-    switch (compatibility) {
+    switch (effectiveCompatibility) {
       case 'excellent':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'good':
@@ -26,24 +42,37 @@ export const CompatibilityBadge: React.FC<CompatibilityBadgeProps> = ({
     }
   };
 
-  const getCompatibilityLabel = () => {
-    switch (compatibility) {
-      case 'excellent':
-        return 'Excellent Match';
-      case 'good':
-        return 'Good Match';
-      case 'fair':
-        return 'Fair Match';
-      case 'poor':
-        return 'Poor Match';
-      default:
-        return 'Unknown';
+  const getCompatibilityLabel = (): string => {
+    if (score >= 95 && isGoldStandard) {
+      return 'Perfect Match';
+    } else if (score >= 90) {
+      return 'Excellent Match';
+    } else if (score >= 85) {
+      return 'Great Match';
+    } else if (score >= 80) {
+      return 'Good Match';
+    } else if (score >= 70) {
+      return 'Acceptable Match';
+    } else {
+      return hasPerfectMatches 
+        ? 'Below Average Match'
+        : 'Best Available Match';
     }
+  };
+
+  const getScoreSubtext = (): string => {
+    if (!hasPerfectMatches && score < 90) {
+      return ' (no perfect matches for this profile yet)';
+    }
+    if (isGoldStandard) {
+      return ' (meets all requirements)';
+    }
+    return '';
   };
 
   return (
     <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getBadgeStyles()} ${className}`}>
-      <span>{score}% {getCompatibilityLabel()}</span>
+      <span>{score}% {getCompatibilityLabel()}{getScoreSubtext()}</span>
     </div>
   );
 };

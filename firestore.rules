@@ -1,0 +1,75 @@
+// firestore.rules
+// Firestore Security Rules for Pet Plates
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidPet(pet) {
+      return pet.keys().hasAll(['id', 'names', 'type', 'breed', 'age']) &&
+             pet.names is list &&
+             pet.names.size() > 0 &&
+             pet.type in ['dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'] &&
+             pet.age in ['baby', 'young', 'adult', 'senior'];
+    }
+    
+    function isValidMeal(meal) {
+      return meal.keys().hasAll(['id', 'petId', 'userId', 'name', 'ingredients', 'analysis']) &&
+             meal.ingredients is list &&
+             meal.ingredients.size() > 0;
+    }
+    
+    // App artifacts structure: artifacts/{appId}/users/{userId}
+    match /artifacts/{appId}/users/{userId} {
+      
+      // Pets collection
+      match /pets/{petId} {
+        // Read: only owner
+        allow read: if isOwner(userId);
+        
+        // Create: only owner, must be valid
+        allow create: if isOwner(userId) && isValidPet(request.resource.data);
+        
+        // Update: only owner, must remain valid
+        allow update: if isOwner(userId) && isValidPet(request.resource.data);
+        
+        // Delete: only owner
+        allow delete: if isOwner(userId);
+      }
+      
+      // Custom meals collection
+      match /custom_meals/{mealId} {
+        // Read: only owner
+        allow read: if isOwner(userId);
+        
+        // Create: only owner, must be valid
+        allow create: if isOwner(userId) && 
+                         isValidMeal(request.resource.data) &&
+                         request.resource.data.userId == userId;
+        
+        // Update: only owner, must remain valid
+        allow update: if isOwner(userId) && 
+                         isValidMeal(request.resource.data) &&
+                         request.resource.data.userId == userId;
+        
+        // Delete: only owner
+        allow delete: if isOwner(userId);
+      }
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

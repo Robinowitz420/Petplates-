@@ -7,11 +7,12 @@ import { ArrowLeft } from 'lucide-react';
 import { recipes } from '@/lib/data/recipes-complete';
 import type { Recipe } from '@/lib/types';
 import RecipeCard from '@/components/RecipeCard';
-import { rateRecipeForPet, type Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+import type { Pet } from '@/lib/utils/petRatingSystem';
 import {
-  calculateImprovedCompatibility,
-  type ImprovedPet,
-} from '@/lib/utils/improvedCompatibilityScoring';
+  calculateEnhancedCompatibility,
+  calibrateScoresForPet,
+  type Pet as EnhancedPet,
+} from '@/lib/utils/enhancedCompatibilityScoring';
 
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
@@ -51,11 +52,11 @@ export default function RecommendedRecipesPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Convert pet data to rating system format
-  const ratingPet: RatingPet | null = pet ? {
+  // Convert pet data to enhanced compatibility format
+  const enhancedPet: EnhancedPet | null = pet ? {
     id: pet.id,
     name: pet.name,
-    type: pet.type as RatingPet['type'],
+    type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
     breed: pet.breed,
     age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10, // Convert to years
     weight: 25, // Default to 25 lbs since weight isn't stored in this format
@@ -79,59 +80,58 @@ export default function RecommendedRecipesPage() {
 
     // Debug logging removed - use logger if needed
 
-    // Calculate match scores for all recipes against this pet using improved scoring
+    // Calculate compatibility scores for all recipes against this pet using enhanced scoring
     const scored = recipes.map((recipe) => {
-      if (!ratingPet) return { recipe, score: null };
+      if (!enhancedPet) return { recipe, score: null };
       
       try {
-        const improvedPet: ImprovedPet = {
-          id: ratingPet.id,
-          name: ratingPet.name,
-          type: ratingPet.type,
-          breed: ratingPet.breed,
-          age: typeof ratingPet.age === 'string' ? parseFloat(ratingPet.age) || 1 : ratingPet.age || 1,
-          weight: ratingPet.weight || 10,
-          activityLevel: ratingPet.activityLevel,
-          healthConcerns: ratingPet.healthConcerns || [],
-          dietaryRestrictions: ratingPet.dietaryRestrictions || [],
-          allergies: ratingPet.allergies || [],
-        };
-        const improved = calculateImprovedCompatibility(recipe, improvedPet);
+        const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
         return {
           recipe,
           score: {
-            matchScore: improved.overallScore,
-            stars: Math.round(improved.overallScore / 20),
+            compatibilityScore: enhanced.overallScore,
+            stars: Math.round(enhanced.overallScore / 20),
             reasoning: {
-              goodMatches: improved.reasoning.strengths,
-              conflicts: improved.reasoning.warnings,
+              goodMatches: enhanced.detailedBreakdown.healthBenefits,
+              conflicts: enhanced.detailedBreakdown.warnings,
             },
-            enhancedScore: improved, // keep for detail view
+            enhancedScore: enhanced, // keep for detail view
           }
         };
       } catch (error) {
-        // Fallback to original scoring
-        const score = rateRecipeForPet(recipe, ratingPet);
-      return {
-        recipe,
-          score: {
-          matchScore: score.overallScore,
-          stars: Math.round(score.overallScore / 20),
-          reasoning: {
-            goodMatches: score.strengths,
-            conflicts: score.warnings
-          }
-          }
-      };
+        console.error('Error calculating compatibility:', error);
+        return { recipe, score: null };
       }
     });
 
+    // Apply per-pet calibration to normalize scores
+    // This ensures 100% is rare and meaningful, and scores are spread across the range
+    const validScored = scored.filter(s => s.score !== null && enhancedPet);
+    if (validScored.length > 0 && enhancedPet) {
+      
+      const recipesToCalibrate = validScored.map(s => s.recipe);
+      const calibratedScores = calibrateScoresForPet(recipesToCalibrate, enhancedPet);
+      
+      // Update scores with calibrated values
+      validScored.forEach((item) => {
+        const calibratedScore = calibratedScores.get(item.recipe.id);
+        if (calibratedScore !== undefined && item.score) {
+          item.score.compatibilityScore = calibratedScore;
+          item.score.stars = Math.round(calibratedScore / 20);
+          // Update enhanced score if it exists
+          if (item.score.enhancedScore) {
+            item.score.enhancedScore.overallScore = calibratedScore;
+          }
+        }
+      });
+    }
+
     // Debug logging removed - use logger if needed
 
-    // Sort by match score (highest first)
+    // Sort by compatibility score (highest first)
     const sorted = scored.sort((a, b) => {
       if (!a.score || !b.score) return 0;
-      return b.score.matchScore - a.score.matchScore;
+      return b.score.compatibilityScore - a.score.compatibilityScore;
     });
 
     // Debug logging removed - use logger if needed
@@ -179,7 +179,7 @@ export default function RecommendedRecipesPage() {
           </h1>
           <p className="text-gray-600 mb-4">
             Recipes ranked by how well they match {pet.name}'s nutritional needs, breed, age, and health concerns.
-            Higher match scores indicate better suitability.
+            Higher compatibility scores indicate better suitability.
           </p>
 
           {/* Debug Info */}
@@ -189,11 +189,11 @@ export default function RecommendedRecipesPage() {
               Pet Type: <strong>{pet.type}</strong> |
               Total Recipes: <strong>{recipes?.length || 0}</strong> |
               Scored Recipes: <strong>{scoredRecipes.length}</strong> |
-              Recipes with Score {'>'} 0: <strong>{scoredRecipes.filter(s => s.score?.matchScore && s.score.matchScore > 0).length}</strong>
+              Recipes with Score {'>'} 0: <strong>{scoredRecipes.filter(s => s.score?.compatibilityScore && s.score.compatibilityScore > 0).length}</strong>
             </p>
             {scoredRecipes.length > 0 && (
               <p className="text-sm text-yellow-700 mt-1">
-                Top Score: <strong>{scoredRecipes[0]?.score?.matchScore || 0}%</strong> |
+                Top Score: <strong>{scoredRecipes[0]?.score?.compatibilityScore || 0}%</strong> |
                 Sample Recipe: <strong>{scoredRecipes[0]?.recipe?.name} ({scoredRecipes[0]?.recipe?.category})</strong>
               </p>
             )}
@@ -205,7 +205,7 @@ export default function RecommendedRecipesPage() {
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              pet={ratingPet}
+              pet={pet}
             />
           ))}
         </div>
@@ -213,7 +213,7 @@ export default function RecommendedRecipesPage() {
         {scoredRecipes.length > 50 && (
           <div className="text-center mt-8">
             <p className="text-gray-600">
-              Showing top 50 best matches. There are {scoredRecipes.length - 50} more recipes available.
+              Showing top 50 best compatibility matches. There are {scoredRecipes.length - 50} more recipes available.
             </p>
           </div>
         )}

@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Trash2, Edit, Calendar, ChefHat } from 'lucide-react';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
-import type { CustomMeal } from '@/lib/types';
+import { getPets } from '@/lib/utils/petStorage'; // Import async storage
+import type { CustomMeal, Pet } from '@/lib/types';
 
 interface Pet {
   id: string;
@@ -48,29 +49,35 @@ export default function CustomMealsHistoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userId = getCurrentUserId();
-    const pets = getPetsFromLocalStorage(userId);
-    const foundPet = pets.find(p => p.id === petId) || null;
-    setPet(foundPet);
-    
-    if (foundPet) {
-      const meals = getCustomMeals(userId, petId);
-      // Sort by most recent first
-      meals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setCustomMeals(meals);
-    }
-    
-    setLoading(false);
+    const loadData = async () => {
+      const userId = getCurrentUserId();
+      try {
+        const pets = await getPets(userId);
+        const foundPet = pets.find(p => p.id === petId) || null;
+        setPet(foundPet);
+        
+        if (foundPet) {
+          const meals = await getCustomMeals(userId, petId);
+          // Sort by most recent first
+          meals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          setCustomMeals(meals);
+        }
+      } catch (error) {
+        console.error('Error loading custom meals:', error);
+      }
+      setLoading(false);
+    };
+    loadData();
   }, [petId]);
 
-  const handleDelete = (mealId: string) => {
+  const handleDelete = async (mealId: string) => {
     if (!confirm('Are you sure you want to delete this custom meal?')) return;
     
     const userId = getCurrentUserId();
-    deleteCustomMeal(userId, petId, mealId);
+    await deleteCustomMeal(userId, petId, mealId);
     
     // Refresh the list
-    const meals = getCustomMeals(userId, petId);
+    const meals = await getCustomMeals(userId, petId);
     meals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setCustomMeals(meals);
   };
@@ -263,7 +270,7 @@ export default function CustomMealsHistoryPage() {
                   </button>
                   <button
                     onClick={() => {
-                      router.push(`/profile/pet/${petId}/custom-meals/${meal.id}`);
+                      router.push(`/recipe/${meal.id}?petId=${petId}`);
                     }}
                     className="flex-1 px-3 py-2 text-sm font-medium text-green-800 bg-green-900/10 border border-green-800/30 rounded-md hover:bg-green-900/20 transition-colors"
                   >

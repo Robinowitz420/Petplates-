@@ -74,6 +74,23 @@ export interface Recipe {
   rating?: number;
   reviews?: number;
   score?: number;
+  // Enhanced fields (all optional for backward compatibility)
+  needsReview?: boolean; // Flag if recipe uses estimated nutrition data or needs manual review
+  validation?: {
+    status: 'validated' | 'needs_review' | 'invalid';
+    validatedAt?: string;
+    method?: 'dry_matter' | 'as_fed' | 'estimated';
+    standards?: string[];
+    warnings?: string[];
+    errors?: string[];
+    missingIngredients?: string[];
+    estimatedNutritionPercent?: number;
+  };
+  generationInfo?: {
+    version: string;
+    attempts?: number;
+    confidence?: number;
+  };
 }
 
 export interface Pet {
@@ -81,6 +98,7 @@ export interface Pet {
   name?: string;
   names?: string[];
   type: string | PetCategory;
+  bannedIngredients?: string[]; // Ingredients user never wants to see for this pet
   breed?: string | null;
   age?: string;
   weight?: string;
@@ -100,6 +118,7 @@ export interface Pet {
   customMeals?: CustomMeal[];
   userId?: string;
   image?: string;
+  completedMealPlans?: number; // Number of completed meal plans for Planning Volume badge
 }
 
 export interface ModifiedRecipeResult {

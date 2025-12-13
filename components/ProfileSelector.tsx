@@ -132,7 +132,7 @@ export default function ProfileSelector() {
               <button
                 key={pet.id}
                 onClick={() => setSelectedPet(pet.id)}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
+                className={`p-4 rounded-lg border-2 transition-colors duration-200 text-left ${
                   selectedPet === pet.id
                     ? 'border-orange-600 bg-orange-50'
                     : 'border-gray-200 bg-white hover:border-orange-300'

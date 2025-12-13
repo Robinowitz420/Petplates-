@@ -24,9 +24,6 @@ export default function EmojiIcon({ emoji, size = 24, className = '' }: EmojiIco
       style={{ 
         display: 'inline-block', 
         verticalAlign: 'middle',
-        filter: 'none', // Force no filters
-        color: 'unset', // Prevent text color inheritance
-        mixBlendMode: 'normal', // Prevent blend mode issues
       }}
     >
       <Image
@@ -38,13 +35,9 @@ export default function EmojiIcon({ emoji, size = 24, className = '' }: EmojiIco
         style={{ 
           display: 'inline-block', 
           verticalAlign: 'middle',
-          imageRendering: 'crisp-edges', // Keep emoji sharp
-          filter: 'none', // Prevent any CSS filters from inverting colors
-          color: 'unset', // Prevent text color inheritance
-          mixBlendMode: 'normal', // Prevent blend mode issues
-          WebkitFilter: 'none', // Safari-specific
+          imageRendering: 'crisp-edges',
         }}
-        unoptimized // For local images
+        unoptimized
       />
     </span>
   );

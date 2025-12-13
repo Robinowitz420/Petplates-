@@ -1,9 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, ShoppingCart, Check, Loader2 } from 'lucide-react';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
+import { calculateMealsFromShoppingList } from '@/lib/utils/mealCalculator';
+
+// Format price for display
+const formatPrice = (price: number) => {
+  return `$${price.toFixed(2)}`;
+};
 
 interface CheckoutItem {
   id: string;
@@ -19,6 +27,10 @@ interface OneClickCheckoutModalProps {
   items: CheckoutItem[];
   recipeName?: string;
   userId?: string; // Optional userId for purchase tracking
+  // Optional props for meal calculation
+  selectedIngredients?: Array<{ key: string; grams: number }>;
+  totalGrams?: number;
+  recommendedServingGrams?: number;
 }
 
 export default function OneClickCheckoutModal({
@@ -26,7 +38,10 @@ export default function OneClickCheckoutModal({
   onClose,
   items,
   recipeName = 'Recipe',
-  userId
+  userId,
+  selectedIngredients,
+  totalGrams,
+  recommendedServingGrams
 }: OneClickCheckoutModalProps) {
   // Get userId from localStorage if not provided
   const getUserId = () => {
@@ -110,8 +125,8 @@ export default function OneClickCheckoutModal({
         
         document.body.appendChild(iframe);
       } else {
-        // Fallback: open in new tab
-        window.open(item.asinLink, '_blank');
+        // Fallback: open in new tab (ensure seller ID)
+        window.open(ensureSellerId(item.asinLink), '_blank');
         resolve(true);
       }
     });
@@ -164,7 +179,7 @@ export default function OneClickCheckoutModal({
     const currentUserId = getUserId();
     items.forEach((item, index) => {
       setTimeout(() => {
-        window.open(item.asinLink, '_blank');
+        window.open(ensureSellerId(item.asinLink), '_blank');
         // Track purchase when item is opened
         if (currentUserId) {
           addPurchase(currentUserId, item.id || item.name, false, item.name);
@@ -206,6 +221,37 @@ export default function OneClickCheckoutModal({
     );
   }
 
+  // Calculate total price
+  const totalPrice = useMemo(() => {
+    return items.reduce((sum, item) => {
+      // Try multiple lookup methods
+      let product = getVettedProduct(item.name.toLowerCase());
+      if (!product) {
+        product = getVettedProductByAnyIdentifier(item.name);
+      }
+      if (!product && item.asinLink) {
+        product = getVettedProductByAnyIdentifier(item.asinLink);
+      }
+      if (product?.price?.amount) {
+        return sum + product.price.amount;
+      }
+      return sum;
+    }, 0);
+  }, [items]);
+
+  // Calculate how many meals this shopping list will provide
+  const mealsCount = useMemo(() => {
+    if (selectedIngredients && totalGrams && recommendedServingGrams) {
+      return calculateMealsFromShoppingList(
+        items.map(item => ({ id: item.id, name: item.name, amount: item.amount || '' })),
+        selectedIngredients,
+        totalGrams,
+        recommendedServingGrams
+      );
+    }
+    return null;
+  }, [items, selectedIngredients, totalGrams, recommendedServingGrams]);
+
   const progress = (currentStep / items.length) * 100;
   const allAdded = currentStep >= items.length;
 
@@ -217,6 +263,11 @@ export default function OneClickCheckoutModal({
           <div>
             <h2 className="text-2xl font-bold text-foreground">One-Click Shopping</h2>
             <p className="text-sm text-gray-400 mt-1">Add all ingredients to your Amazon cart</p>
+            {mealsCount !== null && mealsCount > 0 && (
+              <p className="text-sm text-orange-400 font-semibold mt-1">
+                This shopping list will provide approximately <strong>{mealsCount} meal{mealsCount !== 1 ? 's' : ''}</strong>
+              </p>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -267,6 +318,23 @@ export default function OneClickCheckoutModal({
                     <div className="text-sm text-gray-400">{item.amount}</div>
                   )}
                 </div>
+                {/* Price Display */}
+                {(() => {
+                  // Try multiple lookup methods
+                  let product = getVettedProduct(item.name.toLowerCase());
+                  if (!product) {
+                    product = getVettedProductByAnyIdentifier(item.name);
+                  }
+                  if (!product && item.asinLink) {
+                    product = getVettedProductByAnyIdentifier(item.asinLink);
+                  }
+                  const price = product?.price?.amount;
+                  return price ? (
+                    <div className="text-right mr-3">
+                      <div className="text-lg font-bold text-orange-400">{formatPrice(price)}</div>
+                    </div>
+                  ) : null;
+                })()}
                 <div className="flex items-center gap-3">
                   {isAdded ? (
                     <div className="flex items-center gap-2 text-green-400">
@@ -351,6 +419,11 @@ export default function OneClickCheckoutModal({
             >
               <ShoppingCart size={20} />
               Go to Amazon Cart ({items.length} items)
+              {totalPrice > 0 && (
+                <span className="ml-2 text-xl font-bold">
+                  • {formatPrice(totalPrice)}
+                </span>
+              )}
             </a>
           )}
 

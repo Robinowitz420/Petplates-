@@ -13,7 +13,7 @@ const normalizeValue = (value?: string | null) => {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { profile, recipeIds, limit } = body;
+    const { profile, recipeIds, limit, minCompatibilityScore } = body;
 
     // API request received
 
@@ -24,6 +24,8 @@ export async function POST(request: Request) {
       );
     }
 
+    const bannedIngredients = (profile.bannedIngredients || []).map(normalizeValue);
+    
     const normalizedProfile: PetNutritionProfile = {
       species: profile.species,
       ageGroup: normalizeValue(profile.ageGroup),
@@ -35,6 +37,31 @@ export async function POST(request: Request) {
         ? Number(profile.caloriesPerKgOverride)
         : undefined,
       petName: profile.petName,
+    };
+    
+    // Helper to check if recipe contains banned ingredients
+    const hasBannedIngredient = (recipe: any): boolean => {
+      if (bannedIngredients.length === 0) return false;
+      const recipeIngredients = (recipe.ingredients || []).map((ing: any) => {
+        const name = typeof ing === 'string' ? ing : ing.name;
+        return normalizeValue(name);
+      });
+      return bannedIngredients.some((banned: string) => 
+        recipeIngredients.some((ing: string) => ing.includes(banned) || banned.includes(ing))
+      );
+    };
+
+    // Helper to check if recipe contains allergens
+    const hasAllergen = (recipe: any): boolean => {
+      const allergies = normalizedProfile.allergies || [];
+      if (allergies.length === 0) return false;
+      const recipeIngredients = (recipe.ingredients || []).map((ing: any) => {
+        const name = typeof ing === 'string' ? ing : ing.name;
+        return normalizeValue(name);
+      });
+      return allergies.some((allergy: string) => 
+        recipeIngredients.some((ing: string) => ing.includes(allergy) || allergy.includes(ing))
+      );
     };
 
     if (Number.isNaN(normalizedProfile.weightKg) || normalizedProfile.weightKg <= 0) {
@@ -50,7 +77,14 @@ export async function POST(request: Request) {
       results = generateModifiedRecommendations({
         profile: normalizedProfile,
         recipeIds: recipeIds || [],
-        limit: limit ?? 10,
+        limit: limit ?? 50,
+        minCompatibilityScore: minCompatibilityScore ?? 30,
+      });
+      
+      // Filter out recipes with banned ingredients and allergens
+      results = results.filter(result => {
+        const recipe = result.recipe;
+        return !hasBannedIngredient(recipe) && !hasAllergen(recipe);
       });
     } catch (error) {
       // Error in generateModifiedRecommendations - handled below
@@ -70,8 +104,11 @@ export async function POST(request: Request) {
       
       const tieredRecs = getRecommendedRecipes(petForRecommendations, limit ?? 10, true);
       
+      // Filter out recipes with banned ingredients
+      const filteredRecs = tieredRecs.filter(rec => !hasBannedIngredient(rec.recipe));
+      
       // Convert tiered recommendations to ModifiedRecipeResult format
-      results = tieredRecs.map(rec => ({
+      results = filteredRecs.map(rec => ({
         recipe: rec.recipe,
         adjustedIngredients: rec.recipe.ingredients,
         appliedRules: [],
@@ -105,7 +142,9 @@ export async function POST(request: Request) {
         .filter(r => {
           // Try to match by species (normalized)
           const normalizeSpecies = (s: string) => s.toLowerCase().replace(/s$/, '');
-          return normalizeSpecies(r.category) === normalizeSpecies(normalizedProfile.species);
+          const speciesMatch = normalizeSpecies(r.category) === normalizeSpecies(normalizedProfile.species);
+          // Also filter out banned ingredients
+          return speciesMatch && !hasBannedIngredient(r);
         })
         .slice(0, limit ?? 5)
         .map(r => ({
@@ -138,8 +177,18 @@ export async function POST(request: Request) {
     }
 
     // API returning recipes
+    const totalFound = results.length;
 
-    return NextResponse.json({ results });
+    return NextResponse.json({ 
+      results,
+      totalFound,
+      metadata: {
+        filteredByCompatibility: true,
+        minCompatibilityScore: minCompatibilityScore ?? 30,
+        filteredByBannedIngredients: bannedIngredients.length > 0,
+        filteredByAllergies: (normalizedProfile.allergies || []).length > 0,
+      }
+    });
   } catch (error) {
     console.error('Recommendation engine failure:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

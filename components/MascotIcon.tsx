@@ -41,22 +41,12 @@ export default function MascotIcon({
     return <span className={className}>{emojiMap[mascot]}</span>;
   }
   
-  // Determine if the mascot image should be inverted by CSS
-  const isMascotInverted = mascot === 'puppy-prepper' || mascot === 'professor-purrfessor';
-  
-  // Conditionally apply filter: 'none' and WebkitFilter: 'none'
-  // We remove the filter: none only for the inverted mascots so CSS can apply the invert filter
-  const filterStyle = isMascotInverted ? {} : { filter: 'none', WebkitFilter: 'none' };
-  
   return (
     <span 
       className={`inline-block align-middle ${className}`}
       style={{ 
         display: 'inline-block', 
         verticalAlign: 'middle',
-        ...filterStyle,
-        color: 'unset',
-        mixBlendMode: 'normal',
       }}
     >
       <Image
@@ -69,9 +59,6 @@ export default function MascotIcon({
           display: 'inline-block', 
           verticalAlign: 'middle',
           imageRendering: 'crisp-edges',
-          ...filterStyle,
-          color: 'unset',
-          mixBlendMode: 'normal',
         }}
         unoptimized
       />

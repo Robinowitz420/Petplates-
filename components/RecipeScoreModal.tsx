@@ -3,11 +3,10 @@
 import React, { useEffect } from 'react';
 import { X, AlertTriangle, CheckCircle, Info, Star } from 'lucide-react';
 import type { Pet } from '@/lib/utils/petRatingSystem';
-import { rateRecipeForPet } from '@/lib/utils/petRatingSystem';
 import {
-  calculateImprovedCompatibility,
-  type ImprovedPet,
-} from '@/lib/utils/improvedCompatibilityScoring';
+  calculateEnhancedCompatibility,
+  type Pet as EnhancedPet,
+} from '@/lib/utils/enhancedCompatibilityScoring';
 import type { Recipe } from '@/lib/types';
 import healthConcerns from '@/lib/data/healthConcerns';
 import { actionNeededBeep } from '@/lib/utils/beep';
@@ -31,10 +30,10 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
 
   if (pet) {
     try {
-      const improvedPet: ImprovedPet = {
+      const enhancedPet: EnhancedPet = {
         id: pet.id,
         name: pet.name,
-        type: pet.type,
+        type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
         breed: pet.breed,
         age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
         weight: pet.weight || 10,
@@ -43,27 +42,34 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
         dietaryRestrictions: pet.dietaryRestrictions || [],
         allergies: pet.allergies || [],
       };
-      const improvedScore = calculateImprovedCompatibility(recipe, improvedPet);
+      const enhancedScore = calculateEnhancedCompatibility(recipe, enhancedPet);
+      // Convert enhanced score to expected format
+      const stars = Math.round(enhancedScore.overallScore / 20);
       rating = {
-        overallScore: improvedScore.overallScore,
-        stars: improvedScore.stars,
-        recommendation: improvedScore.recommendation,
-        summaryReasoning: improvedScore.summaryReasoning,
-        compatibility: improvedScore.recommendation || (improvedScore.stars >= 4 ? 'excellent' : improvedScore.stars >= 3 ? 'good' : 'fair'),
+        overallScore: enhancedScore.overallScore,
+        stars: stars,
+        recommendation: enhancedScore.grade === 'A+' || enhancedScore.grade === 'A' ? 'excellent' :
+                       enhancedScore.grade === 'B+' || enhancedScore.grade === 'B' ? 'good' :
+                       enhancedScore.grade === 'C+' || enhancedScore.grade === 'C' ? 'fair' : 'poor',
+        summaryReasoning: `Compatibility score: ${enhancedScore.overallScore}% (${enhancedScore.grade})`,
+        compatibility: enhancedScore.grade === 'A+' || enhancedScore.grade === 'A' ? 'excellent' :
+                       enhancedScore.grade === 'B+' || enhancedScore.grade === 'B' ? 'good' :
+                       enhancedScore.grade === 'C+' || enhancedScore.grade === 'C' ? 'fair' : 'poor',
         breakdown: {
-          petTypeMatch: { score: improvedScore.factors.ingredientSafety },
-          ageAppropriate: { score: improvedScore.factors.lifeStageFit },
-          nutritionalFit: { score: improvedScore.factors.nutritionalAdequacy },
-          healthCompatibility: { score: improvedScore.factors.healthAlignment },
-          allergenSafety: { score: improvedScore.factors.allergenSafety },
+          petTypeMatch: { score: enhancedScore.factors.ingredientSafety.score },
+          ageAppropriate: { score: enhancedScore.factors.lifeStageFit.score },
+          nutritionalFit: { score: enhancedScore.factors.nutritionalAdequacy.score },
+          healthCompatibility: { score: enhancedScore.factors.healthAlignment.score },
+          activityFit: { score: enhancedScore.factors.activityFit.score },
+          allergenSafety: { score: enhancedScore.factors.allergenSafety.score },
         },
-        warnings: improvedScore.reasoning.warnings,
-        strengths: improvedScore.reasoning.strengths,
-        recommendations: improvedScore.reasoning.recommendations,
+        warnings: enhancedScore.detailedBreakdown.warnings,
+        strengths: enhancedScore.detailedBreakdown.healthBenefits,
+        recommendations: enhancedScore.detailedBreakdown.recommendations,
       };
     } catch (error) {
-      // Fallback to original scoring
-      rating = rateRecipeForPet(recipe, pet);
+      console.error('Error calculating compatibility:', error);
+      rating = null;
     }
   }
 

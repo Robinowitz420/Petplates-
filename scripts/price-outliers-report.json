@@ -1,0 +1,25 @@
+{
+  "scanDate": "2025-12-13T01:16:20.469Z",
+  "totalProductsScanned": 289,
+  "outliersFound": 2,
+  "outliers": [
+    {
+      "ingredientName": "amaranth leaves",
+      "currentPrice": 18.99,
+      "category": "Vegetable",
+      "maxReasonablePrice": 15,
+      "asinLink": "https://www.amazon.com/dp/B0DYPHGW89?tag=robinfrench-20",
+      "productName": "Lamb\\",
+      "lastUpdated": "2025-12-12T21:02:44.545Z"
+    },
+    {
+      "ingredientName": "beta-glucans",
+      "currentPrice": 134.95,
+      "category": "Supplement",
+      "maxReasonablePrice": 100,
+      "asinLink": "https://www.amazon.com/dp/B01LWVNL9J?tag=robinfrench-20",
+      "productName": "NOW Supplements Beta Glucans 60 Capsules",
+      "lastUpdated": "2025-12-12T21:05:29.791Z"
+    }
+  ]
+}

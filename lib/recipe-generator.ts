@@ -10,6 +10,7 @@ import { scoreRecipeImproved } from './scoreRecipe';
 import { HEALTH_BENEFIT_MAP, HEALTH_CONTRAINDICATIONS, normalizeConcernKey } from './data/healthBenefitMap';
 import { CONDITION_TEMPLATES, type ConditionTemplate } from './data/conditionTemplates';
 import { calculateDiversityPenalty, getRecentIngredients, normalizeIngredientNames } from './utils/diversityTracker';
+import { generateMealName } from './utils/mealNameGenerator';
 
 // ============================================================================
 // SCRAPED DATA INTEGRATION (lightweight stubs used by test scripts)
@@ -472,7 +473,7 @@ export function computeFinalGenerationScore(
   } as unknown as Recipe;
   
   const improvedScore = pet 
-    ? scoreRecipeImproved(recipeForScoring, pet).matchScore 
+    ? (scoreRecipeImproved(recipeForScoring, pet).compatibilityScore || scoreRecipeImproved(recipeForScoring, pet).matchScore)
     : 60; // Default if no pet
   
   // Generator-specific modifiers (normalized to small adjustments)
@@ -554,11 +555,46 @@ export function generateRecipe(options: RecipeGenerationOptions): GeneratedRecip
     },
   }));
 
+  // Generate recipe name using enhanced naming system
+  const ingredientKeys = ingredients.map(ing => ing.name || ing.id);
+  const totalCalories = ingredientBreakdown.reduce((s, b) => s + b.contribution.calories, 0);
+  const totalProtein = ingredientBreakdown.reduce((s, b) => s + b.contribution.protein, 0);
+  const totalFat = ingredientBreakdown.reduce((s, b) => s + b.contribution.fat, 0);
+  
+  const nutritionalProfile = totalCalories > 0 ? {
+    protein: (totalProtein / totalCalories) * 100,
+    fat: (totalFat / totalCalories) * 100,
+  } : undefined;
+  
+  const recipeForNaming: Recipe = {
+    id: `generated-${template.id}-${Date.now()}`,
+    name: template.name,
+    category: template.category,
+    ingredients: ingredients.map(ing => ({ id: ing.id, name: ing.name, amount: ing.amount })),
+    instructions: ['Combine ingredients', 'Cook as needed', 'Cool and serve'],
+    healthConcerns: [...template.healthBenefits, ...(pet?.healthConcerns || [])],
+    ageGroup: template.ageGroups,
+  };
+  
+  const nameResult = customizations?.name 
+    ? { fullName: customizations.name, shortName: customizations.name }
+    : generateMealName(ingredientKeys, {
+        petName: pet?.name || undefined,
+        petBreed: pet?.breed || undefined,
+        petSpecies: pet?.type || undefined,
+        healthConcerns: recipeForNaming.healthConcerns,
+        nutritionalProfile,
+        mealType: 'complete',
+        recipeId: recipeForNaming.id,
+        recipe: recipeForNaming,
+        isCustomMeal: false,
+      });
+
   const recipe: GeneratedRecipe = {
     templateId: template.id,
     generationTimestamp: new Date(),
-    name: customizations?.name || template.name,
-    description: `${template.name} tailored for ${pet?.name || 'your pet'}`,
+    name: nameResult.fullName,
+    description: `${nameResult.fullName} tailored for ${pet?.name || 'your pet'}`,
     category: template.category,
     healthConcerns: [...template.healthBenefits, ...(pet?.healthConcerns || [])],
     ageGroup: template.ageGroups,
@@ -570,9 +606,9 @@ export function generateRecipe(options: RecipeGenerationOptions): GeneratedRecip
     tags: template.healthBenefits,
     imageUrl: `/images/generated/${template.category}-${template.id}.png`,
     nutritionalCalculation: {
-      calories: ingredientBreakdown.reduce((s, b) => s + b.contribution.calories, 0),
-      protein: ingredientBreakdown.reduce((s, b) => s + b.contribution.protein, 0),
-      fat: ingredientBreakdown.reduce((s, b) => s + b.contribution.fat, 0),
+      calories: totalCalories,
+      protein: totalProtein,
+      fat: totalFat,
       carbs: 0,
       fiber: 0,
       moisture: 0,

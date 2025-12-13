@@ -1,73 +1,86 @@
-'use client';
-
 import React from 'react';
+import Image from 'next/image';
 import { X, AlertTriangle } from 'lucide-react';
 
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;
-  message: string;
+  title?: string;
+  message?: string;
   confirmText?: string;
   cancelText?: string;
-  confirmButtonClass?: string;
+  isDeleteModal?: boolean;
 }
 
 export default function ConfirmModal({
   isOpen,
   onClose,
   onConfirm,
-  title,
-  message,
+  title = 'Confirm Action',
+  message = 'Are you sure you want to proceed?',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  confirmButtonClass = 'bg-red-600 hover:bg-red-700'
+  isDeleteModal = false,
 }: ConfirmModalProps) {
+  
   if (!isOpen) return null;
 
-  // Check if this is a delete confirmation (red button)
-  const isDeleteModal = confirmButtonClass.includes('red');
-  
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className={`bg-surface rounded-xl shadow-2xl border-3 w-full max-w-md ${isDeleteModal ? 'border-orange-500' : 'border-surface-highlight'}`}>
-        <div className="flex items-start justify-between p-6 border-b border-surface-highlight">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-900/30 rounded-lg">
-              <AlertTriangle className="w-6 h-6 text-red-400" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+      <div 
+        className={`rounded-xl shadow-2xl border-3 w-full ${isDeleteModal ? 'border-orange-500 max-w-2xl' : 'border-surface-highlight max-w-md'}`}
+        style={isDeleteModal ? { backgroundColor: '#143424' } : {}}
+      >
+        <div className={`${isDeleteModal ? 'p-10' : 'p-6'}`}>
+          <div className="flex items-start gap-6">
+            {isDeleteModal && (
+              <div className="flex-shrink-0">
+                <Image
+                  src="/images/emojis/Mascots/Harvest Hamster/HHReaper.jpg"
+                  alt="Harvest Hamster"
+                  width={240}
+                  height={240}
+                  className="w-[240px] h-[240px] object-contain mascot-icon mascot-farmer-fluff"
+                  unoptimized
+                />
+              </div>
+            )}
+            {!isDeleteModal && (
+              <div className="flex-shrink-0">
+                <AlertTriangle className="w-6 h-6 text-yellow-500" />
+              </div>
+            )}
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+              <p className="text-sm text-gray-400">{message}</p>
             </div>
-            <h3 className="text-xl font-bold text-foreground">{title}</h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-surface-highlight"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        
-        <div className="p-6">
-          <p className="text-gray-300 text-base leading-relaxed">{message}</p>
-        </div>
 
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-surface-highlight">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg font-semibold text-gray-300 hover:text-white hover:bg-surface-highlight transition-colors border-green-500"
-            style={{ borderWidth: '3px' }}
-          >
-            {cancelText}
-          </button>
-          <button
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
-            className={`px-4 py-2 rounded-lg font-semibold text-white transition-colors ${confirmButtonClass}`}
-          >
-            {confirmText}
-          </button>
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 bg-surface-highlight text-foreground rounded-lg hover:bg-surface-lighter transition-colors"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={() => {
+                onConfirm();
+                onClose();
+              }}
+              className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
+                isDeleteModal
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-primary-600 text-white hover:bg-primary-700'
+              }`}
+            >
+              {confirmText}
+            </button>
+          </div>
         </div>
       </div>
     </div>

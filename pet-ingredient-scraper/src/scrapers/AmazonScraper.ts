@@ -2,6 +2,36 @@ import { Page } from 'puppeteer';
 import { BaseScraper } from './BaseScraper';
 import { ProductSource, Review, ScraperOptions } from '../models/types';
 
+// Price validation constants (inline to avoid dependency issues)
+type ProductCategory = 'Meat' | 'Supplement' | 'Carb' | 'Vegetable' | 'Oil' | 'Seed' | 'Fruit' | 'Insect' | 'Hay' | 'Pellet';
+
+const MAX_REASONABLE_PRICES: Record<ProductCategory, number> = {
+  Vegetable: 15,
+  Meat: 80,
+  Carb: 75,
+  Oil: 40,
+  Supplement: 100,
+  Fruit: 30,
+  Seed: 50,
+  Insect: 50,
+  Hay: 50,
+  Pellet: 80,
+};
+
+function isPriceReasonable(price: number, category?: string): boolean {
+  if (!category) return true;
+  const normalizedCategory = category as ProductCategory;
+  if (!(normalizedCategory in MAX_REASONABLE_PRICES)) return true;
+  const maxPrice = MAX_REASONABLE_PRICES[normalizedCategory];
+  return price <= maxPrice;
+}
+
+function getMaxReasonablePrice(category?: string): number | null {
+  if (!category) return null;
+  const normalizedCategory = category as ProductCategory;
+  return MAX_REASONABLE_PRICES[normalizedCategory] || null;
+}
+
 export class AmazonScraper extends BaseScraper {
   private readonly baseUrl = 'https://www.amazon.com';
   private readonly affiliateTag = 'robinfrench-20';
@@ -72,7 +102,7 @@ export class AmazonScraper extends BaseScraper {
     }
   }
 
-  async getProductDetails(url: string): Promise<{
+  async getProductDetails(url: string, category?: string): Promise<{
     details: any;
     reviews: Review[];
   }> {
@@ -95,6 +125,9 @@ export class AmazonScraper extends BaseScraper {
         const reviewCountText = document.querySelector('#acrCustomerReviewText')?.textContent || '';
         const reviewCount = parseInt(reviewCountText.replace(/[^0-9]/g, '')) || 0;
         
+        // Try to detect if sold by Amazon vs third-party
+        const soldByAmazon = document.querySelector('.a-text-bold:contains("Amazon"), .a-text-bold:contains("Sold by Amazon")') !== null;
+        
         // Get product details
         const details: Record<string, string> = {};
         document.querySelectorAll('#detailBullets_feature_div li, #productDetails_detailBullets_sections1 tr').forEach(row => {
@@ -112,9 +145,26 @@ export class AmazonScraper extends BaseScraper {
           reviewCount,
           details,
           description: document.querySelector('#productDescription')?.textContent?.trim() || '',
-          features: Array.from(document.querySelectorAll('#feature-bullets li')).map(li => li.textContent?.trim() || '').filter(Boolean)
+          features: Array.from(document.querySelectorAll('#feature-bullets li')).map(li => li.textContent?.trim() || '').filter(Boolean),
+          soldByAmazon
         };
       });
+
+      // Validate price if category is provided
+      if (category && details.price > 0) {
+        const isValid = isPriceReasonable(details.price, category);
+        if (!isValid) {
+          const maxPrice = getMaxReasonablePrice(category);
+          console.warn(
+            `⚠️  Price validation failed for ${details.title}: $${details.price.toFixed(2)} exceeds max of $${maxPrice} for category "${category}". ` +
+            `This may be a third-party seller price. Marking price as invalid.`
+          );
+          // Set price to null to mark as invalid/unavailable
+          details.price = null;
+          details.priceValidationFailed = true;
+          details.priceValidationMax = maxPrice;
+        }
+      }
 
       // Get reviews
       const reviews = await this.getProductReviews(url);

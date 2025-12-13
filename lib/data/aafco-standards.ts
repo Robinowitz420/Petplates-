@@ -1,6 +1,210 @@
 // lib/data/aafco-standards.ts
-// Complete AAFCO nutrient profiles for dogs, cats, and comparison with FEDIAF standards
+// AAFCO (Association of American Feed Control Officials) nutritional standards
+// for dog and cat food - based on 2023 guidelines
+// Also includes research-based standards for birds, reptiles, and pocket-pets
 
+export interface NutritionalStandard {
+  protein: { min: number; max: number }; // % on dry matter basis
+  fat: { min: number; max: number }; // % on dry matter basis
+  calcium: { min: number; max: number }; // mg per 1000 kcal
+  phosphorus: { min: number; max: number }; // mg per 1000 kcal
+  caPRatio: { min: number; max: number }; // calcium to phosphorus ratio
+  fiber: { min: number; max: number }; // % on dry matter basis
+  omega6: { min: number }; // % on dry matter basis
+  omega3?: { min: number }; // % on dry matter basis (optional for dogs)
+}
+
+export const AAFCO_STANDARDS: {
+  dogs: {
+    puppy: NutritionalStandard;
+    adult: NutritionalStandard;
+    senior: NutritionalStandard;
+  };
+  cats: {
+    puppy: NutritionalStandard; // kitten
+    adult: NutritionalStandard;
+    senior: NutritionalStandard;
+  };
+} = {
+  // Dog Standards
+  dogs: {
+    // Growth and Reproduction (Puppies, Pregnant/Lactating)
+    puppy: {
+      protein: { min: 22.5, max: 35 }, // Higher for growth
+      fat: { min: 8.5, max: 20 },
+      calcium: { min: 1000, max: 2500 }, // mg per 1000 kcal (1.0% - 2.5% DM)
+      phosphorus: { min: 800, max: 1600 }, // mg per 1000 kcal (0.8% - 1.6% DM)
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 1.3 },
+      omega3: { min: 0.13 },
+    },
+    
+    // Adult Maintenance
+    adult: {
+      protein: { min: 18, max: 32 },
+      fat: { min: 5.5, max: 18 },
+      calcium: { min: 500, max: 2500 }, // mg per 1000 kcal (0.5% - 2.5% DM)
+      phosphorus: { min: 400, max: 1600 }, // mg per 1000 kcal (0.4% - 1.6% DM)
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 1.1 },
+    },
+    
+    // Senior (same as adult but often lower protein/phosphorus recommended)
+    senior: {
+      protein: { min: 18, max: 28 }, // Slightly lower max
+      fat: { min: 5.5, max: 15 },
+      calcium: { min: 500, max: 1800 }, // Lower max for kidney health
+      phosphorus: { min: 400, max: 1200 }, // Lower max for kidney health
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 1.1 },
+    },
+  },
+
+  // Cat Standards
+  cats: {
+    // Growth and Reproduction (Kittens, Pregnant/Lactating)
+    puppy: { // Using 'puppy' key for kittens to match the interface
+      protein: { min: 30, max: 45 }, // Cats are obligate carnivores - higher protein
+      fat: { min: 9, max: 25 },
+      calcium: { min: 1000, max: 2500 }, // mg per 1000 kcal
+      phosphorus: { min: 800, max: 1600 }, // mg per 1000 kcal
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 0.6 },
+    },
+    
+    // Adult Maintenance
+    adult: {
+      protein: { min: 26, max: 40 }, // Higher than dogs
+      fat: { min: 9, max: 22 },
+      calcium: { min: 600, max: 2500 }, // mg per 1000 kcal
+      phosphorus: { min: 500, max: 1600 }, // mg per 1000 kcal
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 0.6 },
+    },
+    
+    // Senior (lower phosphorus for kidney health)
+    senior: {
+      protein: { min: 26, max: 35 },
+      fat: { min: 9, max: 20 },
+      calcium: { min: 600, max: 1800 },
+      phosphorus: { min: 500, max: 1200 }, // Lower max for kidney health
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 0.6 },
+    },
+  },
+};
+
+// Species-specific nutritional guidelines (non-AAFCO, research-based)
+export const SPECIES_NUTRITIONAL_GUIDELINES = {
+  birds: {
+    // Based on avian nutrition research
+    small: { // Parakeets, canaries, finches
+      protein: { min: 12, max: 18 },
+      fat: { min: 3, max: 8 },
+      fiber: { min: 3, max: 8 },
+      calcium: { min: 0.3, max: 1.2 }, // % of diet
+    },
+    medium: { // Cockatiels, conures
+      protein: { min: 14, max: 20 },
+      fat: { min: 4, max: 10 },
+      fiber: { min: 4, max: 10 },
+      calcium: { min: 0.4, max: 1.5 },
+    },
+    large: { // Macaws, cockatoos, African greys
+      protein: { min: 15, max: 22 },
+      fat: { min: 5, max: 12 },
+      fiber: { min: 5, max: 12 },
+      calcium: { min: 0.5, max: 2.0 },
+    },
+  },
+
+  reptiles: {
+    // Based on herpetological nutrition research
+    herbivore: { // Iguanas, tortoises
+      protein: { min: 15, max: 25 },
+      fiber: { min: 20, max: 35 },
+      caPRatio: { min: 1.5, max: 2.5 }, // Critical for bone health
+      calcium: { min: 0.8, max: 2.0 }, // % of diet
+    },
+    carnivore: { // Monitors, snakes
+      protein: { min: 30, max: 50 },
+      fat: { min: 10, max: 25 },
+      caPRatio: { min: 1.2, max: 2.0 },
+      calcium: { min: 0.6, max: 1.5 },
+    },
+    omnivore: { // Bearded dragons, blue-tongue skinks
+      protein: { min: 20, max: 35 },
+      fiber: { min: 10, max: 25 },
+      caPRatio: { min: 1.5, max: 2.5 },
+      calcium: { min: 0.8, max: 2.0 },
+    },
+  },
+
+  'pocket-pets': {
+    // Based on small mammal nutrition research
+    hamster: {
+      protein: { min: 16, max: 24 },
+      fat: { min: 4, max: 10 },
+      fiber: { min: 8, max: 15 },
+      caPRatio: { min: 1.5, max: 2.0 },
+    },
+    'guinea-pig': {
+      protein: { min: 16, max: 20 },
+      fat: { min: 3, max: 6 },
+      fiber: { min: 12, max: 20 }, // High fiber requirement
+      caPRatio: { min: 1.5, max: 2.0 },
+      vitaminC: { min: 10 }, // mg per kg body weight per day - guinea pigs can't synthesize vitamin C
+    },
+    rabbit: {
+      protein: { min: 14, max: 18 },
+      fat: { min: 2, max: 5 },
+      fiber: { min: 18, max: 25 }, // Very high fiber requirement
+      caPRatio: { min: 1.5, max: 2.0 },
+    },
+    ferret: {
+      protein: { min: 32, max: 38 }, // Obligate carnivores like cats
+      fat: { min: 15, max: 20 },
+      fiber: { min: 0, max: 3 }, // Low fiber tolerance
+      caPRatio: { min: 1.0, max: 2.0 },
+    },
+  },
+};
+
+/**
+ * Get the appropriate nutritional standard for a given species and life stage
+ */
+export function getNutritionalStandard(
+  species: string,
+  lifeStage: 'puppy' | 'adult' | 'senior' = 'adult',
+  subtype?: string // for birds (small/medium/large) or reptiles (herbivore/carnivore/omnivore)
+): NutritionalStandard | any {
+  if (species === 'dogs' || species === 'cats') {
+    return AAFCO_STANDARDS[species][lifeStage];
+  }
+
+  if (species === 'birds' && subtype) {
+    return SPECIES_NUTRITIONAL_GUIDELINES.birds[subtype as keyof typeof SPECIES_NUTRITIONAL_GUIDELINES.birds];
+  }
+
+  if (species === 'reptiles' && subtype) {
+    return SPECIES_NUTRITIONAL_GUIDELINES.reptiles[subtype as keyof typeof SPECIES_NUTRITIONAL_GUIDELINES.reptiles];
+  }
+
+  if (species === 'pocket-pets' && subtype) {
+    return SPECIES_NUTRITIONAL_GUIDELINES['pocket-pets'][subtype as keyof typeof SPECIES_NUTRITIONAL_GUIDELINES['pocket-pets']];
+  }
+
+  // Default fallback
+  return AAFCO_STANDARDS.dogs.adult;
+}
+
+// Legacy exports for backward compatibility
 export interface NutrientRange {
   min?: number;
   max?: number;
@@ -115,78 +319,6 @@ export const AAFCO_NUTRIENT_PROFILES = {
   }
 };
 
-// FEDIAF European Standards for comparison
-export const FEDIAF_STANDARDS = {
-  dogAdult: {
-    protein: { min: 18, unit: '% DM' },
-    fat: { min: 5.5, unit: '% DM' },
-    omega3: { min: 0.1, unit: '% DM', note: "Not required by AAFCO" },
-    vitaminE: { min: 50, unit: 'IU/kg' },
-    source: "FEDIAF 2023"
-  } as NutrientProfile,
-
-  dogPuppy: {
-    protein: { min: 20, unit: '% DM' },
-    fat: { min: 8, unit: '% DM' },
-    omega3: { min: 0.1, unit: '% DM' },
-    vitaminE: { min: 50, unit: 'IU/kg' },
-    source: "FEDIAF 2023"
-  } as NutrientProfile,
-
-  catAdult: {
-    protein: { min: 25, unit: '% DM' },
-    fat: { min: 9, unit: '% DM' },
-    taurine: { min: 0.1, unit: '% DM' },
-    arachidonic_acid: { min: 0.02, unit: '% DM' },
-    source: "FEDIAF 2023"
-  } as NutrientProfile,
-
-  catKitten: {
-    protein: { min: 30, unit: '% DM' },
-    fat: { min: 9, unit: '% DM' },
-    taurine: { min: 0.1, unit: '% DM' },
-    arachidonic_acid: { min: 0.02, unit: '% DM' },
-    source: "FEDIAF 2023"
-  } as NutrientProfile
-};
-
-// Comparison between standards
-export const STANDARDS_COMPARISON = {
-  dogProtein: {
-    aafcoAdult: 18,
-    fediafAdult: 18,
-    aafcoPuppy: 22,
-    fediafPuppy: 20,
-    unit: '% DM',
-    note: "Very similar requirements"
-  },
-
-  catTaurine: {
-    aafcoAdult: 0.10,
-    fediafAdult: 0.10,
-    aafcoKitten: 0.10,
-    fediafKitten: 0.10,
-    unit: '% DM',
-    note: "Identical requirements"
-  },
-
-  omega3: {
-    aafco: "Not required",
-    fediaf: { min: 0.1, unit: '% DM' },
-    note: "FEDIAF more comprehensive for fatty acids"
-  },
-
-  vitaminE: {
-    aafcoDog: 50,
-    fediafDog: 50,
-    aafcoCat: 30,
-    fediafCat: "Not specified",
-    unit: 'IU/kg',
-    note: "AAFCO more specific for cats"
-  }
-};
-
-// Helper functions
 export function getAAFCOStandards(species: 'dog' | 'cat', lifeStage: 'adult' | 'growth' | 'all' = 'adult'): NutrientProfile {
   const speciesData = AAFCO_NUTRIENT_PROFILES[species];
 
@@ -202,16 +334,6 @@ export function getAAFCOStandards(species: 'dog' | 'cat', lifeStage: 'adult' | '
   }
 }
 
-export function getFEDIAFStandards(species: 'dog' | 'cat', lifeStage: 'adult' | 'growth' = 'adult'): NutrientProfile {
-  const key = `${species}${lifeStage === 'adult' ? 'Adult' : 'Puppy'}`;
-  return FEDIAF_STANDARDS[key as keyof typeof FEDIAF_STANDARDS];
-}
-
-export function compareStandards(nutrient: string): any {
-  return STANDARDS_COMPARISON[nutrient as keyof typeof STANDARDS_COMPARISON];
-}
-
-// Critical nutrient validation with comprehensive AAFCO/WSAVA checks
 export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', lifeStage: 'adult' | 'growth' = 'adult'): {
   isValid: boolean;
   violations: string[];
@@ -221,7 +343,6 @@ export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', l
   const violations: string[] = [];
   const warnings: string[] = [];
 
-  // Extract nutrient values (handle both object and number formats)
   const getNutrientValue = (nutrient: any): number => {
     if (typeof nutrient === 'number') return nutrient;
     if (nutrient?.min) return nutrient.min;
@@ -237,35 +358,30 @@ export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', l
   const fiber = getNutrientValue(recipe.fiber);
   const taurine = getNutrientValue(recipe.taurine);
 
-  // Check critical nutrients - Protein
   if (protein < (standards.protein.min || 0)) {
     violations.push(`Protein too low: ${protein.toFixed(1)}% vs minimum ${standards.protein.min}% (AAFCO requirement)`);
   } else if (protein > (standards.protein.max || 100)) {
     warnings.push(`Protein may be high: ${protein.toFixed(1)}% vs maximum ${standards.protein.max}%`);
   }
 
-  // Check critical nutrients - Fat
   if (fat < (standards.fat?.min || 0)) {
     violations.push(`Fat too low: ${fat.toFixed(1)}% vs minimum ${standards.fat.min}% (AAFCO requirement)`);
   } else if (fat > (standards.fat?.max || 100)) {
     warnings.push(`Fat may be high: ${fat.toFixed(1)}% vs maximum ${standards.fat.max}%`);
   }
 
-  // Check critical nutrients - Calcium
   if (calcium < (standards.calcium.min || 0)) {
     violations.push(`Calcium too low: ${calcium.toFixed(1)}% vs minimum ${standards.calcium.min}% (AAFCO requirement)`);
   } else if (calcium > (standards.calcium.max || 999)) {
     violations.push(`Calcium too high: ${calcium.toFixed(1)}% vs maximum ${standards.calcium.max}% (may cause skeletal issues)`);
   }
 
-  // Check critical nutrients - Phosphorus
   if (phosphorus < (standards.phosphorus.min || 0)) {
     violations.push(`Phosphorus too low: ${phosphorus.toFixed(1)}% vs minimum ${standards.phosphorus.min}% (AAFCO requirement)`);
   } else if (phosphorus > (standards.phosphorus.max || 999)) {
     warnings.push(`Phosphorus may be high: ${phosphorus.toFixed(1)}% vs maximum ${standards.phosphorus.max}%`);
   }
 
-  // Check Ca:P ratio (critical for bone health)
   if (phosphorus > 0) {
     const caPRatio = calcium / phosphorus;
     const caPStandard = standards.CaP_ratio;
@@ -278,7 +394,6 @@ export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', l
     }
   }
 
-  // Check Fiber (if specified and available in standards)
   if (fiber > 0 && (standards as any).fiber) {
     const fiberStandard = (standards as any).fiber;
     if (fiber < (fiberStandard.min || 0)) {
@@ -288,19 +403,12 @@ export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', l
     }
   }
 
-  // Species-specific checks - Taurine for cats (CRITICAL)
   if (species === 'cat' && standards.taurine) {
     const taurineMin = standards.taurine.min || 0;
     if (taurine < taurineMin) {
       violations.push(`Taurine too low: ${taurine.toFixed(3)}% vs minimum ${taurineMin}% (CRITICAL for cats - can cause heart/eye issues)`);
     }
   }
-
-  // WSAVA additional checks (if applicable)
-  // Note: WSAVA guidelines align closely with AAFCO but emphasize:
-  // - Complete and balanced nutrition
-  // - Appropriate for life stage
-  // - No harmful ingredients
 
   return {
     isValid: violations.length === 0,

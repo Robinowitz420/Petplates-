@@ -317,25 +317,54 @@ function scoreNutritionalAdequacy(
       }
       case 'pocket-pet': {
         const breed = (pet.breed || '').toLowerCase();
+        
+        // Check Ca:P ratio (critical for all pocket-pets)
+        if (nutrition.calcium && nutrition.phosphorus) {
+          const ratio = nutrition.calcium / nutrition.phosphorus;
+          if (ratio < 1.5 || ratio > 2.5) {
+            const deviation = ratio < 1.5 ? 1.5 - ratio : ratio - 2.5;
+            score -= Math.min(deviation * 20, 25);
+          }
+        }
+        
         // Sugar gliders & omnivores need less fiber than rabbits
         const isLowFiber = ['sugar', 'glider', 'hamster', 'rat', 'mouse', 'ferret'].some(b => breed.includes(b));
+        const isHayEater = ['rabbit', 'guinea', 'chinchilla'].some(b => breed.includes(b));
         
         if (isLowFiber) {
             // They need protein/fruit, not hay
-            if (nutrition.fiber > 10) score -= 5; // gentle penalty
-            if (nutrition.protein < 12) score -= 10;
-        } else {
-            // Rabbits/Guinea Pigs (Hay eaters)
+            if (nutrition.fiber > 10) score -= 8; // Increased penalty
+            if (nutrition.protein < 12) score -= 15; // Increased penalty
+            // Ferrets are obligate carnivores - need very high protein
+            if (breed.includes('ferret') && nutrition.protein < 30) {
+              score -= 20;
+            }
+        } else if (isHayEater) {
+            // Rabbits/Guinea Pigs (Hay eaters) - need high fiber
             if (nutrition.fiber < 15) {
-              score -= Math.min((15 - nutrition.fiber) * 2, 20);
+              score -= Math.min((15 - nutrition.fiber) * 2.5, 25); // Increased penalty
             }
             if (nutrition.protein > 20) {
-              score -= Math.min((nutrition.protein - 20) * 1.5, 18);
+              score -= Math.min((nutrition.protein - 20) * 2, 20);
             }
+        } else {
+            // Generic pocket-pet validation
+            if (nutrition.protein < 10) score -= 12;
+            if (nutrition.fiber > 20) score -= 8;
         }
         break;
       }
       default:
+        // Unknown species - apply basic validation
+        if (nutrition.protein < 10) {
+          score -= 10;
+        }
+        if (nutrition.calcium && nutrition.phosphorus) {
+          const ratio = nutrition.calcium / nutrition.phosphorus;
+          if (ratio < 1.0 || ratio > 3.0) {
+            score -= 15;
+          }
+        }
         break;
     }
   }
@@ -449,14 +478,58 @@ function scoreDigestibility(recipe: Recipe, species: string): number {
     if (comp) {
       if (comp.protein && comp.protein > 15) total += 20;
       if (comp.fiber !== undefined) {
-        if ((species === 'dog' || species === 'cat') && comp.fiber >= 2 && comp.fiber <= 5) {
-          total += 15;
-        } else if (comp.fiber > 10) {
-          total -= 10;
+        if (species === 'dog' || species === 'cat') {
+          // Dogs and cats: moderate fiber (2-5%) is ideal
+          if (comp.fiber >= 2 && comp.fiber <= 5) {
+            total += 15;
+          } else if (comp.fiber > 10) {
+            total -= 10; // Too much fiber for carnivores
+          }
+        } else if (species === 'bird') {
+          // Birds: low to moderate fiber (2-8%) is ideal
+          if (comp.fiber >= 2 && comp.fiber <= 8) {
+            total += 12;
+          } else if (comp.fiber > 15) {
+            total -= 8; // Too much fiber for birds
+          }
+        } else if (species === 'reptile') {
+          // Reptiles: fiber needs vary by type, but generally low
+          if (comp.fiber > 10) {
+            total -= 5; // Most reptiles need low fiber
+          }
+        } else if (species === 'pocket-pet') {
+          // Pocket-pets: fiber needs vary dramatically
+          // Hay eaters (rabbits, guinea pigs) need high fiber
+          // Omnivores (hamsters, rats) need moderate fiber
+          // Carnivores (ferrets) need very low fiber
+          if (comp.fiber >= 5 && comp.fiber <= 20) {
+            total += 10; // Acceptable range for most pocket-pets
+          } else if (comp.fiber > 25) {
+            total -= 5; // May be too high for some
+          }
+        } else {
+          // Unknown species: generic handling
+          if (comp.fiber > 10) {
+            total -= 5;
+          }
         }
       }
       if (comp.fat && comp.fat > 0) {
-        total += comp.fat > 10 ? 5 : 10;
+        // Fat digestibility varies by species
+        if (species === 'dog' || species === 'cat') {
+          total += comp.fat > 10 ? 5 : 10;
+        } else if (species === 'bird') {
+          // Birds can handle moderate fat
+          total += comp.fat > 15 ? 3 : 8;
+        } else if (species === 'reptile') {
+          // Reptiles generally need lower fat
+          total += comp.fat > 8 ? 2 : 6;
+        } else if (species === 'pocket-pet') {
+          // Pocket-pets vary: ferrets need high fat, rabbits need low
+          total += comp.fat > 10 ? 3 : 7;
+        } else {
+          total += comp.fat > 10 ? 5 : 10;
+        }
       }
     } else {
       total += 5; // unknown = modest neutral

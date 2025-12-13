@@ -1,0 +1,170 @@
+// lib/utils/nutritionalRecommendations.ts
+// Maps nutritional deficiencies to recommended supplements and ingredients
+
+import { petSupplements, type Supplement } from '@/lib/data/supplements';
+import { getVettedProduct } from '@/lib/data/vetted-products';
+
+export interface RecommendedSupplement {
+  name: string;
+  description: string;
+  benefits: string;
+  addressesDeficiency: string;
+  defaultAmount: string;
+  amazonLink?: string;
+  asinLink?: string;
+  isIngredient?: boolean;
+  productName?: string;
+  vetNote?: string;
+}
+
+/**
+ * Map nutritional gaps to recommended supplements/ingredients
+ */
+export function getRecommendationsForDeficiency(
+  deficiency: string,
+  species: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+  healthConcerns: string[] = []
+): RecommendedSupplement[] {
+  const recommendations: RecommendedSupplement[] = [];
+  const lowerDeficiency = deficiency.toLowerCase();
+
+  // Normalize species for supplement lookup
+  const supplementSpecies = species === 'pocket-pet' ? 'pocket-pets' : 
+                            species === 'reptile' ? 'reptiles' : 
+                            species;
+
+  // Map deficiency patterns to supplement categories
+  const deficiencyMappings: Record<string, string[]> = {
+    'protein': ['allergy-support', 'digestive-health'],
+    'calcium': ['joint-mobility', 'digestive-health'],
+    'phosphorus': ['joint-mobility'],
+    'ca:p': ['joint-mobility'],
+    'taurine': ['allergy-support'],
+    'fiber': ['digestive-health', 'weight-management'],
+    'vitamin': ['skin-coat'],
+    'omega': ['skin-coat', 'allergy-support'],
+    'fat': ['skin-coat', 'allergy-support'],
+  };
+
+  // Find matching supplement categories
+  const matchingCategories: string[] = [];
+  for (const [pattern, categories] of Object.entries(deficiencyMappings)) {
+    if (lowerDeficiency.includes(pattern)) {
+      matchingCategories.push(...categories);
+    }
+  }
+
+  // Get supplements from petSupplements data
+  const speciesSupplements = petSupplements[supplementSpecies as keyof typeof petSupplements];
+  if (speciesSupplements) {
+    for (const category of matchingCategories) {
+      const categorySupplements = speciesSupplements[category as keyof typeof speciesSupplements];
+      if (Array.isArray(categorySupplements)) {
+        for (const supplement of categorySupplements) {
+          // Check if vetted product exists
+          const vettedProduct = getVettedProduct(supplement.name);
+          
+          recommendations.push({
+            name: supplement.name,
+            description: supplement.description,
+            benefits: supplement.benefits,
+            addressesDeficiency: deficiency,
+            defaultAmount: 'As directed',
+            amazonLink: supplement.amazonLink,
+            asinLink: vettedProduct?.asinLink || supplement.amazonLink,
+            productName: vettedProduct?.productName || supplement.name,
+            vetNote: vettedProduct?.vetNote,
+          });
+        }
+      }
+    }
+  }
+
+  // Species-specific ingredient recommendations
+  if (lowerDeficiency.includes('protein') && species === 'cat') {
+    recommendations.push({
+      name: 'Taurine Supplement',
+      description: 'Essential amino acid for cats',
+      benefits: 'Prevents taurine deficiency, supports heart and eye health',
+      addressesDeficiency: 'Low protein / Taurine deficiency',
+      defaultAmount: '250-500mg per day',
+      isIngredient: false,
+    });
+  }
+
+  if (lowerDeficiency.includes('calcium') || lowerDeficiency.includes('ca:p')) {
+    if (species === 'reptile' || species === 'bird') {
+      recommendations.push({
+        name: 'Calcium with Vitamin D3',
+        description: 'Essential for bone health',
+        benefits: 'Prevents metabolic bone disease, supports proper Ca:P ratio',
+        addressesDeficiency: 'Calcium deficiency / Ca:P imbalance',
+        defaultAmount: 'Lightly dust food 2-3x per week',
+        isIngredient: false,
+      });
+    } else {
+      recommendations.push({
+        name: 'Calcium Supplement',
+        description: 'Calcium for bone and dental health',
+        benefits: 'Supports proper Ca:P ratio, bone strength',
+        addressesDeficiency: 'Calcium deficiency / Ca:P imbalance',
+        defaultAmount: 'As directed on package',
+        isIngredient: false,
+      });
+    }
+  }
+
+  if (lowerDeficiency.includes('fiber')) {
+    recommendations.push({
+      name: 'Pumpkin Powder',
+      description: 'Natural fiber source',
+      benefits: 'Promotes digestive regularity and satiety',
+      addressesDeficiency: 'Low fiber',
+      defaultAmount: '1-2 tsp per meal',
+      isIngredient: true,
+    });
+  }
+
+  // Health concern-based recommendations
+  if (healthConcerns.includes('joint-health') || healthConcerns.includes('joint-mobility')) {
+    recommendations.push({
+      name: 'Glucosamine & Chondroitin',
+      description: 'Joint health supplements',
+      benefits: 'Supports cartilage health and joint mobility',
+      addressesDeficiency: 'Joint support needed',
+      defaultAmount: 'As directed on package',
+      isIngredient: false,
+    });
+  }
+
+  // Remove duplicates based on name
+  const uniqueRecommendations = recommendations.filter((rec, index, self) =>
+    index === self.findIndex(r => r.name === rec.name)
+  );
+
+  return uniqueRecommendations;
+}
+
+/**
+ * Get all recommendations for a recipe based on nutritional gaps
+ */
+export function getRecommendationsForRecipe(
+  nutritionalGaps: string[],
+  species: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+  healthConcerns: string[] = []
+): RecommendedSupplement[] {
+  const allRecommendations: RecommendedSupplement[] = [];
+
+  for (const gap of nutritionalGaps) {
+    const recommendations = getRecommendationsForDeficiency(gap, species, healthConcerns);
+    allRecommendations.push(...recommendations);
+  }
+
+  // Remove duplicates
+  const uniqueRecommendations = allRecommendations.filter((rec, index, self) =>
+    index === self.findIndex(r => r.name === rec.name)
+  );
+
+  return uniqueRecommendations;
+}
+

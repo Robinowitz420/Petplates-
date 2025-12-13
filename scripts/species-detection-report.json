@@ -1,0 +1,1184 @@
+{
+  "scanDate": "2025-12-13T01:28:50.211Z",
+  "totalProducts": 292,
+  "needsUpdate": [
+    {
+      "key": "joint supplement",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "detectedSpecies": "dogs"
+    },
+    {
+      "key": "chicken broth",
+      "productName": "Brutus Bone Broth for Dogs No Salt",
+      "detectedSpecies": "dogs"
+    },
+    {
+      "key": "sardine oil",
+      "productName": "Zesty Paws Sardine Oil for Dogs",
+      "detectedSpecies": "dogs"
+    },
+    {
+      "key": "bone broth (low sodium)",
+      "productName": "Brutus Bone Broth for Dogs Low Sodium",
+      "detectedSpecies": "dogs"
+    },
+    {
+      "key": "fish broth (no salt)",
+      "productName": "Brutus Fish Broth for Dogs No Salt",
+      "detectedSpecies": "dogs"
+    },
+    {
+      "key": "joint health supplement",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "detectedSpecies": "dogs"
+    },
+    {
+      "key": "turkey broth (no salt)",
+      "productName": "Brutus Turkey Broth for Dogs No Salt",
+      "detectedSpecies": "dogs"
+    }
+  ],
+  "alreadyHasSpecies": [],
+  "noSpeciesFound": [
+    {
+      "key": "ground chicken",
+      "productName": "Fresh Is Best Freeze Dried Chicken Breast"
+    },
+    {
+      "key": "ground turkey",
+      "productName": "Diestel Free Range Ground Turkey"
+    },
+    {
+      "key": "ground beef (lean)",
+      "productName": "US Wellness Meats Pet Burger"
+    },
+    {
+      "key": "ground lamb",
+      "productName": "Raw Paws Lamb Recipe Rolls"
+    },
+    {
+      "key": "salmon (boneless)",
+      "productName": "A Better Treat Freeze Dried Salmon"
+    },
+    {
+      "key": "chicken breast",
+      "productName": "Bell & Evans Boneless Chicken Breast"
+    },
+    {
+      "key": "chicken thighs",
+      "productName": "Bell & Evans Boneless Chicken Thighs"
+    },
+    {
+      "key": "turkey breast",
+      "productName": "Fresh Is Best Freeze Dried Turkey Tenders"
+    },
+    {
+      "key": "beef liver",
+      "productName": "Fresh Is Best Freeze Dried Beef Liver"
+    },
+    {
+      "key": "chicken liver",
+      "productName": "Fresh Is Best Freeze Dried Chicken Livers"
+    },
+    {
+      "key": "chicken hearts",
+      "productName": "Vital Essentials Freeze Dried Chicken Hearts"
+    },
+    {
+      "key": "sardines (canned in water)",
+      "productName": "Wild Planet Sardines in Water No Salt"
+    },
+    {
+      "key": "eggs",
+      "productName": "Whole Life Pet Freeze Dried Diced Eggs"
+    },
+    {
+      "key": "turkey giblets",
+      "productName": "Vital Essentials Freeze Dried Turkey Giblets"
+    },
+    {
+      "key": "chicken giblets",
+      "productName": "Fresh Is Best Freeze Dried Chicken Giblets"
+    },
+    {
+      "key": "duck breast",
+      "productName": "Fresh Is Best Freeze Dried Duck Breast"
+    },
+    {
+      "key": "venison",
+      "productName": "Fresh Is Best Freeze Dried Venison Bites"
+    },
+    {
+      "key": "rabbit meat",
+      "productName": "Evanger\\"
+    },
+    {
+      "key": "quail",
+      "productName": "Wholesome Beast Freeze Dried Quail Chicks"
+    },
+    {
+      "key": "ground pork (lean)",
+      "productName": "Momentum Freeze Dried Pork Tenderloin"
+    },
+    {
+      "key": "turkey necks",
+      "productName": "Northwest Naturals Freeze Dried Turkey Necks"
+    },
+    {
+      "key": "brown rice",
+      "productName": "Lundberg Family Farms Organic Brown Rice"
+    },
+    {
+      "key": "white rice",
+      "productName": "Nishiki Premium Medium Grain White Rice"
+    },
+    {
+      "key": "quinoa",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "sweet potato",
+      "productName": "Farmer\\"
+    },
+    {
+      "key": "pumpkin puree",
+      "productName": "Farmer\\"
+    },
+    {
+      "key": "butternut squash",
+      "productName": "Farmer\\"
+    },
+    {
+      "key": "lentils",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "chickpeas",
+      "productName": "Goya Organic Chickpeas No Salt"
+    },
+    {
+      "key": "black beans",
+      "productName": "Eden Organic Black Beans No Salt"
+    },
+    {
+      "key": "green peas",
+      "productName": "Nature\\"
+    },
+    {
+      "key": "carrots",
+      "productName": "Nature\\"
+    },
+    {
+      "key": "spinach",
+      "productName": "Earthbound Farm Organic Spinach Frozen"
+    },
+    {
+      "key": "broccoli",
+      "productName": "Cascadian Farm Organic Broccoli Florets"
+    },
+    {
+      "key": "zucchini",
+      "productName": "Nature\\"
+    },
+    {
+      "key": "kale",
+      "productName": "Earthbound Farm Organic Kale"
+    },
+    {
+      "key": "celery",
+      "productName": "Earthbound Farm Organic Celery"
+    },
+    {
+      "key": "brussels sprouts",
+      "productName": "Cascadian Farm Organic Brussels Sprouts"
+    },
+    {
+      "key": "asparagus",
+      "productName": "Cascadian Farm Organic Asparagus Spears"
+    },
+    {
+      "key": "parsley",
+      "productName": "McCormick Culinary Parsley Flakes"
+    },
+    {
+      "key": "cucumber",
+      "productName": "Nature\\"
+    },
+    {
+      "key": "lettuce (romaine)",
+      "productName": "Organic Girl Romaine Lettuce"
+    },
+    {
+      "key": "arugula",
+      "productName": "Organic Girl Baby Arugula"
+    },
+    {
+      "key": "endive",
+      "productName": "Organic Endive Greens"
+    },
+    {
+      "key": "escarole",
+      "productName": "Organic Escarole Greens"
+    },
+    {
+      "key": "dandelion greens",
+      "productName": "Organic Dandelion Greens"
+    },
+    {
+      "key": "collard greens",
+      "productName": "Organic Collard Greens"
+    },
+    {
+      "key": "mustard greens",
+      "productName": "Organic Mustard Greens"
+    },
+    {
+      "key": "turnip greens",
+      "productName": "Organic Turnip Greens"
+    },
+    {
+      "key": "beet greens",
+      "productName": "Organic Beet Greens"
+    },
+    {
+      "key": "radish greens",
+      "productName": "Organic Radish Greens"
+    },
+    {
+      "key": "coconut oil",
+      "productName": "Nutiva Organic Virgin Coconut Oil"
+    },
+    {
+      "key": "olive oil",
+      "productName": "California Olive Ranch Extra Virgin Olive Oil"
+    },
+    {
+      "key": "salmon oil",
+      "productName": "Grizzly Salmon Plus Omega-3 Oil"
+    },
+    {
+      "key": "flaxseed oil",
+      "productName": "Barlean\\"
+    },
+    {
+      "key": "fish oil",
+      "productName": "Nordic Naturals Omega-3 Pet"
+    },
+    {
+      "key": "taurine powder",
+      "productName": "NOW Supplements Taurine Powder 8 oz"
+    },
+    {
+      "key": "calcium carbonate",
+      "productName": "NOW Supplements Calcium Carbonate Powder"
+    },
+    {
+      "key": "vitamin e",
+      "productName": "Solgar Vitamin E 400 IU"
+    },
+    {
+      "key": "b-complex",
+      "productName": "Thorne B-Complex #12"
+    },
+    {
+      "key": "probiotic powder",
+      "productName": "Purina FortiFlora Probiotic Supplement"
+    },
+    {
+      "key": "psyllium husk",
+      "productName": "Organic India Whole Husk Psyllium"
+    },
+    {
+      "key": "omega-3 capsules",
+      "productName": "Nordic Naturals Omega-3 Pet Capsules"
+    },
+    {
+      "key": "digestive enzymes",
+      "productName": "NaturVet Digestive Enzymes Plus Probiotics"
+    },
+    {
+      "key": "hairball paste",
+      "productName": "Tomlyn Laxatone Hairball Remedy"
+    },
+    {
+      "key": "vitamin e oil",
+      "productName": "NOW Solutions Vitamin E Oil"
+    },
+    {
+      "key": "millet (white/red)",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "canary seed",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "niger seed",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "oat groats",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "hemp seeds",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "flaxseeds",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "sesame seeds",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "chia seeds",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "quinoa (cooked)",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "rapeseed",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "sunflower seeds (small amounts)",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "pumpkin seeds",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "bell peppers",
+      "productName": "Earthbound Farm Organic Bell Peppers"
+    },
+    {
+      "key": "corn (fresh)",
+      "productName": "Cascadian Farm Organic Corn on the Cob"
+    },
+    {
+      "key": "apples (no seeds)",
+      "productName": "Organic Honeycrisp Apples"
+    },
+    {
+      "key": "blueberries",
+      "productName": "Driscoll\\"
+    },
+    {
+      "key": "strawberries",
+      "productName": "Driscoll\\"
+    },
+    {
+      "key": "mango",
+      "productName": "Organic Mango"
+    },
+    {
+      "key": "banana",
+      "productName": "Organic Bananas"
+    },
+    {
+      "key": "grapes (chopped)",
+      "productName": "Organic Red Seedless Grapes"
+    },
+    {
+      "key": "papaya",
+      "productName": "Organic Papaya"
+    },
+    {
+      "key": "melon",
+      "productName": "Organic Cantaloupe Melon"
+    },
+    {
+      "key": "egg (hard-boiled)",
+      "productName": "Vital Essentials Freeze Dried Egg Yolk Treats"
+    },
+    {
+      "key": "pellets (fortified)",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "cuttlebone",
+      "productName": "Lafeber\\"
+    },
+    {
+      "key": "honey (tiny amounts)",
+      "productName": "Local Raw Honey"
+    },
+    {
+      "key": "peanut butter (unsalted, tiny amounts)",
+      "productName": "Teddie All Natural Peanut Butter"
+    },
+    {
+      "key": "dubia roaches",
+      "productName": "Josh\\"
+    },
+    {
+      "key": "crickets",
+      "productName": "Fluker\\"
+    },
+    {
+      "key": "mealworms",
+      "productName": "Fluker\\"
+    },
+    {
+      "key": "superworms",
+      "productName": "Josh\\"
+    },
+    {
+      "key": "black soldier fly larvae",
+      "productName": "Grubblies Black Soldier Fly Larvae"
+    },
+    {
+      "key": "hornworms",
+      "productName": "Josh\\"
+    },
+    {
+      "key": "acorn squash",
+      "productName": "Organic Acorn Squash"
+    },
+    {
+      "key": "figs",
+      "productName": "Organic Dried Figs"
+    },
+    {
+      "key": "timothy hay",
+      "productName": "Oxbow Animal Health Western Timothy Hay"
+    },
+    {
+      "key": "meadow hay",
+      "productName": "Small Pet Select Meadow Hay"
+    },
+    {
+      "key": "orchard grass hay",
+      "productName": "Oxbow Animal Health Orchard Grass Hay"
+    },
+    {
+      "key": "alfalfa hay",
+      "productName": "Kaytee Natural Alfalfa Hay"
+    },
+    {
+      "key": "romaine lettuce",
+      "productName": "Organic Girl Romaine Lettuce"
+    },
+    {
+      "key": "cilantro",
+      "productName": "Organic Cilantro"
+    },
+    {
+      "key": "basil",
+      "productName": "Organic Basil"
+    },
+    {
+      "key": "duck hearts",
+      "productName": "Vital Essentials Freeze Dried Duck Hearts"
+    },
+    {
+      "key": "lamb liver",
+      "productName": "Stella & Chewy\\"
+    },
+    {
+      "key": "duck liver",
+      "productName": "Vital Essentials Freeze Dried Duck Liver"
+    },
+    {
+      "key": "chicken necks",
+      "productName": "Raw Paws Pet Food Raw Chicken Necks"
+    },
+    {
+      "key": "turkey thighs",
+      "productName": "Boneless Skinless Turkey Thighs"
+    },
+    {
+      "key": "ground duck",
+      "productName": "Raw Paws Pet Food Raw Ground Duck"
+    },
+    {
+      "key": "ground lamb (lean)",
+      "productName": "Lean Ground Lamb Meat"
+    },
+    {
+      "key": "ground herring",
+      "productName": "K9 Natural Hoki Fish Blend"
+    },
+    {
+      "key": "ground mackerel",
+      "productName": "Northwest Naturals Raw Fish Blend"
+    },
+    {
+      "key": "mackerel (canned)",
+      "productName": "Wild Planet Canned Mackerel"
+    },
+    {
+      "key": "herring (canned)",
+      "productName": "Crown Prince Canned Herring"
+    },
+    {
+      "key": "chicken sausage (no additives)",
+      "productName": "Applegate Naturals Chicken Sausage"
+    },
+    {
+      "key": "turkey sausage (no additives)",
+      "productName": "Applegate Naturals Turkey Sausage"
+    },
+    {
+      "key": "ground pork (lean, small amounts)",
+      "productName": "Lean Ground Pork"
+    },
+    {
+      "key": "regular potato",
+      "productName": "Fresh Russet Potatoes"
+    },
+    {
+      "key": "walnut oil",
+      "productName": "La Tourangelle Walnut Oil"
+    },
+    {
+      "key": "black currant oil",
+      "productName": "NOW Foods Black Currant Seed Oil"
+    },
+    {
+      "key": "almond oil",
+      "productName": "Viva Naturals Sweet Almond Oil"
+    },
+    {
+      "key": "sunflower oil",
+      "productName": "High Oleic Sunflower Oil Cold Pressed"
+    },
+    {
+      "key": "chia seed oil",
+      "productName": "Healthworks Organic Chia Seed Oil"
+    },
+    {
+      "key": "herring oil",
+      "productName": "Nordic Naturals Pet Herring Oil"
+    },
+    {
+      "key": "anchovy oil",
+      "productName": "Carlson Labs Fish Oil Anchovy"
+    },
+    {
+      "key": "evening primrose oil",
+      "productName": "Nature\\"
+    },
+    {
+      "key": "mackerel oil",
+      "productName": "Jarrow Formulas Fish Oil Supplement"
+    },
+    {
+      "key": "borage oil",
+      "productName": "NOW Foods Borage Oil Softgels"
+    },
+    {
+      "key": "sesame oil",
+      "productName": "Spectrum Cold Pressed Sesame Oil"
+    },
+    {
+      "key": "avocado oil",
+      "productName": "Chosen Foods Pure Avocado Oil"
+    },
+    {
+      "key": "avocado oil (tiny amounts)",
+      "productName": "Chosen Foods Pure Avocado Oil"
+    },
+    {
+      "key": "wheat germ oil",
+      "productName": "NOW Foods Wheat Germ Oil Liquid"
+    },
+    {
+      "key": "krill oil",
+      "productName": "Kori Krill Oil Pure Supplement"
+    },
+    {
+      "key": "algae oil (dha)",
+      "productName": "Nordic Naturals Algae Omega DHA"
+    },
+    {
+      "key": "omega-3 oil",
+      "productName": "Grizzly Salmon Oil for Pets"
+    },
+    {
+      "key": "kelp powder",
+      "productName": "NOW Foods Organic Kelp Powder"
+    },
+    {
+      "key": "joint health powder",
+      "productName": "Nutramax Dasuquin Joint Health Powder"
+    },
+    {
+      "key": "amino acid supplement",
+      "productName": "Purina Pro Plan Amino Acid Supplement"
+    },
+    {
+      "key": "calcium supplement",
+      "productName": "Thomas Labs Calcium Carbonate Powder"
+    },
+    {
+      "key": "spirulina powder",
+      "productName": "Vimergy Organic Spirulina Powder"
+    },
+    {
+      "key": "electrolyte powder",
+      "productName": "ReptoBoost Electrolyte Powder"
+    },
+    {
+      "key": "vitamin d3 drops",
+      "productName": "Ddrops Liquid Vitamin D3 Drops"
+    },
+    {
+      "key": "s yeast",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "buckwheat",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "buckwheat (tiny amounts)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "buckwheat (hulled)",
+      "productName": "Anthony\\"
+    },
+    {
+      "key": "sorghum",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "barley",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "barley (cooked, minimal)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "barley (hulled)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "millet",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "millet (tiny amounts)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "farro",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "bulgur",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "amaranth (tiny amounts)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "amaranth seeds",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "teff seeds",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "wheat (hulled)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "oat bran (small amounts)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "oatmeal (cooked, small amounts)",
+      "productName": "Quaker Rolled Oats Old Fashioned"
+    },
+    {
+      "key": "corn (cracked)",
+      "productName": "Scratch and Peck Cracked Corn Non-GMO"
+    },
+    {
+      "key": "safflower seeds",
+      "productName": "Wagner\\"
+    },
+    {
+      "key": "nyjer seeds",
+      "productName": "Wagner\\"
+    },
+    {
+      "key": "bok choi",
+      "productName": "Fresh Baby Bok Choy"
+    },
+    {
+      "key": "bok choy (small amounts)",
+      "productName": "Fresh Baby Bok Choy"
+    },
+    {
+      "key": "navy beans (mashed)",
+      "productName": "Goya Canned Navy Beans Low Sodium"
+    },
+    {
+      "key": "kidney beans (mashed)",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium"
+    },
+    {
+      "key": "kidney beans (mashed, tiny amounts)",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium"
+    },
+    {
+      "key": "pinto beans (mashed)",
+      "productName": "Bush\\"
+    },
+    {
+      "key": "purslane",
+      "productName": "Fresh Purslane Leaves"
+    },
+    {
+      "key": "purslane (small amounts)",
+      "productName": "Fresh Purslane Leaves"
+    },
+    {
+      "key": "s lettuce",
+      "productName": "Miner\\"
+    },
+    {
+      "key": "flaxseed (ground)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "fennel",
+      "productName": "Fresh Fennel Bulb"
+    },
+    {
+      "key": "delicata squash",
+      "productName": "Fresh Delicata Squash"
+    },
+    {
+      "key": "yellow squash",
+      "productName": "Fresh Yellow Summer Squash"
+    },
+    {
+      "key": "leeks",
+      "productName": "Fresh Leeks"
+    },
+    {
+      "key": "shallots",
+      "productName": "Fresh Shallots"
+    },
+    {
+      "key": "tomatoes (small amounts)",
+      "productName": "Fresh Ripe Vine Tomatoes"
+    },
+    {
+      "key": "napa cabbage",
+      "productName": "Fresh Napa Cabbage"
+    },
+    {
+      "key": "napa cabbage (small amounts)",
+      "productName": "Fresh Napa Cabbage"
+    },
+    {
+      "key": "artichokes",
+      "productName": "Fresh Artichoke Hearts"
+    },
+    {
+      "key": "frisee",
+      "productName": "Fresh Frisee Lettuce"
+    },
+    {
+      "key": "radicchio",
+      "productName": "Fresh Radicchio Lettuce"
+    },
+    {
+      "key": "red cabbage",
+      "productName": "Fresh Red Cabbage Head"
+    },
+    {
+      "key": "green cabbage",
+      "productName": "Fresh Green Cabbage Head"
+    },
+    {
+      "key": "swiss chard",
+      "productName": "Fresh Swiss Chard"
+    },
+    {
+      "key": "swiss chard (cooked, tiny amounts)",
+      "productName": "Fresh Swiss Chard"
+    },
+    {
+      "key": "lettuce (romaine, small amounts)",
+      "productName": "Fresh Romaine Lettuce Hearts"
+    },
+    {
+      "key": "red leaf lettuce",
+      "productName": "Fresh Red Leaf Lettuce"
+    },
+    {
+      "key": "mache",
+      "productName": "Fresh Mache Lamb\\"
+    },
+    {
+      "key": "alfalfa sprouts (small amounts)",
+      "productName": "Fresh Alfalfa Sprouts"
+    },
+    {
+      "key": "cat grass (wheatgrass)",
+      "productName": "SmartyKat Cat Grass Growing Kit Wheatgrass"
+    },
+    {
+      "key": "squash (cooked)",
+      "productName": "Fresh Butternut Squash"
+    },
+    {
+      "key": "s quarters",
+      "productName": "Lamb\\"
+    },
+    {
+      "key": "amaranth leaves",
+      "productName": "Fresh Amaranth Leaves"
+    },
+    {
+      "key": "ginger (small amounts)",
+      "productName": "Simply Organic Fresh Ginger Root"
+    },
+    {
+      "key": "turmeric",
+      "productName": "Simply Organic Pure Turmeric Powder"
+    },
+    {
+      "key": "rosemary",
+      "productName": "Frontier Co-op Dried Organic Rosemary"
+    },
+    {
+      "key": "sage",
+      "productName": "Simply Organic Dried Sage Leaf"
+    },
+    {
+      "key": "mint",
+      "productName": "Fresh Mint Leaves"
+    },
+    {
+      "key": "garlic chives",
+      "productName": "Fresh Garlic Chives"
+    },
+    {
+      "key": "raisins (unsweetened)",
+      "productName": "Sun-Maid Organic Raisins Unsweetened"
+    },
+    {
+      "key": "plums (pitted)",
+      "productName": "Fresh Plums Pitted"
+    },
+    {
+      "key": "apricots (pitted)",
+      "productName": "NOW Foods Dried Apricots Unsulphured"
+    },
+    {
+      "key": "kiwi",
+      "productName": "Fresh Kiwi Fruit"
+    },
+    {
+      "key": "mulberries",
+      "productName": "Terrasoul Dried Mulberries Organic"
+    },
+    {
+      "key": "raspberries",
+      "productName": "Fresh Raspberries Organic"
+    },
+    {
+      "key": "cranberries",
+      "productName": "NOW Foods Dried Cranberries Unsweetened"
+    },
+    {
+      "key": "pineapple (small amounts)",
+      "productName": "Fresh Pineapple Fruit"
+    },
+    {
+      "key": "pears (no seeds)",
+      "productName": "Fresh Pears No Seeds"
+    },
+    {
+      "key": "pinhead crickets",
+      "productName": "Josh\\"
+    },
+    {
+      "key": "locusts",
+      "productName": "Exo Terra Canned Locusts Reptile Food"
+    },
+    {
+      "key": "butterworms",
+      "productName": "Rainbow Mealworms Live Butterworms"
+    },
+    {
+      "key": "grasshoppers",
+      "productName": "Fluker\\"
+    },
+    {
+      "key": "small dubia roaches",
+      "productName": "Small Live Dubia Roaches Feeder"
+    },
+    {
+      "key": "silkworms",
+      "productName": "Live Silkworms Reptile Food"
+    },
+    {
+      "key": "earthworms",
+      "productName": "Uncle Jim\\"
+    },
+    {
+      "key": "wheat hay",
+      "productName": "Oxbow Wheat Hay Small Animal"
+    },
+    {
+      "key": "fescue hay",
+      "productName": "Small Pet Select Fescue Hay"
+    },
+    {
+      "key": "oat hay",
+      "productName": "Oxbow Oat Hay Small Animal"
+    },
+    {
+      "key": "bluegrass hay",
+      "productName": "Small Pet Select Bluegrass Hay"
+    },
+    {
+      "key": "straw (wheat/pine)",
+      "productName": "Oxbow Wheat Straw Bedding"
+    },
+    {
+      "key": "dried grass",
+      "productName": "Kaytee Dried Natural Grass Small Animal"
+    },
+    {
+      "key": "bermuda hay",
+      "productName": "Standlee Premium Bermuda Hay"
+    },
+    {
+      "key": "barley hay",
+      "productName": "Standlee Barley Hay"
+    },
+    {
+      "key": "guinea pig pellets (with vitamin c)",
+      "productName": "Oxbow Essentials Cavy Cuisine Guinea Pig Pellets"
+    },
+    {
+      "key": "rabbit pellets (high fiber)",
+      "productName": "Oxbow Essentials Rabbit Food High Fiber"
+    },
+    {
+      "key": "hamster pellets (higher protein)",
+      "productName": "Oxbow Essentials Hamster Food Higher Protein"
+    },
+    {
+      "key": "wild bird mix",
+      "productName": "Lyric Wild Bird Mix No Filler"
+    },
+    {
+      "key": "beta-glucans",
+      "productName": "NOW Supplements Beta Glucans 60 Capsules"
+    },
+    {
+      "key": "biotin",
+      "productName": "NOW Supplements Biotin 5000 mcg"
+    },
+    {
+      "key": "cauliflower",
+      "productName": "Fresh Organic Cauliflower"
+    },
+    {
+      "key": "chicory root",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber"
+    },
+    {
+      "key": "chondroitin sulfate",
+      "productName": "Cosequin DS Plus MSM with Chondroitin"
+    },
+    {
+      "key": "cranberry extract",
+      "productName": "NOW Supplements Cranberry Extract 5000 mg"
+    },
+    {
+      "key": "curcumin (turmeric extract)",
+      "productName": "NOW Supplements Curcumin with BioPerine"
+    },
+    {
+      "key": "d-mannose",
+      "productName": "NOW Supplements D-Mannose Powder"
+    },
+    {
+      "key": "egg yolks",
+      "productName": "Vital Farms Pasture-Raised Eggs"
+    },
+    {
+      "key": "eggplant",
+      "productName": "Fresh Organic Eggplant"
+    },
+    {
+      "key": "eggshells (crushed)",
+      "productName": "NOW Supplements Calcium Carbonate Powder"
+    },
+    {
+      "key": "fructooligosaccharides (fos)",
+      "productName": "NOW Supplements FOS Prebiotic Fiber"
+    },
+    {
+      "key": "glucosamine sulfate",
+      "productName": "Cosequin DS Plus MSM Glucosamine"
+    },
+    {
+      "key": "green beans",
+      "productName": "Fresh Organic Green Beans"
+    },
+    {
+      "key": "green beans (cooked)",
+      "productName": "Fresh Organic Green Beans"
+    },
+    {
+      "key": "hairball control paste",
+      "productName": "Tomlyn Laxatone Hairball Remedy"
+    },
+    {
+      "key": "hyaluronic acid",
+      "productName": "NOW Supplements Hyaluronic Acid 100 mg"
+    },
+    {
+      "key": "inulin (prebiotic)",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber"
+    },
+    {
+      "key": "jerusalem artichoke",
+      "productName": "Fresh Jerusalem Artichoke Sunchokes"
+    },
+    {
+      "key": "l-carnitine powder",
+      "productName": "NOW Supplements L-Carnitine 500 mg"
+    },
+    {
+      "key": "lysine powder",
+      "productName": "NOW Supplements L-Lysine 1000 mg"
+    },
+    {
+      "key": "malabar spinach",
+      "productName": "Fresh Malabar Spinach Leaves"
+    },
+    {
+      "key": "mannanoligosaccharides (mos)",
+      "productName": "NOW Supplements MOS Prebiotic"
+    },
+    {
+      "key": "milk thistle",
+      "productName": "NOW Supplements Milk Thistle 150 mg"
+    },
+    {
+      "key": "new zealand spinach",
+      "productName": "Fresh New Zealand Spinach"
+    },
+    {
+      "key": "niacinamide",
+      "productName": "NOW Supplements Niacinamide 500 mg"
+    },
+    {
+      "key": "oats (rolled)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "peas",
+      "productName": "Fresh Organic Green Peas"
+    },
+    {
+      "key": "peas (mashed)",
+      "productName": "Fresh Organic Green Peas"
+    },
+    {
+      "key": "pectin (from apples)",
+      "productName": "NOW Supplements Apple Pectin Powder"
+    },
+    {
+      "key": "pumpkin seed oil",
+      "productName": "NOW Solutions Pumpkin Seed Oil"
+    },
+    {
+      "key": "quail eggs",
+      "productName": "Fresh Quail Eggs"
+    },
+    {
+      "key": "quercetin",
+      "productName": "NOW Supplements Quercetin with Bromelain"
+    },
+    {
+      "key": "rice (hulled)",
+      "productName": "Lundberg Organic Brown Rice"
+    },
+    {
+      "key": "romanesco broccoli",
+      "productName": "Fresh Romanesco Broccoli"
+    },
+    {
+      "key": "s-adenosyl methionine (sam-e)",
+      "productName": "NOW Supplements SAM-e 200 mg"
+    },
+    {
+      "key": "sardines (in water)",
+      "productName": "Wild Planet Sardines in Water No Salt"
+    },
+    {
+      "key": "snap peas",
+      "productName": "Fresh Organic Snap Peas"
+    },
+    {
+      "key": "snow peas",
+      "productName": "Fresh Organic Snow Peas"
+    },
+    {
+      "key": "snow peas (mashed)",
+      "productName": "Fresh Organic Snow Peas"
+    },
+    {
+      "key": "split peas",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "split peas (mashed)",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "sugar snap peas",
+      "productName": "Fresh Organic Sugar Snap Peas"
+    },
+    {
+      "key": "sugar snap peas (mashed)",
+      "productName": "Fresh Organic Sugar Snap Peas"
+    },
+    {
+      "key": "vitamin b complex",
+      "productName": "Thorne B-Complex #12"
+    },
+    {
+      "key": "vitamin c (small amounts)",
+      "productName": "NOW Supplements Vitamin C 1000 mg"
+    },
+    {
+      "key": "watercress",
+      "productName": "Fresh Organic Watercress"
+    },
+    {
+      "key": "watercress (small amounts)",
+      "productName": "Fresh Organic Watercress"
+    },
+    {
+      "key": "wheat germ",
+      "productName": "Bob\\"
+    },
+    {
+      "key": "wild rice",
+      "productName": "Lundberg Organic Wild Rice"
+    }
+  ]
+}

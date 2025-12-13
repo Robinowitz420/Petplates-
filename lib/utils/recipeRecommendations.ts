@@ -20,9 +20,9 @@ interface Pet {
 import { normalizeToSubtype, type Subtype } from './ingredientWhitelists';
 import { getHealthTemplatesForSpecies, applyHealthTemplate, type HealthConcernTemplate } from '@/lib/data/healthConcernTemplates';
 import {
-  calculateImprovedCompatibility,
-  type ImprovedPet,
-} from './improvedCompatibilityScoring';
+  calculateEnhancedCompatibility,
+  type Pet as EnhancedPet,
+} from './enhancedCompatibilityScoring';
 
 /**
  * Check if recipe matches species/subtype
@@ -101,6 +101,34 @@ export interface RecipeRecommendation {
 }
 
 /**
+ * Normalize pet age to age group string
+ * Handles both string ("adult") and number (5) formats
+ */
+function normalizePetAgeToGroup(age: string | number): string {
+  if (typeof age === 'string') {
+    // Already a string like "adult", "young", etc.
+    const normalized = age.toLowerCase().trim();
+    if (['baby', 'young', 'adult', 'senior', 'all'].includes(normalized)) {
+      return normalized;
+    }
+    // Try to parse if it's a number string
+    const numAge = parseFloat(normalized);
+    if (!isNaN(numAge)) {
+      if (numAge < 1) return 'baby';
+      if (numAge < 2) return 'young';
+      if (numAge < 7) return 'adult';
+      return 'senior';
+    }
+    return normalized; // Return as-is if can't parse
+  }
+  // Convert number to age group
+  if (age < 1) return 'baby';
+  if (age < 2) return 'young';
+  if (age < 7) return 'adult';
+  return 'senior';
+}
+
+/**
  * Normalize health concern names to match recipe database format
  * Maps user-friendly names to database keys
  */
@@ -131,21 +159,29 @@ function normalizeHealthConcern(concern: string): string {
  * @param pet - Pet profile
  * @param minCount - Minimum number of recipes to return
  * @param useEnhancedScoring - Whether to use the enhanced compatibility scoring system
+ * @param customRecipes - Optional custom recipes to include in recommendations
  */
 export const getRecommendedRecipes = (
-  pet: Pet, 
+  pet: Pet,
   minCount: number = 20,
-  useEnhancedScoring: boolean = false
+  useEnhancedScoring: boolean = false,
+  customRecipes?: Recipe[]
 ): RecipeRecommendation[] => {
   const { type, age, healthConcerns } = pet;
   // Normalize health concerns to match recipe database format
   const normalizedConcerns = (healthConcerns || []).map(normalizeHealthConcern);
   const results: RecipeRecommendation[] = [];
+
+  // Use provided recipes or fall back to default recipes
+  const allRecipes = customRecipes || recipes;
+
+  // Normalize pet age to age group string
+  const petAgeGroup = normalizePetAgeToGroup(age);
   
   // Tier 1: Perfect matches (species + age) - health concerns handled in scoring, not filtering
-  const tier1 = recipes.filter(r => {
+  const tier1 = allRecipes.filter(r => {
     const speciesMatch = matchesSpecies(r, pet);
-    const ageMatch = r.ageGroup.includes(age);
+    const ageMatch = (r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all');
     // Health concerns are scoring modifiers, not filters
     return speciesMatch && ageMatch;
   }).map(r => {
@@ -173,9 +209,9 @@ export const getRecommendedRecipes = (
       
       templates.forEach(template => {
         // Find recipes that match subtype and age (can be adapted)
-        const subtypeRecipes = recipes.filter(r => {
+        const subtypeRecipes = allRecipes.filter(r => {
           const speciesMatch = matchesSpecies(r, pet);
-          const ageMatch = r.ageGroup.includes(age);
+          const ageMatch = (r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all');
           // Don't include recipes already in results
           const notIncluded = !results.some(res => res.recipe.id === r.id);
           return speciesMatch && ageMatch && notIncluded;
@@ -222,9 +258,9 @@ export const getRecommendedRecipes = (
   }
   
   // Tier 3: Species + age match (no health concern) - Fill up to minCount
-  const tier3 = recipes.filter(r => {
+  const tier3 = allRecipes.filter(r => {
     const speciesMatch = matchesSpecies(r, pet);
-    const ageMatch = r.ageGroup.includes(age);
+    const ageMatch = (r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all');
     const notIncluded = !results.some(res => res.recipe.id === r.id);
     return speciesMatch && ageMatch && notIncluded;
   }).slice(0, Math.max(0, minCount - results.length)) // Only take what we need
@@ -240,11 +276,13 @@ export const getRecommendedRecipes = (
   results.push(...tier3);
   
   // Tier 4: Species match only (all ages) - Fill up to minCount
-  const tier4 = recipes.filter(r => {
+  // Always ensure we have at least minCount recipes
+  const neededFromTier4 = Math.max(0, minCount - results.length);
+  const tier4 = allRecipes.filter(r => {
     const speciesMatch = matchesSpecies(r, pet);
     const notIncluded = !results.some(res => res.recipe.id === r.id);
     return speciesMatch && notIncluded;
-  }).slice(0, Math.max(0, minCount - results.length)) // Only take what we need
+  }).slice(0, neededFromTier4) // Take only what we need to reach minCount
   .map(r => ({
     recipe: r,
     tier: 4,
@@ -257,7 +295,7 @@ export const getRecommendedRecipes = (
   // Tier 5: Subtype match (generic) - Fill up to minCount for exotics
   if (results.length < minCount && ['bird', 'reptile', 'pocket-pet', 'birds', 'reptiles', 'pocket-pets'].includes(type)) {
     const subtype = normalizeToSubtype(type as any, pet.breed);
-    const tier5 = recipes.filter(r => {
+    const tier5 = allRecipes.filter(r => {
       const matchesSubtype = r.category === subtype || 
         (r.category && r.category.includes(subtype.split('_')[0])) ||
         matchesSpecies(r, pet); // Also include any species matches
@@ -319,10 +357,10 @@ export const getRecommendedRecipes = (
     results.forEach(result => {
       try {
         // Convert pet format for improved scoring
-        const enhancedPet: ImprovedPet = {
+        const enhancedPet: EnhancedPet = {
           id: pet.id,
           name: pet.name,
-          type: pet.type,
+          type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
           breed: pet.breed,
           age: parseFloat(pet.age) || 1,
           weight: pet.weight || 10,
@@ -332,9 +370,9 @@ export const getRecommendedRecipes = (
           allergies: pet.allergies || [],
         };
         
-        const improved = calculateImprovedCompatibility(result.recipe, enhancedPet);
-        result.enhancedScore = improved;
-        result.score = improved.overallScore;
+        const enhanced = calculateEnhancedCompatibility(result.recipe, enhancedPet);
+        result.enhancedScore = enhanced;
+        result.score = enhanced.overallScore;
       } catch (error) {
         // If enhanced scoring fails, keep original score
         console.warn('Enhanced scoring failed for recipe:', result.recipe.id, error);
@@ -351,7 +389,8 @@ export const getRecommendedRecipes = (
     // Otherwise use tier score
     return b.score - a.score;
   });
-  return sorted.slice(0, Math.max(minCount, sorted.length));
+  // Return up to minCount recipes, or all if we have fewer than minCount
+  return sorted.slice(0, Math.min(minCount, sorted.length));
 };
 
 /**
@@ -359,16 +398,17 @@ export const getRecommendedRecipes = (
  */
 export const getRecommendationStats = (pet: Pet) => {
   const { type, age, healthConcerns } = pet;
+  const petAgeGroup = normalizePetAgeToGroup(age);
   
   const perfectCount = recipes.filter(r => 
     r.category === type &&
-    r.ageGroup.includes(age) &&
+    ((r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all')) &&
     (healthConcerns.length === 0 || healthConcerns.some(hc => r.healthConcerns.includes(hc)))
   ).length;
 
   const typeAgeCount = recipes.filter(r => 
     r.category === type &&
-    r.ageGroup.includes(age)
+    ((r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all'))
   ).length - perfectCount;
 
   const typeOnlyCount = recipes.filter(r => 

@@ -5,6 +5,8 @@ import { X, CheckCircle, ShoppingCart, Sparkles } from 'lucide-react';
 import { confirmPurchaseWithDetails } from '@/lib/utils/purchaseTracking';
 import { getNextVillageLevel } from '@/lib/data/villageLevels';
 import { useVillageStore, useVillageProgress } from '@/lib/state/villageStore';
+import { confirmPetPurchase, getPetPurchaseCount } from '@/lib/utils/petPurchaseTracking';
+import { checkAllBadges } from '@/lib/utils/badgeChecker';
 
 export interface PurchaseConfirmationModalProps {
   isOpen: boolean;
@@ -13,6 +15,7 @@ export interface PurchaseConfirmationModalProps {
   ingredientName: string;
   userId?: string;
   amazonOrderId?: string;
+  petId?: string; // Optional pet ID for per-pet purchase tracking
 }
 
 /**
@@ -26,7 +29,8 @@ export default function PurchaseConfirmationModal({
   ingredientId,
   ingredientName,
   userId,
-  amazonOrderId
+  amazonOrderId,
+  petId
 }: PurchaseConfirmationModalProps) {
   const [confirmed, setConfirmed] = useState(false);
   const { refreshFromLocal, setUserId } = useVillageStore();
@@ -49,12 +53,33 @@ export default function PurchaseConfirmationModal({
     }
   }, [isOpen, userId, setUserId]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const currentUserId = getUserId();
     if (currentUserId) {
+      // Confirm global purchase (for village)
       const result = confirmPurchaseWithDetails(currentUserId, ingredientId, ingredientName, amazonOrderId);
       if (result.success) {
         refreshFromLocal(); // Update village store
+        
+        // Also track per-pet purchase if petId is provided
+        if (petId) {
+          await confirmPetPurchase(
+            currentUserId,
+            petId,
+            ingredientId,
+            ingredientName,
+            undefined, // recipeId - not available here
+            amazonOrderId
+          );
+          
+          // Check badges for per-pet purchase
+          const purchaseCount = getPetPurchaseCount(currentUserId, petId);
+          await checkAllBadges(currentUserId, petId, {
+            action: 'purchase_confirmed',
+            purchaseCount,
+          });
+        }
+        
         setConfirmed(true);
         
         // Auto-close after 2 seconds
@@ -129,7 +154,7 @@ export default function PurchaseConfirmationModal({
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
                     <div
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-[width] duration-500 ease-out will-change-[width]"
                       style={{ width: `${(progress / 10) * 100}%` }}
                     />
                   </div>
