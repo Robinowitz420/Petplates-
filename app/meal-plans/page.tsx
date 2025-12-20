@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, Calendar, ShoppingCart } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
 import { PetCategory } from '@/lib/types';
 
 export default function MealPlansPage() {
   const [selectedCategory, setSelectedCategory] = useState<PetCategory>('dogs');
   const [planType, setPlanType] = useState<'one-time' | 'weekly'>('weekly');
 
-  const categoryRecipes = recipes.filter(r => r.category === selectedCategory).slice(0, 14);
+  // Recipes are now generated dynamically
+  const categoryRecipes: any[] = [];
 
   const planOptions = [
     {

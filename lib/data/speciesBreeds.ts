@@ -61,13 +61,9 @@ export const SPECIES_BREEDS_DATA: SpeciesBreedData[] = [
     breeds: [
       { id: 'bearded-dragon', name: 'Bearded Dragon', category: 'reptiles' },
       { id: 'leopard-gecko', name: 'Leopard Gecko', category: 'reptiles' },
-      { id: 'ball-python', name: 'Ball Python', category: 'reptiles' },
-      { id: 'corn-snake', name: 'Corn Snake', category: 'reptiles' },
       { id: 'turtle', name: 'Turtle (Aquatic)', category: 'reptiles' },
       { id: 'tortoise', name: 'Tortoise', category: 'reptiles' },
       { id: 'crested-gecko', name: 'Crested Gecko', category: 'reptiles' },
-      { id: 'kingsnake', name: 'Kingsnake', category: 'reptiles' },
-      { id: 'boa-constrictor', name: 'Boa Constrictor', category: 'reptiles' },
       { id: 'iguana', name: 'Iguana', category: 'reptiles' },
       { id: 'chameleon', name: 'Chameleon', category: 'reptiles' },
       { id: 'other-reptile', name: 'Other', category: 'reptiles' },

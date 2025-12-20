@@ -1,0 +1,1612 @@
+[
+  {
+    "id": "bf9db349-c67b-4bcd-bb2b-8a0ff13d966a",
+    "name": "30-Minute Stovetop Homemade Dog Food",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "coconut_oil",
+        "originalName": "coconut oil",
+        "amount": "1",
+        "unit": "tablespoon",
+        "gramsEstimate": 15
+      },
+      {
+        "canonicalId": "turkey_breast",
+        "originalName": "ground turkey",
+        "amount": "1",
+        "unit": "pound",
+        "gramsEstimate": 453.59
+      },
+      {
+        "canonicalId": "zucchini",
+        "originalName": "zucchini (shredded)",
+        "amount": "1",
+        "unit": "large"
+      },
+      {
+        "canonicalId": "spinach",
+        "originalName": "baby spinach (finely chopped)",
+        "amount": "1",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "carrots",
+        "originalName": "shredded carrots",
+        "amount": "1",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "turmeric",
+        "originalName": "turmeric",
+        "amount": "1/2",
+        "unit": "teaspoon",
+        "gramsEstimate": 5
+      },
+      {
+        "canonicalId": "brown_rice",
+        "originalName": "cooked rice (I like using frozen brown rice)",
+        "amount": "3",
+        "unit": "cups",
+        "gramsEstimate": 720
+      }
+    ],
+    "unmappedIngredients": [
+      "g"
+    ],
+    "mappingSuccessRate": 0.875,
+    "instructions": [
+      "Heat a large skillet or pot over a medium-high heat.  Add in the coconut oil and turkey and sauté until it is browned and cooked through, about 10 minutes.",
+      "Reduce the heat to medium and stir in the zucchini, spinach, carrots and turmeric.  Cook, stirring occasionally, for 5-7 minutes, until the vegetables are tender.",
+      "Turn off the heat and and crack in the egg.  Let the egg cook in the hot food, mix it around to ensure it mixed through and cooked through.",
+      "Stir in the rice until everything is well combined.  Cool and serve!"
+    ],
+    "sourceUrl": "https://cleananddelicious.com/homemade-dog-food/",
+    "sourceName": "cleananddelicious.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:40:56.324Z",
+    "tags": [
+      "homemade dog food",
+      [
+        "DINNER"
+      ],
+      [
+        "American"
+      ]
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "5a38c4e8-21f0-4532-97ae-b8e96a7530a3",
+    "name": "Easy Homemade Dog Food ",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "brown_rice",
+        "originalName": "cooked organic brown rice (3 cups uncooked rice)",
+        "amount": "6",
+        "unit": "cups",
+        "gramsEstimate": 1440
+      },
+      {
+        "canonicalId": "eggs",
+        "originalName": "boiled eggs, peeled and diced small",
+        "amount": "4",
+        "unit": "hard"
+      },
+      {
+        "canonicalId": "carrots",
+        "originalName": "sized carrots, shredded or thinly sliced",
+        "amount": "3",
+        "unit": "medium"
+      },
+      {
+        "canonicalId": "parsley",
+        "originalName": "minced curly parsley",
+        "amount": "1/4",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "olive_oil",
+        "originalName": "of olive or safflower oil",
+        "amount": "3",
+        "unit": "tablespoons"
+      }
+    ],
+    "unmappedIngredients": [
+      "ground lean beef, cooked through, fat drained"
+    ],
+    "mappingSuccessRate": 0.8333333333333334,
+    "instructions": [
+      "Combine all of the ingredients together in a large container and stir to combine completely.",
+      "Store tightly sealed in the refrigerator in-between feedings."
+    ],
+    "sourceUrl": "https://thismessisours.com/easy-homemade-dog-food-recipe/",
+    "sourceName": "thismessisours.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:40:57.540Z",
+    "tags": [
+      "dog food",
+      "homemade dog food",
+      "dog food recipe",
+      "gluten free",
+      "homemade dog food"
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "9968660f-2b23-4c2a-9e6d-a3c8bda34993",
+    "name": "Homemade Dog Food",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "chicken_breast",
+        "originalName": "ground chicken",
+        "amount": "1/2",
+        "unit": "lb",
+        "gramsEstimate": 453.59
+      },
+      {
+        "canonicalId": "turkey_breast",
+        "originalName": "ground turkey",
+        "amount": "1/2",
+        "unit": "lb",
+        "gramsEstimate": 453.59
+      },
+      {
+        "canonicalId": "carrots",
+        "originalName": "baby carrots",
+        "amount": "1",
+        "unit": "lb",
+        "gramsEstimate": 453.59
+      },
+      {
+        "canonicalId": "brown_rice",
+        "originalName": "brown rice",
+        "amount": "3",
+        "unit": "cups",
+        "gramsEstimate": 720
+      },
+      {
+        "canonicalId": "chicken_broth",
+        "originalName": "chicken broth",
+        "amount": "3",
+        "unit": "cups",
+        "gramsEstimate": 720
+      }
+    ],
+    "unmappedIngredients": [
+      "ground beef",
+      "baking potatoes",
+      ", slightly beaten",
+      "water"
+    ],
+    "mappingSuccessRate": 0.5555555555555556,
+    "instructions": [
+      "Cook all 3 ground meats together in larger 6 quart dutch oven.",
+      "Add rice, chicken broth and water.  Cook on medium heat for 30 minutes.",
+      "Add potatoes and carrots, and slightly beaten eggs.  Cook for an additional 20 - 30 minutes.",
+      "After cooking, put mixture into storage containers.  This freezes very well."
+    ],
+    "sourceUrl": "https://www.food.com/recipe/homemade-dog-food-250094",
+    "sourceName": "www.food.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:40:58.703Z",
+    "tags": [
+      "For Large Groups",
+      "< 4 Hours",
+      "Easy",
+      "Healthy"
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "68f25513-5482-4d39-b1cd-ed1789084ddd",
+    "name": "Homemade Dog Food Recipes (30+ Ideas!)",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "brown_rice",
+        "originalName": "brown rice (or swap white rice)",
+        "amount": "2",
+        "unit": "cups",
+        "gramsEstimate": 480
+      },
+      {
+        "canonicalId": "carrots",
+        "originalName": "fresh carrots, shred or cut into small coins (2 large carrots)",
+        "amount": "2",
+        "unit": "cups",
+        "gramsEstimate": 480
+      },
+      {
+        "canonicalId": "sweet_potato",
+        "originalName": "sweet potato, small cubes or shred  (1 large sweet potato)",
+        "amount": "2",
+        "unit": "cups",
+        "gramsEstimate": 480
+      },
+      {
+        "canonicalId": "spinach",
+        "originalName": "fresh spinach",
+        "amount": "2",
+        "unit": "cups",
+        "gramsEstimate": 480
+      }
+    ],
+    "unmappedIngredients": [
+      "ground beef (7 cups cooked crumbled ground beef)",
+      "sea salt",
+      "butter",
+      "beef stock (optional) + 1/2 cup water (28 oz = 3.5 cups, add 1/2 cup water for proper ratio to make rice)",
+      "fresh broccoli, shred or cut finely (or a 12 oz frozen bag)"
+    ],
+    "mappingSuccessRate": 0.4444444444444444,
+    "sourceUrl": "https://www.delicioustable.com/homemade-dog-food/",
+    "sourceName": "www.delicioustable.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:40:59.917Z",
+    "tags": [
+      "dog food recipes",
+      "food for dogs homemade",
+      "homemade dog food",
+      "homemade dog food recipes",
+      "Homemade Dog Food Recipes Vet Approved",
+      "homemade food for dogs",
+      [
+        "Main Course"
+      ],
+      [
+        "American"
+      ]
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "11077c9a-aeaf-4970-aecc-3dbc8c6a947a",
+    "name": "Balanced Dog Food Recipe",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "kelp_powder",
+        "originalName": "kelp powder",
+        "amount": "4",
+        "unit": "tsp",
+        "gramsEstimate": 20
+      },
+      {
+        "canonicalId": "pumpkin",
+        "originalName": "pumpkin puree (NOT pumpkin pie mix!)",
+        "amount": "15",
+        "unit": "oz",
+        "gramsEstimate": 425.25
+      },
+      {
+        "canonicalId": "beef_liver",
+        "originalName": "beef liver (12 oz if using ground turkey or chicken instead of ground beef)",
+        "amount": "8",
+        "unit": "oz",
+        "gramsEstimate": 226.8
+      },
+      {
+        "canonicalId": "broccoli",
+        "originalName": "broccoli",
+        "amount": "8",
+        "unit": "oz",
+        "gramsEstimate": 226.8
+      },
+      {
+        "canonicalId": "spinach",
+        "originalName": "spinach (omit if your dog has kidney issues)",
+        "amount": "8",
+        "unit": "oz",
+        "gramsEstimate": 226.8
+      }
+    ],
+    "unmappedIngredients": [
+      "90% lean ground beef  (or lean ground turkey or chicken)",
+      "hempseeds (or 1/3 cup hempseed oil)",
+      "canned sardines in water (or 4 tsp cod liver oil)",
+      "ground ginger",
+      "(pasture raised)",
+      "shells",
+      "red bell pepper"
+    ],
+    "mappingSuccessRate": 0.4166666666666667,
+    "instructions": [
+      "Begin by mixing together the ground beef, eggs, kelp powder, ground ginger, hempseed, (or hempseed oil),  sardines, and pumpkin puree (if using). Drain the water from the sardines before you add them in. Save half (4) of the eggshells and set them aside.",
+      "Break up the sardines as much as you can so that it is evenly distributed when mixed.",
+      "Next, process the veggies, eggshells, and beef liver. You may need to do this separately if your food processor can&#39;t fit everything. I process everything separately, except for the bell pepper and eggshells- I process those together. I use a Hamilton Beach food processor. I love this one because it has the side scrapers that can be used while the processor is on!",
+      "Add the blended ingredients to the beef and mix until well combined.",
+      "Portion out the food according to your dog&#39;s daily food intake requirements. The dog food will be good in the freezer for weeks, but only for a few days in the fridge. Portion accordingly. I do not like to keep cooked dog food in the fridge for more than 4 days.Reusable freezer bags are the way to go! Let&#39;s try to reduce plastic waste :)",
+      "The food is ready to serve raw, or you can gently cook it. Cook without any oil on a nonstick pan on low heat. Do not try to sear the meat over high heat- you want to gently cook it until it is just done. Let it cool and store in an airtight container to hold in the fridge for up to 4 days. Serve cold, or slightly warmed for picky dogs!"
+    ],
+    "sourceUrl": "https://stellanspice.com/balanced-dog-food/",
+    "sourceName": "stellanspice.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:41:01.194Z",
+    "tags": [
+      "balanced dog food",
+      "dog food recipe",
+      [
+        "Dog Food"
+      ]
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "mixed",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "1d50bb98-9dc0-46a1-8d02-40f3a72c523b",
+    "name": "Homemade Dog Food (Grain Free)",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "coconut_oil",
+        "originalName": "coconut oil",
+        "amount": "1",
+        "unit": "tablespoon",
+        "gramsEstimate": 15
+      },
+      {
+        "canonicalId": "turkey_breast",
+        "originalName": "ground turkey",
+        "amount": "6",
+        "unit": "pounds",
+        "gramsEstimate": 2721.54
+      },
+      {
+        "canonicalId": "green_beans",
+        "originalName": "frozen green beans",
+        "amount": "10",
+        "unit": "oz",
+        "gramsEstimate": 283.5
+      },
+      {
+        "canonicalId": "carrots",
+        "originalName": "carrots (grated (about 1½ cups))",
+        "amount": "2",
+        "unit": "medium"
+      }
+    ],
+    "unmappedIngredients": [
+      "frozen broccoli florets",
+      "¼ cup pumpkin puree"
+    ],
+    "mappingSuccessRate": 0.6666666666666666,
+    "instructions": [
+      "In a large skillet, melt coconut oil, and brown turkey in batches, breaking it up as it cooks",
+      "Set crock pot to high, and place frozen vegetables in bottom of slow cooker",
+      "Spoon cooked turkey over vegetables, and add shredded carrots on top of the turkey",
+      "Cook on high for about 1-2 hours or on low for 3-4 hours or until vegetables are soft and cooked through. Break up veggies, as needed. Stir in pumpkin, allow to cool, and serve"
+    ],
+    "sourceUrl": "https://www.meatloafandmelodrama.com/homemade-dog-food/",
+    "sourceName": "www.meatloafandmelodrama.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:41:02.460Z",
+    "tags": [
+      "crock pot dog food",
+      "homemade dog food",
+      [
+        "Main"
+      ],
+      [
+        "American"
+      ]
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "d9648c47-9003-4f1f-a4ba-36ca4c8423e9",
+    "name": "Homemade Dog Food",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "sweet_potato",
+        "originalName": "sweet potato (peeled and chopped)",
+        "amount": "1",
+        "unit": "large"
+      },
+      {
+        "canonicalId": "lentils",
+        "originalName": "lentils (rinsed; preferably green or brown)",
+        "amount": "1 1/2",
+        "unit": "cups",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "chicken_breast",
+        "originalName": ". ground turkey or ground chicken",
+        "amount": "2",
+        "unit": "lb",
+        "gramsEstimate": 907.18
+      },
+      {
+        "canonicalId": "spinach",
+        "originalName": ". spinach",
+        "amount": "5",
+        "unit": "oz",
+        "gramsEstimate": 141.75
+      }
+    ],
+    "unmappedIngredients": [
+      "(chopped)",
+      "water"
+    ],
+    "mappingSuccessRate": 0.6666666666666666,
+    "sourceUrl": "https://thealmondeater.com/homemade-dog-food/",
+    "sourceName": "thealmondeater.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:41:03.592Z",
+    "tags": [
+      "dog food",
+      "homemade dog food",
+      [
+        "Breakfast",
+        "dinner"
+      ],
+      [
+        "American"
+      ]
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "1f775508-9f6a-44a6-a702-5b32391e6805",
+    "name": "Homemade Rabbit Meal for Dogs",
+    "species": [
+      "dogs"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "barley",
+        "originalName": "barley",
+        "amount": "2",
+        "unit": "cups",
+        "gramsEstimate": 480
+      },
+      {
+        "canonicalId": "wild_rice",
+        "originalName": "wild rice",
+        "amount": "1/2",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "kale",
+        "originalName": "kale, chopped",
+        "amount": "1/2",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "asparagus",
+        "originalName": "asparagus, chopped",
+        "amount": "1/2",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "carrots",
+        "originalName": "carrot, chopped",
+        "amount": "1/2",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "olive_oil",
+        "originalName": "canola oil",
+        "amount": "1/3",
+        "unit": "cup",
+        "gramsEstimate": 240
+      }
+    ],
+    "unmappedIngredients": [
+      ", approx. 4 lbs. each",
+      "water",
+      "lima beans",
+      ", chopped",
+      "plain yogurt"
+    ],
+    "mappingSuccessRate": 0.5454545454545454,
+    "instructions": [
+      "Place rabbits in a large pot and add water.  Bring to a boil.  Reduce heat. Cover and simmer for about 30-45 minutes or until rabbit is cooked and falling from the bone.  \r",
+      "Remove rabbit from the pot.  Remove all meat from bones, making sure you get all the bones from the pot as well.  Discard bones.  Return rabbit meat to pot.\r",
+      "Return pot to a boil.  Add barley, rice and vegetables.  Reduce heat.  Cover and simmer for about 30 minutes or until rice and barley are tender and most of the liquid is absorbed.\r",
+      "Remove from heat.  Stir in canola oil. \r",
+      "Cool completely.  Stir in yogurt.\r",
+      "Package meals in Ziploc bags or containers.  Refrigerate or freeze."
+    ],
+    "sourceUrl": "https://www.food.com/recipe/homemade-rabbit-meal-for-dogs-394819",
+    "sourceName": "www.food.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:41:05.916Z",
+    "tags": [
+      "< 4 Hours"
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "d141245b-4ef2-43e0-b73a-944859059128",
+    "name": "Homemade Cat Food",
+    "species": [
+      "cats"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "brown_rice",
+        "originalName": "cooked rice",
+        "amount": "2",
+        "unit": "cups",
+        "gramsEstimate": 480
+      },
+      {
+        "canonicalId": "chicken_liver",
+        "originalName": "fresh chicken liver",
+        "amount": "1",
+        "unit": "lb",
+        "gramsEstimate": 453.59
+      }
+    ],
+    "unmappedIngredients": [
+      "(6   ounce) cans   tuna in water",
+      "parsley, stems removed, chopped"
+    ],
+    "mappingSuccessRate": 0.5,
+    "instructions": [
+      "Chop the parsley finely and transfer to a large mixing bowl.",
+      "Bring a large pot of water to a boil.  Drain the chicken livers in a sieve over the sink and rinse well.  Drop into boiling water.",
+      "Allow water to return just to a boil, then remove the pan from the heat and cover.  Let the livers poach for five minutes.  Drain well, rinse in cold water, chop in processor, and add to bowl with parsley.",
+      "Drain tuna, add to mixture along with rice.",
+      "Mix and mash until well combined.  Fill storage containers and refrigerate for up to one week, or freeze in portions for up to three months."
+    ],
+    "sourceUrl": "https://www.food.com/recipe/homemade-cat-food-302842",
+    "sourceName": "www.food.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:41:12.936Z",
+    "tags": [
+      "Chicken",
+      "Poultry",
+      "Meat",
+      "High Protein",
+      "Healthy",
+      "High In...",
+      "< 30 Mins",
+      "For Large Groups",
+      "Easy",
+      "Chicken Livers"
+    ],
+    "flags": {
+      "isComplete": false,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "ed884a53-09ae-4c97-9452-6d51a46dca05",
+    "name": "How To Make Homemade Baby Cockatiel Food",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "tuna",
+        "originalName": "Cute AnimalsBirdsFish",
+        "unit": "Other"
+      },
+      {
+        "canonicalId": "peas",
+        "originalName": "peanut butter",
+        "unit": "Smooth"
+      }
+    ],
+    "unmappedIngredients": [
+      "n",
+      "r",
+      "s",
+      "s",
+      "g",
+      "h",
+      "g",
+      "n",
+      "n",
+      "r",
+      "s",
+      "s",
+      "g",
+      "h",
+      "g",
+      "n",
+      "s",
+      "h",
+      "ParentingHacksCleaningPet CompatibilityDIY Ideas",
+      "s",
+      "g",
+      "Compatibility",
+      "Ideas",
+      "s",
+      "r",
+      "t",
+      "Policies",
+      "Experts",
+      "Policy",
+      "of Use",
+      "r",
+      "Cute Animals",
+      "s",
+      "n",
+      "food cereal",
+      "s",
+      "food applesauce",
+      ", unflavored Pedialyte",
+      "n",
+      "water",
+      ": Handfeeding",
+      "Cottage: Formula Recipe"
+    ],
+    "mappingSuccessRate": 0.045454545454545456,
+    "sourceUrl": "https://www.cuteness.com/article/make-homemade-baby-cockatiel-food/",
+    "sourceName": "www.cuteness.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:41:38.670Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "d1598645-1036-417a-9a16-de46cbf793f2",
+    "name": "Cockatiel Seed \"Tweets\" Recipe",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "pine_nuts",
+        "originalName": "pine nuts",
+        "amount": "1/4",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "almonds",
+        "originalName": "sliced almonds",
+        "amount": "1/4",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "millet",
+        "originalName": "millet",
+        "amount": "1/4",
+        "unit": "cup",
+        "gramsEstimate": 240
+      },
+      {
+        "canonicalId": "sesame_seeds",
+        "originalName": "sesame seeds",
+        "amount": "2",
+        "unit": "tablespoons"
+      },
+      {
+        "canonicalId": "eggs",
+        "originalName": "eggs (w/ shells)",
+        "amount": "2",
+        "unit": "whole"
+      },
+      {
+        "canonicalId": "olive_oil",
+        "originalName": "(+) tablespoon(s) olive oil",
+        "amount": "1"
+      }
+    ],
+    "unmappedIngredients": [
+      "whole wheat flour",
+      "sunflower kernels"
+    ],
+    "mappingSuccessRate": 0.75,
+    "instructions": [
+      "Preheat oven to 350 degrees F.",
+      "Line a baking sheet with parchment paper.",
+      "Add flour, nuts and seeds to food processor bowl fitted with multi-purpose blade.",
+      "Pulse to combine.  Add two eggs-whole, pulse to combine.  Run on low and drizzle in oil.  Add more oil if needed for dough to hold together.",
+      "Scoop 1 teaspoon (or larger) portions, roll in a ball, place on baking sheet, press slightly to flatten ball.  If desired use a drinking straw to poke a hole in the center of each tweet (to hang in cage.)",
+      "Bake for about 10-12 minutes or until golden browned on edges.  Cool and store in airtight container in refrigerator or freeze for longer storage."
+    ],
+    "sourceUrl": "https://www.epicuricloud.com/recipe/cockatiel-seed-tweets/",
+    "sourceName": "www.epicuricloud.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:03.629Z",
+    "tags": [],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "mixed",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "32e850ae-08f2-4767-aa0e-451ffe3ed67d",
+    "name": "Homemade Parrot Food Recipes",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "sweet_potato",
+        "originalName": "microwaved sweet potato",
+        "amount": "1/2",
+        "unit": "medium"
+      },
+      {
+        "canonicalId": "peas",
+        "originalName": "peanut butter or almond butter",
+        "amount": "2",
+        "unit": "Tbsp",
+        "gramsEstimate": 30
+      },
+      {
+        "canonicalId": "eggs",
+        "originalName": "cups shredded veggies in this batch",
+        "amount": "3",
+        "unit": "heaping"
+      },
+      {
+        "canonicalId": "butternut_squash",
+        "originalName": "squash",
+        "unit": "yellow"
+      },
+      {
+        "canonicalId": "butternut_squash",
+        "originalName": "squash (calabash)",
+        "unit": "opo"
+      }
+    ],
+    "unmappedIngredients": [
+      "Jiffy corn bread mix",
+      "s",
+      "water",
+      "cinnamon",
+      "dash of garlic powder",
+      "if desired",
+      "p",
+      "p",
+      "t",
+      "i",
+      "r",
+      "i",
+      "p"
+    ],
+    "mappingSuccessRate": 0.2777777777777778,
+    "instructions": [
+      "Put Jiffy mix in big bowl and mash out the chunks. Set aside.",
+      "In another bowl, mix room temperature eggs, banana, sweet potato, cinnamon, garlic powder, and peanut butter/almond butter.",
+      "In third bowl, put shredded veggies.",
+      "Add wet mixture and water to Jiffy mix and stir. Add veggies by handfuls then stir until all is added. If you shredded too much, feed the rest to the birdies.",
+      "Stir to normal consistency. If it's too wet add some dry oats or more Jiffy mix. If it's too dry, add a bit of water. Don't over stir.",
+      "Bake in oiled or oblong pan sprayed with Pam for 20-30 minutes at 400 degrees F. It can be checked with sticking a knife in it until the knife comes out clean, but it is very moist.",
+      "Store in fridge 24 hours before slicing. May be frozen in individual servings. I put 2 pieces per small Ziploc baggie."
+    ],
+    "sourceUrl": "https://www.thriftyfun.com/Homemade-Parrot-Food-Recipes.html",
+    "sourceName": "www.thriftyfun.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:18.107Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "c0857007-78d9-4b76-b50b-aef7ad2513a3",
+    "name": "Pickles The Parrot",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "pumpkin",
+        "originalName": "pumpkin (fresh mashed or plain canned pumpkin)",
+        "amount": "1/2",
+        "unit": "cup",
+        "gramsEstimate": 240
+      }
+    ],
+    "unmappedIngredients": [
+      "e",
+      "gallery",
+      "Us",
+      "Books and Stories",
+      "Us",
+      "Videos",
+      "Recipes",
+      "s",
+      "Blog",
+      "s",
+      "oatmeal",
+      "with shell (some people debate whether or not to give parrots egg shell - it can easily be left out)",
+      "walnuts - broken up small",
+      "a pomegranate, scoop the seeds out and include the juice that comes with it.  You can use more seeds if you like."
+    ],
+    "mappingSuccessRate": 0.06666666666666667,
+    "sourceUrl": "http://www.picklestheparrot.com/birdie-recipes.php",
+    "sourceName": "www.picklestheparrot.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:20.741Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "963ccbac-5ab3-4af3-b276-88b624ba9129",
+    "name": "BirdVibes.com",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "chicken_liver",
+        "originalName": "delivery of the domain",
+        "unit": "Quick"
+      }
+    ],
+    "unmappedIngredients": [
+      "e",
+      "s",
+      "us",
+      "us",
+      "account",
+      "-day money back guarantee",
+      "immediate ownership",
+      "and secure shopping",
+      "zero percent financing",
+      "and secure shopping",
+      "e",
+      "s",
+      "plans",
+      "account",
+      "back guarantee",
+      ".com",
+      ".com",
+      "s",
+      "guide",
+      "studies",
+      "s",
+      "w",
+      "us",
+      "and conditions",
+      "policy"
+    ],
+    "mappingSuccessRate": 0.038461538461538464,
+    "sourceUrl": "https://birdvibes.com/7-tasty-homemade-parrot-foods-your-bird-will-love/",
+    "sourceName": "birdvibes.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:30.154Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "64e73baa-7684-4405-a0ad-4c934ea4c431",
+    "name": "Parrot food recipes you can make yourself",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "policy",
+      "a claim",
+      "s",
+      "s",
+      "s",
+      "us",
+      "us",
+      "0",
+      "Insurance",
+      "Insurance",
+      "Insurance",
+      "Pet Insurance",
+      "Business Insurance",
+      "policy",
+      "a claim",
+      "s",
+      "s",
+      "s",
+      "us",
+      "us",
+      "Road Business Park,Bridge Road,Haywards Heath,West Sussex RH16 1TX",
+      "0"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "https://britishpetinsurance.co.uk/d-i-y-parrot-food-recipes/",
+    "sourceName": "britishpetinsurance.co.uk",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:34.577Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "689d284f-422a-4792-bf76-edb32ed9835b",
+    "name": "The Landing Mash",
+    "species": [
+      "birds"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "e",
+      "t",
+      "Bird Bread Homemade Treats",
+      "to the Chop Party",
+      "and Sprouts: A Nutritional Powerhouse for Parrots by Michelle “Elle” Magnon",
+      "2018",
+      "2014",
+      "2014",
+      "2014",
+      "2013",
+      "2013",
+      "2013",
+      "2013",
+      "2012",
+      "2012",
+      "2012",
+      "2012",
+      "2012",
+      "2012",
+      "2012",
+      "2012",
+      "2012",
+      "d",
+      "Subscribe\n\t\t\n\t\t\n\t\t\t\n\t\t\tSubscribed\n\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t\t\t\tThe Happy Cockatoo: Elle's Avian Cuisine\t\t\t\n\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tJoin 132 other subscribers\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\tSign me up\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\tAlready have a WordPress.com account? Log in now.",
+      "Happy Cockatoo: Elle's Avian Cuisine",
+      "have a WordPress.com account? Log in now.",
+      "The Happy Cockatoo: Elle's Avian Cuisine\t\t\t\n\t\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\n\t\t\tSubscribe\n\t\t\n\t\t\n\t\t\t\n\t\t\tSubscribed\n\t\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tSign up\n\t\t\t\t\t\t\tLog in\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\tReport this content\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\tView site in Reader\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\tManage subscriptions\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCollapse this bar",
+      "Happy Cockatoo: Elle's Avian Cuisine",
+      "Subscribed",
+      "up",
+      "in",
+      "this content",
+      "site in Reader",
+      "subscriptions",
+      "this bar"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "https://thehappycockatoo.wordpress.com/tag/parrot-recipes/",
+    "sourceName": "thehappycockatoo.wordpress.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:35.676Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "fceb82c8-97cd-4c49-aa35-8c762572b388",
+    "name": "Homemade Rabbit Treats",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "s",
+      "p",
+      "n",
+      "t",
+      "g",
+      "g",
+      "e",
+      "s",
+      "We Are",
+      "Publish?",
+      "Started",
+      "p",
+      "p",
+      "of Service|",
+      "Statement|",
+      "settings|",
+      "Notices & Trademarks"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "https://www.instructables.com/Homemade-Rabbit-Treats/",
+    "sourceName": "www.instructables.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:43.884Z",
+    "flags": {
+      "isComplete": false,
+      "prepStyle": "unknown",
+      "mealType": "treat"
+    }
+  },
+  {
+    "id": "c4ec3283-fcb8-4d93-b050-8cad952b3201",
+    "name": "How to Make Inexpensive Rabbit Treats",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "carrots",
+        "originalName": "¼ Cup of Minced Carrots"
+      }
+    ],
+    "unmappedIngredients": [
+      "a",
+      "¼ Cup Food Pellets",
+      "¼ Cup Orchard Grass (or the Hay Your Bunny Likes)"
+    ],
+    "mappingSuccessRate": 0.25,
+    "instructions": [
+      "Measure out 1/4 cup hay and 1/4 cup food pellets and grind them to powder in a food processor and by pounding if necessary.",
+      "Add 1/4 cup carrots to food processor and blend until minced.",
+      "Add 1 banana and mix until a rough \"dough\" forms.",
+      "If needed, move to a mixing bowl and hand mix to get as smooth as possible.",
+      "Preheat oven to 250°. Measure out a heaping tablespoon of mixture and roll into balls. Place onto a lined baking sheet.",
+      "Cook for 90 minutes, turning balls every 30 minutes."
+    ],
+    "sourceUrl": "https://2kidstrying2cook.com/how-to-make-inexpensive-rabbit-treats/",
+    "sourceName": "2kidstrying2cook.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:44.980Z",
+    "tags": [
+      "Rabbit treats",
+      "homemade bunny food",
+      "Animal treats",
+      ""
+    ],
+    "flags": {
+      "isComplete": false,
+      "prepStyle": "cooked",
+      "mealType": "treat"
+    }
+  },
+  {
+    "id": "ab1a256d-9f35-4e6d-b829-606044bdae75",
+    "name": "\"gnaw, gnaw\" Biscuits: Teeth Tamers for Guinea Pigs and Rabbits Recipe",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "carrots",
+        "originalName": "finely shredded carrot",
+        "amount": "3/4",
+        "unit": "cup",
+        "gramsEstimate": 720
+      }
+    ],
+    "unmappedIngredients": [
+      "kibble ((guinea pig or rabbit))",
+      "unsweetened applesauce",
+      "old fashioned oats, ground (or 3/4 cup oat flour)",
+      "small pieces of Timothy hay ((I used the fine bits from bottom of box))",
+      "r"
+    ],
+    "mappingSuccessRate": 0.16666666666666666,
+    "instructions": [
+      "Preheat oven to 250 degrees.",
+      "Line a baking sheet with parchment paper.",
+      "Mix together the kibble, applesauce and carrots to hydrate them.",
+      "Stir in the other ingredients.  Mixture should be moist enough to hold together when squeezed in your hand.  (May need to add 1 tablespoon or so of water as kibble and hay textures can vary.)",
+      "Spread mixture onto prepared baking sheet and pat until about 1/4 - 1/2 - inch thick.",
+      "Bake for 15 minutes.",
+      "Remove from oven and use a pizza wheel or knife to cut into squares (don't separate at this point.)",
+      "Continue baking for another 30 minutes.",
+      "Remove from oven and cut on the same scored lines. Separate them on the baking sheet.  Bake another 30 minutes.",
+      "Use a small spatula to turn the squares over.  Bake for 45-60 minutes more or until dried to the desired consistency.  When they seem just about all dried, I usually turn off the oven and let them cool in the warm oven - helps dry them out even more.",
+      "Store in an airtight container."
+    ],
+    "sourceUrl": "https://www.epicuricloud.com/recipe/gnaw-gnaw-biscuits-teeth-tamers-for-guinea-pigs-and-rabbits/",
+    "sourceName": "www.epicuricloud.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:53.000Z",
+    "tags": [],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "32f10e5a-2f45-4264-aa6b-6b82b9a40cbe",
+    "name": "How To Make Homemade Guinea Pig Treats",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "Forums\n\n\n\t\t\n\n\t\t\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\t\n\t\n\t\n\tNew posts\n\n\t\n\n\t\t\t\t\n\t\t\t\t\t\n\t\n\t\n\tSearch forums",
+      "List",
+      "List",
+      "Pig Info",
+      "Posts",
+      "Events",
+      "h",
+      "posts",
+      "forums",
+      "grass and lawn tips to avoid springtime deaths Click here for details",
+      "Pig Care",
+      "t",
+      "Thread starter\n\t\t\tThread starter\n\n\t\t\tanniedabannie",
+      "Start date\n\t\t\tStart date\n\n\t\t\tJul 13, 2015",
+      "13, 2015",
+      "13, 2015",
+      "13, 2015",
+      "16, 2015",
+      "16, 2015",
+      "19, 2015",
+      "19, 2015",
+      "20, 2015",
+      "20, 2015",
+      "20, 2015",
+      "#10",
+      "21, 2015",
+      "#11",
+      "21, 2015",
+      "#12",
+      "Pig Care",
+      "t",
+      "- 2020",
+      "us",
+      "and rules",
+      "policy",
+      "p",
+      "e",
+      "S",
+      "This site uses cookies to help personalise content, tailor your experience and to keep you logged in if you register.\nBy continuing to use this site, you are consenting to our use of cookies.\n\t\n\n\t\n\t\tAccept\n\t\tLearn more…"
+    ],
+    "mappingSuccessRate": 0,
+    "instructions": [
+      "Kill those nuggets with a blender or handheld choppy-thing  until they are a fine powder (but a few lumps are fine)"
+    ],
+    "sourceUrl": "https://www.theguineapigforum.co.uk/threads/how-to-make-homemade-guinea-pig-treats.128887/",
+    "sourceName": "www.theguineapigforum.co.uk",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:42:54.579Z",
+    "flags": {
+      "isComplete": false,
+      "prepStyle": "unknown",
+      "mealType": "treat"
+    }
+  },
+  {
+    "id": "6807908b-0b2d-4777-ace4-77ab8417d0c9",
+    "name": "The Hammock",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "e",
+      "Diet",
+      "Training",
+      "s",
+      "y",
+      "e",
+      "& Bedding",
+      "M",
+      "History",
+      "law",
+      "s",
+      "g",
+      "h",
+      "t",
+      "Bridge",
+      "s"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "http://thehammock.weebly.com/ferret-diet.html",
+    "sourceName": "thehammock.weebly.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:43:23.330Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "83d157f1-1d07-4a71-be02-0d38c270c602",
+    "name": "​Fairoak Ferrets",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "brown_rice",
+        "originalName": "USLATEST NEWSADOPTING YOUR KITSABOUT FAIROAK FERRETSPRICE LIST",
+        "unit": "CONTACT"
+      }
+    ],
+    "unmappedIngredients": [
+      "E",
+      "FERRETS & LITTERSHOBSJILLSPLANNED PAIRINGSPREVIOUS KITS 2022PREVIOUS KITS 2021PREVIOUS KITS 2020PREVIOUS KITS 2019PREVIOUS KITS 2018PREVIOUS KITS 2017PREVIOUS KITS 2016PREVIOUS KITS 2015PREVIOUS KITS 2014",
+      "S",
+      "S",
+      "PAIRINGS",
+      "KITS 2022",
+      "KITS 2021",
+      "KITS 2020",
+      "KITS 2019",
+      "KITS 2018",
+      "KITS 2017",
+      "KITS 2016",
+      "KITS 2015",
+      "KITS 2014",
+      "FOR FERRETSINTRODUCTIONHOUSINGEXERCISEFEEDINGRAW FEEDINGNEUTERINGNIP TRAININGMAINTENANCEFERRET COLOURSWhat are Angora Ferrets?",
+      "N",
+      "G",
+      "E",
+      "G",
+      "FEEDING",
+      "G",
+      "TRAINING",
+      "E",
+      "COLOURS",
+      "are Angora Ferrets?",
+      "KITS 2022CURRENT LITTERS 2022ABOUT OUR KITS",
+      "LITTERS 2022",
+      "OUR KITS",
+      "NEWS",
+      "YOUR KITS",
+      "FAIROAK FERRETS",
+      "LIST",
+      "e"
+    ],
+    "mappingSuccessRate": 0.029411764705882353,
+    "sourceUrl": "https://www.fairoakferrets.co.uk/raw-feeding-ferrets",
+    "sourceName": "www.fairoakferrets.co.uk",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:43:27.208Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "bdee7855-6483-4c51-9d94-e28db5f7a3ff",
+    "name": "Veggie Delight",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "carrots",
+        "originalName": "carrot",
+        "amount": "1",
+        "unit": "Small"
+      }
+    ],
+    "unmappedIngredients": [
+      "floret",
+      "of cucumber"
+    ],
+    "mappingSuccessRate": 0.3333333333333333,
+    "instructions": [
+      "Wash and finely chop the vegetables.",
+      "Mix them together and serve in your hamster’s dish."
+    ],
+    "sourceUrl": "https://articles.hepper.com/homemade-hamster-food-recipes/",
+    "sourceName": "articles.hepper.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:43:35.841Z",
+    "tags": [
+      "hamster food",
+      "homemade",
+      "veggies"
+    ],
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "32f56f0b-2ae7-4903-b00a-623ab14825d9",
+    "name": "hamster recipes - The Hamster Bakery",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "e",
+      "pets",
+      "recipes",
+      "pig recipes",
+      "recipes"
+    ],
+    "mappingSuccessRate": 0,
+    "instructions": [
+      "preheat the oven to 200'c",
+      "put the hamster food, oats,raisins and flour in a bowl and mix",
+      "add honey and egg whites. mix thoroughly",
+      "wipe the cupcake tin with a little flour",
+      "add about 2-3cm of mixture into each hole and smooth",
+      "put in oven for about 8-10 minutes, checking at five.",
+      "allow to cool completely before serving",
+      "preheat the oven to 200'c, 180'c fan oven",
+      "mix the oats, flour and oil.",
+      "add the water until it is a thick but dry paste",
+      "knead the mixture for about five minutes, until you can no longer feel the oats",
+      "put it to one side for a bit",
+      "in separate bowl, mix the dog biscuits powder and a little honey until smooth.",
+      "back to the dough for Molding. separate the dough into about 1 inch blobs",
+      "for the croissants- roll out the blobs into a sausage, flatten, then twist a little. curve round into a slight c shape",
+      "for the pain au chocolat- flatten the blobs, spread with a little of the dog biscuit mixture and curve two sides of the shape inwards",
+      "put on a baking tray, brush each one with a TINY bit of egg and bake for 10 minutes, checking at five"
+    ],
+    "sourceUrl": "https://thehamsterbakery.weebly.com/hamster-recipes.html",
+    "sourceName": "thehamsterbakery.weebly.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:43:40.281Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "cooked",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "612b72b9-51a6-428b-b6e0-b0ffb09578aa",
+    "name": "Homemade Pet Rat Food",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "s",
+      "p",
+      "n",
+      "t",
+      "g",
+      "g",
+      "e",
+      "s",
+      "We Are",
+      "Publish?",
+      "Started",
+      "p",
+      "p",
+      "of Service|",
+      "Statement|",
+      "settings|",
+      "Notices & Trademarks"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "https://www.instructables.com/Homemade-Pet-Rat-Food/",
+    "sourceName": "www.instructables.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:43:51.423Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "14778387-6a25-4778-8160-e3f7b4e67c70",
+    "name": "Homemade Sugar Glider Diets",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [
+      {
+        "canonicalId": "bee_pollen",
+        "originalName": "bee pollen",
+        "amount": "1",
+        "unit": "tsp",
+        "gramsEstimate": 5
+      },
+      {
+        "canonicalId": "acacia_gum",
+        "originalName": "acacia gum",
+        "amount": "1",
+        "unit": "tsp",
+        "gramsEstimate": 5
+      },
+      {
+        "canonicalId": "chicken_breast",
+        "originalName": "chicken baby food",
+        "amount": "5",
+        "unit": "oz",
+        "gramsEstimate": 141.75
+      },
+      {
+        "canonicalId": "wheat_germ",
+        "originalName": "wheat germ",
+        "amount": "1/4",
+        "unit": "cup",
+        "gramsEstimate": 240
+      }
+    ],
+    "unmappedIngredients": [
+      "vegetables with a balanced calcium-to-phosphorus (Ca:P) ratio (fresh or Garden Fresh Re-Hydrate)",
+      "fruit with a balanced Ca:P ratio (fresh or Garden Fresh Re-Hydrate)",
+      "protein (2 large eggs or 5 oz chicken)",
+      "Glider-Cal (calcium powder)",
+      "water",
+      "apple juice",
+      "honey (do not use raw or unfiltered)",
+      "g",
+      "Gerber Yogurt Juice Blend (or 2 oz yogurt + 2 oz fruit juice)",
+      "Rep-Cal Herpivite (blue label)",
+      "Rep-Cal Calcium (pink label)",
+      "dry baby cereal"
+    ],
+    "mappingSuccessRate": 0.25,
+    "sourceUrl": "https://exoticnutrition.com/blogs/blog/homemade-sugar-glider-diets",
+    "sourceName": "exoticnutrition.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:44:01.903Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "d43b8892-3d40-467d-bafa-516b9c74ee4f",
+    "name": "Angela’s Sugar Glider Food Recipe",
+    "species": [
+      "pocket-pets"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "e",
+      "s",
+      "s",
+      "t",
+      "t"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "https://www.charmedpen.com/posts/angelas-sugar-glider-food-recipe/",
+    "sourceName": "www.charmedpen.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:44:03.533Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "642b9fd8-d1e2-4212-a45c-97c58329942e",
+    "name": "A Easy Meal to Make for Your Bearded Dragon!",
+    "species": [
+      "reptiles"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "s",
+      "p",
+      "n",
+      "t",
+      "g",
+      "g",
+      "e",
+      "s",
+      "We Are",
+      "Publish?",
+      "Started",
+      "p",
+      "p",
+      "of Service|",
+      "Statement|",
+      "settings|",
+      "Notices & Trademarks"
+    ],
+    "mappingSuccessRate": 0,
+    "instructions": [
+      "Pour 5-10 pellets in a bowl.",
+      "Pour enough water so the pellets are just barely floating.",
+      "Place them off to the side to soak.",
+      "Take one frozen strawberry and put it in a microwave safe bowl.",
+      "Place the strawberry in the microwave for 30 seconds.",
+      "Take it out of the microwave.",
+      "Set it to the side to cool. We'll come back to it later.",
+      "Cut 1-2 inches off a banana. Then slice it up into pieces about half the size of a dime.",
+      "Slice 2 baby carrots into thin pieces. If you have large carrots, slice it into tiny pieces. You should have about 2tsp of carrots.",
+      "Cut up a broccoli piece. Make sure you slice the stem of the broccoli into tiny pieces. Warning: Broccoli is messy!",
+      "Cut up your strawberry. If it's a fresh strawberry then cut it along with the other fresh foods. If its a microwaved strawberry then just cut it up in the bowl your microwaved it in. If its a microwaved strawberry then make sure you cut all the stringy bits up!"
+    ],
+    "sourceUrl": "https://www.instructables.com/A-Easy-Meal-to-Make-for-Your-Bearded-Dragon/",
+    "sourceName": "www.instructables.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:44:35.087Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "raw",
+      "mealType": "meal"
+    }
+  },
+  {
+    "id": "5a2fae21-ea9e-4190-96a1-6afcca95bb50",
+    "name": "Making bearded dragon food in bulk",
+    "species": [
+      "reptiles"
+    ],
+    "ingredients": [],
+    "unmappedIngredients": [
+      "s",
+      "Guides",
+      "s",
+      "a",
+      "s",
+      "Requests",
+      "Reports",
+      "Requests",
+      "Feedback",
+      "g",
+      "s",
+      "Help",
+      "e",
+      "s",
+      "s",
+      "of Service",
+      "Policy"
+    ],
+    "mappingSuccessRate": 0,
+    "sourceUrl": "https://community.morphmarket.com/t/making-bearded-dragon-food-in-bulk/22066",
+    "sourceName": "community.morphmarket.com",
+    "sourceTier": "community",
+    "scrapedAt": "2025-12-18T23:44:36.467Z",
+    "flags": {
+      "isComplete": true,
+      "prepStyle": "unknown",
+      "mealType": "meal"
+    }
+  }
+]

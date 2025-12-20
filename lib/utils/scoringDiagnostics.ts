@@ -1,5 +1,4 @@
-import { Recipe } from '@/lib/types/recipe';
-import { Pet } from '@/lib/types/pet';
+import { Recipe, Pet } from '../types';
 import { calculateEnhancedCompatibility } from './enhancedCompatibilityScoring';
 
 export interface ScoreDistributionAnalysis {

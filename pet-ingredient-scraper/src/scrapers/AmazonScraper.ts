@@ -1,5 +1,5 @@
 import { Page } from 'puppeteer';
-import { BaseScraper } from './BaseScraper';
+import { BaseScraper } from './BaseScraper.ts.ts';
 import { ProductSource, Review, ScraperOptions } from '../models/types';
 
 // Price validation constants (inline to avoid dependency issues)

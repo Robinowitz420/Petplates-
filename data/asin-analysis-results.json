@@ -1,0 +1,3720 @@
+{
+  "totalProducts": 289,
+  "highConfidence": 185,
+  "mediumConfidence": 25,
+  "lowConfidence": 79,
+  "needsManualCheck": 104,
+  "issuesByType": {
+    "Product name does not contain ingredient name": 78,
+    "Product name has weak match with ingredient": 22,
+    "Suspicious product name pattern: \"blend\"": 2,
+    "Vet note too short or missing": 29,
+    "Suspicious product name pattern: \"mix\"": 1
+  },
+  "results": [
+    {
+      "ingredient": "ground chicken",
+      "asin": "B0BXZVFN6G",
+      "productName": "Fresh Is Best Freeze Dried Chicken Breast",
+      "vetNote": "High-quality, human-grade chicken breast that maintains nutritional value through freeze-drying.",
+      "url": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground turkey",
+      "asin": "B091CCD4T7",
+      "productName": "Diestel Free Range Ground Turkey",
+      "vetNote": "Premium free-range turkey with optimal protein-to-fat ratio for canine health.",
+      "url": "https://www.amazon.com/dp/B091CCD4T7?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground beef (lean)",
+      "asin": "B07VHR2WNZ",
+      "productName": "US Wellness Meats Pet Burger",
+      "vetNote": "Grass-fed, human-grade beef with controlled fat content for weight management.",
+      "url": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "ground lamb",
+      "asin": "B0082C00P8",
+      "productName": "Raw Paws Lamb Recipe Rolls",
+      "vetNote": "Novel protein source ideal for dogs with chicken or beef allergies.",
+      "url": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "salmon (boneless)",
+      "asin": "B08NCDSV82",
+      "productName": "A Better Treat Freeze Dried Salmon",
+      "vetNote": "Wild-caught salmon providing essential omega-3 fatty acids for skin, coat, and joint health.",
+      "url": "https://www.amazon.com/dp/B08NCDSV82?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken breast",
+      "asin": "B0787WTY4C",
+      "productName": "Bell & Evans Boneless Chicken Breast",
+      "vetNote": "Air-chilled chicken breast with superior moisture retention and protein quality.",
+      "url": "https://www.amazon.com/dp/B0787WTY4C?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken thighs",
+      "asin": "B0787YFWYB",
+      "productName": "Bell & Evans Boneless Chicken Thighs",
+      "vetNote": "Higher fat content than breast meat, providing more calories and flavor.",
+      "url": "https://www.amazon.com/dp/B0787YFWYB?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "turkey breast",
+      "asin": "B0CZRN7HXT",
+      "productName": "Fresh Is Best Freeze Dried Turkey Tenders",
+      "vetNote": "Lean turkey breast maintaining natural nutrients through gentle freeze-drying.",
+      "url": "https://www.amazon.com/dp/B0CZRN7HXT?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "beef liver",
+      "asin": "B07G3QFG8N",
+      "productName": "Fresh Is Best Freeze Dried Beef Liver",
+      "vetNote": "Rich source of vitamin A, iron, and B vitamins essential for canine health.",
+      "url": "https://www.amazon.com/dp/B07G3QFG8N?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken liver",
+      "asin": "B07S8JCNTH",
+      "productName": "Fresh Is Best Freeze Dried Chicken Livers",
+      "vetNote": "Concentrated nutrition with high vitamin content and natural enzymes.",
+      "url": "https://www.amazon.com/dp/B07S8JCNTH?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken hearts",
+      "asin": "B0BXZ3JJL9",
+      "productName": "Vital Essentials Freeze Dried Chicken Hearts",
+      "vetNote": "Excellent taurine source and natural chews for dental health.",
+      "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "sardines (canned in water)",
+      "asin": "B01FUWYO2M",
+      "productName": "Wild Planet Sardines in Water No Salt",
+      "vetNote": "Omega-3 rich fish with edible bones providing natural calcium and phosphorus.",
+      "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "eggs",
+      "asin": "B001DY6U9M",
+      "productName": "Whole Life Pet Freeze Dried Diced Eggs",
+      "vetNote": "Complete protein source with all essential amino acids and natural vitamins.",
+      "url": "https://www.amazon.com/dp/B001DY6U9M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "turkey giblets",
+      "asin": "B0BXZ3JJL9",
+      "productName": "Vital Essentials Freeze Dried Turkey Giblets",
+      "vetNote": "Natural organ meat mix providing comprehensive nutrition and enzymes.",
+      "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken giblets",
+      "asin": "B0BXZVFN6G",
+      "productName": "Fresh Is Best Freeze Dried Chicken Giblets",
+      "vetNote": "Traditional organ meat blend with heart, liver, and gizzard for complete nutrition.",
+      "url": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "duck breast",
+      "asin": "B01KAOGE5U",
+      "productName": "Fresh Is Best Freeze Dried Duck Breast",
+      "vetNote": "Novel protein with healthy fat profile and rich flavor dogs love.",
+      "url": "https://www.amazon.com/dp/B01KAOGE5U?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "venison",
+      "asin": "B07VHR2WNZ",
+      "productName": "Fresh Is Best Freeze Dried Venison Bites",
+      "vetNote": "Lean game meat ideal for dogs with allergies or weight management needs.",
+      "url": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "rabbit meat",
+      "asin": "B0082C00P8",
+      "productName": "Evanger\\",
+      "vetNote": "Hypoallergenic novel protein perfect for elimination diet trials.",
+      "url": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "quail",
+      "asin": "B0DK1SJ2Z7",
+      "productName": "Wholesome Beast Freeze Dried Quail Chicks",
+      "vetNote": "Small game bird providing novel protein and natural calcium from bones.",
+      "url": "https://www.amazon.com/dp/B0DK1SJ2Z7?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground pork (lean)",
+      "asin": "B0CLJW1P6D",
+      "productName": "Momentum Freeze Dried Pork Tenderloin",
+      "vetNote": "Lean pork alternative for dogs that tolerate it, with good palatability.",
+      "url": "https://www.amazon.com/dp/B0CLJW1P6D?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "turkey necks",
+      "asin": "B0FHJ6G2NZ",
+      "productName": "Northwest Naturals Freeze Dried Turkey Necks",
+      "vetNote": "Natural chews providing dental benefits and natural nutrients.",
+      "url": "https://www.amazon.com/dp/B0FHJ6G2NZ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "brown rice",
+      "asin": "B072JNNB33",
+      "productName": "Lundberg Family Farms Organic Brown Rice",
+      "vetNote": "Whole grain rice providing complex carbohydrates and fiber for digestive health.",
+      "url": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "white rice",
+      "asin": "B00IDQY2PW",
+      "productName": "Nishiki Premium Medium Grain White Rice",
+      "vetNote": "Easily digestible carbohydrate source for dogs with sensitive stomachs.",
+      "url": "https://www.amazon.com/dp/B00IDQY2PW?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "quinoa",
+      "asin": "B07ZJNYGW4",
+      "productName": "Bob\\",
+      "vetNote": "Complete protein grain with all essential amino acids and gluten-free.",
+      "url": "https://www.amazon.com/dp/B07ZJNYGW4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "sweet potato",
+      "asin": "B07D92VQ9C",
+      "productName": "Farmer\\",
+      "vetNote": "Complex carbohydrate with beta-carotene and fiber for digestive health.",
+      "url": "https://www.amazon.com/dp/B07D92VQ9C?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "pumpkin puree",
+      "asin": "B0062A87HA",
+      "productName": "Farmer\\",
+      "vetNote": "Natural soluble fiber for digestive health and stool regulation.",
+      "url": "https://www.amazon.com/dp/B0062A87HA?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "butternut squash",
+      "asin": "B000HDCSTG",
+      "productName": "Farmer\\",
+      "vetNote": "Low-glycemic carbohydrate with beta-carotene and antioxidants.",
+      "url": "https://www.amazon.com/dp/B000HDCSTG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "lentils",
+      "asin": "B000VDZ2GI",
+      "productName": "Bob\\",
+      "vetNote": "Plant-based protein and fiber source for balanced nutrition.",
+      "url": "https://www.amazon.com/dp/B000VDZ2GI?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "chickpeas",
+      "asin": "B0BYPF1Y79",
+      "productName": "Goya Organic Chickpeas No Salt",
+      "vetNote": "Protein-rich legume providing complex carbohydrates and minerals.",
+      "url": "https://www.amazon.com/dp/B0BYPF1Y79?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "black beans",
+      "asin": "B094WYT2BK",
+      "productName": "Eden Organic Black Beans No Salt",
+      "vetNote": "High-fiber legume with antioxidants and plant-based protein.",
+      "url": "https://www.amazon.com/dp/B094WYT2BK?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "green peas",
+      "asin": "B074H4SHTD",
+      "productName": "Nature\\",
+      "vetNote": "Natural source of plant protein and digestive fiber.",
+      "url": "https://www.amazon.com/dp/B074H4SHTD?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "carrots",
+      "asin": "B074H64BPW",
+      "productName": "Nature\\",
+      "vetNote": "Beta-carotene rich vegetable supporting immune and vision health.",
+      "url": "https://www.amazon.com/dp/B074H64BPW?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "spinach",
+      "asin": "B0013ABAJG",
+      "productName": "Earthbound Farm Organic Spinach Frozen",
+      "vetNote": "Iron-rich leafy green providing vitamins K, A, and folate.",
+      "url": "https://www.amazon.com/dp/B0013ABAJG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "broccoli",
+      "asin": "B07SV522V9",
+      "productName": "Cascadian Farm Organic Broccoli Florets",
+      "vetNote": "Cruciferous vegetable with antioxidants and vitamin C.",
+      "url": "https://www.amazon.com/dp/B07SV522V9?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "zucchini",
+      "asin": "B07Q9WV1LY",
+      "productName": "Nature\\",
+      "vetNote": "Low-calorie vegetable providing hydration and minerals.",
+      "url": "https://www.amazon.com/dp/B07Q9WV1LY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "kale",
+      "asin": "B09VKDGT39",
+      "productName": "Earthbound Farm Organic Kale",
+      "vetNote": "Nutrient-dense leafy green with calcium and antioxidants.",
+      "url": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "celery",
+      "asin": "B09VKDGT39",
+      "productName": "Earthbound Farm Organic Celery",
+      "vetNote": "Low-calorie crunchy vegetable providing hydration and fiber.",
+      "url": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "brussels sprouts",
+      "asin": "B004DAQPR0",
+      "productName": "Cascadian Farm Organic Brussels Sprouts",
+      "vetNote": "Cruciferous vegetable with sulforaphane for antioxidant support.",
+      "url": "https://www.amazon.com/dp/B004DAQPR0?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "asparagus",
+      "asin": "B07QV5G8HY",
+      "productName": "Cascadian Farm Organic Asparagus Spears",
+      "vetNote": "Diuretic vegetable supporting urinary tract health.",
+      "url": "https://www.amazon.com/dp/B07QV5G8HY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "parsley",
+      "asin": "B0D8C4N4WY",
+      "productName": "McCormick Culinary Parsley Flakes",
+      "vetNote": "Fresh herb providing chlorophyll and natural breath freshening.",
+      "url": "https://www.amazon.com/dp/B0D8C4N4WY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "cucumber",
+      "asin": "B001PLETDC",
+      "productName": "Nature\\",
+      "vetNote": "Hydrating vegetable with natural electrolytes.",
+      "url": "https://www.amazon.com/dp/B001PLETDC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "lettuce (romaine)",
+      "asin": "B0F3YTY4XQ",
+      "productName": "Organic Girl Romaine Lettuce",
+      "vetNote": "Leafy green providing hydration and vitamin K.",
+      "url": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "arugula",
+      "asin": "B00JXR8RYW",
+      "productName": "Organic Girl Baby Arugula",
+      "vetNote": "Peppery leafy green with calcium and antioxidants.",
+      "url": "https://www.amazon.com/dp/B00JXR8RYW?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "endive",
+      "asin": "B0006L2XNK",
+      "productName": "Organic Endive Greens",
+      "vetNote": "Bitter leafy green supporting liver health and digestion.",
+      "url": "https://www.amazon.com/dp/B0006L2XNK?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "escarole",
+      "asin": "B084ZVBGQ6",
+      "productName": "Organic Escarole Greens",
+      "vetNote": "Mild leafy green providing folate and vitamin K.",
+      "url": "https://www.amazon.com/dp/B084ZVBGQ6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "dandelion greens",
+      "asin": "B000WR4A5M",
+      "productName": "Organic Dandelion Greens",
+      "vetNote": "Natural diuretic supporting kidney and liver health.",
+      "url": "https://www.amazon.com/dp/B000WR4A5M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "collard greens",
+      "asin": "B000P6H23W",
+      "productName": "Organic Collard Greens",
+      "vetNote": "Calcium-rich leafy green for bone and dental health.",
+      "url": "https://www.amazon.com/dp/B000P6H23W?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "mustard greens",
+      "asin": "B094JT2CCH",
+      "productName": "Organic Mustard Greens",
+      "vetNote": "Spicy leafy green with antioxidants and vitamin K.",
+      "url": "https://www.amazon.com/dp/B094JT2CCH?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "turnip greens",
+      "asin": "B09HQH6WZT",
+      "productName": "Organic Turnip Greens",
+      "vetNote": "Nutrient-dense greens with calcium and antioxidants.",
+      "url": "https://www.amazon.com/dp/B09HQH6WZT?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "beet greens",
+      "asin": "B0F9LNFLTK",
+      "productName": "Organic Beet Greens",
+      "vetNote": "Iron-rich greens supporting red blood cell production.",
+      "url": "https://www.amazon.com/dp/B0F9LNFLTK?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "radish greens",
+      "asin": "B07CHNV4S1",
+      "productName": "Organic Radish Greens",
+      "vetNote": "Peppery greens providing vitamin C and minerals.",
+      "url": "https://www.amazon.com/dp/B07CHNV4S1?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "coconut oil",
+      "asin": "B00UHCJKVG",
+      "productName": "Nutiva Organic Virgin Coconut Oil",
+      "vetNote": "Medium-chain triglycerides for quick energy and cognitive support.",
+      "url": "https://www.amazon.com/dp/B00UHCJKVG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "olive oil",
+      "asin": "B00GGBLPVU",
+      "productName": "California Olive Ranch Extra Virgin Olive Oil",
+      "vetNote": "Monounsaturated fats with antioxidants for skin and coat health.",
+      "url": "https://www.amazon.com/dp/B00GGBLPVU?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "salmon oil",
+      "asin": "B09RYYWHH1",
+      "productName": "Grizzly Salmon Plus Omega-3 Oil",
+      "vetNote": "Concentrated omega-3 fatty acids for joint, skin, and heart health.",
+      "url": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "flaxseed oil",
+      "asin": "B002VLZ830",
+      "productName": "Barlean\\",
+      "vetNote": "Plant-based omega-3 source for skin and coat conditioning.",
+      "url": "https://www.amazon.com/dp/B002VLZ830?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "fish oil",
+      "asin": "B00CBY93XS",
+      "productName": "Nordic Naturals Omega-3 Pet",
+      "vetNote": "Purified fish oil with optimal EPA/DHA ratio for canine health.",
+      "url": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "taurine powder",
+      "asin": "B00VAOKFO6",
+      "productName": "NOW Supplements Taurine Powder 8 oz",
+      "vetNote": "Essential amino acid for heart health and vision support in cats.",
+      "url": "https://www.amazon.com/dp/B00VAOKFO6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "calcium carbonate",
+      "asin": "B004421K68",
+      "productName": "NOW Supplements Calcium Carbonate Powder",
+      "vetNote": "Highly bioavailable calcium source for bone health and metabolic balance.",
+      "url": "https://www.amazon.com/dp/B004421K68?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "vitamin e",
+      "asin": "B01I5OB3LW",
+      "productName": "Solgar Vitamin E 400 IU",
+      "vetNote": "Antioxidant vitamin supporting immune function and skin health.",
+      "url": "https://www.amazon.com/dp/B01I5OB3LW?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "b-complex",
+      "asin": "B01INRFW0E",
+      "productName": "Thorne B-Complex #12",
+      "vetNote": "Complete B vitamin complex for energy metabolism and nervous system health.",
+      "url": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "probiotic powder",
+      "asin": "B0BGV8L7L2",
+      "productName": "Purina FortiFlora Probiotic Supplement",
+      "vetNote": "Veterinarian-recommended probiotic for digestive health and immune support.",
+      "url": "https://www.amazon.com/dp/B0BGV8L7L2?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "psyllium husk",
+      "asin": "B0016AXN7A",
+      "productName": "Organic India Whole Husk Psyllium",
+      "vetNote": "Soluble fiber for digestive health and hairball prevention in cats.",
+      "url": "https://www.amazon.com/dp/B0016AXN7A?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "joint supplement",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "vetNote": "Veterinarian-formulated glucosamine supplement for joint health and mobility.",
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "omega-3 capsules",
+      "asin": "B004OA5XP4",
+      "productName": "Nordic Naturals Omega-3 Pet Capsules",
+      "vetNote": "Purified fish oil capsules providing EPA/DHA for skin, coat, and joint health.",
+      "url": "https://www.amazon.com/dp/B004OA5XP4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "digestive enzymes",
+      "asin": "B00O6FINFO",
+      "productName": "NaturVet Digestive Enzymes Plus Probiotics",
+      "vetNote": "Enzyme blend supporting digestion of proteins, fats, and carbohydrates.",
+      "url": "https://www.amazon.com/dp/B00O6FINFO?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "hairball paste",
+      "asin": "B07B282MR4",
+      "productName": "Tomlyn Laxatone Hairball Remedy",
+      "vetNote": "Veterinarian-formulated paste for hairball prevention and digestive health.",
+      "url": "https://www.amazon.com/dp/B07B282MR4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken broth",
+      "asin": "B07DFNP37Y",
+      "productName": "Brutus Bone Broth for Dogs No Salt",
+      "vetNote": "Concentrated bone broth providing collagen, glucosamine, and natural electrolytes.",
+      "url": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "vitamin e oil",
+      "asin": "B0DZ5ZCC85",
+      "productName": "NOW Solutions Vitamin E Oil",
+      "vetNote": "Natural vitamin E oil for topical skin health and antioxidant support.",
+      "url": "https://www.amazon.com/dp/B0DZ5ZCC85?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "millet (white/red)",
+      "asin": "B0002DH3FU",
+      "productName": "Lafeber\\",
+      "vetNote": "High-quality millet spray for parrots and hookbills.",
+      "url": "https://www.amazon.com/dp/B0002DH3FU?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "canary seed",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "vetNote": "Traditional canary seed mix for small birds.",
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "niger seed",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "vetNote": "Thistle seed attracting finches and small songbirds.",
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "oat groats",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "vetNote": "Whole oat groats for larger parrots and hookbills.",
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "hemp seeds",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "vetNote": "Nutrient-rich hemp seeds for feather health.",
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "flaxseeds",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "vetNote": "Omega-3 rich flax seeds for skin and feather health.",
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "sesame seeds",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "vetNote": "Calcium-rich sesame seeds for bone health.",
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "chia seeds",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "vetNote": "Hydrating chia seeds providing omega-3s and fiber.",
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "quinoa (cooked)",
+      "asin": "B001CCOVB4",
+      "productName": "Lafeber\\",
+      "vetNote": "Complete protein grain for avian nutrition.",
+      "url": "https://www.amazon.com/dp/B001CCOVB4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "rapeseed",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "vetNote": "Canola/rapeseed for additional dietary variety.",
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "sunflower seeds (small amounts)",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "vetNote": "High-fat seeds to be fed in moderation.",
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "pumpkin seeds",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "vetNote": "Nutrient-dense seeds with natural deworming properties.",
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "bell peppers",
+      "asin": "B000P6J14K",
+      "productName": "Earthbound Farm Organic Bell Peppers",
+      "vetNote": "Vitamin C rich peppers for immune health.",
+      "url": "https://www.amazon.com/dp/B000P6J14K?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "corn (fresh)",
+      "asin": "B000REL738",
+      "productName": "Cascadian Farm Organic Corn on the Cob",
+      "vetNote": "Fresh corn providing carbohydrates and antioxidants.",
+      "url": "https://www.amazon.com/dp/B000REL738?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "apples (no seeds)",
+      "asin": "B00AR0TG44",
+      "productName": "Organic Honeycrisp Apples",
+      "vetNote": "Vitamin-rich fruit providing natural sugars and fiber.",
+      "url": "https://www.amazon.com/dp/B00AR0TG44?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "blueberries",
+      "asin": "B07Z568Y3N",
+      "productName": "Driscoll\\",
+      "vetNote": "Antioxidant-rich berries for immune and cognitive health.",
+      "url": "https://www.amazon.com/dp/B07Z568Y3N?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "strawberries",
+      "asin": "B002B8Z98W",
+      "productName": "Driscoll\\",
+      "vetNote": "Vitamin C rich berries providing natural hydration.",
+      "url": "https://www.amazon.com/dp/B002B8Z98W?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "mango",
+      "asin": "B00WM6CHFQ",
+      "productName": "Organic Mango",
+      "vetNote": "Tropical fruit providing beta-carotene and vitamin C.",
+      "url": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "banana",
+      "asin": "B07ZLFKBFD",
+      "productName": "Organic Bananas",
+      "vetNote": "Potassium-rich fruit for electrolyte balance.",
+      "url": "https://www.amazon.com/dp/B07ZLFKBFD?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "grapes (chopped)",
+      "asin": "B000RGYJI6",
+      "productName": "Organic Red Seedless Grapes",
+      "vetNote": "Hydrating fruit providing natural antioxidants.",
+      "url": "https://www.amazon.com/dp/B000RGYJI6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "papaya",
+      "asin": "B07FZ159ZB",
+      "productName": "Organic Papaya",
+      "vetNote": "Digestive enzyme-rich fruit for gut health.",
+      "url": "https://www.amazon.com/dp/B07FZ159ZB?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "melon",
+      "asin": "B000NSGULC",
+      "productName": "Organic Cantaloupe Melon",
+      "vetNote": "High-water content fruit for hydration.",
+      "url": "https://www.amazon.com/dp/B000NSGULC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "egg (hard-boiled)",
+      "asin": "B0BWBNT8JX",
+      "productName": "Vital Essentials Freeze Dried Egg Yolk Treats",
+      "vetNote": "Calcium and protein-rich egg treats for birds.",
+      "url": "https://www.amazon.com/dp/B0BWBNT8JX?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "pellets (fortified)",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "vetNote": "Complete nutrition pellets formulated for avian health.",
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "cuttlebone",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "vetNote": "Natural calcium source for beak and bone health.",
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "honey (tiny amounts)",
+      "asin": "B0791X9GSG",
+      "productName": "Local Raw Honey",
+      "vetNote": "Natural sweetener and antimicrobial properties (use sparingly).",
+      "url": "https://www.amazon.com/dp/B0791X9GSG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "peanut butter (unsalted, tiny amounts)",
+      "asin": "B06ZXZ3JPZ",
+      "productName": "Teddie All Natural Peanut Butter",
+      "vetNote": "Healthy fat source for foraging enrichment (unsalted only).",
+      "url": "https://www.amazon.com/dp/B06ZXZ3JPZ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "dubia roaches",
+      "asin": "B09QD6PBB8",
+      "productName": "Josh\\",
+      "vetNote": "High-quality feeder insects with optimal calcium-to-phosphorus ratio.",
+      "url": "https://www.amazon.com/dp/B09QD6PBB8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "crickets",
+      "asin": "B000YFGS52",
+      "productName": "Fluker\\",
+      "vetNote": "Standard feeder insects gut-loaded for nutritional value.",
+      "url": "https://www.amazon.com/dp/B000YFGS52?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "mealworms",
+      "asin": "B07TKDYMMP",
+      "productName": "Fluker\\",
+      "vetNote": "Dried mealworms providing fat and protein for insectivorous reptiles.",
+      "url": "https://www.amazon.com/dp/B07TKDYMMP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "superworms",
+      "asin": "B01018SX5Y",
+      "productName": "Josh\\",
+      "vetNote": "Larger feeder insects for bigger reptiles and amphibians.",
+      "url": "https://www.amazon.com/dp/B01018SX5Y?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "black soldier fly larvae",
+      "asin": "B0BLZ88Q3R",
+      "productName": "Grubblies Black Soldier Fly Larvae",
+      "vetNote": "Sustainable, high-calcium feeder insects with excellent nutrition.",
+      "url": "https://www.amazon.com/dp/B0BLZ88Q3R?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "hornworms",
+      "asin": "B09Y4RTNK9",
+      "productName": "Josh\\",
+      "vetNote": "Moisture-rich feeder insects ideal for tropical species.",
+      "url": "https://www.amazon.com/dp/B09Y4RTNK9?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "acorn squash",
+      "asin": "B07FZ34ZS4",
+      "productName": "Organic Acorn Squash",
+      "vetNote": "Nutrient-rich squash providing beta-carotene and fiber.",
+      "url": "https://www.amazon.com/dp/B07FZ34ZS4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "figs",
+      "asin": "B08MDKF98D",
+      "productName": "Organic Dried Figs",
+      "vetNote": "Calcium-rich dried fruit for omnivorous reptiles.",
+      "url": "https://www.amazon.com/dp/B08MDKF98D?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "timothy hay",
+      "asin": "B006AYMMRY",
+      "productName": "Oxbow Animal Health Western Timothy Hay",
+      "vetNote": "High-quality timothy hay for proper dental health and digestion.",
+      "url": "https://www.amazon.com/dp/B006AYMMRY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "meadow hay",
+      "asin": "B07CJ2FRNC",
+      "productName": "Small Pet Select Meadow Hay",
+      "vetNote": "Nutrient-rich meadow hay providing essential fiber.",
+      "url": "https://www.amazon.com/dp/B07CJ2FRNC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "orchard grass hay",
+      "asin": "B00S6Y8MHU",
+      "productName": "Oxbow Animal Health Orchard Grass Hay",
+      "vetNote": "Premium orchard grass hay for optimal small animal nutrition.",
+      "url": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "alfalfa hay",
+      "asin": "B0CM34Z4BQ",
+      "productName": "Kaytee Natural Alfalfa Hay",
+      "vetNote": "Calcium-rich alfalfa hay for young or pregnant small animals.",
+      "url": "https://www.amazon.com/dp/B0CM34Z4BQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "romaine lettuce",
+      "asin": "B0F3YTY4XQ",
+      "productName": "Organic Girl Romaine Lettuce",
+      "vetNote": "Hydrating leafy green providing vitamins and minerals.",
+      "url": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "cilantro",
+      "asin": "B07M9FWTRC",
+      "productName": "Organic Cilantro",
+      "vetNote": "Fresh herb providing natural antioxidants and flavor.",
+      "url": "https://www.amazon.com/dp/B07M9FWTRC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "basil",
+      "asin": "B097F282FC",
+      "productName": "Organic Basil",
+      "vetNote": "Aromatic herb providing antioxidants and natural flavor enhancement.",
+      "url": "https://www.amazon.com/dp/B097F282FC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "duck hearts",
+      "asin": "B0BWBNT8JX",
+      "productName": "Vital Essentials Freeze Dried Duck Hearts",
+      "vetNote": "Vital Essentials or Raw Paws Pet Food. Freeze-dried for convenience and safety.",
+      "url": "https://www.amazon.com/dp/B0BWBNT8JX?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "lamb liver",
+      "asin": "B0015G862M",
+      "productName": "Stella & Chewy\\",
+      "vetNote": "Northwest Naturals or Stella & Chewy\\",
+      "url": "https://www.amazon.com/dp/B0015G862M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "duck liver",
+      "asin": "B0BWBV5PRJ",
+      "productName": "Vital Essentials Freeze Dried Duck Liver",
+      "vetNote": "Vital Essentials freeze-dried duck liver treat.",
+      "url": "https://www.amazon.com/dp/B0BWBV5PRJ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken necks",
+      "asin": "B0821PF71M",
+      "productName": "Raw Paws Pet Food Raw Chicken Necks",
+      "vetNote": "Raw Paws Pet Food or My Pet Carnivore. Raw chicken necks for dental health.",
+      "url": "https://www.amazon.com/dp/B0821PF71M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "turkey thighs",
+      "asin": "B00AR100NE",
+      "productName": "Boneless Skinless Turkey Thighs",
+      "vetNote": "Human-grade source from butcher or grocery store.",
+      "url": "https://www.amazon.com/dp/B00AR100NE?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground duck",
+      "asin": "B0BY3CNR3Q",
+      "productName": "Raw Paws Pet Food Raw Ground Duck",
+      "vetNote": "Raw Paws Pet Food or Darwins Pet Food. Frozen/raw ground duck.",
+      "url": "https://www.amazon.com/dp/B0BY3CNR3Q?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground lamb (lean)",
+      "asin": "B088Y2N6WC",
+      "productName": "Lean Ground Lamb Meat",
+      "vetNote": "Human-grade lean ground lamb from quality source.",
+      "url": "https://www.amazon.com/dp/B088Y2N6WC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground herring",
+      "asin": "B00B3G89MQ",
+      "productName": "K9 Natural Hoki Fish Blend",
+      "vetNote": "K9 Natural hoki/fish blend for pets.",
+      "url": "https://www.amazon.com/dp/B00B3G89MQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Suspicious product name pattern: \"blend\""
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "ground mackerel",
+      "asin": "B079Z4MZTG",
+      "productName": "Northwest Naturals Raw Fish Blend",
+      "vetNote": "Northwest Naturals raw fish blend.",
+      "url": "https://www.amazon.com/dp/B079Z4MZTG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Suspicious product name pattern: \"blend\""
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "mackerel (canned)",
+      "asin": "B017J9X8IA",
+      "productName": "Wild Planet Canned Mackerel",
+      "vetNote": "Wild Planet or Safe Catch. Canned in water, no salt added.",
+      "url": "https://www.amazon.com/dp/B017J9X8IA?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "herring (canned)",
+      "asin": "B01FUWYO2M",
+      "productName": "Crown Prince Canned Herring",
+      "vetNote": "Crown Prince or Season. Canned in water, no salt added.",
+      "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicken sausage (no additives)",
+      "asin": "B001JO4O80",
+      "productName": "Applegate Naturals Chicken Sausage",
+      "vetNote": "Niman Ranch or Applegate. Read labels carefully for nitrates/sugar.",
+      "url": "https://www.amazon.com/dp/B001JO4O80?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "turkey sausage (no additives)",
+      "asin": "B00I2VLI5A",
+      "productName": "Applegate Naturals Turkey Sausage",
+      "vetNote": "Applegate Naturals. Read labels carefully.",
+      "url": "https://www.amazon.com/dp/B00I2VLI5A?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ground pork (lean, small amounts)",
+      "asin": "B01H0AI6J4",
+      "productName": "Lean Ground Pork",
+      "vetNote": "Human-grade lean ground pork.",
+      "url": "https://www.amazon.com/dp/B01H0AI6J4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "regular potato",
+      "asin": "B09SHBJWBR",
+      "productName": "Fresh Russet Potatoes",
+      "vetNote": "Human-grade standard russet potato.",
+      "url": "https://www.amazon.com/dp/B09SHBJWBR?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "walnut oil",
+      "asin": "B00QGWLZ3C",
+      "productName": "La Tourangelle Walnut Oil",
+      "vetNote": "La Tourangelle or NOW Foods. Cold-pressed, human-grade.",
+      "url": "https://www.amazon.com/dp/B00QGWLZ3C?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "black currant oil",
+      "asin": "B01FXEM0BY",
+      "productName": "NOW Foods Black Currant Seed Oil",
+      "vetNote": "NOW Foods or Life-Flo. Capsules often best.",
+      "url": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "almond oil",
+      "asin": "B0BXMMDNJ8",
+      "productName": "Viva Naturals Sweet Almond Oil",
+      "vetNote": "NOW Foods or Viva Naturals. Cold-pressed, edible grade.",
+      "url": "https://www.amazon.com/dp/B0BXMMDNJ8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "sunflower oil",
+      "asin": "B00MNTRVPS",
+      "productName": "High Oleic Sunflower Oil Cold Pressed",
+      "vetNote": "Goya or BetterBody Foods. High oleic, cold-pressed.",
+      "url": "https://www.amazon.com/dp/B00MNTRVPS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chia seed oil",
+      "asin": "B00WM6CHFQ",
+      "productName": "Healthworks Organic Chia Seed Oil",
+      "vetNote": "Healthworks or Organic Veda. Cold-pressed.",
+      "url": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "herring oil",
+      "asin": "B00CBY93XS",
+      "productName": "Nordic Naturals Pet Herring Oil",
+      "vetNote": "Nordic Naturals Pet or Grizzly Pet Products.",
+      "url": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "anchovy oil",
+      "asin": "B0FDNB2DVS",
+      "productName": "Carlson Labs Fish Oil Anchovy",
+      "vetNote": "Nordic Naturals Pet or Carlson Labs.",
+      "url": "https://www.amazon.com/dp/B0FDNB2DVS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "evening primrose oil",
+      "asin": "B07FPBQ31W",
+      "productName": "Nature\\",
+      "vetNote": "NOW Foods or Nature\\",
+      "url": "https://www.amazon.com/dp/B07FPBQ31W?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "mackerel oil",
+      "asin": "B01NBTJFJB",
+      "productName": "Jarrow Formulas Fish Oil Supplement",
+      "vetNote": "Nordic Naturals Pet or Jarrow Formulas.",
+      "url": "https://www.amazon.com/dp/B01NBTJFJB?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "sardine oil",
+      "asin": "B0CXKHT5K2",
+      "productName": "Zesty Paws Sardine Oil for Dogs",
+      "vetNote": "Zesty Paws or Grizzly Salmon Oil.",
+      "url": "https://www.amazon.com/dp/B0CXKHT5K2?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "borage oil",
+      "asin": "B01FXEM0BY",
+      "productName": "NOW Foods Borage Oil Softgels",
+      "vetNote": "NOW Foods or Barleans. Cold-pressed.",
+      "url": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "sesame oil",
+      "asin": "B0797GTG2C",
+      "productName": "Spectrum Cold Pressed Sesame Oil",
+      "vetNote": "Chosen Foods or Spectrum. Toasted or un-toasted.",
+      "url": "https://www.amazon.com/dp/B0797GTG2C?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "avocado oil",
+      "asin": "B0C3WCRNPN",
+      "productName": "Chosen Foods Pure Avocado Oil",
+      "vetNote": "Chosen Foods or La Tourangelle. Pure avocado oil.",
+      "url": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "avocado oil (tiny amounts)",
+      "asin": "B0C3WCRNPN",
+      "productName": "Chosen Foods Pure Avocado Oil",
+      "vetNote": "Chosen Foods or La Tourangelle. Pure avocado oil.",
+      "url": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "wheat germ oil",
+      "asin": "B001GAOHK2",
+      "productName": "NOW Foods Wheat Germ Oil Liquid",
+      "vetNote": "NOW Foods or Solgar. High potency liquid.",
+      "url": "https://www.amazon.com/dp/B001GAOHK2?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "krill oil",
+      "asin": "B004HIQ9CY",
+      "productName": "Kori Krill Oil Pure Supplement",
+      "vetNote": "Viva Labs or Kori Krill Oil. Pure krill oil supplement.",
+      "url": "https://www.amazon.com/dp/B004HIQ9CY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "algae oil (dha)",
+      "asin": "B079J5YZSS",
+      "productName": "Nordic Naturals Algae Omega DHA",
+      "vetNote": "Nordic Naturals Algae Omega or Ovega-3. Vegan DHA.",
+      "url": "https://www.amazon.com/dp/B079J5YZSS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "omega-3 oil",
+      "asin": "B09RYYWHH1",
+      "productName": "Grizzly Salmon Oil for Pets",
+      "vetNote": "Grizzly Salmon Oil or Nordic Naturals Pet.",
+      "url": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "kelp powder",
+      "asin": "B0002JG1GG",
+      "productName": "NOW Foods Organic Kelp Powder",
+      "vetNote": "NOW Foods or Starwest Botanicals. Organic kelp powder.",
+      "url": "https://www.amazon.com/dp/B0002JG1GG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "joint health powder",
+      "asin": "B00PXK1G50",
+      "productName": "Nutramax Dasuquin Joint Health Powder",
+      "vetNote": "Nutramax Dasuquin or VetriScience Glycoflex.",
+      "url": "https://www.amazon.com/dp/B00PXK1G50?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "amino acid supplement",
+      "asin": "B0C2JFLZHF",
+      "productName": "Purina Pro Plan Amino Acid Supplement",
+      "vetNote": "Purina Pro Plan Veterinary Diets amino acid supplement.",
+      "url": "https://www.amazon.com/dp/B0C2JFLZHF?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "calcium supplement",
+      "asin": "B0CKNK682W",
+      "productName": "Thomas Labs Calcium Carbonate Powder",
+      "vetNote": "NOW Foods Calcium Carbonate or Thomas Labs Calciboost.",
+      "url": "https://www.amazon.com/dp/B0CKNK682W?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "spirulina powder",
+      "asin": "B08S4982CC",
+      "productName": "Vimergy Organic Spirulina Powder",
+      "vetNote": "NOW Foods or Vimergy. Organic, high purity.",
+      "url": "https://www.amazon.com/dp/B08S4982CC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "electrolyte powder",
+      "asin": "B0FMZHN6M1",
+      "productName": "ReptoBoost Electrolyte Powder",
+      "vetNote": "ReptoBoost or Pedialyte. Unflavored, read labels.",
+      "url": "https://www.amazon.com/dp/B0FMZHN6M1?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "vitamin d3 drops",
+      "asin": "B084JL2R77",
+      "productName": "Bob\\",
+      "vetNote": "NOW Foods or Bob\\",
+      "url": "https://www.amazon.com/dp/B084JL2R77?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "buckwheat",
+      "asin": "B00KQ17MDG",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B00KQ17MDG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "buckwheat (tiny amounts)",
+      "asin": "B00KQ17MDG",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B00KQ17MDG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "buckwheat (hulled)",
+      "asin": "B0D15QDVW7",
+      "productName": "Anthony\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B0D15QDVW7?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "sorghum",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "barley",
+      "asin": "B0D481997Z",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B0D481997Z?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "barley (cooked, minimal)",
+      "asin": "B00QKP257A",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B00QKP257A?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "barley (hulled)",
+      "asin": "B00QKP257A",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B00QKP257A?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "millet",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "millet (tiny amounts)",
+      "asin": "B07XPCWYP2",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B07XPCWYP2?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "farro",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "bulgur",
+      "asin": "B081DQ5NG5",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B081DQ5NG5?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "amaranth (tiny amounts)",
+      "asin": "B000V1O40U",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "amaranth seeds",
+      "asin": "B000V1O40U",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "teff seeds",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "wheat (hulled)",
+      "asin": "B000YFB5NC",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B000YFB5NC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "oat bran (small amounts)",
+      "asin": "B07CC9RF6Y",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B07CC9RF6Y?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "oatmeal (cooked, small amounts)",
+      "asin": "B00CTLAIH8",
+      "productName": "Quaker Rolled Oats Old Fashioned",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B00CTLAIH8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "corn (cracked)",
+      "asin": "B01HHGD81C",
+      "productName": "Scratch and Peck Cracked Corn Non-GMO",
+      "vetNote": "Scratch and Peck Feeds or Purina. Cracked corn non-GMO.",
+      "url": "https://www.amazon.com/dp/B01HHGD81C?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "safflower seeds",
+      "asin": "B0FWLFGG21",
+      "productName": "Wagner\\",
+      "vetNote": "Wagner\\",
+      "url": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "nyjer seeds",
+      "asin": "B0D6688V7C",
+      "productName": "Wagner\\",
+      "vetNote": "Wagner\\",
+      "url": "https://www.amazon.com/dp/B0D6688V7C?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "bok choi",
+      "asin": "B0FN4YGSK6",
+      "productName": "Fresh Baby Bok Choy",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0FN4YGSK6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "bok choy (small amounts)",
+      "asin": "B0FN4YGSK6",
+      "productName": "Fresh Baby Bok Choy",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0FN4YGSK6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "navy beans (mashed)",
+      "asin": "B006AZE13G",
+      "productName": "Goya Canned Navy Beans Low Sodium",
+      "vetNote": "Goya or Bush\\",
+      "url": "https://www.amazon.com/dp/B006AZE13G?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Vet note too short or missing"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "kidney beans (mashed)",
+      "asin": "B00552005I",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+      "vetNote": "Goya or Bush\\",
+      "url": "https://www.amazon.com/dp/B00552005I?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Vet note too short or missing"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "kidney beans (mashed, tiny amounts)",
+      "asin": "B00552005I",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+      "vetNote": "Goya or Bush\\",
+      "url": "https://www.amazon.com/dp/B00552005I?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient",
+          "Vet note too short or missing"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "pinto beans (mashed)",
+      "asin": "B0C4G2PR58",
+      "productName": "Bush\\",
+      "vetNote": "Goya or Bush\\",
+      "url": "https://www.amazon.com/dp/B0C4G2PR58?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "purslane",
+      "asin": "B09MDXM2YQ",
+      "productName": "Fresh Purslane Leaves",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B09MDXM2YQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "purslane (small amounts)",
+      "asin": "B0D3J7FZFD",
+      "productName": "Miner\\",
+      "vetNote": "Fresh produce or seeds for growing.",
+      "url": "https://www.amazon.com/dp/B0D3J7FZFD?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "flaxseed (ground)",
+      "asin": "B075XC6C69",
+      "productName": "Bob\\",
+      "vetNote": "Bob\\",
+      "url": "https://www.amazon.com/dp/B075XC6C69?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "fennel",
+      "asin": "B00E3J6RC4",
+      "productName": "Fresh Fennel Bulb",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B00E3J6RC4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "delicata squash",
+      "asin": "B07KHH8K4L",
+      "productName": "Fresh Delicata Squash",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B07KHH8K4L?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "yellow squash",
+      "asin": "B08QVBFGDC",
+      "productName": "Fresh Yellow Summer Squash",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B08QVBFGDC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "leeks",
+      "asin": "B09HQJGQDG",
+      "productName": "Fresh Leeks",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B09HQJGQDG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "shallots",
+      "asin": "B09B2ZWHKQ",
+      "productName": "Fresh Shallots",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B09B2ZWHKQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "tomatoes (small amounts)",
+      "asin": "B086WX15TH",
+      "productName": "Fresh Ripe Vine Tomatoes",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B086WX15TH?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "napa cabbage",
+      "asin": "B07FTVYNM3",
+      "productName": "Fresh Napa Cabbage",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B07FTVYNM3?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "napa cabbage (small amounts)",
+      "asin": "B079VV1K9L",
+      "productName": "Fresh Napa Cabbage",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B079VV1K9L?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "artichokes",
+      "asin": "B0DF91JXND",
+      "productName": "Fresh Artichoke Hearts",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0DF91JXND?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "frisee",
+      "asin": "B07FZGKZL4",
+      "productName": "Fresh Frisee Lettuce",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B07FZGKZL4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "radicchio",
+      "asin": "B00BJPTZLA",
+      "productName": "Fresh Radicchio Lettuce",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B00BJPTZLA?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "red cabbage",
+      "asin": "B000RH1MXK",
+      "productName": "Fresh Red Cabbage Head",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B000RH1MXK?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "green cabbage",
+      "asin": "B09HQGDCKV",
+      "productName": "Fresh Green Cabbage Head",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B09HQGDCKV?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "swiss chard",
+      "asin": "B07F12P248",
+      "productName": "Fresh Swiss Chard",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B07F12P248?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "swiss chard (cooked, tiny amounts)",
+      "asin": "B07F12P248",
+      "productName": "Fresh Swiss Chard",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B07F12P248?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "lettuce (romaine, small amounts)",
+      "asin": "B074H5J9G2",
+      "productName": "Fresh Romaine Lettuce Hearts",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B074H5J9G2?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "red leaf lettuce",
+      "asin": "B0BX76BG5V",
+      "productName": "Fresh Red Leaf Lettuce",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0BX76BG5V?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "mache",
+      "asin": "B00AWLAQFG",
+      "productName": "Fresh Mache Lamb\\",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B00AWLAQFG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "alfalfa sprouts (small amounts)",
+      "asin": "B0DFZTWLTY",
+      "productName": "Fresh Alfalfa Sprouts",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0DFZTWLTY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "cat grass (wheatgrass)",
+      "asin": "B0D45F9TGG",
+      "productName": "SmartyKat Cat Grass Growing Kit Wheatgrass",
+      "vetNote": "SmartyKat or Catit. Cat Grass growing kit wheatgrass.",
+      "url": "https://www.amazon.com/dp/B0D45F9TGG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "squash (cooked)",
+      "asin": "B0DYPHGW89",
+      "productName": "Lamb\\",
+      "vetNote": "Wild harvested or seeds for growing.",
+      "url": "https://www.amazon.com/dp/B0DYPHGW89?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "amaranth leaves",
+      "asin": "B0F2YRBGS6",
+      "productName": "Fresh Amaranth Leaves",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0F2YRBGS6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "ginger (small amounts)",
+      "asin": "B0C6V3416T",
+      "productName": "Simply Organic Fresh Ginger Root",
+      "vetNote": "McCormick or Simply Organic. Organic ginger root fresh.",
+      "url": "https://www.amazon.com/dp/B0C6V3416T?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "turmeric",
+      "asin": "B018GPDCV4",
+      "productName": "Simply Organic Pure Turmeric Powder",
+      "vetNote": "Simply Organic or Tummydrops. Pure turmeric powder.",
+      "url": "https://www.amazon.com/dp/B018GPDCV4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "rosemary",
+      "asin": "B004JWLMNY",
+      "productName": "Frontier Co-op Dried Organic Rosemary",
+      "vetNote": "Simply Organic or Frontier Co-op. Dried organic rosemary.",
+      "url": "https://www.amazon.com/dp/B004JWLMNY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "sage",
+      "asin": "B0CH3R9TVY",
+      "productName": "Simply Organic Dried Sage Leaf",
+      "vetNote": "Simply Organic or Frontier Co-op. Dried sage leaf.",
+      "url": "https://www.amazon.com/dp/B0CH3R9TVY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "mint",
+      "asin": "B097F3NT7N",
+      "productName": "Fresh Mint Leaves",
+      "vetNote": "Fresh produce or Mountain Rose Herbs. Fresh mint leaves.",
+      "url": "https://www.amazon.com/dp/B097F3NT7N?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "garlic chives",
+      "asin": "B097F3J1PY",
+      "productName": "Fresh Garlic Chives",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B097F3J1PY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "raisins (unsweetened)",
+      "asin": "B01GXPRIQY",
+      "productName": "Sun-Maid Organic Raisins Unsweetened",
+      "vetNote": "Sun-Maid or Trader Joe\\",
+      "url": "https://www.amazon.com/dp/B01GXPRIQY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "plums (pitted)",
+      "asin": "B07P6Z8L76",
+      "productName": "Fresh Plums Pitted",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B07P6Z8L76?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "apricots (pitted)",
+      "asin": "B07FZWBPC5",
+      "productName": "NOW Foods Dried Apricots Unsulphured",
+      "vetNote": "Fresh produce or NOW Foods. Dried apricots unsulphured no sugar.",
+      "url": "https://www.amazon.com/dp/B07FZWBPC5?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "kiwi",
+      "asin": "B01LASWK7G",
+      "productName": "Fresh Kiwi Fruit",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B01LASWK7G?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "mulberries",
+      "asin": "B074153BXC",
+      "productName": "Terrasoul Dried Mulberries Organic",
+      "vetNote": "Navitas Organics or Terrasoul Superfoods. Dried mulberries organic.",
+      "url": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "raspberries",
+      "asin": "B000P6G12U",
+      "productName": "Fresh Raspberries Organic",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B000P6G12U?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "cranberries",
+      "asin": "B074153BXC",
+      "productName": "NOW Foods Dried Cranberries Unsweetened",
+      "vetNote": "Fresh produce or NOW Foods. Dried cranberries unsweetened.",
+      "url": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "pineapple (small amounts)",
+      "asin": "B000P6L3V4",
+      "productName": "Fresh Pineapple Fruit",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B000P6L3V4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "pears (no seeds)",
+      "asin": "B0DYKVQ3XZ",
+      "productName": "Fresh Pears No Seeds",
+      "vetNote": "Fresh produce from grocery store or farmers market.",
+      "url": "https://www.amazon.com/dp/B0DYKVQ3XZ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "pinhead crickets",
+      "asin": "B07196FX9W",
+      "productName": "Josh\\",
+      "vetNote": "Josh\\",
+      "url": "https://www.amazon.com/dp/B07196FX9W?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "locusts",
+      "asin": "B000CMKHBS",
+      "productName": "Exo Terra Canned Locusts Reptile Food",
+      "vetNote": "Rainbow Mealworms or Exo Terra. Canned locusts reptile food.",
+      "url": "https://www.amazon.com/dp/B000CMKHBS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "butterworms",
+      "asin": "B093BD8NXR",
+      "productName": "Rainbow Mealworms Live Butterworms",
+      "vetNote": "Josh\\",
+      "url": "https://www.amazon.com/dp/B093BD8NXR?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Vet note too short or missing"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "grasshoppers",
+      "asin": "B004HSQRG2",
+      "productName": "Fluker\\",
+      "vetNote": "Fluker\\",
+      "url": "https://www.amazon.com/dp/B004HSQRG2?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "small dubia roaches",
+      "asin": "B09QD6PBB8",
+      "productName": "Small Live Dubia Roaches Feeder",
+      "vetNote": "DubiaRoaches.com or Josh\\",
+      "url": "https://www.amazon.com/dp/B09QD6PBB8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "silkworms",
+      "asin": "B08JKNZPSF",
+      "productName": "Live Silkworms Reptile Food",
+      "vetNote": "Coastal Silkworms or SilkwormShop. Live silkworms reptile food.",
+      "url": "https://www.amazon.com/dp/B08JKNZPSF?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "earthworms",
+      "asin": "B097PDMK47",
+      "productName": "Uncle Jim\\",
+      "vetNote": "Uncle Jim\\",
+      "url": "https://www.amazon.com/dp/B097PDMK47?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name",
+          "Vet note too short or missing"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "wheat hay",
+      "asin": "B0CLC76V98",
+      "productName": "Oxbow Wheat Hay Small Animal",
+      "vetNote": "Oxbow Animal Health or Small Pet Select. Wheat hay small animal.",
+      "url": "https://www.amazon.com/dp/B0CLC76V98?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "fescue hay",
+      "asin": "B00S6YIF36",
+      "productName": "Small Pet Select Fescue Hay",
+      "vetNote": "Small Pet Select fescue hay.",
+      "url": "https://www.amazon.com/dp/B00S6YIF36?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "oat hay",
+      "asin": "B000WFKP80",
+      "productName": "Oxbow Oat Hay Small Animal",
+      "vetNote": "Oxbow Animal Health or Small Pet Select. Oat hay small animal.",
+      "url": "https://www.amazon.com/dp/B000WFKP80?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "bluegrass hay",
+      "asin": "B00S6Y8MHU",
+      "productName": "Small Pet Select Bluegrass Hay",
+      "vetNote": "Small Pet Select bluegrass hay.",
+      "url": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "straw (wheat/pine)",
+      "asin": "B0CDQMD1CB",
+      "productName": "Oxbow Wheat Straw Bedding",
+      "vetNote": "Kaytee or Oxbow. Wheat straw bedding.",
+      "url": "https://www.amazon.com/dp/B0CDQMD1CB?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "dried grass",
+      "asin": "B0002DK8OI",
+      "productName": "Kaytee Dried Natural Grass Small Animal",
+      "vetNote": "Kaytee or Timothy Grass. Dried natural grass small animal.",
+      "url": "https://www.amazon.com/dp/B0002DK8OI?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "bermuda hay",
+      "asin": "B0FSVM5P3D",
+      "productName": "Standlee Premium Bermuda Hay",
+      "vetNote": "Oxbow Animal Health or Standlee Hay. Premium bermuda hay.",
+      "url": "https://www.amazon.com/dp/B0FSVM5P3D?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "barley hay",
+      "asin": "B08YM9VJC5",
+      "productName": "Standlee Barley Hay",
+      "vetNote": "Small Pet Select or Standlee Hay. Barley hay.",
+      "url": "https://www.amazon.com/dp/B08YM9VJC5?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "guinea pig pellets (with vitamin c)",
+      "asin": "B00E4KT5NA",
+      "productName": "Oxbow Essentials Cavy Cuisine Guinea Pig Pellets",
+      "vetNote": "Oxbow Essentials Cavy Cuisine or Sherwood. Guinea pig pellets with vitamin C.",
+      "url": "https://www.amazon.com/dp/B00E4KT5NA?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "rabbit pellets (high fiber)",
+      "asin": "B0017JANQY",
+      "productName": "Oxbow Essentials Rabbit Food High Fiber",
+      "vetNote": "Oxbow Essentials Rabbit Food. Adult rabbit pellets high fiber.",
+      "url": "https://www.amazon.com/dp/B0017JANQY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "hamster pellets (higher protein)",
+      "asin": "B0053SYJVA",
+      "productName": "Oxbow Essentials Hamster Food Higher Protein",
+      "vetNote": "Higgins Sunburst or Oxbow Essentials. Hamster food higher protein.",
+      "url": "https://www.amazon.com/dp/B0053SYJVA?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "wild bird mix",
+      "asin": "B0FWLFGG21",
+      "productName": "Lyric Wild Bird Mix No Filler",
+      "vetNote": "Lyric or Kaytee. Wild bird mix no filler.",
+      "url": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Suspicious product name pattern: \"mix\""
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "beta-glucans",
+      "asin": "B01LWVNL9J",
+      "productName": "NOW Supplements Beta Glucans 60 Capsules",
+      "vetNote": "Immune-supporting beta-glucans from yeast or mushrooms for enhanced immune function.",
+      "url": "https://www.amazon.com/dp/B01LWVNL9J?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "biotin",
+      "asin": "B01AMJCHB8",
+      "productName": "NOW Supplements Biotin 5000 mcg",
+      "vetNote": "B-complex vitamin essential for healthy skin, coat, and metabolic function.",
+      "url": "https://www.amazon.com/dp/B01AMJCHB8?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "bone broth (low sodium)",
+      "asin": "B07DFNP37Y",
+      "productName": "Brutus Bone Broth for Dogs Low Sodium",
+      "vetNote": "Concentrated bone broth providing collagen, glucosamine, and natural electrolytes without excess sodium.",
+      "url": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "cauliflower",
+      "asin": "B000P6G0GM",
+      "productName": "Fresh Organic Cauliflower",
+      "vetNote": "Fresh produce from grocery store or farmers market. Low-calorie vegetable rich in fiber and vitamins.",
+      "url": "https://www.amazon.com/dp/B000P6G0GM?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "chicory root",
+      "asin": "B08Q7KZYKC",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber",
+      "vetNote": "Prebiotic fiber from chicory root supporting healthy gut bacteria and digestive function.",
+      "url": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "chondroitin sulfate",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM with Chondroitin",
+      "vetNote": "Veterinarian-formulated joint supplement with chondroitin for cartilage health and mobility.",
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "cranberry extract",
+      "asin": "B01N7KMPU3",
+      "productName": "NOW Supplements Cranberry Extract 5000 mg",
+      "vetNote": "Concentrated cranberry extract supporting urinary tract health and preventing bacterial adhesion.",
+      "url": "https://www.amazon.com/dp/B01N7KMPU3?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "curcumin (turmeric extract)",
+      "asin": "B0CK3C31JP",
+      "productName": "NOW Supplements Curcumin with BioPerine",
+      "vetNote": "Anti-inflammatory curcumin from turmeric with enhanced absorption for joint and immune support.",
+      "url": "https://www.amazon.com/dp/B0CK3C31JP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "d-mannose",
+      "asin": "B01N6X9YBS",
+      "productName": "NOW Supplements D-Mannose Powder",
+      "vetNote": "Natural sugar compound supporting urinary tract health by preventing bacterial adhesion.",
+      "url": "https://www.amazon.com/dp/B01N6X9YBS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "egg yolks",
+      "asin": "B00M1QWODW",
+      "productName": "Vital Farms Pasture-Raised Eggs",
+      "vetNote": "High-quality eggs from pasture-raised hens, rich in protein, healthy fats, and essential nutrients.",
+      "url": "https://www.amazon.com/dp/B00M1QWODW?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "eggplant",
+      "asin": "B001PLGQPQ",
+      "productName": "Fresh Organic Eggplant",
+      "vetNote": "Fresh produce from grocery store or farmers market. Low-calorie vegetable with fiber and antioxidants.",
+      "url": "https://www.amazon.com/dp/B001PLGQPQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "eggshells (crushed)",
+      "asin": "B004421K68",
+      "productName": "NOW Supplements Calcium Carbonate Powder",
+      "vetNote": "Crushed eggshells provide natural calcium carbonate. Can be prepared at home from organic eggs or use calcium supplement.",
+      "url": "https://www.amazon.com/dp/B004421K68?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "fish broth (no salt)",
+      "asin": "B07DFQFLJL",
+      "productName": "Brutus Fish Broth for Dogs No Salt",
+      "vetNote": "Concentrated fish broth providing omega-3s, collagen, and natural flavor without added salt.",
+      "url": "https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "fructooligosaccharides (fos)",
+      "asin": "B08Q7KZYKC",
+      "productName": "NOW Supplements FOS Prebiotic Fiber",
+      "vetNote": "Prebiotic fiber supporting beneficial gut bacteria growth and digestive health.",
+      "url": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "glucosamine sulfate",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM Glucosamine",
+      "vetNote": "Veterinarian-formulated glucosamine sulfate for joint cartilage health and mobility support.",
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "green beans",
+      "asin": "B0DDTC6QNY",
+      "productName": "Fresh Organic Green Beans",
+      "vetNote": "Fresh produce from grocery store or farmers market. Low-calorie vegetable rich in fiber and vitamins.",
+      "url": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "green beans (cooked)",
+      "asin": "B0DDTC6QNY",
+      "productName": "Fresh Organic Green Beans",
+      "vetNote": "Fresh produce from grocery store or farmers market. Steam or boil until tender for optimal digestibility.",
+      "url": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "hairball control paste",
+      "asin": "B07B282MR4",
+      "productName": "Tomlyn Laxatone Hairball Remedy",
+      "vetNote": "Veterinarian-formulated paste for hairball prevention and digestive health in cats.",
+      "url": "https://www.amazon.com/dp/B07B282MR4?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "hyaluronic acid",
+      "asin": "B07XHNCJMC",
+      "productName": "NOW Supplements Hyaluronic Acid 100 mg",
+      "vetNote": "Joint health supplement supporting cartilage hydration and joint lubrication.",
+      "url": "https://www.amazon.com/dp/B07XHNCJMC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "inulin (prebiotic)",
+      "asin": "B08Q7KZYKC",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber",
+      "vetNote": "Prebiotic fiber from chicory root supporting healthy gut bacteria and digestive function.",
+      "url": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "jerusalem artichoke",
+      "asin": "B0CQK5XCVZ",
+      "productName": "Fresh Jerusalem Artichoke Sunchokes",
+      "vetNote": "Fresh produce from grocery store or farmers market. Prebiotic-rich root vegetable supporting gut health.",
+      "url": "https://www.amazon.com/dp/B0CQK5XCVZ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "joint health supplement",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "vetNote": "Veterinarian-formulated joint supplement with glucosamine, chondroitin, and MSM for joint health and mobility.",
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "l-carnitine powder",
+      "asin": "B06Y1BTLGK",
+      "productName": "NOW Supplements L-Carnitine 500 mg",
+      "vetNote": "Amino acid supporting heart health, energy metabolism, and weight management.",
+      "url": "https://www.amazon.com/dp/B06Y1BTLGK?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "lysine powder",
+      "asin": "B00V3MR88G",
+      "productName": "NOW Supplements L-Lysine 1000 mg",
+      "vetNote": "Essential amino acid supporting immune function, collagen production, and overall health.",
+      "url": "https://www.amazon.com/dp/B00V3MR88G?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "malabar spinach",
+      "asin": "B0DLT7BSNJ",
+      "productName": "Fresh Malabar Spinach Leaves",
+      "vetNote": "Fresh produce from grocery store or farmers market. Nutrient-rich leafy green with vitamins and minerals.",
+      "url": "https://www.amazon.com/dp/B0DLT7BSNJ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "mannanoligosaccharides (mos)",
+      "asin": "B0CRFWM2Z6",
+      "productName": "NOW Supplements MOS Prebiotic",
+      "vetNote": "Prebiotic supplement supporting beneficial gut bacteria and immune function.",
+      "url": "https://www.amazon.com/dp/B0CRFWM2Z6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "milk thistle",
+      "asin": "B0019LVFD0",
+      "productName": "NOW Supplements Milk Thistle 150 mg",
+      "vetNote": "Liver-supporting herb with antioxidant properties for hepatic health and detoxification.",
+      "url": "https://www.amazon.com/dp/B0019LVFD0?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "new zealand spinach",
+      "asin": "B0C8VD126M",
+      "productName": "Fresh New Zealand Spinach",
+      "vetNote": "Fresh produce from grocery store or farmers market. Nutrient-rich leafy green alternative to traditional spinach.",
+      "url": "https://www.amazon.com/dp/B0C8VD126M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "niacinamide",
+      "asin": "B0CZMBZPLV",
+      "productName": "NOW Supplements Niacinamide 500 mg",
+      "vetNote": "B-vitamin (B3) supporting energy metabolism, skin health, and nervous system function.",
+      "url": "https://www.amazon.com/dp/B0CZMBZPLV?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "oats (rolled)",
+      "asin": "B07VCM66N6",
+      "productName": "Bob\\",
+      "vetNote": "Whole grain rolled oats providing fiber, B vitamins, and sustained energy. Cook thoroughly before serving.",
+      "url": "https://www.amazon.com/dp/B07VCM66N6?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "peas",
+      "asin": "B07D1NGQ6B",
+      "productName": "Fresh Organic Green Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Protein-rich legume with fiber and vitamins.",
+      "url": "https://www.amazon.com/dp/B07D1NGQ6B?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "peas (mashed)",
+      "asin": "B07D1NGQ6B",
+      "productName": "Fresh Organic Green Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Steam and mash for optimal digestibility.",
+      "url": "https://www.amazon.com/dp/B07D1NGQ6B?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "pectin (from apples)",
+      "asin": "B01CO69SYG",
+      "productName": "NOW Supplements Apple Pectin Powder",
+      "vetNote": "Soluble fiber from apples supporting digestive health and blood sugar regulation.",
+      "url": "https://www.amazon.com/dp/B01CO69SYG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "pumpkin seed oil",
+      "asin": "B0FKYLMWYG",
+      "productName": "NOW Solutions Pumpkin Seed Oil",
+      "vetNote": "Omega-3 and omega-6 rich oil supporting urinary health, skin, and coat condition.",
+      "url": "https://www.amazon.com/dp/B0FKYLMWYG?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "quail eggs",
+      "asin": "B0BSRGV9PR",
+      "productName": "Fresh Quail Eggs",
+      "vetNote": "Small nutrient-dense eggs from quail, rich in protein, healthy fats, and essential nutrients.",
+      "url": "https://www.amazon.com/dp/B0BSRGV9PR?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "quercetin",
+      "asin": "B08M5L372P",
+      "productName": "NOW Supplements Quercetin with Bromelain",
+      "vetNote": "Antioxidant flavonoid supporting immune function, allergy relief, and anti-inflammatory benefits.",
+      "url": "https://www.amazon.com/dp/B08M5L372P?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "rice (hulled)",
+      "asin": "B072JNNB33",
+      "productName": "Lundberg Organic Brown Rice",
+      "vetNote": "Whole grain brown rice with hull removed, providing fiber, B vitamins, and sustained energy.",
+      "url": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "romanesco broccoli",
+      "asin": "B01I1Q74MQ",
+      "productName": "Fresh Romanesco Broccoli",
+      "vetNote": "Fresh produce from grocery store or farmers market. Nutrient-rich cruciferous vegetable with vitamins C and K.",
+      "url": "https://www.amazon.com/dp/B01I1Q74MQ?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "s-adenosyl methionine (sam-e)",
+      "asin": "B000OSSQFY",
+      "productName": "NOW Supplements SAM-e 200 mg",
+      "vetNote": "Methyl donor supporting liver health, joint function, and mood regulation.",
+      "url": "https://www.amazon.com/dp/B000OSSQFY?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "sardines (in water)",
+      "asin": "B01FUWYO2M",
+      "productName": "Wild Planet Sardines in Water No Salt",
+      "vetNote": "Wild-caught sardines canned in water without added salt. Rich in omega-3s, calcium, and protein.",
+      "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "snap peas",
+      "asin": "B077L6C7YB",
+      "productName": "Fresh Organic Snap Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Edible-pod peas rich in fiber and vitamins.",
+      "url": "https://www.amazon.com/dp/B077L6C7YB?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "snow peas",
+      "asin": "B07MGSDD7L",
+      "productName": "Fresh Organic Snow Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Flat-podded peas with tender texture and mild flavor.",
+      "url": "https://www.amazon.com/dp/B07MGSDD7L?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "snow peas (mashed)",
+      "asin": "B08KRNKC9G",
+      "productName": "Fresh Organic Snow Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Steam and mash for optimal digestibility.",
+      "url": "https://www.amazon.com/dp/B08KRNKC9G?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "split peas",
+      "asin": "B08DVGSW58",
+      "productName": "Bob\\",
+      "vetNote": "Dried split peas providing protein, fiber, and B vitamins. Soak and cook thoroughly before serving.",
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "split peas (mashed)",
+      "asin": "B08DVGSW58",
+      "productName": "Bob\\",
+      "vetNote": "Dried split peas providing protein, fiber, and B vitamins. Cook and mash for optimal digestibility.",
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "sugar snap peas",
+      "asin": "B08DVGSW58",
+      "productName": "Fresh Organic Sugar Snap Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Sweet, crisp peas with edible pods rich in fiber.",
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "sugar snap peas (mashed)",
+      "asin": "B08DVGSW58",
+      "productName": "Fresh Organic Sugar Snap Peas",
+      "vetNote": "Fresh produce from grocery store or farmers market. Steam and mash for optimal digestibility.",
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "turkey broth (no salt)",
+      "asin": "B07DFQFLJL",
+      "productName": "Brutus Turkey Broth for Dogs No Salt",
+      "vetNote": "Concentrated turkey broth providing protein, collagen, and natural flavor without added salt.",
+      "url": "https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "vitamin b complex",
+      "asin": "B01INRFW0E",
+      "productName": "Thorne B-Complex #12",
+      "vetNote": "Complete B vitamin complex for energy metabolism, nervous system health, and overall vitality.",
+      "url": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "vitamin c (small amounts)",
+      "asin": "B074GCB1ND",
+      "productName": "NOW Supplements Vitamin C 1000 mg",
+      "vetNote": "Antioxidant vitamin supporting immune function and collagen production. Use in small amounts as directed.",
+      "url": "https://www.amazon.com/dp/B074GCB1ND?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "watercress",
+      "asin": "B0BSK8P8KS",
+      "productName": "Fresh Organic Watercress",
+      "vetNote": "Fresh produce from grocery store or farmers market. Nutrient-dense leafy green with vitamins A, C, and K.",
+      "url": "https://www.amazon.com/dp/B0BSK8P8KS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    },
+    {
+      "ingredient": "watercress (small amounts)",
+      "asin": "B0BSK8P8KS",
+      "productName": "Fresh Organic Watercress",
+      "vetNote": "Fresh produce from grocery store or farmers market. Use in small amounts due to strong flavor and oxalate content.",
+      "url": "https://www.amazon.com/dp/B0BSK8P8KS?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name has weak match with ingredient"
+        ],
+        "confidence": "medium"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "wheat germ",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "vetNote": "Nutrient-dense wheat germ providing vitamin E, B vitamins, and healthy fats for skin and coat health.",
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "analysis": {
+        "issues": [
+          "Product name does not contain ingredient name"
+        ],
+        "confidence": "low"
+      },
+      "needsManualCheck": true
+    },
+    {
+      "ingredient": "wild rice",
+      "asin": "B089CP461X",
+      "productName": "Lundberg Organic Wild Rice",
+      "vetNote": "Whole grain wild rice providing protein, fiber, and B vitamins. Cook thoroughly before serving.",
+      "url": "https://www.amazon.com/dp/B089CP461X?tag=robinfrench-20",
+      "analysis": {
+        "issues": [],
+        "confidence": "high"
+      },
+      "needsManualCheck": false
+    }
+  ]
+}

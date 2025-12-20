@@ -1,0 +1,13 @@
+{
+  "totalRecipes": 0,
+  "errors": [],
+  "warnings": [],
+  "stats": {
+    "toxicIngredients": 0,
+    "missingData": 0,
+    "allergyMismatches": 0,
+    "missingIngredients": 0,
+    "incompleteNutrition": 0
+  },
+  "passed": true
+}

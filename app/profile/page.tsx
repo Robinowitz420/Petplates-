@@ -13,14 +13,6 @@ import AddPetModal from '@/components/CreatePetModal';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets, savePet, deletePet } from '@/lib/utils/petStorage'; // Import from storage util
 import type { CustomMeal } from '@/lib/types';
-// Lazy load recipes to avoid blocking initial page load
-let recipesCache: any[] | null = null;
-const loadRecipes = async () => {
-  if (recipesCache) return recipesCache;
-  const recipesModule = await import('@/lib/data/recipes-complete');
-  recipesCache = recipesModule.recipes;
-  return recipesCache;
-};
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
 import Image from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
@@ -535,8 +527,6 @@ export default function MyPetsPage() {
   const [planOffset, setPlanOffset] = useState(0);
 const [planWeekly, setPlanWeekly] = useState<{ day: string; meals: any[] }[]>([]);
 const [swapTarget, setSwapTarget] = useState<{ dayIdx: number; mealIdx: number } | null>(null);
-  const [recipes, setRecipes] = useState<any[]>([]);
-const [recipesLoading, setRecipesLoading] = useState(false);
   const [badgeRefreshKey, setBadgeRefreshKey] = useState(0);
 const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activePetId) : null), [activePetId, pets]);
   const [confirmModal, setConfirmModal] = useState<{
@@ -550,29 +540,11 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
     message: '',
     onConfirm: () => {},
   });
-  // Load recipes lazily when first needed (not on initial page load)
-  useEffect(() => {
-    if (recipes.length === 0 && !recipesLoading) {
-      setRecipesLoading(true);
-      loadRecipes().then((loadedRecipes) => {
-        setRecipes(loadedRecipes);
-        setRecipesLoading(false);
-      }).catch(() => {
-        setRecipesLoading(false);
-      });
-    }
-  }, [recipes.length, recipesLoading]);
-
-  // Lazy recipe name lookup - loads recipes on-demand to avoid blocking initial render
+  // Recipe name lookup - uses formatted name since recipes are now generated dynamically
   const getRecipeName = useCallback((id: string) => {
     if (!id) return 'Unnamed Meal';
-    // If recipes not loaded yet, return formatted name (will update when recipes load)
-    if (recipes.length === 0) {
-      return formatRecipeName(id);
-    }
-    const recipe = recipes.find(r => r.id === id);
-    return recipe?.name || recipe?.shortName || formatRecipeName(id);
-  }, [recipes]);
+    return formatRecipeName(id);
+  }, []);
 const buildWeeklyPlan = useCallback(
     (saved: string[], offset: number): WeeklyPlanEntry[] => {
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -831,9 +803,7 @@ const buildWeeklyPlan = useCallback(
   const allMealsForPlan = useMemo(() => {
     if (!activePet) return [];
     const saved = Array.isArray(activePet.savedRecipes)
-      ? activePet.savedRecipes
-          .map((rid) => recipes.find((r) => r.id === rid))
-          .filter(Boolean) as any[]
+      ? activePet.savedRecipes.filter(Boolean) as any[]
       : [];
     const customs = customMeals.map(convertCustomMealToRecipe);
     return [...saved, ...customs];
@@ -1026,83 +996,10 @@ const buildWeeklyPlan = useCallback(
     const [openedCount, setOpenedCount] = useState(0);
 
     const handleBuyAll = async () => {
-      setIsOpening(true);
-      setOpenedCount(0);
-
-      // Collect all unique ingredients from all meals in the plan
-      const ingredientLinks = new Set<string>();
-      
-      weeklyPlan.forEach(({ meals }) => {
-        meals.forEach(mealId => {
-          if (mealId) {
-            const recipe = recipes.find(r => r.id === mealId);
-            if (recipe && recipe.ingredients) {
-              recipe.ingredients.forEach((ing: any) => {
-                // Try to get vetted product link first
-                const vettedProduct = getVettedProduct(ing.name);
-                const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink || (ing as any).asinLink;
-                
-                if (link) {
-                  ingredientLinks.add(link);
-                }
-              });
-            }
-          }
-        });
-      });
-
-      const linksArray = Array.from(ingredientLinks);
-      
-      if (linksArray.length === 0) {
-        alert('No ingredient purchase links available for meals in this plan.');
-        setIsOpening(false);
-        return;
-      }
-
-      // Open first tab immediately (user gesture)
-      if (linksArray.length > 0) {
-        window.open(linksArray[0], '_blank');
-        setOpenedCount(1);
-      }
-
-      // Open remaining tabs with delays
-      for (let i = 1; i < linksArray.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        const newWindow = window.open(linksArray[i], '_blank');
-        setOpenedCount(i + 1);
-        
-        // If popup was blocked, try again with a longer delay
-        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          window.open(linksArray[i], '_blank');
-        }
-      }
-
-      // Reset state after all tabs are opened
-      setTimeout(() => {
-        setIsOpening(false);
-        setOpenedCount(0);
-      }, 1000);
+      alert('Meal plans are now generated dynamically. Please navigate to individual meals to purchase ingredients.');
     };
 
-    const totalIngredients = useMemo(() => {
-      const links = new Set<string>();
-      weeklyPlan.forEach(({ meals }) => {
-        meals.forEach(mealId => {
-          if (mealId) {
-            const recipe = recipes.find(r => r.id === mealId);
-            if (recipe && recipe.ingredients) {
-              recipe.ingredients.forEach((ing: any) => {
-                const vettedProduct = getVettedProduct(ing.name);
-                const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink || (ing as any).asinLink;
-                if (link) links.add(link);
-              });
-            }
-          }
-        });
-      });
-      return links.size;
-    }, [weeklyPlan]);
+    const totalIngredients = 0;
 
     if (totalIngredients === 0) {
       return null;
@@ -1478,10 +1375,9 @@ const buildWeeklyPlan = useCallback(
                                 <div className="max-h-[480px] overflow-y-auto pr-2 space-y-2">
                                   {combinedIds.map((rid) => {
                                     const isCustomMeal = rid.startsWith('custom_');
-                                    const recipe = isCustomMeal ? null : recipes.find((r) => r.id === rid);
                                     const customMeal = isCustomMeal ? customMeals.find((m) => m.id === rid) : null;
                                     const mealName = isCustomMeal ? customMeal?.name || 'Custom Meal' : getRecipeName(rid);
-                                    const mealData = isCustomMeal ? customMeal : recipe;
+                                    const mealData = isCustomMeal ? customMeal : null;
 
                                     // Calculate compatibility score
                                     let compatibilityScore: number | null = null;

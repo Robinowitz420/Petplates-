@@ -1,0 +1,70 @@
+{
+  "timestamp": "2025-12-17T21:30:24.976Z",
+  "results": [
+    {
+      "species": "dogs",
+      "recipesGenerated": 11,
+      "recipesValid": 11,
+      "avgTotalGrams": 1277.909090909091,
+      "avgProteinPercent": 20.355213273748543,
+      "avgFatPercent": 18.64824908656539,
+      "avgCarbsPercent": 0.590360082803725,
+      "avgCalories": 3444.203636363636,
+      "portionSizeIssues": 0,
+      "nutritionalBalanceIssues": 10,
+      "calculationErrors": 0
+    },
+    {
+      "species": "cats",
+      "recipesGenerated": 22,
+      "recipesValid": 22,
+      "avgTotalGrams": 1677.590909090909,
+      "avgProteinPercent": 21.112055350620945,
+      "avgFatPercent": 15.312015696169386,
+      "avgCarbsPercent": 0.20083333212662866,
+      "avgCalories": 3845.9440909090918,
+      "portionSizeIssues": 0,
+      "nutritionalBalanceIssues": 21,
+      "calculationErrors": 0
+    },
+    {
+      "species": "birds",
+      "recipesGenerated": 8,
+      "recipesValid": 8,
+      "avgTotalGrams": 810.75,
+      "avgProteinPercent": 14.715816146850383,
+      "avgFatPercent": 18.213005036569378,
+      "avgCarbsPercent": 31.307372102150705,
+      "avgCalories": 3725.9125,
+      "portionSizeIssues": 8,
+      "nutritionalBalanceIssues": 10,
+      "calculationErrors": 0
+    },
+    {
+      "species": "reptiles",
+      "recipesGenerated": 20,
+      "recipesValid": 20,
+      "avgTotalGrams": 633.1,
+      "avgProteinPercent": 14.403989352481858,
+      "avgFatPercent": 7.1378117854191725,
+      "avgCarbsPercent": 4.174804826802924,
+      "avgCalories": 855.2405000000001,
+      "portionSizeIssues": 5,
+      "nutritionalBalanceIssues": 20,
+      "calculationErrors": 0
+    },
+    {
+      "species": "pocket-pets",
+      "recipesGenerated": 10,
+      "recipesValid": 10,
+      "avgTotalGrams": 2548.8,
+      "avgProteinPercent": 14.737771178134574,
+      "avgFatPercent": 15.95245017712116,
+      "avgCarbsPercent": 28.805222738951805,
+      "avgCalories": 9722.045999999998,
+      "portionSizeIssues": 0,
+      "nutritionalBalanceIssues": 14,
+      "calculationErrors": 0
+    }
+  ]
+}

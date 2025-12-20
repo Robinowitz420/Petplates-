@@ -9,7 +9,7 @@ import { ALL_INGREDIENTS } from '../utils/allIngredients';
 import { getFallbackNutrition } from '../utils/nutritionFallbacks';
 
 export type Species = 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
-export type IngredientCategory = 'protein' | 'grain' | 'vegetable' | 'fruit' | 'supplement' | 'fat' | 'insect' | 'hay' | 'pellet';
+export type IngredientCategory = 'protein' | 'grain' | 'vegetable' | 'fruit' | 'supplement' | 'fat' | 'insect' | 'hay' | 'pellet' | 'seed' | 'nut';
 
 /**
  * Unified ingredient structure - single source of truth
@@ -96,8 +96,18 @@ function detectCategory(name: string, species?: Species): IngredientCategory {
     return 'fruit';
   }
   
-  // Grain/Seed detection
-  if (lower.match(/\b(rice|oats|quinoa|barley|wheat|grain|seed|millet|canary|niger|hemp|flax|chia|sesame|sunflower|pumpkin|safflower|nyjer|amaranth|buckwheat|teff|rapeseed|poppy|corn|maize|groat)\b/)) {
+  // Nut detection (before seeds, as nuts are more specific)
+  if (lower.match(/\b(almond|walnut|pecan|cashew|hazelnut|pistachio|macadamia|brazil.*nut|pine.*nut|chestnut|peanut|nut)\b/)) {
+    return 'nut';
+  }
+  
+  // Seed detection (for birds/pocket-pets - NOT grains)
+  if (lower.match(/\b(millet|canary.*seed|niger|nyjer|hemp.*seed|flax.*seed|chia.*seed|sesame.*seed|sunflower.*seed|pumpkin.*seed|safflower|poppy.*seed|seed)\b/)) {
+    return 'seed';
+  }
+  
+  // Grain detection (carbs for mammals)
+  if (lower.match(/\b(rice|oats|quinoa|barley|wheat|grain|amaranth|buckwheat|teff|corn|maize|groat)\b/)) {
     return 'grain';
   }
   
@@ -111,13 +121,13 @@ function detectCategory(name: string, species?: Species): IngredientCategory {
     return 'pellet';
   }
   
-  // Supplement detection
-  if (lower.match(/\b(supplement|vitamin|calcium|taurine|fortified|cuttlebone|grit|probiotic|enzyme|glucosamine|chondroitin|omega|epa|dha|antioxidant|spirulina|kelp|brewer.*yeast|electrolyte|amino.*acid|joint.*health)\b/)) {
+  // Supplement detection (includes fish oils only)
+  if (lower.match(/\b(supplement|vitamin|calcium|taurine|fortified|cuttlebone|grit|probiotic|enzyme|glucosamine|chondroitin|omega|epa|dha|antioxidant|spirulina|kelp|brewer.*yeast|electrolyte|amino.*acid|joint.*health|fish.*oil|salmon.*oil|anchovy.*oil|mackerel.*oil|krill.*oil|cod.*liver.*oil|sardine.*oil|tuna.*oil|herring.*oil)\b/)) {
     return 'supplement';
   }
   
-  // Fat/Oil detection
-  if (lower.match(/\b(oil|fat|salmon.*oil|fish.*oil|coconut.*oil|olive.*oil)\b/)) {
+  // Fat/Oil detection (non-fish oils)
+  if (lower.match(/\b(oil|fat|coconut.*oil|olive.*oil|flax.*oil|hemp.*oil|algae.*oil|wheat.*germ.*oil|canola.*oil|sunflower.*oil|safflower.*oil|avocado.*oil|lard|tallow|schmaltz|suet)\b/)) {
     return 'fat';
   }
   
@@ -205,10 +215,6 @@ function getVettedProducts(displayNames: string[]): UnifiedIngredient['vettedPro
  * Get categories by species from allIngredients
  */
 function getCategoriesBySpecies(id: string, displayNames: string[]): Record<Species, IngredientCategory[]> | undefined {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unifiedIngredientRegistry.ts:207',message:'getCategoriesBySpecies entry',data:{id,displayNamesCount:displayNames.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-  
   const categoriesBySpecies: Record<Species, IngredientCategory[]> = {
     dog: [],
     cat: [],
@@ -219,16 +225,8 @@ function getCategoriesBySpecies(id: string, displayNames: string[]): Record<Spec
   
   let hasCategories = false;
   
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unifiedIngredientRegistry.ts:220',message:'Before ALL_INGREDIENTS iteration',data:{allIngredientsKeys:Object.keys(ALL_INGREDIENTS),categoriesBySpeciesKeys:Object.keys(categoriesBySpecies)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-  
   // Check allIngredients structure
   Object.entries(ALL_INGREDIENTS).forEach(([species, speciesData]) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unifiedIngredientRegistry.ts:222',message:'ALL_INGREDIENTS entry',data:{species,speciesDataType:typeof speciesData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    
     // Normalize species key from ALL_INGREDIENTS (plural) to Species type (singular)
     let normalizedSpecies: Species;
     if (species === 'dogs') {
@@ -244,10 +242,6 @@ function getCategoriesBySpecies(id: string, displayNames: string[]): Record<Spec
     } else {
       normalizedSpecies = species as Species;
     }
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unifiedIngredientRegistry.ts:240',message:'After normalization',data:{originalSpecies:species,normalizedSpecies,categoriesBySpeciesHasKey:normalizedSpecies in categoriesBySpecies},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     Object.entries(speciesData).forEach(([categoryName, ingredientList]) => {
       if (Array.isArray(ingredientList)) {
@@ -265,17 +259,19 @@ function getCategoriesBySpecies(id: string, displayNames: string[]): Record<Spec
             category = categoryName === 'hay' ? 'hay' : 'vegetable';
           } else if (categoryName === 'fruits') {
             category = 'fruit';
-          } else if (categoryName === 'carbs' || categoryName === 'seeds' || categoryName === 'pellets') {
-            category = categoryName === 'pellets' ? 'pellet' : 'grain';
+          } else if (categoryName === 'seeds') {
+            category = 'seed';
+          } else if (categoryName === 'nuts') {
+            category = 'nut';
+          } else if (categoryName === 'carbs') {
+            category = 'grain';  // Maps to 'carb' in final ingredient type
+          } else if (categoryName === 'pellets') {
+            category = 'pellet';
           } else if (categoryName === 'fats') {
             category = 'fat';
           } else if (categoryName === 'supplements' || categoryName === 'fiber_supplements') {
             category = 'supplement';
           }
-          
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unifiedIngredientRegistry.ts:265',message:'Before categoriesBySpecies access',data:{normalizedSpecies,category,categoriesBySpeciesValue:categoriesBySpecies[normalizedSpecies]},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-          // #endregion
           
           if (categoriesBySpecies[normalizedSpecies] && !categoriesBySpecies[normalizedSpecies].includes(category)) {
             categoriesBySpecies[normalizedSpecies].push(category);
@@ -285,10 +281,6 @@ function getCategoriesBySpecies(id: string, displayNames: string[]): Record<Spec
       }
     });
   });
-  
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unifiedIngredientRegistry.ts:275',message:'getCategoriesBySpecies exit',data:{hasCategories,resultKeys:hasCategories?Object.keys(categoriesBySpecies):null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   
   return hasCategories ? categoriesBySpecies : undefined;
 }
@@ -432,7 +424,16 @@ let _nameToIdMap: Map<string, string> | null = null;
 
 function getRegistry(): Map<string, UnifiedIngredient> {
   if (!_registry) {
+    console.log('[Registry] Building ingredient registry...');
     _registry = buildRegistry();
+    console.log(`[Registry] Built ${_registry.size} ingredients`);
+    
+    // Log category breakdown
+    const byCategory: Record<string, number> = {};
+    _registry.forEach(ing => {
+      byCategory[ing.category] = (byCategory[ing.category] || 0) + 1;
+    });
+    console.log('[Registry] By category:', byCategory);
   }
   return _registry;
 }

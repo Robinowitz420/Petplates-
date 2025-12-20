@@ -29,6 +29,7 @@ export interface Ingredient {
   name: string;
   amount: string;
   asinLink?: string; // ASIN-based direct product link
+  amazonLink?: string; // Legacy Amazon affiliate link
   productName?: string; // Vetted product name
   vetNote?: string; // Veterinary note about the product
   isVetted?: boolean; // Whether this ingredient has been vetted
@@ -74,6 +75,8 @@ export interface Recipe {
   rating?: number;
   reviews?: number;
   score?: number;
+  celebrityName?: string; // For celebrity pet recipes
+  celebrityQuote?: string; // Quote from celebrity about the recipe
   // Enhanced fields (all optional for backward compatibility)
   needsReview?: boolean; // Flag if recipe uses estimated nutrition data or needs manual review
   validation?: {

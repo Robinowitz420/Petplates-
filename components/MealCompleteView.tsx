@@ -13,7 +13,7 @@ import Tooltip from '@/components/Tooltip';
 import { getPets } from '@/lib/utils/petStorage';
 import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendations';
 import { logger } from '@/lib/utils/logger';
-import { getVettedProduct, getVettedProductByAnyIdentifier, getGenericIngredientName } from '@/lib/data/vetted-products';
+import { getProductByIngredient, getProductPrice, getProductUrl } from '@/lib/data/product-prices';
 import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
@@ -349,31 +349,19 @@ export default function MealCompleteView({
     console.log('[MealCompleteView] selectedIngredients:', selectedIngredients);
     console.log('[MealCompleteView] selectedIngredients.length:', selectedIngredients.length);
     
-    // Convert petType to plural form for getVettedProduct (do once outside map)
-    const speciesForIngredients = petType ? (petType === 'dog' ? 'dogs' : petType === 'cat' ? 'cats' : petType + 's') : undefined;
-    
     const result = selectedIngredients
       .map((ing, index) => {
         console.log(`[MealCompleteView] Processing ingredient ${index + 1}:`, ing);
         const displayName = getIngredientDisplayName(ing.key);
         console.log(`[MealCompleteView]   Display name from getIngredientDisplayName:`, displayName);
-        const ingredientName = displayName.toLowerCase();
-        console.log(`[MealCompleteView]   Lowercase ingredient name for lookup:`, ingredientName);
         
-        const vettedProduct = getVettedProduct(ingredientName, speciesForIngredients);
-        console.log(`[MealCompleteView]   Vetted product lookup result:`, vettedProduct);
-        
-        if (!vettedProduct) {
-          console.log(`[MealCompleteView]   ❌ No vetted product found for:`, ingredientName);
-        }
-        
-        const link = vettedProduct?.asinLink || vettedProduct?.purchaseLink;
-        console.log(`[MealCompleteView]   Purchase link:`, link);
+        const link = getProductUrl(displayName);
+        console.log(`[MealCompleteView]   Product-prices purchase link:`, link);
         
         if (link) {
           const item = {
             id: ing.key,
-            name: vettedProduct?.productName || displayName,
+            name: displayName,
             amount: `${ing.grams}g`,
             asinLink: ensureSellerId(link)
           };
@@ -392,14 +380,11 @@ export default function MealCompleteView({
   }, [selectedIngredients, getIngredientDisplayName]);
 
   const ingredientsWithoutASINs = useMemo(() => {
-    // Convert petType to plural form for getVettedProduct (do once outside filter)
-    const speciesForFilter = petType ? (petType === 'dog' ? 'dogs' : petType === 'cat' ? 'cats' : petType + 's') : undefined;
-    
     return selectedIngredients
       .filter(ing => {
-        const ingredientName = getIngredientDisplayName(ing.key).toLowerCase();
-        const vettedProduct = getVettedProduct(ingredientName, speciesForFilter);
-        return !vettedProduct?.asinLink && !vettedProduct?.purchaseLink;
+        const displayName = getIngredientDisplayName(ing.key);
+        const link = getProductUrl(displayName);
+        return !link;
       })
       .map(ing => ({
         id: ing.key,
@@ -422,44 +407,24 @@ export default function MealCompleteView({
     }
     
     try {
-      // Convert petType to plural form for getVettedProduct (do once at start)
-      const speciesForLookup = petType ? (petType === 'dog' ? 'dogs' : petType === 'cat' ? 'cats' : petType + 's') : undefined;
-      
       const shoppingListItems = ingredientsWithASINs.map(ing => {
-        const ingredientName = ing.name.toLowerCase();
-        let vettedProduct = getVettedProduct(ingredientName, speciesForLookup);
-        if (!vettedProduct) {
-          // Try alternative lookup
-          vettedProduct = getVettedProductByAnyIdentifier(ing.name);
-        }
         return {
           id: ing.id,
           name: ing.name,
           amount: ing.amount,
-          category: vettedProduct?.category
+          category: undefined
         };
       });
       
       console.log('[MealCompleteView] Shopping list items for calculation:', shoppingListItems);
       
-      // Calculate total cost using the same logic as ShoppingList component, preferBudget=true for cost control
+      // Calculate total cost using product-prices.json when available, otherwise fall back to package estimates
       const totalCost = ingredientsWithASINs.reduce((sum, item) => {
-        // Try to get generic ingredient name for budget-aware lookup
-        const genericName = getGenericIngredientName(item.name) || item.name.toLowerCase();
-        let product = getVettedProduct(genericName, speciesForLookup, true); // preferBudget=true
-        if (!product) {
-          product = getVettedProduct(item.name.toLowerCase(), speciesForLookup, true); // preferBudget=true
-        }
-        if (!product) {
-          product = getVettedProductByAnyIdentifier(item.name, speciesForLookup, true); // preferBudget=true
-        }
-        if (product?.price?.amount) {
-          return sum + product.price.amount;
-        }
-        return sum;
+        const price = getProductPrice(item.name);
+        return typeof price === 'number' ? sum + price : sum;
       }, 0);
       
-      const result = calculateMealsFromGroceryList(shoppingListItems, undefined, speciesForLookup);
+      const result = calculateMealsFromGroceryList(shoppingListItems);
       // Override totalCost with the one calculated from ShoppingList logic to ensure they match
       if (result) {
         result.totalCost = totalCost;
@@ -486,12 +451,8 @@ export default function MealCompleteView({
     if (ingredientsWithASINs.length > 0) {
       const testItem = ingredientsWithASINs[0];
       console.log('First ingredient:', testItem);
-      // Convert petType to plural form for getVettedProduct
-      const species = petType ? (petType === 'dog' ? 'dogs' : petType === 'cat' ? 'cats' : petType + 's') : undefined;
-      const vettedProduct = getVettedProduct(testItem.name.toLowerCase(), species);
-      console.log('Vetted product for first ingredient:', vettedProduct);
-      console.log('Has category?:', vettedProduct?.category);
-      console.log('Category value:', vettedProduct?.category || 'undefined');
+      const pricedUrl = getProductUrl(testItem.name);
+      console.log('Product-prices url for first ingredient:', pricedUrl);
     }
     console.log('mealEstimateForCost:', mealEstimateForCost);
     console.groupEnd();

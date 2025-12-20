@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { recipes as baseRecipes } from '@/lib/data/recipes-complete';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
 import { calculateEnhancedCompatibility, type Pet as EnhancedPet, getGrade } from '@/lib/utils/enhancedCompatibilityScoring';
 import { CompatibilityBadge } from '@/components/CompatibilityBadge';
@@ -46,21 +45,18 @@ const getCurrentUserId = () => {
   return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
 };
 
-// Get combined recipes (base + custom)
+// Get custom recipes from localStorage
 const getCombinedRecipes = (): Recipe[] => {
-  const recipes = [...baseRecipes];
-
-  // Add custom recipes from localStorage
   if (typeof window !== 'undefined') {
     try {
       const customRecipes = JSON.parse(localStorage.getItem('custom_recipes') || '[]');
-      recipes.push(...customRecipes);
+      return customRecipes;
     } catch (error) {
       console.error('Error loading custom recipes:', error);
     }
   }
 
-  return recipes;
+  return [];
 };
 
 export default function RecommendedRecipesPage() {
@@ -152,53 +148,91 @@ useEffect(() => {
 
   (async () => {
     try {
-      const concerns = (pet.healthConcerns || []).filter((concern) => concern !== 'none');
-      const allergies = pet.allergies?.filter((allergy) => allergy !== 'none') || [];
-      
-      // Add timeout to API call
+      // First try the new cost-optimized recipe generation API
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-      const response = await fetch('/api/recommendations', {
+      const response = await fetch('/api/recipes/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
-          profile: {
-            species: pet.type,
-            ageGroup: pet.age,
-            breed: pet.breed,
-            weightKg: pet.weightKg || 10,
-            healthConcerns: concerns,
-            allergies,
-            petName: petDisplayName,
+          species: pet.type,
+          count: 50,
+          petProfile: {
+            name: petDisplayName,
+            weight: pet.weight,
+            weightKg: pet.weightKg,
+            age: pet.age,
+            allergies: pet.allergies || [],
+            healthConcerns: pet.healthConcerns || [],
           },
-          limit: 50,
         }),
       });
       
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        // API error - using fallback recommendations
-        throw new Error(errorData.error || `Engine offline (${response.status})`);
+        throw new Error(`Recipe generation failed (${response.status})`);
       }
 
       const data = await response.json();
       if (!isMounted) return;
       
-      // Log for debugging
-      if (!data?.results || data.results.length === 0) {
-        // API returned no results - using fallback
+      if (data?.recipes && data.recipes.length > 0) {
+        // Convert generated recipes to ModifiedRecipeResult format
+        const generatedMeals = data.recipes.map((recipe: any) => ({
+          recipe,
+          explanation: `Cost-optimized meal: $${recipe.estimatedCostPerMeal?.toFixed(2) || 'N/A'} per meal`,
+        }));
+        setEngineMeals(generatedMeals as ModifiedRecipeResult[]);
+      } else {
+        throw new Error('No recipes generated');
       }
-      
-      setEngineMeals((data?.results as ModifiedRecipeResult[]) || []);
     } catch (error) {
       if (!isMounted) return;
-      // Recommendation API error - using fallback
-      setEngineMeals(null);
-      setEngineError('Personalized explanations unavailable—showing standard matches.');
+      console.error('Recipe generation error:', error);
+      // Fall back to recommendations API if generation fails
+      try {
+        const concerns = (pet.healthConcerns || []).filter((concern) => concern !== 'none');
+        const allergies = pet.allergies?.filter((allergy) => allergy !== 'none') || [];
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch('/api/recommendations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            profile: {
+              species: pet.type,
+              ageGroup: pet.age,
+              breed: pet.breed,
+              weightKg: pet.weightKg || 10,
+              healthConcerns: concerns,
+              allergies,
+              petName: petDisplayName,
+            },
+            limit: 50,
+          }),
+        });
+        
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`Recommendations failed (${response.status})`);
+        }
+
+        const data = await response.json();
+        if (!isMounted) return;
+        
+        setEngineMeals((data?.results as ModifiedRecipeResult[]) || []);
+      } catch (fallbackError) {
+        if (!isMounted) return;
+        setEngineMeals(null);
+        setEngineError('Unable to load meals—showing standard matches.');
+      }
     } finally {
       if (isMounted) {
         setLoadingMeals(false);
@@ -631,7 +665,15 @@ useEffect(() => {
               onMouseEnter={() => setHoveredRecipe(recipeId)}
               onMouseLeave={() => setHoveredRecipe(null)}
             >
-              <Link href={`/recipe/${recipeId}?petId=${petId}`}>
+              <Link 
+                href={`/recipe/${recipeId}?petId=${petId}`}
+                onClick={() => {
+                  // Store recipe in session storage for dynamically generated recipes
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipe));
+                  }
+                }}
+              >
                 <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/30 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
                   <div className="p-6 flex-1 flex flex-col">
                     <div className="mb-3">

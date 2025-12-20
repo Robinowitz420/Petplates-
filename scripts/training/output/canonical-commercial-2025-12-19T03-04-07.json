@@ -1,0 +1,136 @@
+[
+  {
+    "source": "openpetfoodfacts",
+    "sourceUrl": "https://world.openpetfoodfacts.org/product/4008239346056",
+    "brand": "Vitacraft",
+    "productName": "Chews",
+    "speciesHint": [
+      "dogs"
+    ],
+    "productType": "dry",
+    "ingredientsRaw": "knochen aus 100% getrockneter Rinderhaut. ls Erganzung zum täglichen Futter: Trainiert die Yuskulatur des Hundes und sorgt für artgerechte Sulaftigung. Einzelfuttermittel für Hunde. Partienr.: ehe Stempel. Kühl und trocken lagern. (a)Chew bones made of 100% beef hide. Ideal as a applement to daily feed: helps strengthen jaw muscles. Feed material for dogs. Batch no.: see stamp. Keep dry and cool. Os à mâcher, 100% peau de bauf séchée. Idéal en complément de la nourriture quotidienne : fait travailler les muscles de la mâchoire du chien tout en lui procurant une occupation saine. Matière première pour chiens. No de lot: voir le tampon. Conserver au sec et à l'abri de la chaleur.",
+    "ingredientsList": [
+      {
+        "name": "knochen aus 100% getrockneter Rinderhaut. ls Erganzung zum täglichen Futter: Trainiert die Yuskulatur des Hundes und sorgt für artgerechte Sulaftigung. Einzelfuttermittel für Hunde. Partienr.: ehe Stempel. Kühl und trocken lagern. (a)Chew bones made of 100% beef hide. Ideal as a applement to daily feed: helps strengthen jaw muscles. Feed material for dogs. Batch no.: see stamp. Keep dry and cool. Os à mâcher",
+        "position": 1
+      },
+      {
+        "name": "% peau de bauf séchée. Idéal en complément de la nourriture quotidienne : fait travailler les muscles de la mâchoire du chien tout en lui procurant une occupation saine. Matière première pour chiens. No de lot: voir le tampon. Conserver au sec et à l'abri de la chaleur.",
+        "position": 2
+      }
+    ],
+    "scrapedAt": "2025-12-19T02:57:01.865Z",
+    "barcode": "4008239346056",
+    "ingredients": [
+      {
+        "canonicalId": "peas",
+        "originalName": "% peau de bauf séchée. Idéal en complément de la nourriture quotidienne : fait travailler les muscles de la mâchoire du chien tout en lui procurant une occupation saine. Matière première pour chiens. No de lot: voir le tampon. Conserver au sec et à l'abri de la chaleur.",
+        "position": 2,
+        "confidence": 0.8
+      }
+    ],
+    "unmappedIngredients": [
+      "knochen aus 100% getrockneter Rinderhaut. ls Erganzung zum täglichen Futter: Trainiert die Yuskulatur des Hundes und sorgt für artgerechte Sulaftigung. Einzelfuttermittel für Hunde. Partienr.: ehe Stempel. Kühl und trocken lagern. (a)Chew bones made of 100% beef hide. Ideal as a applement to daily feed: helps strengthen jaw muscles. Feed material for dogs. Batch no.: see stamp. Keep dry and cool. Os à mâcher"
+    ],
+    "mappingSuccessRate": 0.5
+  },
+  {
+    "source": "openpetfoodfacts",
+    "sourceUrl": "https://world.openpetfoodfacts.org/product/5000214019176",
+    "brand": "Unknown",
+    "productName": "Peamutt butter",
+    "speciesHint": [
+      "dogs"
+    ],
+    "productType": "unknown",
+    "ingredientsRaw": "peanuts (97.5%), palm oil",
+    "ingredientsList": [
+      {
+        "name": "peanuts",
+        "position": 1
+      },
+      {
+        "name": "palm oil",
+        "position": 2
+      }
+    ],
+    "scrapedAt": "2025-12-19T02:57:01.865Z",
+    "barcode": "5000214019176",
+    "ingredients": [
+      {
+        "canonicalId": "peas",
+        "originalName": "peanuts",
+        "position": 1,
+        "confidence": 0.8
+      }
+    ],
+    "unmappedIngredients": [
+      "palm oil"
+    ],
+    "mappingSuccessRate": 0.5
+  },
+  {
+    "source": "openpetfoodfacts",
+    "sourceUrl": "https://world.openpetfoodfacts.org/product/7617028318111",
+    "brand": "Max",
+    "productName": "Bâtonnets à mastiquer",
+    "speciesHint": [
+      "dogs"
+    ],
+    "productType": "dry",
+    "ingredientsRaw": "Aliment complémentaire pour chiens: la structure naturelle et la composition de la peau de bæuf font de ce batonfnet d mastiquer aussi bien une récompense qu'un complément alimentaire ou encore un excellent moyen d'entretenir la dentition en bon état, car ils réduisent la formation du tartre et de la plaque.",
+    "ingredientsList": [
+      {
+        "name": "Aliment complémentaire pour chiens: la structure naturelle et la composition de la peau de bæuf font de ce batonfnet d mastiquer aussi bien une récompense qu'un complément alimentaire ou encore un excellent moyen d'entretenir la dentition en bon état",
+        "position": 1
+      },
+      {
+        "name": "car ils réduisent la formation du tartre et de la plaque.",
+        "position": 2
+      }
+    ],
+    "scrapedAt": "2025-12-19T02:57:04.041Z",
+    "barcode": "7617028318111",
+    "ingredients": [
+      {
+        "canonicalId": "peas",
+        "originalName": "Aliment complémentaire pour chiens: la structure naturelle et la composition de la peau de bæuf font de ce batonfnet d mastiquer aussi bien une récompense qu'un complément alimentaire ou encore un excellent moyen d'entretenir la dentition en bon état",
+        "position": 1,
+        "confidence": 0.8
+      }
+    ],
+    "unmappedIngredients": [
+      "car ils réduisent la formation du tartre et de la plaque."
+    ],
+    "mappingSuccessRate": 0.5
+  },
+  {
+    "source": "openpetfoodfacts",
+    "sourceUrl": "https://world.openpetfoodfacts.org/product/3270190698128",
+    "brand": "Carrefour",
+    "productName": "Chew Sticks",
+    "speciesHint": [
+      "dogs"
+    ],
+    "productType": "unknown",
+    "ingredientsRaw": "Peau de bœuf",
+    "ingredientsList": [
+      {
+        "name": "Peau de bœuf",
+        "position": 1
+      }
+    ],
+    "scrapedAt": "2025-12-19T02:57:17.238Z",
+    "barcode": "3270190698128",
+    "ingredients": [
+      {
+        "canonicalId": "peas",
+        "originalName": "Peau de bœuf",
+        "position": 1,
+        "confidence": 0.8
+      }
+    ],
+    "unmappedIngredients": [],
+    "mappingSuccessRate": 1
+  }
+]

@@ -537,8 +537,8 @@ async function main() {
         logToFile(`First 200 chars: ${fileContent.substring(0, 200)}\n`);
         
         // Check if TS file imports from JSON - if so, try loading JSON again
-        if (fileContent.includes("import recipesData from './recipes-complete.json'") || 
-            fileContent.includes('import recipesData from "./recipes-complete.json"')) {
+        if (fileContent.includes("import recipesData from './recipes-complete.json.ts.ts'") ||
+            fileContent.includes("import recipesData from './recipes-complete.json.ts.ts'")) {
           logToFile('📖 TS file imports from JSON, loading JSON file directly...\n');
           if (fs.existsSync(jsonPath)) {
             try {
@@ -729,7 +729,7 @@ async function main() {
 // This file imports and re-exports it for TypeScript compatibility
 
 import type { Recipe } from '../types';
-import recipesData from './recipes-complete.json';
+import recipesData from './recipes-complete.json.ts.ts';
 
 export const recipes: Recipe[] = recipesData as Recipe[];
 `;

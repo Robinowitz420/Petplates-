@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ShoppingCart, Sparkles, ArrowRight } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getButtonCopy, trackButtonClick, type ButtonCopyVariant } from '@/lib/utils/abTesting';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
-import { getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
+import { getProductByIngredient } from '@/lib/data/product-prices';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -32,6 +31,8 @@ const PET_TYPES: { id: PetCategory; emoji: string; label: string }[] = [
 export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModalProps) {
   const [selectedType, setSelectedType] = useState<PetCategory>('dogs');
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
+  const [recipes, setRecipes] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   // A/B Testing: Get assigned button copy
   const [buttonCopy, setButtonCopy] = useState<ButtonCopyVariant | null>(null);
@@ -40,19 +41,38 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
     setButtonCopy(getButtonCopy(false));
   }, []);
 
-  // Get top 3 recipes for selected pet type with VERIFIED Amazon links
-  const topRecipes = useMemo(() => {
-    return recipes
-      .filter(r => r.category === selectedType)
-      .filter(r => {
-        // Only show recipes with at least 2 ingredients that have Amazon links
-        const ingredientsWithLinks = r.ingredients?.filter(ing => 
-          ing.amazonLink || (ing as any).asinLink
-        ) || [];
-        return ingredientsWithLinks.length >= 2;
-      })
-      .slice(0, 3);
-  }, [selectedType]);
+  // Fetch recipes when pet type changes
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const fetchRecipes = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/recipes/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            species: selectedType,
+            count: 3, // Only need 3 for preview
+          }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setRecipes(data.recipes || []);
+        } else {
+          setRecipes([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch recipes:', error);
+        setRecipes([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchRecipes();
+  }, [selectedType, isOpen]);
 
   if (!isOpen) return null;
 
@@ -103,25 +123,28 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
             </div>
           </div>
 
-          {/* Recipe Grid */}
-          {topRecipes.length > 0 ? (
+          {/* Recipe Grid or Loading */}
+          {isLoading ? (
+            <div className="text-center py-12">
+              <Sparkles className="text-orange-400 mx-auto mb-4 animate-spin" size={48} />
+              <h3 className="text-xl font-bold text-white mb-2">
+                Generating Perfect Meals...
+              </h3>
+              <p className="text-gray-300">
+                Creating personalized recipes for your {selectedType.replace('-', ' ')}
+              </p>
+            </div>
+          ) : recipes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {topRecipes.map(recipe => {
-                const amazonIngredients = recipe.ingredients?.filter(ing => 
-                  ing.amazonLink || (ing as any).asinLink
+              {recipes.map(recipe => {
+                // Get ingredients with purchase links
+                const ingredientsWithLinks = recipe.ingredients?.filter((ing: any) => 
+                  ing.asinLink || ing.amazonLink
                 ) || [];
                 
-                // Calculate total price for this recipe
-                const recipeTotalPrice = amazonIngredients.reduce((sum, ing) => {
-                  const link = ing.amazonLink || (ing as any).asinLink;
-                  // Try multiple lookup methods
-                  let product = getVettedProduct(ing.name.toLowerCase());
-                  if (!product) {
-                    product = getVettedProductByAnyIdentifier(ing.name);
-                  }
-                  if (!product && link) {
-                    product = getVettedProductByAnyIdentifier(link);
-                  }
+                // Calculate total price using our high-quality product-prices system
+                const recipeTotalPrice = ingredientsWithLinks.reduce((sum: number, ing: any) => {
+                  const product = getProductByIngredient(ing.name);
                   if (product?.price?.amount) {
                     return sum + product.price.amount;
                   }
@@ -161,7 +184,7 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
                       <div className="mb-4 pb-3 border-b border-surface-highlight">
                         <p className="text-xs text-gray-500 mb-2">Key Ingredients:</p>
                         <div className="flex flex-wrap gap-1">
-                          {recipe.ingredients?.slice(0, 4).map((ing, idx) => (
+                          {recipe.ingredients?.slice(0, 4).map((ing: any, idx: number) => (
                             <span
                               key={idx}
                               className="text-xs bg-green-900/40 text-green-300 px-2 py-1 rounded"
@@ -179,15 +202,16 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
 
                       {/* CTA Buttons */}
                       <div className="space-y-2">
-                        {/* BIG Amazon Button */}
-                        {amazonIngredients.length > 0 && (
+                        {/* Shop Ingredients Button */}
+                        {ingredientsWithLinks.length > 0 && (
                           <button
                             onClick={() => {
-                              // Open first ingredient link (instant affiliate opportunity!)
-                              const link = amazonIngredients[0].amazonLink || (amazonIngredients[0] as any).asinLink;
+                              // Open first ingredient link
+                              const firstIng = ingredientsWithLinks[0];
+                              const link = firstIng.asinLink || firstIng.amazonLink;
                               if (link) {
                                 window.open(ensureSellerId(link), '_blank');
-                                // Track conversion
+                                // Track affiliate click
                                 if (typeof window !== 'undefined') {
                                   localStorage.setItem('last_affiliate_click', JSON.stringify({
                                     recipeId: recipe.id,
@@ -204,7 +228,7 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
                             className="w-full py-3 px-4 rounded-lg font-bold text-base bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 border-2 border-orange-400"
                           >
                             <ShoppingCart size={18} />
-                            {buttonCopy?.text || 'Shop Ingredients'} ({amazonIngredients.length} items)
+                            {buttonCopy?.text || 'Shop Ingredients'} ({ingredientsWithLinks.length} items)
                             {recipeTotalPrice > 0 && (
                               <span className="ml-2 text-sm font-normal opacity-90">
                                 • {formatPrice(recipeTotalPrice)}
@@ -228,8 +252,14 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
               })}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-400">
-              <p>No recipes found for {selectedType}. Try another pet type!</p>
+            <div className="text-center py-12">
+              <Sparkles className="text-orange-400 mx-auto mb-4" size={48} />
+              <h3 className="text-xl font-bold text-white mb-2">
+                Personalized Meals Await!
+              </h3>
+              <p className="text-gray-300 mb-6">
+                Create a free account to generate cost-optimized meal plans tailored to your {selectedType.replace('-', ' ')}'s specific needs, age, and health concerns.
+              </p>
             </div>
           )}
 

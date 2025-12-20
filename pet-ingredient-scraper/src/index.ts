@@ -1,5 +1,5 @@
-import { AmazonScraper } from './scrapers/AmazonScraper';
-import { RegulatoryScraper } from './scrapers/RegulatoryScraper';
+import { AmazonScraper } from './scrapers/AmazonScraper.ts.ts';
+import { RegulatoryScraper } from './scrapers/RegulatoryScraper.ts.ts';
 import { writeFileSync } from 'fs';
 import path from 'path';
 

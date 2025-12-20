@@ -512,7 +512,7 @@ export default function RecipeBuilderPage() {
                     species: foundPet.type,
                     ageGroup: foundPet.age,
                     breed: foundPet.breed,
-                    weightKg: parseFloat(foundPet.weight?.replace(/[^0-9.]/g, '')) || 10,
+                    weightKg: parseFloat(foundPet.weight?.replace(/[^0-9.]/g, '') || '10'),
                     healthConcerns: concerns,
                     allergies,
                     petName: petDisplayName,

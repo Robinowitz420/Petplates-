@@ -1,0 +1,2047 @@
+{
+  "generatedAt": "2025-12-16T02:09:05.112Z",
+  "flags": [
+    {
+      "key": "b-complex",
+      "asin": "B01INRFW0E",
+      "amazonLink": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20",
+      "productName": "Thorne B-Complex #12",
+      "fetchedTitle": "Amazon.com: Nutricost High Potency Vitamin B Complex 462mg, 120 Capsules - with Vitamin C - Energy Complex : Health &amp; Household",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B01INRFW0E",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "joint supplement",
+      "asin": "B003ULL1NQ",
+      "amazonLink": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "fetchedTitle": "Amazon.com: Nutramax Cosequin for Dogs Joint Health Supplement, Contains Glucosamine for Dogs, Plus Chondroitin and MSM, Supports Healthy Joints, For All Breeds and Sizes, Chewable Tablets, 132 Count",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B003ULL1NQ",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "hairball paste",
+      "asin": "B07B282MR4",
+      "amazonLink": "https://www.amazon.com/dp/B07B282MR4?tag=robinfrench-20",
+      "productName": "Tomlyn Laxatone Hairball Remedy",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "chicken broth",
+      "asin": "B07DFNP37Y",
+      "amazonLink": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20",
+      "productName": "Brutus Bone Broth for Dogs No Salt",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "canary seed",
+      "asin": "B00027ZVG4",
+      "amazonLink": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "niger seed",
+      "asin": "B086211R4H",
+      "amazonLink": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "oat groats",
+      "asin": "B086211R4H",
+      "amazonLink": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "rapeseed",
+      "asin": "B00027ZVG4",
+      "amazonLink": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "egg (hard-boiled)",
+      "asin": "B0BWBNT8JX",
+      "amazonLink": "https://www.amazon.com/dp/B0BWBNT8JX?tag=robinfrench-20",
+      "productName": "Vital Essentials Freeze Dried Egg Yolk Treats",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "pellets (fortified)",
+      "asin": "B086211R4H",
+      "amazonLink": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "cuttlebone",
+      "asin": "B00027ZVG4",
+      "amazonLink": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "amaranth seeds",
+      "asin": "B000V1O40U",
+      "amazonLink": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "teff seeds",
+      "asin": "B0FKBVN6XP",
+      "amazonLink": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_5_keys"
+      ]
+    },
+    {
+      "key": "safflower seeds",
+      "asin": "B0FWLFGG21",
+      "amazonLink": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20",
+      "productName": "Wagner\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "bok choy (small amounts)",
+      "asin": "B0FN4YGSK6",
+      "amazonLink": "https://www.amazon.com/dp/B0FN4YGSK6?tag=robinfrench-20",
+      "productName": "Fresh Baby Bok Choy",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "wild bird mix",
+      "asin": "B0FWLFGG21",
+      "amazonLink": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20",
+      "productName": "Lyric Wild Bird Mix No Filler",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "bone broth (low sodium)",
+      "asin": "B07DFNP37Y",
+      "amazonLink": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20",
+      "productName": "Brutus Bone Broth for Dogs Low Sodium",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "chicory root",
+      "asin": "B08Q7KZYKC",
+      "amazonLink": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_3_keys"
+      ]
+    },
+    {
+      "key": "chondroitin sulfate",
+      "asin": "B003ULL1NQ",
+      "amazonLink": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "productName": "Cosequin DS Plus MSM with Chondroitin",
+      "fetchedTitle": "Amazon.com: Nutramax Cosequin for Dogs Joint Health Supplement, Contains Glucosamine for Dogs, Plus Chondroitin and MSM, Supports Healthy Joints, For All Breeds and Sizes, Chewable Tablets, 132 Count",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B003ULL1NQ",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "sulfate"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "fish broth (no salt)",
+      "asin": "B07DFQFLJL",
+      "amazonLink": "https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20",
+      "productName": "Brutus Fish Broth for Dogs No Salt",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "fructooligosaccharides (fos)",
+      "asin": "B08Q7KZYKC",
+      "amazonLink": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20",
+      "productName": "NOW Supplements FOS Prebiotic Fiber",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_3_keys"
+      ]
+    },
+    {
+      "key": "glucosamine sulfate",
+      "asin": "B003ULL1NQ",
+      "amazonLink": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "productName": "Cosequin DS Plus MSM Glucosamine",
+      "fetchedTitle": "Amazon.com: Nutramax Cosequin for Dogs Joint Health Supplement, Contains Glucosamine for Dogs, Plus Chondroitin and MSM, Supports Healthy Joints, For All Breeds and Sizes, Chewable Tablets, 132 Count",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B003ULL1NQ",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "sulfate"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "inulin (prebiotic)",
+      "asin": "B08Q7KZYKC",
+      "amazonLink": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_3_keys"
+      ]
+    },
+    {
+      "key": "joint health supplement",
+      "asin": "B003ULL1NQ",
+      "amazonLink": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "fetchedTitle": "Amazon.com: Nutramax Cosequin for Dogs Joint Health Supplement, Contains Glucosamine for Dogs, Plus Chondroitin and MSM, Supports Healthy Joints, For All Breeds and Sizes, Chewable Tablets, 132 Count",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B003ULL1NQ",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "rice (hulled)",
+      "asin": "B072JNNB33",
+      "amazonLink": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20",
+      "productName": "Lundberg Organic Brown Rice",
+      "fetchedTitle": "Amazon.com : Success Boil-In-Bag Quinoa, Quick Tri-Color Quinoa, 12-Ounce Box : Everything Else",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B072JNNB33",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "rice"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "turkey broth (no salt)",
+      "asin": "B07DFQFLJL",
+      "amazonLink": "https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20",
+      "productName": "Brutus Turkey Broth for Dogs No Salt",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "vitamin b complex",
+      "asin": "B01INRFW0E",
+      "amazonLink": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20",
+      "productName": "Thorne B-Complex #12",
+      "fetchedTitle": "Amazon.com: Nutricost High Potency Vitamin B Complex 462mg, 120 Capsules - with Vitamin C - Energy Complex : Health &amp; Household",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B01INRFW0E",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "wheat germ",
+      "asin": "B0FKBVN6XP",
+      "amazonLink": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs",
+        "asin_shared_with_5_keys"
+      ]
+    },
+    {
+      "key": "ground chicken",
+      "asin": "B0BXZVFN6G",
+      "amazonLink": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20",
+      "productName": "Fresh Is Best Freeze Dried Chicken Breast",
+      "fetchedTitle": "Amazon.com: Vital Essentials Freeze-Dried Raw Beef &amp; Chicken Meal or Mixer Cat Food Crunchy Nibs, 8 oz : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0BXZVFN6G",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "ground"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "ground lamb",
+      "asin": "B0082C00P8",
+      "amazonLink": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20",
+      "productName": "Raw Paws Lamb Recipe Rolls",
+      "fetchedTitle": "Amazon.com: Primal Freeze Dried Dog Food Nuggets, Chicken; Complete Balanced Meal, Topper or Treat; Premium, Healthy, Grain Free, High Protein Raw Dog Food, 14 oz : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0082C00P8",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "ground",
+          "lamb"
+        ],
+        "mismatchScore": 2,
+        "hasJerkySignal": false,
+        "hasTreatSignal": true,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "chicken hearts",
+      "asin": "B0BXZ3JJL9",
+      "amazonLink": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
+      "productName": "Vital Essentials Freeze Dried Chicken Hearts",
+      "fetchedTitle": "Amazon.com: Vital Essentials Freeze-Dried Raw Rabbit Meal or Mixer Cat Food Crunchy Nibs, 12 oz : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0BXZ3JJL9",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "chicken",
+          "hearts"
+        ],
+        "mismatchScore": 2,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "sardines (canned in water)",
+      "asin": "B01FUWYO2M",
+      "amazonLink": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+      "productName": "Wild Planet Sardines in Water No Salt",
+      "fetchedTitle": "Amazon.com : Safe Catch Canned Wild Tuna Fish, Wild Caught, Lowest Mercury, Gluten-Free, Kosher, Non-GMO, Whole30 Approved, Paleo, Keto Food, 5oz Can, 12-Pack : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B01FUWYO2M",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "sardines"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_3_keys"
+      ]
+    },
+    {
+      "key": "turkey giblets",
+      "asin": "B0BXZ3JJL9",
+      "amazonLink": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
+      "productName": "Vital Essentials Freeze Dried Turkey Giblets",
+      "fetchedTitle": "Amazon.com: Vital Essentials Freeze-Dried Raw Rabbit Meal or Mixer Cat Food Crunchy Nibs, 12 oz : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0BXZ3JJL9",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "turkey",
+          "giblets"
+        ],
+        "mismatchScore": 2,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "chicken giblets",
+      "asin": "B0BXZVFN6G",
+      "amazonLink": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20",
+      "productName": "Fresh Is Best Freeze Dried Chicken Giblets",
+      "fetchedTitle": "Amazon.com: Vital Essentials Freeze-Dried Raw Beef &amp; Chicken Meal or Mixer Cat Food Crunchy Nibs, 8 oz : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0BXZVFN6G",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "giblets"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "rabbit meat",
+      "asin": "B0082C00P8",
+      "amazonLink": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20",
+      "productName": "Evanger\\",
+      "fetchedTitle": "Amazon.com: Primal Freeze Dried Dog Food Nuggets, Chicken; Complete Balanced Meal, Topper or Treat; Premium, Healthy, Grain Free, High Protein Raw Dog Food, 14 oz : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0082C00P8",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "rabbit",
+          "meat"
+        ],
+        "mismatchScore": 2,
+        "hasJerkySignal": false,
+        "hasTreatSignal": true,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "brown rice",
+      "asin": "B072JNNB33",
+      "amazonLink": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20",
+      "productName": "Lundberg Family Farms Organic Brown Rice",
+      "fetchedTitle": "Amazon.com : Success Boil-In-Bag Quinoa, Quick Tri-Color Quinoa, 12-Ounce Box : Everything Else",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B072JNNB33",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "brown",
+          "rice"
+        ],
+        "mismatchScore": 2,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "kale",
+      "asin": "B09VKDGT39",
+      "amazonLink": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20",
+      "productName": "Earthbound Farm Organic Kale",
+      "fetchedTitle": "Amazon.com: EARTHBOUND FARM Organic Power Greens, 16 OZ : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B09VKDGT39",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "kale"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "celery",
+      "asin": "B09VKDGT39",
+      "amazonLink": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20",
+      "productName": "Earthbound Farm Organic Celery",
+      "fetchedTitle": "Amazon.com: EARTHBOUND FARM Organic Power Greens, 16 OZ : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B09VKDGT39",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "celery"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "lettuce (romaine)",
+      "asin": "B0F3YTY4XQ",
+      "amazonLink": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20",
+      "productName": "Organic Girl Romaine Lettuce",
+      "fetchedTitle": "Amazon.com: Organic Girl Organic Romaine Heart Leaves, 6 OZ : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0F3YTY4XQ",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "lettuce"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "salmon oil",
+      "asin": "B09RYYWHH1",
+      "amazonLink": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20",
+      "productName": "Grizzly Salmon Plus Omega-3 Oil",
+      "fetchedTitle": "Amazon.com : pawTree Salmon Oil-Dog and Cat Fish Oil Supplement-Ideal for excessive shedding control, seasonal allergies, itch relief, dry, irritated skin. With over 15 heart-healthy Omega-3 &amp; Omega-6 Fatty Acids. : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B09RYYWHH1",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "fish oil",
+      "asin": "B00CBY93XS",
+      "amazonLink": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20",
+      "productName": "Nordic Naturals Omega-3 Pet",
+      "fetchedTitle": "Amazon.com : Nordic Naturals Omega-3 Pet, Unflavored - 16 oz - 1380 mg Omega-3 Per Teaspoon - Fish Oil for Large to Very Large Dogs with EPA &amp; DHA - Promotes Heart, Skin, Coat, &amp; Immune Health : Pet Fish Oil Nutritional Supplements : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B00CBY93XS",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "calcium carbonate",
+      "asin": "B004421K68",
+      "amazonLink": "https://www.amazon.com/dp/B004421K68?tag=robinfrench-20",
+      "productName": "NOW Supplements Calcium Carbonate Powder",
+      "fetchedTitle": "Amazon.com: NOW Foods Supplements, Calcium Carbonate Powder, High Percentage of Calcium, Supports Bone Health*, 12-Ounce : Health &amp; Household",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B004421K68",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "hemp seeds",
+      "asin": "B086211R4H",
+      "amazonLink": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "flaxseeds",
+      "asin": "B00027ZVG4",
+      "amazonLink": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "sesame seeds",
+      "asin": "B086211R4H",
+      "amazonLink": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "chia seeds",
+      "asin": "B086211R4H",
+      "amazonLink": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "sunflower seeds (small amounts)",
+      "asin": "B00027ZVG4",
+      "amazonLink": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "pumpkin seeds",
+      "asin": "B00027ZVG4",
+      "amazonLink": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+      "productName": "Lafeber\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_6_keys"
+      ]
+    },
+    {
+      "key": "mango",
+      "asin": "B00WM6CHFQ",
+      "amazonLink": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20",
+      "productName": "Organic Mango",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "dubia roaches",
+      "asin": "B09QD6PBB8",
+      "amazonLink": "https://www.amazon.com/dp/B09QD6PBB8?tag=robinfrench-20",
+      "productName": "Josh\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "orchard grass hay",
+      "asin": "B00S6Y8MHU",
+      "amazonLink": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20",
+      "productName": "Oxbow Animal Health Orchard Grass Hay",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "romaine lettuce",
+      "asin": "B0F3YTY4XQ",
+      "amazonLink": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20",
+      "productName": "Organic Girl Romaine Lettuce",
+      "fetchedTitle": "Amazon.com: Organic Girl Organic Romaine Heart Leaves, 6 OZ : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B0F3YTY4XQ",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "lettuce"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "duck hearts",
+      "asin": "B0BWBNT8JX",
+      "amazonLink": "https://www.amazon.com/dp/B0BWBNT8JX?tag=robinfrench-20",
+      "productName": "Vital Essentials Freeze Dried Duck Hearts",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "herring (canned)",
+      "asin": "B01FUWYO2M",
+      "amazonLink": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+      "productName": "Crown Prince Canned Herring",
+      "fetchedTitle": "Amazon.com : Safe Catch Canned Wild Tuna Fish, Wild Caught, Lowest Mercury, Gluten-Free, Kosher, Non-GMO, Whole30 Approved, Paleo, Keto Food, 5oz Can, 12-Pack : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B01FUWYO2M",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "herring"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_3_keys"
+      ]
+    },
+    {
+      "key": "black currant oil",
+      "asin": "B01FXEM0BY",
+      "amazonLink": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20",
+      "productName": "NOW Foods Black Currant Seed Oil",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "chia seed oil",
+      "asin": "B00WM6CHFQ",
+      "amazonLink": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20",
+      "productName": "Healthworks Organic Chia Seed Oil",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "herring oil",
+      "asin": "B00CBY93XS",
+      "amazonLink": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20",
+      "productName": "Nordic Naturals Pet Herring Oil",
+      "fetchedTitle": "Amazon.com : Nordic Naturals Omega-3 Pet, Unflavored - 16 oz - 1380 mg Omega-3 Per Teaspoon - Fish Oil for Large to Very Large Dogs with EPA &amp; DHA - Promotes Heart, Skin, Coat, &amp; Immune Health : Pet Fish Oil Nutritional Supplements : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B00CBY93XS",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "herring"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "borage oil",
+      "asin": "B01FXEM0BY",
+      "amazonLink": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20",
+      "productName": "NOW Foods Borage Oil Softgels",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "avocado oil",
+      "asin": "B0C3WCRNPN",
+      "amazonLink": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20",
+      "productName": "Chosen Foods Pure Avocado Oil",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "avocado oil (tiny amounts)",
+      "asin": "B0C3WCRNPN",
+      "amazonLink": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20",
+      "productName": "Chosen Foods Pure Avocado Oil",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "omega-3 oil",
+      "asin": "B09RYYWHH1",
+      "amazonLink": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20",
+      "productName": "Grizzly Salmon Oil for Pets",
+      "fetchedTitle": "Amazon.com : pawTree Salmon Oil-Dog and Cat Fish Oil Supplement-Ideal for excessive shedding control, seasonal allergies, itch relief, dry, irritated skin. With over 15 heart-healthy Omega-3 &amp; Omega-6 Fatty Acids. : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B09RYYWHH1",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "buckwheat",
+      "asin": "B00KQ17MDG",
+      "amazonLink": "https://www.amazon.com/dp/B00KQ17MDG?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "buckwheat (tiny amounts)",
+      "asin": "B00KQ17MDG",
+      "amazonLink": "https://www.amazon.com/dp/B00KQ17MDG?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "sorghum",
+      "asin": "B0FKBVN6XP",
+      "amazonLink": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_5_keys"
+      ]
+    },
+    {
+      "key": "barley (cooked, minimal)",
+      "asin": "B00QKP257A",
+      "amazonLink": "https://www.amazon.com/dp/B00QKP257A?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "barley (hulled)",
+      "asin": "B00QKP257A",
+      "amazonLink": "https://www.amazon.com/dp/B00QKP257A?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "millet",
+      "asin": "B0FKBVN6XP",
+      "amazonLink": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_5_keys"
+      ]
+    },
+    {
+      "key": "farro",
+      "asin": "B0FKBVN6XP",
+      "amazonLink": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_5_keys"
+      ]
+    },
+    {
+      "key": "amaranth (tiny amounts)",
+      "asin": "B000V1O40U",
+      "amazonLink": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "bok choi",
+      "asin": "B0FN4YGSK6",
+      "amazonLink": "https://www.amazon.com/dp/B0FN4YGSK6?tag=robinfrench-20",
+      "productName": "Fresh Baby Bok Choy",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "kidney beans (mashed)",
+      "asin": "B00552005I",
+      "amazonLink": "https://www.amazon.com/dp/B00552005I?tag=robinfrench-20",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "kidney beans (mashed, tiny amounts)",
+      "asin": "B00552005I",
+      "amazonLink": "https://www.amazon.com/dp/B00552005I?tag=robinfrench-20",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "swiss chard",
+      "asin": "B07F12P248",
+      "amazonLink": "https://www.amazon.com/dp/B07F12P248?tag=robinfrench-20",
+      "productName": "Fresh Swiss Chard",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "swiss chard (cooked, tiny amounts)",
+      "asin": "B07F12P248",
+      "amazonLink": "https://www.amazon.com/dp/B07F12P248?tag=robinfrench-20",
+      "productName": "Fresh Swiss Chard",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "mulberries",
+      "asin": "B074153BXC",
+      "amazonLink": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20",
+      "productName": "Terrasoul Dried Mulberries Organic",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "cranberries",
+      "asin": "B074153BXC",
+      "amazonLink": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20",
+      "productName": "NOW Foods Dried Cranberries Unsweetened",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "small dubia roaches",
+      "asin": "B09QD6PBB8",
+      "amazonLink": "https://www.amazon.com/dp/B09QD6PBB8?tag=robinfrench-20",
+      "productName": "Small Live Dubia Roaches Feeder",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "bluegrass hay",
+      "asin": "B00S6Y8MHU",
+      "amazonLink": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20",
+      "productName": "Small Pet Select Bluegrass Hay",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "eggshells (crushed)",
+      "asin": "B004421K68",
+      "amazonLink": "https://www.amazon.com/dp/B004421K68?tag=robinfrench-20",
+      "productName": "NOW Supplements Calcium Carbonate Powder",
+      "fetchedTitle": "Amazon.com: NOW Foods Supplements, Calcium Carbonate Powder, High Percentage of Calcium, Supports Bone Health*, 12-Ounce : Health &amp; Household",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B004421K68",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "eggshells"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "green beans",
+      "asin": "B0DDTC6QNY",
+      "amazonLink": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20",
+      "productName": "Fresh Organic Green Beans",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "green beans (cooked)",
+      "asin": "B0DDTC6QNY",
+      "amazonLink": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20",
+      "productName": "Fresh Organic Green Beans",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "hairball control paste",
+      "asin": "B07B282MR4",
+      "amazonLink": "https://www.amazon.com/dp/B07B282MR4?tag=robinfrench-20",
+      "productName": "Tomlyn Laxatone Hairball Remedy",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "peas",
+      "asin": "B07D1NGQ6B",
+      "amazonLink": "https://www.amazon.com/dp/B07D1NGQ6B?tag=robinfrench-20",
+      "productName": "Fresh Organic Green Peas",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "peas (mashed)",
+      "asin": "B07D1NGQ6B",
+      "amazonLink": "https://www.amazon.com/dp/B07D1NGQ6B?tag=robinfrench-20",
+      "productName": "Fresh Organic Green Peas",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "sardines (in water)",
+      "asin": "B01FUWYO2M",
+      "amazonLink": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+      "productName": "Wild Planet Sardines in Water No Salt",
+      "fetchedTitle": "Amazon.com : Safe Catch Canned Wild Tuna Fish, Wild Caught, Lowest Mercury, Gluten-Free, Kosher, Non-GMO, Whole30 Approved, Paleo, Keto Food, 5oz Can, 12-Pack : Grocery &amp; Gourmet Food",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B01FUWYO2M",
+      "titleSignals": {
+        "missingKeyTokens": [
+          "sardines"
+        ],
+        "mismatchScore": 1,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "asin_shared_with_3_keys"
+      ]
+    },
+    {
+      "key": "split peas",
+      "asin": "B08DVGSW58",
+      "amazonLink": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "split peas (mashed)",
+      "asin": "B08DVGSW58",
+      "amazonLink": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "sugar snap peas",
+      "asin": "B08DVGSW58",
+      "amazonLink": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "productName": "Fresh Organic Sugar Snap Peas",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "sugar snap peas (mashed)",
+      "asin": "B08DVGSW58",
+      "amazonLink": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20",
+      "productName": "Fresh Organic Sugar Snap Peas",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_4_keys"
+      ]
+    },
+    {
+      "key": "watercress",
+      "asin": "B0BSK8P8KS",
+      "amazonLink": "https://www.amazon.com/dp/B0BSK8P8KS?tag=robinfrench-20",
+      "productName": "Fresh Organic Watercress",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "watercress (small amounts)",
+      "asin": "B0BSK8P8KS",
+      "amazonLink": "https://www.amazon.com/dp/B0BSK8P8KS?tag=robinfrench-20",
+      "productName": "Fresh Organic Watercress",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "asin_shared_with_2_keys"
+      ]
+    },
+    {
+      "key": "taurine powder",
+      "asin": "B00VAOKFO6",
+      "amazonLink": "https://www.amazon.com/dp/B00VAOKFO6?tag=robinfrench-20",
+      "productName": "NOW Supplements Taurine Powder 8 oz",
+      "fetchedTitle": "Amazon.com: Nutricost Taurine Powder 250 Grams - 125 Servings, 2000mg Per Serving : Health &amp; Household",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B00VAOKFO6",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": false
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "vitamin e",
+      "asin": "B01I5OB3LW",
+      "amazonLink": "https://www.amazon.com/dp/B01I5OB3LW?tag=robinfrench-20",
+      "productName": "Solgar Vitamin E 400 IU",
+      "fetchedTitle": "Amazon.com: Nutricost Vitamin E 400 IU, 240 Softgel Capsules - Gluten Free, Non-GMO : Health &amp; Household",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B01I5OB3LW",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "omega-3 capsules",
+      "asin": "B004OA5XP4",
+      "amazonLink": "https://www.amazon.com/dp/B004OA5XP4?tag=robinfrench-20",
+      "productName": "Nordic Naturals Omega-3 Pet Capsules",
+      "fetchedTitle": "Amazon.com : Omega-Caps ES for Large &amp; Giant Dogs - Omega 3, Vitamins, Minerals, Antioxidants - Support Immune System, Joints, Heart, and Brain - 250 Softgel Capsules : Pet Fish Oil Nutritional Supplements : Pet Supplies",
+      "fetchedStatus": 200,
+      "fetchedUrl": "https://www.amazon.com/dp/B004OA5XP4",
+      "titleSignals": {
+        "missingKeyTokens": [],
+        "mismatchScore": 0,
+        "hasJerkySignal": false,
+        "hasTreatSignal": false,
+        "hasSupplementSignal": true
+      },
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "vitamin e oil",
+      "asin": "B0DZ5ZCC85",
+      "amazonLink": "https://www.amazon.com/dp/B0DZ5ZCC85?tag=robinfrench-20",
+      "productName": "NOW Solutions Vitamin E Oil",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "honey (tiny amounts)",
+      "asin": "B0791X9GSG",
+      "amazonLink": "https://www.amazon.com/dp/B0791X9GSG?tag=robinfrench-20",
+      "productName": "Local Raw Honey",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "peanut butter (unsalted, tiny amounts)",
+      "asin": "B06ZXZ3JPZ",
+      "amazonLink": "https://www.amazon.com/dp/B06ZXZ3JPZ?tag=robinfrench-20",
+      "productName": "Teddie All Natural Peanut Butter",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "wheat (hulled)",
+      "asin": "B000YFB5NC",
+      "amazonLink": "https://www.amazon.com/dp/B000YFB5NC?tag=robinfrench-20",
+      "productName": "Bob\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "nyjer seeds",
+      "asin": "B0D6688V7C",
+      "amazonLink": "https://www.amazon.com/dp/B0D6688V7C?tag=robinfrench-20",
+      "productName": "Wagner\\",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "beta-glucans",
+      "asin": "B01LWVNL9J",
+      "amazonLink": "https://www.amazon.com/dp/B01LWVNL9J?tag=robinfrench-20",
+      "productName": "NOW Supplements Beta Glucans 60 Capsules",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "biotin",
+      "asin": "B01AMJCHB8",
+      "amazonLink": "https://www.amazon.com/dp/B01AMJCHB8?tag=robinfrench-20",
+      "productName": "NOW Supplements Biotin 5000 mcg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "cranberry extract",
+      "asin": "B01N7KMPU3",
+      "amazonLink": "https://www.amazon.com/dp/B01N7KMPU3?tag=robinfrench-20",
+      "productName": "NOW Supplements Cranberry Extract 5000 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "curcumin (turmeric extract)",
+      "asin": "B0CK3C31JP",
+      "amazonLink": "https://www.amazon.com/dp/B0CK3C31JP?tag=robinfrench-20",
+      "productName": "NOW Supplements Curcumin with BioPerine",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "d-mannose",
+      "asin": "B01N6X9YBS",
+      "amazonLink": "https://www.amazon.com/dp/B01N6X9YBS?tag=robinfrench-20",
+      "productName": "NOW Supplements D-Mannose Powder",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "egg yolks",
+      "asin": "B00M1QWODW",
+      "amazonLink": "https://www.amazon.com/dp/B00M1QWODW?tag=robinfrench-20",
+      "productName": "Vital Farms Pasture-Raised Eggs",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "hyaluronic acid",
+      "asin": "B07XHNCJMC",
+      "amazonLink": "https://www.amazon.com/dp/B07XHNCJMC?tag=robinfrench-20",
+      "productName": "NOW Supplements Hyaluronic Acid 100 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "jerusalem artichoke",
+      "asin": "B0CQK5XCVZ",
+      "amazonLink": "https://www.amazon.com/dp/B0CQK5XCVZ?tag=robinfrench-20",
+      "productName": "Fresh Jerusalem Artichoke Sunchokes",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "l-carnitine powder",
+      "asin": "B06Y1BTLGK",
+      "amazonLink": "https://www.amazon.com/dp/B06Y1BTLGK?tag=robinfrench-20",
+      "productName": "NOW Supplements L-Carnitine 500 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "lysine powder",
+      "asin": "B00V3MR88G",
+      "amazonLink": "https://www.amazon.com/dp/B00V3MR88G?tag=robinfrench-20",
+      "productName": "NOW Supplements L-Lysine 1000 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "mannanoligosaccharides (mos)",
+      "asin": "B0CRFWM2Z6",
+      "amazonLink": "https://www.amazon.com/dp/B0CRFWM2Z6?tag=robinfrench-20",
+      "productName": "NOW Supplements MOS Prebiotic",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "milk thistle",
+      "asin": "B0019LVFD0",
+      "amazonLink": "https://www.amazon.com/dp/B0019LVFD0?tag=robinfrench-20",
+      "productName": "NOW Supplements Milk Thistle 150 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "niacinamide",
+      "asin": "B0CZMBZPLV",
+      "amazonLink": "https://www.amazon.com/dp/B0CZMBZPLV?tag=robinfrench-20",
+      "productName": "NOW Supplements Niacinamide 500 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "pectin (from apples)",
+      "asin": "B01CO69SYG",
+      "amazonLink": "https://www.amazon.com/dp/B01CO69SYG?tag=robinfrench-20",
+      "productName": "NOW Supplements Apple Pectin Powder",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "quercetin",
+      "asin": "B08M5L372P",
+      "amazonLink": "https://www.amazon.com/dp/B08M5L372P?tag=robinfrench-20",
+      "productName": "NOW Supplements Quercetin with Bromelain",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "s-adenosyl methionine (sam-e)",
+      "asin": "B000OSSQFY",
+      "amazonLink": "https://www.amazon.com/dp/B000OSSQFY?tag=robinfrench-20",
+      "productName": "NOW Supplements SAM-e 200 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    },
+    {
+      "key": "vitamin c (small amounts)",
+      "asin": "B074GCB1ND",
+      "amazonLink": "https://www.amazon.com/dp/B074GCB1ND?tag=robinfrench-20",
+      "productName": "NOW Supplements Vitamin C 1000 mg",
+      "fetchedTitle": "",
+      "fetchedStatus": null,
+      "fetchedUrl": "",
+      "titleSignals": null,
+      "problems": [
+        "key_not_in_ingredient_catalogs"
+      ]
+    }
+  ],
+  "duplicates": [
+    {
+      "asin": "B00027ZVG4",
+      "keys": [
+        "canary seed",
+        "flaxseeds",
+        "rapeseed",
+        "sunflower seeds (small amounts)",
+        "pumpkin seeds",
+        "cuttlebone"
+      ]
+    },
+    {
+      "asin": "B086211R4H",
+      "keys": [
+        "niger seed",
+        "oat groats",
+        "hemp seeds",
+        "sesame seeds",
+        "chia seeds",
+        "pellets (fortified)"
+      ]
+    },
+    {
+      "asin": "B0FKBVN6XP",
+      "keys": [
+        "sorghum",
+        "millet",
+        "farro",
+        "teff seeds",
+        "wheat germ"
+      ]
+    },
+    {
+      "asin": "B003ULL1NQ",
+      "keys": [
+        "joint supplement",
+        "chondroitin sulfate",
+        "glucosamine sulfate",
+        "joint health supplement"
+      ]
+    },
+    {
+      "asin": "B08DVGSW58",
+      "keys": [
+        "split peas",
+        "split peas (mashed)",
+        "sugar snap peas",
+        "sugar snap peas (mashed)"
+      ]
+    },
+    {
+      "asin": "B01FUWYO2M",
+      "keys": [
+        "sardines (canned in water)",
+        "herring (canned)",
+        "sardines (in water)"
+      ]
+    },
+    {
+      "asin": "B08Q7KZYKC",
+      "keys": [
+        "chicory root",
+        "fructooligosaccharides (fos)",
+        "inulin (prebiotic)"
+      ]
+    },
+    {
+      "asin": "B0BXZVFN6G",
+      "keys": [
+        "ground chicken",
+        "chicken giblets"
+      ]
+    },
+    {
+      "asin": "B0082C00P8",
+      "keys": [
+        "ground lamb",
+        "rabbit meat"
+      ]
+    },
+    {
+      "asin": "B0BXZ3JJL9",
+      "keys": [
+        "chicken hearts",
+        "turkey giblets"
+      ]
+    },
+    {
+      "asin": "B072JNNB33",
+      "keys": [
+        "brown rice",
+        "rice (hulled)"
+      ]
+    },
+    {
+      "asin": "B09VKDGT39",
+      "keys": [
+        "kale",
+        "celery"
+      ]
+    },
+    {
+      "asin": "B0F3YTY4XQ",
+      "keys": [
+        "lettuce (romaine)",
+        "romaine lettuce"
+      ]
+    },
+    {
+      "asin": "B09RYYWHH1",
+      "keys": [
+        "salmon oil",
+        "omega-3 oil"
+      ]
+    },
+    {
+      "asin": "B00CBY93XS",
+      "keys": [
+        "fish oil",
+        "herring oil"
+      ]
+    },
+    {
+      "asin": "B004421K68",
+      "keys": [
+        "calcium carbonate",
+        "eggshells (crushed)"
+      ]
+    },
+    {
+      "asin": "B01INRFW0E",
+      "keys": [
+        "b-complex",
+        "vitamin b complex"
+      ]
+    },
+    {
+      "asin": "B07B282MR4",
+      "keys": [
+        "hairball paste",
+        "hairball control paste"
+      ]
+    },
+    {
+      "asin": "B07DFNP37Y",
+      "keys": [
+        "chicken broth",
+        "bone broth (low sodium)"
+      ]
+    },
+    {
+      "asin": "B00WM6CHFQ",
+      "keys": [
+        "mango",
+        "chia seed oil"
+      ]
+    },
+    {
+      "asin": "B0BWBNT8JX",
+      "keys": [
+        "egg (hard-boiled)",
+        "duck hearts"
+      ]
+    },
+    {
+      "asin": "B09QD6PBB8",
+      "keys": [
+        "dubia roaches",
+        "small dubia roaches"
+      ]
+    },
+    {
+      "asin": "B00S6Y8MHU",
+      "keys": [
+        "orchard grass hay",
+        "bluegrass hay"
+      ]
+    },
+    {
+      "asin": "B01FXEM0BY",
+      "keys": [
+        "black currant oil",
+        "borage oil"
+      ]
+    },
+    {
+      "asin": "B0C3WCRNPN",
+      "keys": [
+        "avocado oil",
+        "avocado oil (tiny amounts)"
+      ]
+    },
+    {
+      "asin": "B00KQ17MDG",
+      "keys": [
+        "buckwheat",
+        "buckwheat (tiny amounts)"
+      ]
+    },
+    {
+      "asin": "B00QKP257A",
+      "keys": [
+        "barley (cooked, minimal)",
+        "barley (hulled)"
+      ]
+    },
+    {
+      "asin": "B000V1O40U",
+      "keys": [
+        "amaranth (tiny amounts)",
+        "amaranth seeds"
+      ]
+    },
+    {
+      "asin": "B0FWLFGG21",
+      "keys": [
+        "safflower seeds",
+        "wild bird mix"
+      ]
+    },
+    {
+      "asin": "B0FN4YGSK6",
+      "keys": [
+        "bok choi",
+        "bok choy (small amounts)"
+      ]
+    },
+    {
+      "asin": "B00552005I",
+      "keys": [
+        "kidney beans (mashed)",
+        "kidney beans (mashed, tiny amounts)"
+      ]
+    },
+    {
+      "asin": "B07F12P248",
+      "keys": [
+        "swiss chard",
+        "swiss chard (cooked, tiny amounts)"
+      ]
+    },
+    {
+      "asin": "B074153BXC",
+      "keys": [
+        "mulberries",
+        "cranberries"
+      ]
+    },
+    {
+      "asin": "B07DFQFLJL",
+      "keys": [
+        "fish broth (no salt)",
+        "turkey broth (no salt)"
+      ]
+    },
+    {
+      "asin": "B0DDTC6QNY",
+      "keys": [
+        "green beans",
+        "green beans (cooked)"
+      ]
+    },
+    {
+      "asin": "B07D1NGQ6B",
+      "keys": [
+        "peas",
+        "peas (mashed)"
+      ]
+    },
+    {
+      "asin": "B0BSK8P8KS",
+      "keys": [
+        "watercress",
+        "watercress (small amounts)"
+      ]
+    }
+  ],
+  "fetchTitles": true,
+  "fetchConfig": {
+    "maxFetch": 60,
+    "fetchDelayMs": 2000
+  }
+}

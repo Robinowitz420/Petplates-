@@ -1,7 +1,7 @@
 'use client';
 
 import { calculateMealsFromGroceryList, type MealEstimate, type ShoppingListItem } from '@/lib/utils/mealEstimation';
-import { getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
+import { getProductPrice } from '@/lib/data/product-prices';
 import { Info } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
@@ -20,13 +20,8 @@ export function ShoppingListSummary({ shoppingList, className = '' }: ShoppingLi
     }
     
     return shoppingList.reduce((sum, item) => {
-      let product = getVettedProduct(item.name.toLowerCase());
-      if (!product) {
-        product = getVettedProductByAnyIdentifier(item.name);
-      }
-      if (product?.price?.amount) {
-        return sum + product.price.amount;
-      }
+      const price = getProductPrice(item.name);
+      if (typeof price === 'number') return sum + price;
       return sum;
     }, 0);
   }, [shoppingList]);
@@ -43,12 +38,8 @@ export function ShoppingListSummary({ shoppingList, className = '' }: ShoppingLi
     
     try {
       const result = calculateMealsFromGroceryList(shoppingList);
-      // Override totalCost with the one calculated from ShoppingList logic to ensure they match
-      if (result) {
-        result.totalCost = totalCost;
-        result.costPerMeal = result.estimatedMeals > 0 ? totalCost / result.estimatedMeals : 0;
-      }
       console.log('[ShoppingListSummary] Estimate calculated:', result);
+      console.log('[ShoppingListSummary] UI totalCost prop (not used):', totalCost);
       return result;
     } catch (error) {
       console.error('[ShoppingListSummary] Error calculating meals:', error);

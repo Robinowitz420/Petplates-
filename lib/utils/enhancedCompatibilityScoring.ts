@@ -1624,7 +1624,7 @@ export function calculateBonuses(recipe: Recipe, pet: Pet): number {
 /**
  * Convert score to letter grade
  */
-function getGrade(score: number): 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F' {
+export function getGrade(score: number): 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F' {
   if (score >= 95) return 'A+';
   if (score >= 90) return 'A';
   if (score >= 85) return 'B+';

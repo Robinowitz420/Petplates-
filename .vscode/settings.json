@@ -1,4 +1,30 @@
 {
     "CodeGPT.apiKey": "Anthropic",
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    
+    // Auto-run validation on save for specific files
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "lib/validation/.*\\.ts$",
+                "cmd": "npx tsx lib/generator/Phase1_5_AutoClassify.ts > .validation-output.log 2>&1"
+            },
+            {
+                "match": "lib/data/vetted-products\\.ts$",
+                "cmd": "npx tsx lib/generator/Phase1_5_AutoClassify.ts > .validation-output.log 2>&1"
+            }
+        ]
+    },
+    
+    // File associations
+    "files.associations": {
+        "*.csv": "csv"
+    },
+    
+    // Exclude auto-generated files from search
+    "search.exclude": {
+        "**/.validation-output.log": true,
+        "**/PHASE_*_MANUAL_REVIEW.csv": false,
+        "**/AUTO_CLASSIFICATION_REPORT.md": false
+    }
 }

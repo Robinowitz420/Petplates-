@@ -1,7 +1,6 @@
 // lib/utils/recipeIngredients.ts
 // Utility to extract and map ingredients from recipes to ingredient composition keys
 
-import { recipes } from '@/lib/data/recipes-complete';
 import { INGREDIENT_COMPOSITIONS } from '@/lib/data/ingredientCompositions';
 
 /**

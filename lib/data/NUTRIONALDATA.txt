@@ -1,0 +1,247 @@
+Python
+
+nutrition_db = {
+    # --- FEEDER INSECTS (As Fed) ---
+    "Cricket": {"protein": 15.4, "fat": 3.3, "fiber": 2.2, "moisture": 77.1, "ca_p_ratio": "0.14:1"},
+    "Dubia Roach": {"protein": 21.4, "fat": 6.1, "fiber": 2.6, "moisture": 65.6, "ca_p_ratio": "0.3:1"},
+    "Mealworm": {"protein": 18.7, "fat": 13.4, "fiber": 2.5, "moisture": 61.9, "ca_p_ratio": "0.06:1"},
+    "Superworm": {"protein": 17.4, "fat": 16.0, "fiber": 2.4, "moisture": 59.0, "ca_p_ratio": "0.08:1"},
+    "Waxworm": {"protein": 14.1, "fat": 24.9, "fiber": 3.4, "moisture": 58.5, "ca_p_ratio": "0.07:1"},
+    "Black Soldier Fly Larvae": {"protein": 15.5, "fat": 9.4, "fiber": 2.8, "moisture": 66.8, "ca_p_ratio": "1.5:1"}, # High Calcium
+    "Hornworm": {"protein": 9.0, "fat": 3.0, "fiber": 1.1, "moisture": 85.0, "ca_p_ratio": "0.15:1"},
+    "Silkworm": {"protein": 9.3, "fat": 1.4, "fiber": 1.1, "moisture": 82.7, "ca_p_ratio": "0.4:1"},
+    "Butterworm": {"protein": 16.2, "fat": 29.4, "fiber": 1.4, "moisture": 58.5, "ca_p_ratio": "0.05:1"},
+    "Fruit Fly": {"protein": 17.0, "fat": 5.0, "fiber": 2.0, "moisture": 70.0, "ca_p_ratio": "0.1:1"},
+
+    # --- WHOLE PREY (Rodents/Birds) ---
+    "Pinkie Mouse": {"protein": 11.8, "fat": 4.5, "ash": 1.7, "moisture": 79.2},
+    "Fuzzy Mouse": {"protein": 15.7, "fat": 6.6, "ash": 2.4, "moisture": 73.0},
+    "Hopper Mouse": {"protein": 16.8, "fat": 7.4, "ash": 2.8, "moisture": 70.0},
+    "Adult Mouse": {"protein": 18.5, "fat": 8.0, "ash": 3.0, "moisture": 66.0},
+    "Rat Pup": {"protein": 13.0, "fat": 6.8, "ash": 1.9, "moisture": 76.0},
+    "Adult Rat": {"protein": 20.0, "fat": 9.5, "ash": 3.4, "moisture": 64.0},
+    "Day Old Chick": {"protein": 16.0, "fat": 6.0, "ash": 2.3, "moisture": 74.0},
+    "Quail (Whole)": {"protein": 19.0, "fat": 4.5, "ash": 3.0, "moisture": 70.0},
+    
+    # --- HAYS & GRASSES (Dry Matter Basis approx) ---
+    "Timothy Hay": {"protein": 7.0, "fat": 1.5, "fiber": 32.0, "calcium": 0.4},
+    "Alfalfa Hay": {"protein": 17.0, "fat": 1.5, "fiber": 24.0, "calcium": 1.3}, # High protein/calc
+    "Orchard Grass Hay": {"protein": 10.0, "fat": 1.5, "fiber": 30.0, "calcium": 0.3},
+    "Bermuda Hay": {"protein": 9.0, "fat": 1.7, "fiber": 29.0, "calcium": 0.4},
+}
+2. Produce (Greens & Vegetables)
+Key for Reptiles/Small Mammals: Focus on the Calcium to Phosphorus Ratio. A ratio below 1:1 (more Phos than Calc) prevents calcium absorption.
+
+Ingredient	Protein (%)	Fiber (%)	Sugar	Ca:P Ratio	Notes
+Dandelion Greens	2.7	3.5	Low	2.8:1	Excellent Staple
+Collard Greens	2.5	3.6	Low	1.8:1	Excellent Staple
+Mustard Greens	2.7	3.2	Low	2.4:1	Excellent Staple
+Turnip Greens	1.5	3.2	Low	4.5:1	Excellent Staple
+Arugula	2.6	1.6	Low	1.3:1	Good
+Kale	2.9	2.0	Low	2.4:1	High Oxalates (Caution)
+Spinach	2.9	2.2	Low	0.5:1	High Oxalates (Rarely feed)
+Romaine Lettuce	1.2	2.1	Med	0.8:1	Hydration only
+Iceberg Lettuce	0.9	1.2	High	1:1	Nutritionally Void
+Butternut Squash	1.0	2.0	Med	0.6:1	Good mixer
+Bell Pepper	0.9	1.7	Med	0.5:1	High Vit C
+Carrot	0.9	2.8	High	0.6:1	Treat only
+Corn (Fresh)	3.2	2.0	High	0.02:1	Poor Ca:P, High Starch
+
+Export to Sheets
+
+3. Meat & Fish (Raw/Cooked)
+Standard values per 100g.
+
+Ingredient	Protein (g)	Fat (g)	Notes
+Chicken Breast	31	3.6	Lean protein source
+Chicken Thigh	26	10.9	Higher fat
+Chicken Liver	24	6.5	Very high Vit A (Limit)
+Chicken Heart	26	10	High Taurine
+Turkey (Ground)	27	7-15	Varies by lean %
+Beef Liver	20	3.6	Very high Copper/Vit A
+Salmon (Filet)	20	13	High Omega 3
+Egg (Whole)	13	11	Complete protein
+Eggshell	~0	~0	95% Calcium Carbonate
+
+Export to Sheets
+
+4. Handling Generic/Brand Items
+Your list contains generic terms that cannot have specific static data because they are manufactured products. You must assign a "Target Average" or flag them for manual entry:
+
+Pellets (Guinea Pig, Rabbit, Chinchilla, Hamster, Rat, Ferret):
+
+Action: You cannot assign one value.
+
+Heuristic: Use Oxbow Essentials or Mazuri nutritional labels as your "Standard Reference" if you need a placeholder.
+
+Example (Guinea Pig): Protein 14%, Fat 2%, Fiber 25-28%.
+
+Supplements (Calcium, Multivitamins, Glucosamine, MSM):
+
+These are effectively 0 Calories/Macros. They should be flagged in your database as "Micronutrient Only."
+
+Calcium Carbonate: 40% Elemental Calcium.
+
+Oils (Salmon, Hemp, Flax, etc.):
+
+All are 100% Fat (approx 900 kcal/100g). The difference is the Omega 3/6/9 profile.
+
+Recommended Next Step
+This list is massive. To make this actionable for your script:
+
+Would you like me to generate a full CSV-formatted text block for a specific sub-section (e.g., just the "Seeds, Nuts & Grains" or just the "Fruits") so you can paste it directly into your database?
+
+Python
+
+fruits_db = {
+    # Format: Protein(%), Fat(%), Fiber(%), Sugar(%), Ca:P Ratio
+    "Apple": {"protein": 0.3, "fat": 0.2, "fiber": 2.4, "sugar": 10.4, "ca_p_ratio": "0.5:1"},
+    "Apricot": {"protein": 1.4, "fat": 0.4, "fiber": 2.0, "sugar": 9.2, "ca_p_ratio": "0.6:1"},
+    "Blackberries": {"protein": 1.4, "fat": 0.5, "fiber": 5.3, "sugar": 4.9, "ca_p_ratio": "1.3:1"}, # Good Ca:P
+    "Blueberries": {"protein": 0.7, "fat": 0.3, "fiber": 2.4, "sugar": 10.0, "ca_p_ratio": "0.5:1"},
+    "Cantaloupe": {"protein": 0.8, "fat": 0.2, "fiber": 0.9, "sugar": 7.9, "ca_p_ratio": "0.6:1"},
+    "Cherry": {"protein": 1.1, "fat": 0.2, "fiber": 2.1, "sugar": 12.8, "ca_p_ratio": "0.6:1"}, # Remove pits!
+    "Cranberry": {"protein": 0.4, "fat": 0.1, "fiber": 3.6, "sugar": 4.0, "ca_p_ratio": "0.6:1"},
+    "Fig": {"protein": 0.8, "fat": 0.3, "fiber": 2.9, "sugar": 16.0, "ca_p_ratio": "2.5:1"}, # High Calcium!
+    "Grapes": {"protein": 0.7, "fat": 0.2, "fiber": 0.9, "sugar": 15.5, "ca_p_ratio": "0.5:1"},
+    "Honeydew": {"protein": 0.5, "fat": 0.1, "fiber": 0.8, "sugar": 8.1, "ca_p_ratio": "0.6:1"},
+    "Kiwi": {"protein": 1.1, "fat": 0.5, "fiber": 3.0, "sugar": 9.0, "ca_p_ratio": "1.0:1"},
+    "Mango": {"protein": 0.8, "fat": 0.4, "fiber": 1.6, "sugar": 13.7, "ca_p_ratio": "0.9:1"},
+    "Papaya": {"protein": 0.5, "fat": 0.3, "fiber": 1.7, "sugar": 7.8, "ca_p_ratio": "4.8:1"}, # Excellent Ca:P
+    "Peach": {"protein": 0.9, "fat": 0.3, "fiber": 1.5, "sugar": 8.4, "ca_p_ratio": "0.3:1"},
+    "Pear": {"protein": 0.4, "fat": 0.1, "fiber": 3.1, "sugar": 9.8, "ca_p_ratio": "0.8:1"},
+    "Pineapple": {"protein": 0.5, "fat": 0.1, "fiber": 1.4, "sugar": 9.9, "ca_p_ratio": "1.6:1"}, # Acidic
+    "Plum": {"protein": 0.7, "fat": 0.3, "fiber": 1.4, "sugar": 9.9, "ca_p_ratio": "0.4:1"},
+    "Raspberries": {"protein": 1.2, "fat": 0.7, "fiber": 6.5, "sugar": 4.4, "ca_p_ratio": "1.8:1"}, # Good Ca:P
+    "Strawberries": {"protein": 0.7, "fat": 0.3, "fiber": 2.0, "sugar": 4.9, "ca_p_ratio": "0.7:1"},
+    "Watermelon": {"protein": 0.6, "fat": 0.2, "fiber": 0.4, "sugar": 6.2, "ca_p_ratio": "0.9:1"},
+    "Banana": {"protein": 1.1, "fat": 0.3, "fiber": 2.6, "sugar": 12.2, "ca_p_ratio": "0.2:1"}, # Low Calcium
+    "Date": {"protein": 2.5, "fat": 0.4, "fiber": 8.0, "sugar": 63.0, "ca_p_ratio": "0.6:1"}, # Very High Sugar
+    "Prune": {"protein": 2.2, "fat": 0.4, "fiber": 7.1, "sugar": 38.0, "ca_p_ratio": "0.6:1"}
+}
+2. Seeds, Nuts & Grains (Raw)
+Nutritional Note: These are energy-dense items. The fat content is the primary driver for caloric density. Inverse Ca:P ratios are very common here (high phosphorus), meaning they should often be fed with calcium supplements for reptiles/birds.
+
+Python
+
+seeds_nuts_grains_db = {
+    # Format: Protein(%), Fat(%), Fiber(%), Carbohydrates(%)
+    "Almond": {"protein": 21.2, "fat": 49.9, "fiber": 12.5, "carbs": 21.6},
+    "Amaranth (Raw)": {"protein": 13.6, "fat": 7.0, "fiber": 6.7, "carbs": 65.0},
+    "Barley (Hulled)": {"protein": 12.5, "fat": 2.3, "fiber": 17.3, "carbs": 73.0},
+    "Brazil Nut": {"protein": 14.3, "fat": 67.1, "fiber": 7.5, "carbs": 11.7}, # High Selenium
+    "Buckwheat": {"protein": 13.3, "fat": 3.4, "fiber": 10.0, "carbs": 71.5},
+    "Cashew": {"protein": 18.2, "fat": 43.9, "fiber": 3.3, "carbs": 30.2},
+    "Chia Seeds": {"protein": 16.5, "fat": 30.7, "fiber": 34.4, "carbs": 42.1},
+    "Flaxseed": {"protein": 18.3, "fat": 42.2, "fiber": 27.3, "carbs": 28.9},
+    "Hazelnut": {"protein": 15.0, "fat": 60.8, "fiber": 9.7, "carbs": 16.7},
+    "Hemp Seeds": {"protein": 31.6, "fat": 48.8, "fiber": 4.0, "carbs": 8.7},
+    "Macadamia": {"protein": 7.9, "fat": 75.8, "fiber": 8.6, "carbs": 13.8}, # Toxic to dogs
+    "Millet": {"protein": 11.0, "fat": 4.2, "fiber": 8.5, "carbs": 72.9},
+    "Oats (Rolled/Groats)": {"protein": 16.9, "fat": 6.9, "fiber": 10.6, "carbs": 66.3},
+    "Peanut": {"protein": 25.8, "fat": 49.2, "fiber": 8.5, "carbs": 16.1}, # High chance of aflatoxin
+    "Pecan": {"protein": 9.2, "fat": 72.0, "fiber": 9.6, "carbs": 13.9},
+    "Pine Nut": {"protein": 13.7, "fat": 68.4, "fiber": 3.7, "carbs": 13.1},
+    "Pistachio": {"protein": 20.2, "fat": 45.3, "fiber": 10.3, "carbs": 27.2},
+    "Pumpkin Seeds (Pepitas)": {"protein": 30.2, "fat": 49.1, "fiber": 6.0, "carbs": 10.7}, # Natural dewormer
+    "Quinoa (Raw)": {"protein": 14.1, "fat": 6.1, "fiber": 7.0, "carbs": 64.2},
+    "Sesame Seeds": {"protein": 17.7, "fat": 49.7, "fiber": 11.8, "carbs": 23.4},
+    "Sunflower Seeds": {"protein": 20.8, "fat": 51.5, "fiber": 8.6, "carbs": 20.0},
+    "Walnut": {"protein": 15.2, "fat": 65.2, "fiber": 6.7, "carbs": 13.7},
+    "Canary Seed": {"protein": 16.0, "fat": 6.0, "fiber": 6.0, "carbs": 55.0},
+    "Safflower Seed": {"protein": 16.2, "fat": 38.5, "fiber": 35.0, "carbs": 34.0},
+    "Nyjer (Thistle) Seed": {"protein": 19.0, "fat": 39.0, "fiber": 14.0, "carbs": 20.0}
+}
+3. Oils & Fats
+Nutritional Note: All oils are effectively 100% fat and ~884-900 kcal per 100g. The main difference is the Fatty Acid Profile.
+
+Python
+
+oils_db = {
+    # Values per 100g. Macros: 100g Fat, 0g Protein, 0g Carbs.
+    # Key Benefit noted for logic.
+    "Salmon Oil": {"fat": 100, "benefit": "High Omega-3 (EPA/DHA)"},
+    "Krill Oil": {"fat": 100, "benefit": "High Omega-3 + Astaxanthin"},
+    "Cod Liver Oil": {"fat": 100, "benefit": "High Vitamin A & D"},
+    "Herring Oil": {"fat": 100, "benefit": "High Omega-3"},
+    "Coconut Oil": {"fat": 100, "benefit": "MCTs (Medium Chain Triglycerides)"},
+    "Olive Oil": {"fat": 100, "benefit": "Monounsaturated Fats"},
+    "Flaxseed Oil": {"fat": 100, "benefit": "High ALA (Plant Omega-3)"},
+    "Hemp Seed Oil": {"fat": 100, "benefit": "Balanced Omega 3-6 (1:3 ratio)"},
+    "Sunflower Oil": {"fat": 100, "benefit": "High Omega-6 (Linoleic Acid)"},
+    "Safflower Oil": {"fat": 100, "benefit": "High Omega-6"},
+    "Wheat Germ Oil": {"fat": 100, "benefit": "Highest Vitamin E Content"},
+    "Pumpkin Seed Oil": {"fat": 100, "benefit": "Parasite resistance/Urinary health"}
+
+
+cooked_grains_legumes_db = {
+    # Format: Protein(%), Fat(%), Fiber(%), Carbohydrates(%), Moisture(%)
+    
+    # --- RICE & GRAINS (Cooked) ---
+    "White Rice (Cooked)": {"protein": 2.7, "fat": 0.3, "fiber": 0.4, "carbs": 28.2, "moisture": 68.4},
+    "Brown Rice (Cooked)": {"protein": 2.6, "fat": 0.9, "fiber": 1.8, "carbs": 23.0, "moisture": 70.0},
+    "Wild Rice (Cooked)": {"protein": 4.0, "fat": 0.3, "fiber": 3.0, "carbs": 21.3, "moisture": 74.0},
+    "Quinoa (Cooked)": {"protein": 4.4, "fat": 1.9, "fiber": 2.8, "carbs": 21.3, "moisture": 71.6},
+    "Oatmeal (Cooked)": {"protein": 2.5, "fat": 1.4, "fiber": 1.7, "carbs": 12.0, "moisture": 84.0}, # High moisture
+    "Barley (Cooked)": {"protein": 2.3, "fat": 0.4, "fiber": 3.8, "carbs": 28.2, "moisture": 68.0},
+    "Buckwheat (Cooked)": {"protein": 3.4, "fat": 0.6, "fiber": 2.7, "carbs": 19.9, "moisture": 75.0},
+    "Millet (Cooked)": {"protein": 3.5, "fat": 1.0, "fiber": 1.3, "carbs": 23.7, "moisture": 71.0},
+    "Corn (Cooked)": {"protein": 3.3, "fat": 1.3, "fiber": 2.5, "carbs": 22.0, "moisture": 70.0}, # Sweet corn
+    "Whole Wheat Pasta (Cooked)": {"protein": 5.3, "fat": 0.6, "fiber": 3.9, "carbs": 26.5, "moisture": 66.0},
+    "Couscous (Cooked)": {"protein": 3.8, "fat": 0.2, "fiber": 1.4, "carbs": 23.0, "moisture": 72.0},
+
+    # --- BEANS & LEGUMES (Cooked) ---
+    # *Note: Raw beans contain lectins (toxic). Always assume cooked values for feeding.*
+    "Black Beans (Cooked)": {"protein": 8.9, "fat": 0.5, "fiber": 8.7, "carbs": 23.7, "moisture": 66.0},
+    "Kidney Beans (Cooked)": {"protein": 8.7, "fat": 0.5, "fiber": 6.4, "carbs": 22.8, "moisture": 67.0},
+    "Pinto Beans (Cooked)": {"protein": 9.0, "fat": 0.7, "fiber": 9.0, "carbs": 26.2, "moisture": 63.0},
+    "Navy Beans (Cooked)": {"protein": 8.2, "fat": 0.6, "fiber": 10.5, "carbs": 26.0, "moisture": 64.0},
+    "Chickpeas (Garbanzo) (Cooked)": {"protein": 8.9, "fat": 2.6, "fiber": 7.6, "carbs": 27.4, "moisture": 60.0},
+    "Lentils (Cooked)": {"protein": 9.0, "fat": 0.4, "fiber": 7.9, "carbs": 20.1, "moisture": 69.7},
+    "Green Peas (Cooked)": {"protein": 5.4, "fat": 0.4, "fiber": 5.5, "carbs": 14.5, "moisture": 78.0},
+    "Split Peas (Cooked)": {"protein": 8.3, "fat": 0.4, "fiber": 8.3, "carbs": 19.6, "moisture": 70.0},
+    "Soybeans (Edamame) (Cooked)": {"protein": 11.9, "fat": 5.2, "fiber": 5.2, "carbs": 10.0, "moisture": 71.0}, # High protein
+    
+    # --- STARCHY VEG (Cooked) ---
+    "Sweet Potato (Cooked/Baked)": {"protein": 2.0, "fat": 0.1, "fiber": 3.3, "carbs": 20.7, "moisture": 73.0},
+    "Pumpkin (Cooked/Puree)": {"protein": 1.0, "fat": 0.2, "fiber": 2.9, "carbs": 6.5, "moisture": 90.0}, # Good for digestion
+    "Squash (Winter) (Cooked)": {"protein": 0.9, "fat": 0.4, "fiber": 2.8, "carbs": 8.0, "moisture": 89.0}
+}
+2. Remaining Unique Items
+These are specific items from your list that didn't fit neatly into the previous categories.
+
+Python
+
+misc_items_db = {
+    # --- PROCESSED/HUMAN ITEMS ---
+    "Cheerios (Whole Grain)": {"protein": 12.0, "fat": 6.5, "fiber": 10.0, "carbs": 73.0, "sugar": 4.0}, # Low sugar cereal
+    "Peanut Butter": {"protein": 25.0, "fat": 50.0, "fiber": 6.0, "carbs": 20.0, "sugar": 9.0}, # Calorie dense
+    "Tofu (Firm)": {"protein": 17.3, "fat": 8.7, "fiber": 2.3, "carbs": 2.8, "moisture": 70.0},
+    "Popcorn (Air Popped)": {"protein": 12.9, "fat": 4.5, "fiber": 14.5, "carbs": 77.9},
+    "Brewer's Yeast": {"protein": 40.0, "fat": 3.0, "fiber": 20.0, "ash": 7.0}, # High B-Vitamins
+    
+    # --- ANIMAL BY-PRODUCTS (Treats) ---
+    "Bone Broth (Liquid)": {"protein": 4.0, "fat": 0.5, "carbs": 0.5, "moisture": 94.0}, # Hydration support
+    "Gelatin (Unsweetened)": {"protein": 85.6, "fat": 0.1, "carbs": 0.0}, # 99% Protein (Collagen)
+    "Egg Yolk (Raw)": {"protein": 15.8, "fat": 26.5, "carbs": 3.6}, # Nutrient dense part of egg
+    "Egg White (Raw)": {"protein": 10.9, "fat": 0.2, "carbs": 0.7} # Lean protein
+}
+
+Acacia Gum / Gum Arabic0-2g Carbs, 0g Fat/Protein100% Soluble Fiber (Prebiotic)Amino Acid Supplement80-100g Protein, 0g Fat/CarbsBuilding blocks of protein (e.g., L-Lysine, L-Carnitine)Beta Glucan0g Fat/Protein, 0-5g CarbsSoluble Fiber (Immune support)Biotin / Niacinamide0g Fat/Protein/CarbsB-Vitamin (Micronutrient Only)Calcium Carbonate0g Fat/Protein/Carbs40% Elemental Calcium (Micronutrient Only)Chondroitin Sulfate0g Fat/Protein/CarbsJoint Health (Micronutrient Only)Curcumin0g Fat/Protein/CarbsAnti-inflammatory compound (Micronutrient Only)D Mannose100g Carbs (Sugar), 0g Fat/ProteinUrinary tract healthDigestive Enzymes0g Fat/Protein/CarbsAid digestion (Micronutrient Only)Electrolyte PowderVaries (mostly trace salts)Mineral/Hydration supportFructooligosaccharide (FOS)100g Carbs, 0g Fat/ProteinPrebiotic Fiber (Soluble)Glucosamine/Sulfate0g Fat/Protein/CarbsJoint Health (Micronutrient Only)Hyaluronic Acid / MSM0g Fat/Protein/CarbsJoint Health (Micronutrient Only)Inulin100g Carbs, 0g Fat/ProteinPrebiotic Fiber (Soluble)Kelp Powder8-15g Protein, 0.5g Fat, 40-60g CarbsHigh Iodine/MineralsL-Carnitine Powder100g Protein (Amino Acid)Fat metabolism supportLysine Powder100g Protein (Amino Acid)Essential Amino AcidMannanoligosaccharide (MOS)0g Fat/Protein/CarbsPrebiotic Fiber (Gut Health)Pectin100g Carbs, 0g Fat/ProteinSoluble Fiber (Thickener)Probiotic Powder0g Fat/Protein/CarbsLive culture (often in trace carb base)Psyllium Husk80-90g Fiber, 0g Fat/ProteinBulk-forming fiberQuercetin0g Fat/Protein/CarbsAntioxidant/Anti-inflammatory2. General Produce (Greens & Vegetables)IngredientProtein (%)Fiber (%)Ca:P RatioNotesAcorn Squash0.91.50.6:1Similar to ButternutArtichoke (Cooked)3.35.40.4:1High FiberAsparagus (Cooked)2.42.10.6:1Good source of Vitamin KBasil (Fresh)3.21.61.8:1Good Ca:PBeet Greens (Cooked)2.62.40.8:1High OxalateBok Choy1.51.02.7:1Excellent Ca:P StapleBrussel Sprout (Cooked)3.43.80.7:1High Vitamin C/KButter Lettuce1.30.90.7:1High MoistureCauliflower (Cooked)1.92.00.5:1Good fiberCelery0.71.60.8:1High MoistureCucumber0.71.50.4:1High MoistureDandelion Greens2.73.52.8:1Excellent StapleDelicata Squash1.01.50.6:1Good mixerEggplant (Cooked)0.82.50.5:1Low nutrientsEndive / Escarole1.33.10.7:1Good fiberFennel (Raw)1.23.10.8:1Mild anise flavorGreen Beans (Cooked)1.83.20.8:1Low nutrient densityGreen Cabbage1.32.50.6:1Good fiberJerusalem Artichoke2.01.60.4:1High InulinKabocha Squash1.01.80.5:1Good mixerLeek (Cooked)1.51.80.5:1Strong flavorMalabar Spinach2.01.02.7:1Excellent Ca:PMint3.88.02.5:1High Ca:PMustard Greens2.73.22.4:1Excellent StapleNapa Cabbage1.21.22.4:1Excellent Ca:PParsley (Fresh)3.03.34.2:1Highest Ca:P, high Vit KPattypan Squash0.71.50.5:1High MoisturePumpkin1.00.10.6:1High moisture, good digestionPurslane1.60.93.6:1Excellent StapleRadicchio1.53.01.2:1Good Ca:PRed Cabbage1.42.50.6:1Good fiberRegular Potato (Cooked)2.02.10.05:1Poor Ca:P, High Starch3. Missing Prey & Feeder DataI will provide the remaining unique prey and feeder insects not covered previously.Pythonprey_feed_db = {
+    # --- FISH / REPTILES ---
+    "Feeder Fish (Generic minnow/guppy)": {"protein": 14.0, "fat": 3.0, "moisture": 80.0, "ca_p_ratio": "0.5:1"},
+    "Silverside (Fish)": {"protein": 18.0, "fat": 2.0, "moisture": 79.0, "ca_p_ratio": "0.7:1"},
+    "Earthworm": {"protein": 17.0, "fat": 2.5, "moisture": 75.0, "ca_p_ratio": "0.8:1"},
+    "Butterworm": {"protein": 16.2, "fat": 29.4, "moisture": 58.5, "ca_p_ratio": "0.05:1"}, # High Fat
+    "Pinhead Cricket": {"protein": 15.0, "fat": 3.0, "moisture": 77.0, "ca_p_ratio": "0.14:1"}, # Similar to Adult Cricket
+    "Locust (Large)": {"protein": 19.0, "fat": 5.0, "moisture": 70.0, "ca_p_ratio": "0.3:1"},
+    "Grasshopper (Generic)": {"protein": 20.0, "fat": 6.0, "moisture": 70.0, "ca_p_ratio": "0.3:1"},
+    "Fruit Fly (Drosophila)": {"protein": 17.0, "fat": 5.0, "moisture": 70.0, "ca_p_ratio": "0.1:1"},
+    "Small Dubia Roach": {"protein": 21.4, "fat": 6.1, "moisture": 65.6, "ca_p_ratio": "0.3:1"}, # Same as large
+    "Phoenix Worm": {"protein": 15.5, "fat": 9.4, "moisture": 66.8, "ca_p_ratio": "**1.5:1**"}, # BSF Larvae, High Calcium
+    "Waxworm": {"protein": 14.1, "fat": 24.9, "moisture": 58.5, "ca_p_ratio": "0.07:1"},
+    "Day Old Chick (DOC)": {"protein": 16.0, "fat": 6.0, "moisture": 74.0, "ca_p_ratio": "1.8:1"}, # High Calcium due to bones
+    "Hopper Mouse": {"protein": 16.8, "fat": 7.4, "moisture": 70.0, "ca_p_ratio": "1.5:1"},
+}
+
+IngredientProtein (%) (DM)Fiber (%) (DM)Ca:P RatioNoteAlfalfa Based Pellet16-2020-30High (1.5:1+)Depends heavily on brand. Use a target of 17% Protein.Timothy Based Pellet12-1420-25Balanced (1:1-2:1)Depends heavily on brand. Use a target of 13% Protein.Guinea Pig Pellet14-1820-25BalancedMust contain Vitamin CRabbit Pellet12-1818-25VariesUse general Alfalfa or Timothy base value.Chinchilla Pellet16-2015-20VariesTypically higher fat/protein than rabbitHamster/Gerbil Pellet18-248-15VariesHigher protein/fatMeadow Hay6-1025-35VariesGeneric blend, use Timothy Hay as default.Fescue Hay8-1225-35VariesSimilar to Timothy/OrchardBarley Hay8-1030-35VariesLower protein than Alfalfa5. Final Missing Items (Targeted Lookup)Many of the remaining meat/oil/specific vegetable items are standard USDA/commodity items.Oils (100% Fat): Algae Oil, Almond Oil, Avocado Oil, Chia Seed Oil, Black Currant Oil, Borage Oil, Evening Primrose Oil. (The only difference is the Omega profile).Canned/Cooked Meats: Anchovy Canned, Herring Canned, Mackerel Canned, Tuna Water. (All are high protein, varying fat. Use average of 20-25% Protein, 5-15% Fat).Broths: Bone Broth, Chicken Broth, Fish Broth, Turkey Broth. (All are 95%+ moisture, 0.5-2.0% Protein, negligible fat/carbs).

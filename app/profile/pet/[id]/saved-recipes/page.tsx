@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HeartOff, ArrowLeft, Utensils, Clock, Trash2 } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
@@ -95,21 +94,6 @@ export default function SavedRecipesPage() {
       isCustom?: boolean;
       compatibilityScore?: number;
     }[] = [];
-    
-    // Add regular recipes
-    if (pet && pet.savedRecipes) {
-      pet.savedRecipes.forEach((recipeId) => {
-        const recipe = recipes.find((r) => r.id === recipeId);
-        if (recipe) {
-          allMeals.push({
-            id: recipe.id,
-            name: recipe.name,
-            dateAdded: undefined,
-            isCustom: false,
-          });
-        }
-      });
-    }
     
     // Add custom meals (with compatibility score)
     customMeals.forEach((meal) => {

@@ -1,0 +1,4478 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: app/api/recipes/generate/route.ts, lib/generator/RecipeBuilder.ts, lib/generator/RecipePriorScoring.ts, lib/generator/RecipeConstraintRules.ts, lib/generator/CombinatoricsPruning.ts, lib/generator/RecipeCompositionValidator.ts, lib/utils/enhancedCompatibilityScoring.ts
+- Files matching these patterns are excluded: **/*.xml, **/*.json, **/*.md
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+app/api/recipes/generate/route.ts
+lib/generator/CombinatoricsPruning.ts
+lib/generator/RecipeBuilder.ts
+lib/generator/RecipeCompositionValidator.ts
+lib/generator/RecipeConstraintRules.ts
+lib/generator/RecipePriorScoring.ts
+lib/utils/enhancedCompatibilityScoring.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="app/api/recipes/generate/route.ts">
+import { NextRequest, NextResponse } from 'next/server';
+import { generateRecipesForPet } from '@/lib/recipe-generator-v3';
+import type { Pet } from '@/lib/types';
+
+export const runtime = 'nodejs';
+
+interface RecipeRequest {
+  species?: string;
+  count?: number;
+  petProfile?: {
+    name?: string;
+    weight?: string;
+    weightKg?: number;
+    age?: string;
+    allergies?: string[];
+    healthConcerns?: string[];
+  };
+}
+
+/**
+ * Generate recipes dynamically based on pet species
+ * POST /api/recipes/generate
+ * Body: { species: 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets', count?: number, petProfile?: {...} }
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body: RecipeRequest = await request.json();
+    const { species = 'dogs', count = 50, petProfile } = body;
+
+    // Create a mock pet for recipe generation
+    const mockPet: any = {
+      id: `mock-${species}-${Date.now()}`,
+      name: petProfile?.name || 'Your Pet',
+      type: species,
+      breed: 'Mixed',
+      age: petProfile?.age || 'adult',
+      weight: petProfile?.weight || '10',
+      weightKg: petProfile?.weightKg || 10,
+      allergies: petProfile?.allergies || [],
+      healthConcerns: petProfile?.healthConcerns || [],
+    };
+
+    // Generate recipes using pragmatic system
+    console.log('[API] Generating recipes for pet:', {
+      name: mockPet.name,
+      type: mockPet.type,
+      healthConcerns: mockPet.healthConcerns,
+      allergies: mockPet.allergies,
+    });
+    
+    const recipes = generateRecipesForPet(
+      {
+        pet: mockPet as Pet,
+      },
+      count
+    );
+
+    console.log('[API] Generated recipes count:', recipes?.length || 0);
+
+    const generatedRecipes = recipes.map((recipe: any, index: number) => ({
+      ...recipe,
+      id: recipe.id || `generated-${species}-${index}-${Date.now()}`,
+      generatedAt: new Date().toISOString(),
+    }));
+
+    if (generatedRecipes.length === 0) {
+      console.error('[API] No recipes generated - returning 500');
+      return NextResponse.json(
+        { error: 'Failed to generate any recipes', species, attemptedCount: count, petProfile: mockPet },
+        { status: 500 }
+      );
+    }
+
+    // Sort by overall score (best first)
+    generatedRecipes.sort((a: any, b: any) => (b.scores?.overall || 0) - (a.scores?.overall || 0));
+
+    return NextResponse.json({
+      success: true,
+      recipes: generatedRecipes,
+      stats: {
+        total: generatedRecipes.length,
+        avgScore: (generatedRecipes.reduce((sum: number, r: any) => sum + (r.scores?.overall || 0), 0) / generatedRecipes.length).toFixed(1),
+      },
+    });
+  } catch (error) {
+    console.error('Recipe generation error:', error);
+    return NextResponse.json(
+      { error: 'Failed to generate recipes', details: String(error) },
+      { status: 500 }
+    );
+  }
+}
+</file>
+
+<file path="lib/generator/CombinatoricsPruning.ts">
+/**
+ * COMBINATORICS PRUNING
+ * Pre-validation filtering to prevent micronutrient-toxic pairings
+ * 
+ * This runs BEFORE validation, teaching the generator what NOT to produce
+ * instead of just rejecting finished recipes.
+ */
+
+import type { Ingredient } from '@/lib/data/ingredients';
+
+// ============================================================================
+// TOXIC PAIRINGS (Disallow these combinations)
+// ============================================================================
+
+interface ToxicPairing {
+  ingredients: string[]; // ingredient names (lowercase, partial match)
+  reason: string;
+  maxAllowed?: number; // max of this pairing allowed (0 = never)
+}
+
+const TOXIC_PAIRINGS: ToxicPairing[] = [
+  // Liver + high-iodine fish = vitamin A + iodine overload
+  {
+    ingredients: ['liver', 'salmon'],
+    reason: 'Liver + salmon = vitamin A + iodine spike',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'cod'],
+    reason: 'Liver + cod = vitamin A + iodine overload',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'sardine'],
+    reason: 'Liver + sardine = vitamin A + iodine spike',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'mackerel'],
+    reason: 'Liver + mackerel = vitamin A + iodine overload',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'herring'],
+    reason: 'Liver + herring = vitamin A + iodine spike',
+    maxAllowed: 0,
+  },
+
+  // Liver + high-iodine supplements = iodine bomb
+  {
+    ingredients: ['liver', 'kelp'],
+    reason: 'Liver + kelp = iodine bomb',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'seaweed'],
+    reason: 'Liver + seaweed = iodine overload',
+    maxAllowed: 0,
+  },
+
+  // Multiple organ meats = mineral overload
+  {
+    ingredients: ['liver', 'kidney'],
+    reason: 'Multiple organ meats = copper/mineral toxicity',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'heart'],
+    reason: 'Multiple organ meats = mineral imbalance',
+    maxAllowed: 0,
+  },
+
+  // High-copper sources together
+  {
+    ingredients: ['liver', 'sunflower_seed'],
+    reason: 'Liver + sunflower seeds = copper overload',
+    maxAllowed: 0,
+  },
+  {
+    ingredients: ['liver', 'pumpkin_seed'],
+    reason: 'Liver + pumpkin seeds = copper spike',
+    maxAllowed: 0,
+  },
+
+  // Oxalate + calcium = absorption issues
+  {
+    ingredients: ['spinach', 'eggshell_powder'],
+    reason: 'Spinach oxalates + calcium supplement = poor absorption',
+    maxAllowed: 0,
+  },
+];
+
+// ============================================================================
+// INGREDIENT MICRONUTRIENT DENSITY PROFILE
+// ============================================================================
+
+interface MicronutrientProfile {
+  vitaminA?: 'high' | 'medium' | 'low';
+  copper?: 'high' | 'medium' | 'low';
+  iodine?: 'high' | 'medium' | 'low';
+  oxalates?: 'high' | 'medium' | 'low';
+}
+
+const MICRONUTRIENT_PROFILES: Record<string, MicronutrientProfile> = {
+  // Organ meats (high in multiple micronutrients)
+  liver: { vitaminA: 'high', copper: 'high', iodine: 'medium' },
+  kidney: { copper: 'high', iodine: 'medium' },
+  heart: { copper: 'medium' },
+
+  // Fish (iodine-rich)
+  salmon: { iodine: 'high', vitaminA: 'medium' },
+  cod: { iodine: 'high' },
+  sardine: { iodine: 'high' },
+  mackerel: { iodine: 'high' },
+  herring: { iodine: 'high' },
+
+  // Supplements (concentrated)
+  kelp: { iodine: 'high' },
+  seaweed: { iodine: 'high' },
+  fish_oil: { vitaminA: 'high' },
+  cod_liver_oil: { vitaminA: 'high', iodine: 'high' },
+
+  // Seeds (copper-rich)
+  sunflower_seed: { copper: 'high' },
+  pumpkin_seed: { copper: 'high' },
+  sesame_seed: { copper: 'high' },
+
+  // Vegetables (oxalate-rich)
+  spinach: { oxalates: 'high' },
+  beet_greens: { oxalates: 'high' },
+  chard: { oxalates: 'high' },
+};
+
+// ============================================================================
+// PRUNING FUNCTIONS
+// ============================================================================
+
+/**
+ * Check if a pairing violates toxic combination rules
+ */
+export function hasToxicPairing(ingredients: Ingredient[]): boolean {
+  const names = ingredients.map(ing => ing.name.toLowerCase());
+
+  for (const pairing of TOXIC_PAIRINGS) {
+    const matches = pairing.ingredients.filter(required =>
+      names.some(name => name.includes(required))
+    );
+
+    if (matches.length === pairing.ingredients.length) {
+      // All ingredients in this toxic pairing are present
+      if (pairing.maxAllowed === 0) {
+        return true; // Disallowed
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Get micronutrient density profile for an ingredient
+ */
+export function getMicronutrientProfile(ingredient: Ingredient): MicronutrientProfile {
+  const name = ingredient.name.toLowerCase();
+
+  for (const [key, profile] of Object.entries(MICRONUTRIENT_PROFILES)) {
+    if (name.includes(key)) {
+      return profile;
+    }
+  }
+
+  return {}; // Unknown ingredient, assume low density
+}
+
+/**
+ * Calculate cumulative micronutrient risk for a recipe
+ * Returns a risk score (0-100) where 100 = definitely toxic
+ * 
+ * NOTE: This is SOFT pruning. Only flag truly dangerous combos.
+ * Fish + liver is OK. Fish + fish oil + liver is risky.
+ */
+export function calculateMicronutrientRisk(ingredients: Ingredient[]): number {
+  let risk = 0;
+
+  // Check for specific dangerous combos
+  const vitaminAHighCount = ingredients.filter(ing => {
+    const profile = getMicronutrientProfile(ing);
+    return profile.vitaminA === 'high';
+  }).length;
+
+  const iodineHighCount = ingredients.filter(ing => {
+    const profile = getMicronutrientProfile(ing);
+    return profile.iodine === 'high';
+  }).length;
+
+  const copperHighCount = ingredients.filter(ing => {
+    const profile = getMicronutrientProfile(ing);
+    return profile.copper === 'high';
+  }).length;
+
+  // Only flag if we have MULTIPLE high sources of the SAME nutrient
+  // (not just any high-density ingredient)
+  
+  // Multiple vitamin A sources (e.g., liver + fish oil)
+  if (vitaminAHighCount >= 2) risk += 50;
+
+  // Multiple iodine sources (e.g., kelp + fish + fish oil)
+  if (iodineHighCount >= 3) risk += 50;
+  else if (iodineHighCount >= 2) risk += 20; // Mild risk for 2 iodine sources
+
+  // Multiple copper sources (e.g., liver + seeds)
+  if (copperHighCount >= 2) risk += 40;
+
+  return Math.min(100, risk);
+}
+
+/**
+ * Prune candidates that are likely to fail T6 (nutrient ceiling)
+ * Returns true if candidate should be rejected
+ */
+export function shouldPruneCandidateForMicronutrients(ingredients: Ingredient[]): boolean {
+  // Hard reject: toxic pairings
+  if (hasToxicPairing(ingredients)) {
+    return true;
+  }
+
+  // Soft reject: high micronutrient risk
+  const risk = calculateMicronutrientRisk(ingredients);
+  if (risk > 70) {
+    return true; // Likely to fail T6
+  }
+
+  return false;
+}
+
+/**
+ * Get a human-readable reason why a candidate was pruned
+ */
+export function getPruningReason(ingredients: Ingredient[]): string {
+  if (hasToxicPairing(ingredients)) {
+    const names = ingredients.map(ing => ing.name.toLowerCase());
+    for (const pairing of TOXIC_PAIRINGS) {
+      const matches = pairing.ingredients.filter(required =>
+        names.some(name => name.includes(required))
+      );
+      if (matches.length === pairing.ingredients.length) {
+        return pairing.reason;
+      }
+    }
+  }
+
+  const risk = calculateMicronutrientRisk(ingredients);
+  if (risk > 70) {
+    return `High micronutrient risk (${Math.round(risk)}/100)`;
+  }
+
+  return 'Unknown';
+}
+</file>
+
+<file path="lib/generator/RecipeBuilder.ts">
+/**
+ * ENHANCED RECIPE BUILDER
+ * Adds health-aware ingredient selection + palatability
+ * 
+ * Key improvements:
+ * 1. Health concerns drive ingredient selection (40% weight)
+ * 2. Contraindications filtered as hard constraints
+ * 3. Palatability built into scoring (30% weight)
+ * 4. Species-specific taste preferences
+ * 5. Debug info for transparency
+ */
+
+import type { Species } from '@/lib/data/ingredients';
+import { INGREDIENTS, getIngredientsForSpecies, type Ingredient, type IngredientCategory } from '@/lib/data/ingredients';
+
+/**
+ * Normalize ingredient category strings to canonical values.
+ * Handles variations like 'fish', 'seafood', 'meat', 'poultry' → 'protein'
+ */
+function canonicalCategory(cat: any): IngredientCategory | 'unknown' {
+  const c = String(cat ?? '').toLowerCase().trim();
+
+  // PROTEIN family (fish, meat, poultry, seafood, eggs)
+  if (
+    c === 'protein' ||
+    c.includes('protein') ||
+    c.includes('meat') ||
+    c.includes('poultry') ||
+    c.includes('fish') ||
+    c.includes('seafood') ||
+    c.includes('egg')
+  ) return 'protein';
+
+  // VEGETABLE family
+  if (c === 'vegetable' || c.includes('veg')) return 'vegetable';
+
+  // FAT family (oils)
+  if (c === 'fat' || c.includes('oil')) return 'fat';
+
+  // CARB family (grains, starches)
+  if (c === 'carb' || c.includes('grain') || c.includes('starch')) return 'carb';
+
+  // Keep specialized categories as-is
+  if (['seed', 'nut', 'fruit', 'insect', 'hay', 'pellet', 'supplement'].includes(c)) {
+    return c as IngredientCategory;
+  }
+
+  return 'unknown';
+}
+import { getNutritionalStandard } from '@/lib/data/aafco-standards';
+import { HEALTH_BENEFIT_MAP, HEALTH_CONTRAINDICATIONS } from '@/lib/data/healthBenefitMap';
+import { validateRecipeComprehensive } from './RecipeConstraintRules';
+import { shouldPruneCandidateForMicronutrients, getPruningReason } from './CombinatoricsPruning';
+import { isFatCompatibleWithProteins, calculatePairingScore, logPairingDecision } from './RecipePMIScoring';
+import { applyPriorScoring } from './RecipePriorScoring';
+import { filterCandidatesByCommercialPriors, applyCommercialPriorScoring, hasCommercialPriors } from './CommercialPriorEnforcement';
+
+export interface GenerationConstraints {
+  species: Species;
+  lifeStage: 'puppy' | 'adult' | 'senior';
+  petWeightKg?: number; // PHASE 1.3: Actual pet weight for portion calculation
+  healthConcerns?: string[];
+  budgetPerMeal?: number;
+  targetCalories?: number;
+  allergies?: string[];
+  bannedIngredients?: string[];
+  recentIngredients?: string[]; // Track recently used ingredients for variety
+}
+
+export interface PortionedIngredient {
+  ingredient: Ingredient;
+  grams: number;
+}
+
+export interface GeneratedRecipeRaw {
+  ingredients: PortionedIngredient[];
+  totalGrams: number;
+  estimatedCost: number;
+  micronutrientDataIncomplete?: boolean; // Flag for exotic pets (no AAFCO standards)
+  debugInfo?: {
+    candidateCount: number;
+    topScores: Array<{ name: string; score: number; breakdown: any }>;
+    validation?: {
+      isValid: boolean;
+      failedRules: string[];
+      softPenalties: Array<{ ruleId: string; penalty: number; message: string }>;
+    };
+  };
+}
+
+interface ScoredIngredient {
+  ingredient: Ingredient;
+  totalScore: number;
+  breakdown: {
+    health: number;
+    quality: number;
+    nutritional: number;
+    diversity?: number;
+  };
+}
+
+export type DiversityMode = 'high' | 'medium' | 'low' | 'none';
+
+export class RecipeBuilder {
+  private constraints: GenerationConstraints;
+  private qualityTier: 'premium' | 'standard' | 'budget';
+  private diversityMode: DiversityMode;
+
+  // Scoring weights (reflects priority order)
+  private weights = {
+    health: 0.40,
+    nutritional: 0.50,
+    quality: 0.10,
+  };
+
+  constructor(
+    constraints: GenerationConstraints,
+    qualityTier: 'premium' | 'standard' | 'budget' = 'standard',
+    diversityMode: DiversityMode = 'medium'
+  ) {
+    this.constraints = constraints;
+    this.qualityTier = qualityTier;
+    this.diversityMode = diversityMode;
+  }
+
+  /**
+   * Main generation method
+   */
+  generate(): GeneratedRecipeRaw | null {
+    try {
+      console.log(`\n========== RECIPE GENERATION START (${this.constraints.species}) ==========`);
+      const maxRetries = 3;
+      let attempt = 0;
+      const failedIngredients = new Set<string>(); // Track ingredients that failed hard gates
+
+      while (attempt < maxRetries) {
+        attempt++;
+        console.log(`\n--- Attempt ${attempt}/${maxRetries} ---`);
+
+        // 1. Get candidate ingredients (hard filters)
+        let candidates = this.getCandidateIngredients();
+        console.log(`[Step 1] Candidates after filters: ${candidates.length}`);
+        
+        // 🔥 CRITICAL GUARDRAIL: Block small candidate pools (vetted-only path)
+        const MIN_POOL = 200;
+        if (this.constraints.species === 'cats' && candidates.length < MIN_POOL) {
+          throw new Error(
+            `[RecipeBuilder] Candidate pool collapsed to ${candidates.length}. ` +
+            `Refusing to generate recipes from small pool (likely vetted-only/products-only path). ` +
+            `Minimum required: ${MIN_POOL}`
+          );
+        }
+        
+        if (candidates.length === 0) {
+          console.warn(`No candidate ingredients found for ${this.constraints.species}`);
+          return null;
+        }
+
+        // 🔥 NEW: Exclude ingredients that failed hard gates in previous attempts
+        if (failedIngredients.size > 0) {
+          candidates = candidates.filter(ing => !failedIngredients.has(ing.name));
+          if (candidates.length === 0) {
+            console.warn('All candidates excluded due to previous failures');
+            return null;
+          }
+        }
+
+        // 2. Score all candidates
+        const scored = this.scoreIngredients(candidates);
+        console.log(`[Step 2] Scored ingredients: ${scored.length}`);
+        console.log(`[Step 2] Top 5 scores:`, scored.slice(0, 5).map(s => `${s.ingredient.name} (${s.totalScore.toFixed(1)})`));
+
+        // 3. Select best ingredients by category
+        const selected = this.selectIngredients(scored);
+        console.log(`[Step 3] Selected ingredients: ${selected.length}`);
+        console.log(`[Step 3] Ingredients:`, selected.map(i => `${i.name} (${i.category})`));
+        if (selected.length === 0) {
+          console.warn('No ingredients selected');
+          return null;
+        }
+
+        // 🔥 NEW: Prune micronutrient-toxic candidates BEFORE validation
+        if (shouldPruneCandidateForMicronutrients(selected)) {
+          if (attempt < maxRetries) {
+            console.warn(
+              `Attempt ${attempt} pruned (micronutrient risk): ${getPruningReason(selected)}`
+            );
+            continue; // Retry with different random selections
+          }
+        }
+
+        // 4. Calculate portions
+        const portioned = this.calculatePortions(selected);
+        console.log(`[Step 4] Portioned ingredients: ${portioned.length}`);
+        console.log(`[Step 4] Portions:`, portioned.map(p => `${p.ingredient.name}: ${p.grams}g`));
+        if (portioned.length === 0) {
+          console.warn('Failed to calculate portions');
+          return null;
+        }
+
+        // 5. Calculate cost
+        const estimatedCost = this.calculateCost(portioned);
+        console.log(`[Step 5] Estimated cost: $${estimatedCost.toFixed(2)}`);
+
+        // 🔥 NEW: Validate recipe composition (comprehensive)
+        const comprehensiveValidation = validateRecipeComprehensive(
+          selected,
+          this.constraints.species,
+          this.constraints.lifeStage,
+          estimatedCost,
+          this.constraints.allergies
+        );
+
+        console.log(`[Step 6] Validation result: ${comprehensiveValidation.isValid ? 'PASS' : 'FAIL'}`);
+        if (!comprehensiveValidation.isValid) {
+          console.warn(`[Step 6] Failed hard gates:`, comprehensiveValidation.failedRules);
+          
+          // 🔥 NEW: Track which ingredients to exclude next time
+          // If S2 (organ meat) failed, exclude organ meats
+          if (comprehensiveValidation.failedRules.includes('S2')) {
+            selected.forEach(ing => {
+              if (ing.name.toLowerCase().includes('liver') ||
+                  ing.name.toLowerCase().includes('kidney') ||
+                  ing.name.toLowerCase().includes('heart')) {
+                failedIngredients.add(ing.name);
+              }
+            });
+          }
+          
+          if (attempt < maxRetries) {
+            continue; // Retry with different random selections
+          }
+          // Last attempt failed - do NOT return recipe
+          console.error('Could not generate valid recipe after', maxRetries, 'attempts');
+          continue; // Skip to next retry (which will exit loop)
+        } else {
+          console.log(`[Step 6] ✅ Validation passed!`);
+          if (comprehensiveValidation.totalPenalty > 0) {
+            console.warn(
+              `[Step 6] Recipe quality penalties: ${comprehensiveValidation.totalPenalty}`,
+              comprehensiveValidation.softGates.map(g => `${g.ruleId}: -${g.penalty}`)
+            );
+          }
+        }
+
+        // 🔥 PHASE 1: Only return if validation passed
+        const species = this.constraints.species;
+        const isExoticPet = species === 'birds' || species === 'reptiles' || species === 'pocket-pets';
+        
+        return {
+          ingredients: portioned,
+          totalGrams: portioned.reduce((sum, p) => sum + p.grams, 0),
+          estimatedCost,
+          // Flag exotic pets: micronutrient data incomplete (no AAFCO standards)
+          micronutrientDataIncomplete: isExoticPet,
+          debugInfo: {
+            candidateCount: candidates.length,
+            topScores: scored.slice(0, 10).map(s => ({
+              name: s.ingredient.name,
+              score: Math.round(s.totalScore),
+              breakdown: {
+                health: Math.round(s.breakdown.health),
+                quality: Math.round(s.breakdown.quality),
+                nutrition: Math.round(s.breakdown.nutritional),
+              },
+            })),
+            validation: {
+              isValid: comprehensiveValidation.isValid,
+              failedRules: comprehensiveValidation.failedRules,
+              softPenalties: comprehensiveValidation.softGates.map(g => ({
+                ruleId: g.ruleId,
+                penalty: g.penalty,
+                message: g.message,
+              })),
+            },
+          },
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('RecipeBuilder.generate() error:', error);
+      return null;
+    }
+  }
+
+
+  /**
+   * STEP 1: HARD FILTERS
+   * Get candidate ingredients filtered by species and hard constraints
+   */
+  private getCandidateIngredients(): Ingredient[] {
+    let candidates = getIngredientsForSpecies(this.constraints.species);
+    
+    // 🔥 STACK TRACE: Identify source of small pools
+    console.log(`[PoolSource] Initial candidates: ${candidates.length}`, {
+      species: this.constraints.species,
+      source: 'getIngredientsForSpecies'
+    });
+    if (candidates.length < 200) {
+      console.trace('[PoolSource] Small pool detected - trace:');
+    }
+    
+    // 🔥 INVARIANT: Full pool must be large enough for cats
+    if (this.constraints.species === 'cats' && candidates.length < 200) {
+      throw new Error(
+        `[Invariant] Full ingredient pool too small (${candidates.length}). ` +
+        `Registry/provider is wrong. Expected 400+. ` +
+        `This means getIngredientsForSpecies is returning a subset (vetted-only? priced-only?).`
+      );
+    }
+
+    // Apply each filter individually with logging
+    candidates = candidates.filter(ing => {
+      // Filter 1: Allergies (HARD)
+      if (
+        this.constraints.allergies?.some(a =>
+          ing.name.toLowerCase().includes(a.toLowerCase())
+        )
+      ) {
+        return false;
+      }
+
+      // Filter 2: Banned ingredients (HARD)
+      if (
+        this.constraints.bannedIngredients?.some(b =>
+          ing.name.toLowerCase().includes(b.toLowerCase())
+        )
+      ) {
+        return false;
+      }
+
+      // Filter 3: Health contraindications (HARD)
+      if (this.constraints.healthConcerns?.length) {
+        for (const concern of this.constraints.healthConcerns) {
+          const contraindicated = HEALTH_CONTRAINDICATIONS[concern] || [];
+          const isContraindicated = contraindicated.some(
+            contra =>
+              ing.name.toLowerCase().includes(contra.toLowerCase()) ||
+              ing.id.includes(contra.toLowerCase())
+          );
+          if (isContraindicated) {
+            return false; // Hard exclude
+          }
+        }
+      }
+
+      // Filter 4: Exclude supplements from base recipes (HARD)
+      // Supplements should only appear in supplements tab as add-ons
+      if (ing.category === 'supplement') {
+        return false;
+      }
+
+      // Filter 4b: Explicitly exclude fish oils (HARD)
+      // Fish oils should only be supplements, not base ingredients
+      const lowerName = ing.name.toLowerCase();
+      const lowerId = ing.id.toLowerCase();
+      if (lowerName.includes('fish oil') || 
+          lowerName.includes('salmon oil') || 
+          lowerName.includes('anchovy oil') ||
+          lowerName.includes('mackerel oil') ||
+          lowerName.includes('krill oil') ||
+          lowerName.includes('cod liver oil') ||
+          lowerName.includes('sardine oil') ||
+          lowerName.includes('tuna oil') ||
+          lowerName.includes('herring oil') ||
+          lowerId.includes('fish_oil') ||
+          lowerId.includes('salmon_oil') ||
+          lowerId.includes('anchovy_oil') ||
+          lowerId.includes('mackerel_oil') ||
+          lowerId.includes('krill_oil') ||
+          lowerId.includes('cod_liver_oil') ||
+          lowerId.includes('sardine_oil') ||
+          lowerId.includes('tuna_oil') ||
+          lowerId.includes('herring_oil')) {
+        console.log(`[FILTER] Excluding fish oil: ${ing.name} (id: ${ing.id})`);
+        return false;
+      }
+
+      // Filter 5: Budget constraint (SOFT - allow some flex)
+      if (this.constraints.budgetPerMeal && ing.pricePerLb) {
+        const maxPrice = this.constraints.budgetPerMeal * 3; // Allow 3x for high-value ingredients
+        if (ing.pricePerLb > maxPrice) return false;
+      }
+
+      return true;
+    });
+    
+    console.log(`[Filters] After all filters: ${candidates.length} candidates`);
+    
+    // 🔥 INVARIANT: Check category pools for cats
+    if (this.constraints.species === 'cats') {
+      const veg = candidates.filter(x => canonicalCategory(x.category) === 'vegetable');
+      const fat = candidates.filter(x => canonicalCategory(x.category) === 'fat');
+      // Allow all proteins (exotic proteins already filtered out earlier)
+      const proteinPool = candidates.filter(x => canonicalCategory(x.category) === 'protein');
+      
+      console.log(`[CategoryPools] protein=${proteinPool.length}, veg=${veg.length}, fat=${fat.length}`);
+      
+      if (veg.length < 2 || fat.length < 1 || proteinPool.length < 1) {
+        throw new Error(
+          `[Invariant] Missing required ingredient categories for cats: ` +
+          `protein=${proteinPool.length} (need 1+), veg=${veg.length} (need 2+), fat=${fat.length} (need 1+). ` +
+          `Cannot generate valid recipes. Pool size: ${candidates.length}`
+        );
+      }
+    }
+
+    return candidates;
+  }
+
+  /**
+   * STEP 2: SCORE ALL CANDIDATES
+   * Multi-factor scoring: health + quality + nutrition + diversity penalty
+   * CRITICAL FIX: For protein category, heavily prioritize protein density
+   */
+  private scoreIngredients(candidates: Ingredient[]): ScoredIngredient[] {
+    const recentIngredients = this.constraints.recentIngredients || [];
+    
+    return candidates
+      .map(ing => {
+        const breakdown = {
+          health: this.scoreHealth(ing),
+          quality: this.scoreQuality(ing),
+          nutritional: this.scoreNutritional(ing),
+        };
+
+        // CRITICAL FIX: For protein category, use special weights
+        // USER REQUIREMENT: Nutrition ALWAYS wins - protein density must dominate
+        let weights = this.weights;
+        if (canonicalCategory(ing.category) === 'protein') {
+          weights = {
+            health: 0.20,
+            nutritional: 0.75,  // NUTRITION ALWAYS WINS - protein density dominates
+            quality: 0.05,      // Minimal influence from quality
+          };
+        }
+
+        let totalScore =
+          breakdown.health * weights.health +
+          breakdown.quality * weights.quality +
+          breakdown.nutritional * weights.nutritional;
+
+        // Apply diversity penalty for recently used ingredients
+        const ingNameLower = ing.name.toLowerCase();
+        const timesUsedRecently = recentIngredients.filter(r => r === ingNameLower).length;
+        
+        if (timesUsedRecently > 0) {
+          // Heavy penalty: 50% reduction per recent use
+          const diversityPenalty = Math.pow(0.5, timesUsedRecently);
+          totalScore *= diversityPenalty;
+          
+          if (timesUsedRecently >= 2) {
+            console.log(`[Diversity] Penalizing ${ing.name}: used ${timesUsedRecently}x recently, score ${totalScore.toFixed(1)} → ${(totalScore * diversityPenalty).toFixed(1)}`);
+          }
+        }
+
+        return { ingredient: ing, totalScore, breakdown };
+      })
+      .sort((a, b) => b.totalScore - a.totalScore); // Sort by total score descending
+  }
+
+  /**
+   * HEALTH SCORE (0-100)
+   * Does this ingredient help with pet's health concerns?
+   */
+  private scoreHealth(ing: Ingredient): number {
+    if (!this.constraints.healthConcerns?.length) return 50; // Neutral if no concerns
+
+    let score = 0;
+    const ingName = ing.name.toLowerCase();
+
+    for (const concern of this.constraints.healthConcerns) {
+      const beneficialIngredients = HEALTH_BENEFIT_MAP[concern] || [];
+
+      // Check if this ingredient is explicitly beneficial
+      const isBeneficial = beneficialIngredients.some(
+        beneficial =>
+          ingName.includes(beneficial.toLowerCase()) ||
+          beneficial.toLowerCase().includes(ingName)
+      );
+
+      if (isBeneficial) {
+        score += 35; // +35 per matched health concern (can exceed 100)
+      }
+    }
+
+    return Math.min(100, score);
+  }
+
+  /**
+   * QUALITY SCORE (0-100)
+   * Ingredient quality rating
+   */
+  private scoreQuality(ing: Ingredient): number {
+    return ing.qualityScore * 10; // Convert 1-10 to 0-100
+  }
+
+  /**
+   * NUTRITIONAL SCORE (0-100)
+   * CRITICAL FIX: Heavily prioritize protein density to meet AAFCO standards
+   * Protein is now 60% of nutritional score (was ~30%)
+   */
+  private scoreNutritional(ing: Ingredient): number {
+    const comp = ing.composition;
+    let score = 0;
+
+    // PROTEIN DENSITY - Now 70 points max
+    // Prioritize actual protein content over omega-3 for protein ingredients
+    if (comp.protein) {
+      if (comp.protein >= 30) score += 70;        // Chicken breast, turkey breast
+      else if (comp.protein >= 25) score += 55;   // Ground turkey, ground chicken, tuna
+      else if (comp.protein >= 20) score += 40;   // Salmon, duck
+      else if (comp.protein >= 15) score += 25;   // Eggs, some fish
+      else if (comp.protein >= 10) score += 12;   // Legumes
+      else if (comp.protein >= 5) score += 6;     // Some vegetables
+    }
+
+    // Healthy fats (omega-3) - 10 points max (reduced from 20)
+    // Omega-3 is good but shouldn't make canned fish dominate every recipe
+    if (comp.omega3 && comp.omega3 > 1) score += 10;
+    else if (comp.omega3 && comp.omega3 > 0.5) score += 5;
+
+    // Fiber (good for digestion) - 10 points max
+    if (comp.fiber && comp.fiber > 5) score += 10;
+    else if (comp.fiber && comp.fiber > 2) score += 5;
+
+    // Micronutrients - 10 points max
+    if (comp.calcium && comp.calcium > 100) score += 5;
+    if (comp.vitaminA && comp.vitaminA > 500) score += 5;
+
+    return Math.min(100, score);
+  }
+
+  /**
+   * Get required categories for a given species
+   */
+  private getRequiredCategoriesForSpecies(): IngredientCategory[] {
+    const species = this.constraints.species;
+    
+    switch (species) {
+      case 'dogs':
+        return ['protein', 'carb', 'vegetable'];
+      case 'cats':
+        return ['protein', 'vegetable'];
+      
+      case 'birds':
+        // Birds need seeds/nuts as protein, fruits/veggies for vitamins
+        return ['seed', 'nut', 'fruit', 'vegetable'];
+      
+      case 'reptiles':
+        // Reptiles need insects as protein, veggies for fiber
+        return ['insect', 'vegetable', 'fruit'];
+      
+      case 'pocket-pets':
+        // Pocket-pets need hay as staple, veggies/fruits for variety
+        return ['hay', 'vegetable', 'fruit', 'seed'];
+      
+      default:
+        return ['protein', 'carb', 'vegetable'];
+    }
+  }
+
+  /**
+   * Get how many ingredients to select from each category
+   * Some categories are more important than others
+   */
+  private getIngredientCountForCategory(category: IngredientCategory): number {
+    const species = this.constraints.species;
+    
+    // Dogs/Cats
+    if (species === 'dogs' || species === 'cats') {
+      if (category === 'protein') {
+        return 1; // S1: Exactly 1 primary protein (hard gate)
+      }
+      if (category === 'carb') {
+        return species === 'cats' ? 0 : 1; // Cats don't need carbs (obligate carnivores)
+      }
+      if (category === 'vegetable') {
+        return species === 'cats' ? 2 : 1; // Cats get 2 veggies for variety (min 3 ingredients)
+      }
+      if (category === 'fat') {
+        return 1; // 1 fat
+      }
+      return 1; // Default
+    }
+    
+    // Birds
+    if (species === 'birds') {
+      if (category === 'seed' || category === 'nut') {
+        return 2; // 2 seeds/nuts for variety
+      }
+      if (category === 'fruit') {
+        return 1; // 1 fruit
+      }
+      if (category === 'vegetable') {
+        return 1; // 1 veggie
+      }
+    }
+    
+    // Reptiles
+    if (species === 'reptiles') {
+      if (category === 'insect') {
+        return 2; // 2 insects for variety
+      }
+      if (category === 'vegetable') {
+        return 1; // 1 veggie
+      }
+      if (category === 'fruit') {
+        return 1; // 1 fruit (optional)
+      }
+    }
+    
+    // Pocket-pets
+    if (species === 'pocket-pets') {
+      if (category === 'hay') {
+        return 1; // 1 hay type (essential)
+      }
+      if (category === 'vegetable') {
+        return 2; // 2 veggies for variety
+      }
+      if (category === 'fruit') {
+        return 1; // 1 fruit (treat)
+      }
+      if (category === 'seed') {
+        return 1; // 1 seed type (optional)
+      }
+    }
+    
+    return 1; // Default
+  }
+
+  // REMOVED: Hardcoded fat-protein pairing logic
+  // Now using PMI-based pairing intelligence from recipePriors.json
+  // See RecipePMIScoring.ts for learned pairing logic
+
+  /**
+   * STEP 3: SELECT BEST INGREDIENTS
+   * Pick ingredients with weighted randomization to ensure diversity
+   * 🔥 FIX: Species-aware ingredient selection
+   */
+  private selectIngredients(scored: ScoredIngredient[]): Ingredient[] {
+    const selected: Ingredient[] = [];
+    const categories = this.getRequiredCategoriesForSpecies();
+
+    // 🔥 PRECONDITION CHECK: For cats, ensure we have all required categories
+    if (this.constraints.species === 'cats') {
+      const vegPool = scored.filter(s => canonicalCategory(s.ingredient.category) === 'vegetable');
+      const fatPool = scored.filter(s => canonicalCategory(s.ingredient.category) === 'fat');
+      // Allow all proteins (exotic proteins already filtered out earlier)
+      const proteinPool = scored.filter(s => canonicalCategory(s.ingredient.category) === 'protein');
+      
+      if (vegPool.length < 2 || fatPool.length < 1 || proteinPool.length < 1) {
+        throw new Error(
+          `[RecipeBuilder] Insufficient pools for cats: ` +
+          `protein=${proteinPool.length}, veg=${vegPool.length}, fat=${fatPool.length}. ` +
+          `Cannot generate valid recipe without all required categories.`
+        );
+      }
+    }
+
+    // DEBUG: Log what we're looking for
+    if (this.constraints.species === 'birds') {
+      console.log(`[BIRD DEBUG] Looking for categories: ${categories.join(', ')}`);
+      console.log(`[BIRD DEBUG] Total scored ingredients: ${scored.length}`);
+    }
+
+    for (const category of categories) {
+      let inCategory = scored.filter(s => canonicalCategory(s.ingredient.category) === category);
+      
+      // CRITICAL: For dogs/cats protein category, all proteins allowed (exotic already filtered)
+      // No additional filtering needed here
+      
+      // 🔥 COMMERCIAL PRIORS: Filter candidates using learned commercial pairing rules
+      if (hasCommercialPriors(this.constraints.species) && selected.length > 0) {
+        const selectedIds = selected.map(ing => ing.id);
+        const beforeCommercialFilter = inCategory.length;
+        
+        // Filter out hardBlockPairs (never co-occur in commercial products)
+        inCategory = filterCandidatesByCommercialPriors(
+          inCategory.map(s => s.ingredient),
+          selectedIds,
+          this.constraints.species,
+          '[Commercial] '
+        ).map(ing => {
+          // Find the scored ingredient back
+          return inCategory.find(s => s.ingredient.id === ing.id)!;
+        }).filter(Boolean);
+        
+        const afterCommercialFilter = inCategory.length;
+        if (beforeCommercialFilter !== afterCommercialFilter) {
+          console.log(`[Commercial Filter] Removed ${beforeCommercialFilter - afterCommercialFilter} hard-blocked ingredients`);
+        }
+      }
+      
+      // 🔥 PMI-BASED: Filter fats using learned pairing intelligence
+      if (category === 'fat') {
+        const selectedProteins = selected.filter(ing => canonicalCategory(ing.category) === 'protein');
+        if (selectedProteins.length > 0) {
+          const beforeFilter = inCategory.length;
+          inCategory = inCategory.filter(s => {
+            const compat = isFatCompatibleWithProteins(s.ingredient, selectedProteins, this.constraints.species);
+            if (!compat.compatible) {
+              console.log(`[PMI Filter] ${s.ingredient.name}: ${compat.reason}`);
+            }
+            return compat.compatible;
+          });
+          const afterFilter = inCategory.length;
+          if (beforeFilter !== afterFilter) {
+            console.log(`[PMI Filter] Removed ${beforeFilter - afterFilter} incompatible fats based on learned priors`);
+          }
+        }
+      }
+      
+      // 🔥 DEBUG: Log protein pool details for cats
+      if (this.constraints.species === 'cats' && category === 'protein') {
+        console.log(`[ProteinPool] Total proteins in scored: ${inCategory.length}`);
+        console.log(`[ProteinPool] Top 10 proteins:`, inCategory.slice(0, 10).map(s => 
+          `${s.ingredient.name} (score: ${s.totalScore.toFixed(1)}, role: ${s.ingredient.proteinRole || 'none'})`
+        ));
+      }
+      
+      if (inCategory.length === 0) {
+        console.warn(`No ingredients found for category: ${category} (species: ${this.constraints.species})`);
+        continue;
+      }
+
+      const count = this.getIngredientCountForCategory(category);
+      
+      // DEBUG: Log selection details for birds
+      if (this.constraints.species === 'birds') {
+        console.log(`[BIRD DEBUG] Category '${category}': ${inCategory.length} available, selecting ${count}`);
+        if (inCategory.length > 0) {
+          console.log(`[BIRD DEBUG]   Top 3 in ${category}:`, inCategory.slice(0, 3).map(s => 
+            `${s.ingredient.name} (score: ${s.totalScore.toFixed(1)})`
+          ));
+        }
+      }
+      
+      // Skip if count is 0 (e.g., cats don't need grains)
+      if (count === 0) continue;
+
+      // Pick randomly from top N
+      for (let i = 0; i < count && inCategory.length > 0; i++) {
+        let poolSize: number;
+        switch (this.diversityMode) {
+          case 'high':
+            poolSize = Math.min(8, inCategory.length);
+            break;
+          case 'medium':
+            poolSize = Math.min(5, inCategory.length);
+            break;
+          case 'low':
+            poolSize = Math.min(3, inCategory.length);
+            break;
+          case 'none':
+            poolSize = 1;
+            break;
+        }
+
+        const randomIndex = this.weightedRandomSelection(inCategory.slice(0, poolSize));
+        const selectedIng = inCategory[randomIndex].ingredient;
+        selected.push(selectedIng);
+        
+        // 🔥 DEBUG: Log what was selected
+        if (this.constraints.species === 'cats' && category === 'protein') {
+          console.log(`[Selection] Picked protein: ${selectedIng.name} (from pool of ${poolSize})`);
+        }
+        
+        // Remove selected to avoid duplicates
+        inCategory.splice(randomIndex, 1);
+      }
+    }
+
+    if (selected.length === 0) {
+      console.error('No ingredients selected for species:', this.constraints.species);
+      console.error('Available categories:', categories);
+      console.error('Scored ingredients count:', scored.length);
+    }
+
+    // CRITICAL: Enforce minimum 3 ingredients for proper meal prep
+    // 2-ingredient meals are just "putting ingredients in a bowl", not meal prep
+    const MIN_INGREDIENTS = 3;
+    if (selected.length < MIN_INGREDIENTS) {
+      console.warn(`Only ${selected.length} ingredients selected, need at least ${MIN_INGREDIENTS}`);
+      
+      // 🔥 NEVER pad with proteins when vegetables/fats are missing
+      // Check what categories we're missing
+      const selectedCategories = new Set(selected.map(ing => ing.category));
+      const missingCategories = categories.filter(cat => !selectedCategories.has(cat));
+      
+      if (missingCategories.length > 0) {
+        console.error(`Missing required categories: ${missingCategories.join(', ')}`);
+        console.error('Cannot pad with random ingredients - aborting recipe generation');
+        throw new Error(
+          `Recipe generation failed: missing required categories [${missingCategories.join(', ')}]. ` +
+          `This indicates the ingredient pool is too small or filtered incorrectly.`
+        );
+      }
+      
+      // Only pad if we have all required categories but just need more variety
+      const remainingNeeded = MIN_INGREDIENTS - selected.length;
+      const alreadySelectedIds = new Set(selected.map(ing => ing.id));
+      
+      // Get top-scoring ingredients from EXISTING categories only (no proteins if we already have one)
+      const availableToAdd = scored
+        .filter(s => {
+          // Don't add if already selected
+          if (alreadySelectedIds.has(s.ingredient.id)) return false;
+          
+          // For cats: don't add more proteins (we already have 1)
+          if (this.constraints.species === 'cats' && canonicalCategory(s.ingredient.category) === 'protein') {
+            return false;
+          }
+          
+          // Only add from categories we already have
+          return selectedCategories.has(s.ingredient.category);
+        })
+        .slice(0, remainingNeeded * 3); // Get 3x needed for variety
+      
+      for (let i = 0; i < remainingNeeded && availableToAdd.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * Math.min(5, availableToAdd.length));
+        selected.push(availableToAdd[randomIndex].ingredient);
+        availableToAdd.splice(randomIndex, 1);
+      }
+      
+      console.log(`Added ${remainingNeeded} ingredients to reach minimum. Total: ${selected.length}`);
+    }
+
+    // DEBUG: Log final selection for birds
+    if (this.constraints.species === 'birds') {
+      console.log(`[BIRD DEBUG] Final selection: ${selected.length} ingredients`);
+      selected.forEach(ing => console.log(`[BIRD DEBUG]   - ${ing.name} (${ing.category})`));
+    }
+
+    return selected;
+  }
+
+  /**
+   * Weighted random selection
+   * Higher-scoring ingredients have higher probability of being selected
+   */
+  private weightedRandomSelection(pool: ScoredIngredient[]): number {
+    if (pool.length === 1) return 0;
+
+    // Calculate weights (score^2 gives exponential preference to higher scores)
+    const weights = pool.map(s => Math.pow(Math.max(0, s.totalScore), 2));
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+    if (totalWeight === 0) {
+      // Fallback to uniform random if all scores are 0 or negative
+      return Math.floor(Math.random() * pool.length);
+    }
+
+    // Pick random value in [0, totalWeight)
+    let random = Math.random() * totalWeight;
+
+    // Find which ingredient this corresponds to
+    for (let i = 0; i < weights.length; i++) {
+      random -= weights[i];
+      if (random <= 0) return i;
+    }
+
+    return pool.length - 1; // Fallback
+  }
+
+  /**
+   * Calculate portions based on NUTRIENT TARGETS (not category weights)
+   * CRITICAL FIX: Calculate protein/fat needs UPFRONT, then allocate portions to meet targets
+   * This ensures recipes meet AAFCO standards for all species
+   */
+  private calculatePortions(ingredients: Ingredient[]): PortionedIngredient[] {
+    const petWeightKg = this.constraints.petWeightKg || 5;
+    const species = this.constraints.species;
+    
+    // Step 1: Calculate total meal size
+    const totalMealGrams = this.calculateTotalMealSize(petWeightKg, species);
+    
+    // Step 2: Get nutritional targets for this species
+    const targets = this.getNutritionalTargets(species);
+    
+    // Step 3: Calculate required nutrient grams
+    const targetProteinGrams = totalMealGrams * targets.proteinPercent;
+    const targetFatGrams = totalMealGrams * targets.fatPercent;
+    
+    // Step 4: Allocate portions to meet nutrient targets
+    return this.allocateNutrientTargetedPortions(
+      ingredients,
+      totalMealGrams,
+      targetProteinGrams,
+      targetFatGrams,
+      petWeightKg
+    );
+  }
+  
+  /**
+   * Calculate total meal size based on species and pet weight
+   */
+  private calculateTotalMealSize(petWeightKg: number, species: Species): number {
+    if (species === 'dogs' || species === 'cats') {
+      const mealMultiplier = this.qualityTier === 'premium' ? 80 : this.qualityTier === 'standard' ? 65 : 50;
+      return petWeightKg * mealMultiplier;
+    } else if (species === 'birds') {
+      return petWeightKg * 40;
+    } else if (species === 'reptiles') {
+      return petWeightKg * 30;
+    } else if (species === 'pocket-pets') {
+      return petWeightKg * 100;
+    }
+    return petWeightKg * 65;
+  }
+  
+  /**
+   * Get nutritional targets (protein %, fat %) for each species
+   * Based on AAFCO standards
+   */
+  private getNutritionalTargets(species: Species): { proteinPercent: number; fatPercent: number } {
+    switch (species) {
+      case 'dogs':
+        return { proteinPercent: 0.20, fatPercent: 0.08 }; // 20% protein, 8% fat (above 18% minimum)
+      case 'cats':
+        return { proteinPercent: 0.23, fatPercent: 0.10 }; // 23% protein, 10% fat (allows diverse protein sources)
+      case 'birds':
+        // Target 15% but accept 13-17% range (natural fluctuation in seed diets)
+        return { proteinPercent: 0.15, fatPercent: 0.08 };
+      case 'reptiles':
+        // Target 15% but accept 13-17% range (natural fluctuation in insect diets)
+        return { proteinPercent: 0.15, fatPercent: 0.07 };
+      case 'pocket-pets':
+        // Target 14% but accept 12-16% range (natural fluctuation in hay diets)
+        return { proteinPercent: 0.14, fatPercent: 0.06 };
+      default:
+        return { proteinPercent: 0.20, fatPercent: 0.08 };
+    }
+  }
+  
+  /**
+   * Allocate portions to meet nutrient targets
+   * Uses iterative approach: start with base allocation, then adjust to hit targets
+   */
+  private allocateNutrientTargetedPortions(
+    ingredients: Ingredient[],
+    totalMealGrams: number,
+    targetProteinGrams: number,
+    targetFatGrams: number,
+    petWeightKg: number
+  ): PortionedIngredient[] {
+    const species = this.constraints.species;
+    
+    // Note: highProtein used later for boosting portions if needed
+    const highProtein = ingredients.filter(ing => (ing.composition.protein || 0) >= 15);
+    
+    const portioned: PortionedIngredient[] = [];
+    let allocatedGrams = 0;
+    let allocatedProtein = 0;
+    let allocatedFat = 0;
+    
+    // USER REQUIREMENT: Distribute portions across ALL selected ingredients
+    // Don't allocate 90% to one ingredient - spread it out for variety
+    
+    // For dogs/cats: Use SELECTED protein (whatever was chosen by scoring)
+    if (species === 'dogs' || species === 'cats') {
+      // Get ANY protein that was selected (no primary/secondary distinction)
+      const proteinIngredients = ingredients.filter(ing => canonicalCategory(ing.category) === 'protein');
+      
+      if (proteinIngredients.length === 0) {
+        console.warn('No protein ingredients available for dogs/cats!');
+        console.warn('Selected ingredients:', ingredients.map(i => `${i.name} (cat: ${i.category})`));
+        return [];
+      }
+      
+      // Use whichever protein was selected (chicken, sardines, mackerel, turkey, etc.)
+      const primaryProtein = proteinIngredients[0];
+      
+      // Calculate portion needed to hit protein target with THIS protein
+      const proteinDensity = (primaryProtein.composition.protein || 20) / 100;
+      const requiredIngredientGrams = targetProteinGrams / proteinDensity;
+      
+      let proteinPortion = requiredIngredientGrams;
+      
+      // ARCHITECTURAL RULE: Hard upper bound to prevent crowding out micronutrients/fats
+      // Cats: 90% max (obligate carnivores, need high protein even with diverse sources)
+      // Dogs: 85% max (leaves 15% for variety & micronutrient carriers)
+      const maxProteinPercent = species === 'cats' ? 0.90 : 0.85;
+      proteinPortion = Math.min(proteinPortion, totalMealGrams * maxProteinPercent);
+      
+      // ARCHITECTURAL RULE: Never override max-inclusion constraints
+      const maxGrams = petWeightKg * 1000 * primaryProtein.maxInclusionPercent[species];
+      proteinPortion = Math.min(proteinPortion, maxGrams);
+      
+      proteinPortion = Math.round(proteinPortion);
+      
+      if (proteinPortion > 0) {
+        portioned.push({ ingredient: primaryProtein, grams: proteinPortion });
+        allocatedGrams += proteinPortion;
+        allocatedProtein += (primaryProtein.composition.protein || 0) * proteinPortion / 100;
+        allocatedFat += (primaryProtein.composition.fat || 0) * proteinPortion / 100;
+      }
+      
+      // Allocate remaining grams to other ingredients
+      const remainingGrams = totalMealGrams - allocatedGrams;
+      const otherIngredients = ingredients.filter(ing => ing.id !== primaryProtein.id);
+      
+      if (remainingGrams > 0 && otherIngredients.length > 0) {
+        const gramsPerIngredient = remainingGrams / otherIngredients.length;
+        
+        for (const ing of otherIngredients) {
+          let grams = gramsPerIngredient;
+          grams *= (0.85 + Math.random() * 0.3);
+          
+          const maxGrams = petWeightKg * 1000 * ing.maxInclusionPercent[species];
+          grams = Math.min(grams, maxGrams);
+          grams = Math.round(grams);
+          
+          if (grams > 0) {
+            portioned.push({ ingredient: ing, grams });
+            allocatedGrams += grams;
+            allocatedProtein += (ing.composition.protein || 0) * grams / 100;
+            allocatedFat += (ing.composition.fat || 0) * grams / 100;
+          }
+        }
+      }
+    } else {
+      // For exotic pets: Distribute with bias toward higher-protein items
+      // Equal grams ≠ equal nutrition - bias toward protein-dense natural foods
+      
+      // Calculate protein density weights for each ingredient
+      const totalProteinDensity = ingredients.reduce((sum, ing) => 
+        sum + (ing.composition.protein || 0), 0);
+      
+      for (const ing of ingredients) {
+        const proteinDensity = ing.composition.protein || 0;
+        
+        // Base allocation: equal distribution
+        const baseGrams = totalMealGrams / ingredients.length;
+        
+        // Protein bias: allocate more to higher-protein ingredients
+        // Weight = 70% equal + 30% protein-density-weighted
+        const proteinWeight = totalProteinDensity > 0 
+          ? proteinDensity / totalProteinDensity 
+          : 1 / ingredients.length;
+        
+        let grams = (baseGrams * 0.70) + (totalMealGrams * proteinWeight * 0.30);
+        
+        // Add variation (±15%)
+        grams *= (0.85 + Math.random() * 0.3);
+        
+        // ARCHITECTURAL RULE: Never override max-inclusion constraints
+        const maxGrams = petWeightKg * 1000 * ing.maxInclusionPercent[species];
+        grams = Math.min(grams, maxGrams);
+        grams = Math.round(grams);
+        
+        if (grams > 0) {
+          portioned.push({ ingredient: ing, grams });
+          allocatedGrams += grams;
+          allocatedProtein += (ing.composition.protein || 0) * grams / 100;
+          allocatedFat += (ing.composition.fat || 0) * grams / 100;
+        }
+      }
+    }
+    
+    // Step 4: Adjust if we're still below protein target
+    const currentProteinPercent = allocatedGrams > 0 ? (allocatedProtein / allocatedGrams) : 0;
+    const targetProteinPercent = targetProteinGrams / totalMealGrams;
+    
+    if (currentProteinPercent < targetProteinPercent * 0.95 && highProtein.length > 0) {
+      // Boost high-protein portions by 20%
+      for (const portioned_ing of portioned) {
+        if ((portioned_ing.ingredient.composition.protein || 0) >= 15) {
+          const boost = Math.round(portioned_ing.grams * 0.2);
+          const maxGrams = petWeightKg * 1000 * portioned_ing.ingredient.maxInclusionPercent[species];
+          portioned_ing.grams = Math.min(portioned_ing.grams + boost, maxGrams);
+        }
+      }
+    }
+    
+    return portioned;
+  }
+
+
+  /**
+   * Calculate estimated cost
+   */
+  private calculateCost(portioned: PortionedIngredient[]): number {
+    return portioned.reduce((sum, p) => {
+      if (!p.ingredient.pricePerLb) return sum;
+      const lbs = p.grams / 453.592;
+      return sum + lbs * p.ingredient.pricePerLb;
+    }, 0);
+  }
+}
+</file>
+
+<file path="lib/generator/RecipeCompositionValidator.ts">
+/**
+ * RECIPE COMPOSITION VALIDATOR
+ * Ensures recipes follow safe ingredient combination rules
+ * Prevents unsafe combinations like multiple organ meats or unbalanced macros
+ */
+
+import type { Ingredient, Species } from '@/lib/data/ingredients';
+
+// ============================================================================
+// INGREDIENT ROLE DEFINITIONS
+// ============================================================================
+
+export const INGREDIENT_ROLES = {
+  // Main proteins - can be primary ingredient (30-40% of recipe)
+  mainProtein: [
+    'chicken', 'turkey', 'beef', 'lamb', 'duck', 'venison',
+    'salmon', 'whitefish', 'cod', 'sardine', 'tuna', 'egg'
+  ],
+
+  // Organ meats - MUST be limited to <10% of recipe
+  organMeat: [
+    'liver', 'kidney', 'heart', 'tripe', 'lung', 'spleen'
+  ],
+
+  // Carbohydrates - should be 30-40% of recipe
+  carbs: [
+    'rice', 'oats', 'quinoa', 'barley', 'potato', 'sweet potato',
+    'pumpkin', 'squash', 'lentils', 'chickpeas', 'beans'
+  ],
+
+  // Vegetables - should be 10-20% of recipe
+  vegetables: [
+    'carrots', 'green beans', 'broccoli', 'spinach', 'kale',
+    'zucchini', 'celery', 'peas', 'asparagus', 'lettuce'
+  ],
+
+  // Fats/oils - should be <5% of recipe
+  fats: [
+    'fish oil', 'coconut oil', 'olive oil', 'salmon oil', 'flaxseed', 'oil'
+  ],
+};
+
+// ============================================================================
+// UNSAFE COMBINATIONS
+// ============================================================================
+
+export const UNSAFE_COMBINATIONS = [
+  {
+    name: 'Multiple Organ Meats',
+    ingredients: ['liver', 'kidney', 'heart'],
+    maxCombined: 1, // Can only have 1 organ meat per recipe
+    reason: 'Risk of vitamin A toxicity and mineral imbalance',
+  },
+  {
+    name: 'High-Fat Proteins Together',
+    ingredients: ['salmon', 'sardine', 'duck', 'lamb', 'mackerel'],
+    maxCombined: 1, // Only 1 high-fat protein per recipe
+    reason: 'Too much fat can cause pancreatitis',
+  },
+  {
+    name: 'Multiple Fish Sources',
+    ingredients: ['salmon', 'sardine', 'tuna', 'mackerel', 'whitefish', 'cod'],
+    maxCombined: 1, // Only 1 fish per recipe
+    reason: 'Risk of mercury accumulation and thiamine deficiency',
+  },
+];
+
+// ============================================================================
+// REQUIRED RECIPE STRUCTURE BY SPECIES
+// ============================================================================
+
+export const REQUIRED_RECIPE_STRUCTURE: Record<Species, {
+  mustHave: string[];
+  shouldHave: string[];
+  optional: string[];
+  minIngredients: number;
+  maxIngredients: number;
+}> = {
+  dogs: {
+    mustHave: ['mainProtein', 'carbs'], // REQUIRED
+    shouldHave: ['vegetables'], // RECOMMENDED
+    optional: ['fats', 'organMeat'], // OPTIONAL
+    minIngredients: 3, // At least protein + carb + veggie
+    maxIngredients: 6, // Don't overcomplicate
+  },
+  cats: {
+    mustHave: ['mainProtein'], // Obligate carnivores - protein is essential
+    shouldHave: ['fats'], // Cats need higher fat
+    optional: ['carbs', 'vegetables'], // Cats don't need carbs, but tolerate some
+    minIngredients: 2, // Can be simpler (protein + fat)
+    maxIngredients: 5,
+  },
+  birds: {
+    mustHave: ['vegetables', 'seed'], // Birds need seeds/veggies
+    shouldHave: ['fruit'], // Birds love fruits
+    optional: ['protein', 'carbs'],
+    minIngredients: 2,
+    maxIngredients: 5,
+  },
+  reptiles: {
+    mustHave: ['protein'], // Carnivorous reptiles need protein
+    shouldHave: ['vegetable'], // Some herbivorous/omnivorous reptiles
+    optional: ['carbs', 'fruit'],
+    minIngredients: 1,
+    maxIngredients: 4,
+  },
+  'pocket-pets': {
+    mustHave: ['hay', 'vegetable'], // Herbivores need hay and veggies
+    shouldHave: ['fruit'], // Optional treats
+    optional: ['carbs', 'seed'],
+    minIngredients: 2,
+    maxIngredients: 5,
+  },
+};
+
+// ============================================================================
+// VALIDATION RESULT
+// ============================================================================
+
+export interface ValidationResult {
+  isValid: boolean;
+  issues: string[];
+  warnings: string[];
+}
+
+// ============================================================================
+// MAIN VALIDATION FUNCTION
+// ============================================================================
+
+/**
+ * Validate recipe composition for safety and balance
+ */
+export function validateRecipeComposition(
+  selectedIngredients: Ingredient[],
+  species: Species
+): ValidationResult {
+  const issues: string[] = [];
+  const warnings: string[] = [];
+
+  const ingredientNames = selectedIngredients.map(ing => ing.name.toLowerCase());
+
+  // ========================================================================
+  // CHECK 1: Required structure
+  // ========================================================================
+  const structure = REQUIRED_RECIPE_STRUCTURE[species];
+  if (structure) {
+    // Check mustHave categories
+    for (const category of structure.mustHave) {
+      const hasCategory = ingredientNames.some(name =>
+        INGREDIENT_ROLES[category as keyof typeof INGREDIENT_ROLES]?.some(role =>
+          name.includes(role)
+        )
+      );
+      if (!hasCategory) {
+        issues.push(`Missing required ingredient type: ${category}`);
+      }
+    }
+
+    // Check shouldHave categories
+    for (const category of structure.shouldHave) {
+      const hasCategory = ingredientNames.some(name =>
+        INGREDIENT_ROLES[category as keyof typeof INGREDIENT_ROLES]?.some(role =>
+          name.includes(role)
+        )
+      );
+      if (!hasCategory) {
+        warnings.push(`Recommended ingredient type missing: ${category}`);
+      }
+    }
+
+    // Check ingredient count
+    if (selectedIngredients.length < structure.minIngredients) {
+      issues.push(
+        `Too few ingredients (${selectedIngredients.length}, need ${structure.minIngredients}+)`
+      );
+    }
+    if (selectedIngredients.length > structure.maxIngredients) {
+      warnings.push(
+        `Too many ingredients (${selectedIngredients.length}, recommended max ${structure.maxIngredients})`
+      );
+    }
+  }
+
+  // ========================================================================
+  // CHECK 2: Unsafe combinations
+  // ========================================================================
+  for (const combo of UNSAFE_COMBINATIONS) {
+    const matchedIngredients = ingredientNames.filter(name =>
+      combo.ingredients.some(unsafe => name.includes(unsafe))
+    );
+
+    if (matchedIngredients.length > combo.maxCombined) {
+      issues.push(
+        `Unsafe combination: ${matchedIngredients.join(' + ')}. ` +
+        `${combo.reason}. Max ${combo.maxCombined} allowed.`
+      );
+    }
+  }
+
+  // ========================================================================
+  // CHECK 3: Organ meat percentage (if present)
+  // ========================================================================
+  const hasOrganMeat = ingredientNames.some(name =>
+    INGREDIENT_ROLES.organMeat.some(organ => name.includes(organ))
+  );
+
+  if (hasOrganMeat) {
+    const organMeats = selectedIngredients.filter(ing =>
+      INGREDIENT_ROLES.organMeat.some(organ => ing.name.toLowerCase().includes(organ))
+    );
+
+    // Check if organ meat has proper role
+    const organMeatRole = organMeats[0]?.feedingRole;
+    if (organMeatRole === 'staple') {
+      issues.push(
+        `${organMeats[0].name} is marked as staple but should be supplement. ` +
+        `Organ meats must be limited to <10% of recipe.`
+      );
+    }
+
+    // If multiple ingredients, warn if organ meat portion is too large
+    if (selectedIngredients.length <= 2 && hasOrganMeat) {
+      issues.push(
+        `Recipe has too few ingredients with organ meat present. ` +
+        `Add carbs/vegetables to dilute organ meat concentration.`
+      );
+    }
+  }
+
+  // ========================================================================
+  // CHECK 4: No double proteins without carbs (for dogs)
+  // ========================================================================
+  if (species === 'dogs') {
+    const proteinCount = ingredientNames.filter(name =>
+      INGREDIENT_ROLES.mainProtein.some(p => name.includes(p)) ||
+      INGREDIENT_ROLES.organMeat.some(o => name.includes(o))
+    ).length;
+
+    const hasCarbs = ingredientNames.some(name =>
+      INGREDIENT_ROLES.carbs.some(c => name.includes(c))
+    );
+
+    if (proteinCount >= 2 && !hasCarbs) {
+      issues.push(
+        `Recipe has ${proteinCount} protein sources but no carbohydrates. ` +
+        `This is unbalanced and too protein-heavy.`
+      );
+    }
+  }
+
+  return {
+    isValid: issues.length === 0,
+    issues,
+    warnings,
+  };
+}
+
+/**
+ * Check if an ingredient should be categorized as a supplement (organ meat)
+ */
+export function isOrganMeat(ingredient: Ingredient): boolean {
+  const name = ingredient.name.toLowerCase();
+  return INGREDIENT_ROLES.organMeat.some(organ => name.includes(organ));
+}
+
+/**
+ * Get ingredient category role
+ */
+export function getIngredientRole(ingredient: Ingredient): string {
+  const name = ingredient.name.toLowerCase();
+
+  if (INGREDIENT_ROLES.mainProtein.some(p => name.includes(p))) return 'mainProtein';
+  if (INGREDIENT_ROLES.organMeat.some(o => name.includes(o))) return 'organMeat';
+  if (INGREDIENT_ROLES.carbs.some(c => name.includes(c))) return 'carbs';
+  if (INGREDIENT_ROLES.vegetables.some(v => name.includes(v))) return 'vegetables';
+  if (INGREDIENT_ROLES.fats.some(f => name.includes(f))) return 'fats';
+
+  return 'unknown';
+}
+</file>
+
+<file path="lib/generator/RecipeConstraintRules.ts">
+/**
+ * RECIPE CONSTRAINT RULES
+ * Pre-scoring validation gates that reject unsafe/invalid recipes before optimization
+ * 
+ * Pipeline:
+ * 1. Constraint Gate (hard rejections)
+ * 2. Composition Validator (structure + balance)
+ * 3. Nutrient Ceiling Validator (micronutrient caps)
+ * 4. Optimizer (cost + nutrition)
+ * 5. Scorer (quality + fit)
+ */
+
+import type { Ingredient, Species } from '@/lib/data/ingredients';
+
+// ============================================================================
+// NUTRIENT CEILING TABLE (Species-Aware)
+// Absolute caps per day equivalent, not scoring targets
+// ============================================================================
+
+export const NUTRIENT_CEILINGS: Record<Species, {
+  vitaminA_IU: number;
+  copper_mg: number;
+  iodine_mcg: number;
+  fat_percent: number;
+  calcium_g: number;
+  calcium_phosphorus_min: number;
+  calcium_phosphorus_max: number;
+}> = {
+  dogs: {
+    vitaminA_IU: 30000,       // PHASE 2: Per recipe (realistic with organs)
+    copper_mg: 5.0,           // PHASE 2: Per recipe ceiling (realistic with organs)
+    iodine_mcg: 1000,         // PHASE 2: Per recipe ceiling (realistic)
+    fat_percent: 30,
+    calcium_g: 2.5,
+    calcium_phosphorus_min: 1.2,
+    calcium_phosphorus_max: 2.0,
+  },
+  cats: {
+    vitaminA_IU: 25000,       // PHASE 2: Per recipe (realistic with organs)
+    copper_mg: 4.0,           // PHASE 2: Per recipe ceiling (realistic with organs)
+    iodine_mcg: 800,          // PHASE 2: Per recipe ceiling (realistic)
+    fat_percent: 45,
+    calcium_g: 2.0,
+    calcium_phosphorus_min: 1.1,
+    calcium_phosphorus_max: 1.5,
+  },
+  birds: {
+    vitaminA_IU: 4000, // Species-dependent, conservative estimate
+    copper_mg: 0.3,
+    iodine_mcg: 150,
+    fat_percent: 15,
+    calcium_g: 1.5,
+    calcium_phosphorus_min: 1.0,
+    calcium_phosphorus_max: 2.0,
+  },
+  reptiles: {
+    vitaminA_IU: 3000, // Highly species-dependent
+    copper_mg: 0.2,
+    iodine_mcg: 100,
+    fat_percent: 20,
+    calcium_g: 2.0,
+    calcium_phosphorus_min: 1.5,
+    calcium_phosphorus_max: 2.5,
+  },
+  'pocket-pets': {
+    vitaminA_IU: 4000,
+    copper_mg: 0.3,
+    iodine_mcg: 150,
+    fat_percent: 20,
+    calcium_g: 1.8,
+    calcium_phosphorus_min: 1.0,
+    calcium_phosphorus_max: 2.0,
+  },
+};
+
+// ============================================================================
+// INGREDIENT ROLE MATRIX
+// Prevents "two mains in disguise" and organ stacking
+// ============================================================================
+
+export const INGREDIENT_ROLE_MATRIX = {
+  'primary-protein': {
+    allowedAsPrimary: true,
+    percentCap: 0.60,
+    maxPerRecipe: 1, // Exactly one primary protein
+    examples: ['chicken_breast', 'beef', 'salmon', 'turkey_breast'],
+  },
+  'carb-base': {
+    allowedAsPrimary: false,
+    percentCap: 0.40,
+    maxPerRecipe: 2,
+    examples: ['rice', 'sweet_potato', 'oats', 'barley'],
+  },
+  'vegetable': {
+    allowedAsPrimary: false,
+    percentCap: 0.25,
+    maxPerRecipe: 3,
+    examples: ['carrots', 'green_beans', 'spinach', 'broccoli'],
+  },
+  'organ-meat': {
+    allowedAsPrimary: false,
+    percentCap: 0.10, // Hard cap for organ meats
+    maxPerRecipe: 1, // Only one organ meat per recipe
+    examples: ['chicken_liver', 'beef_liver', 'chicken_hearts'],
+  },
+  'fat-supplement': {
+    allowedAsPrimary: false,
+    percentCap: 0.05,
+    maxPerRecipe: 1, // Only one added fat source
+    examples: ['fish_oil', 'coconut_oil', 'olive_oil'],
+  },
+  'micronutrient': {
+    allowedAsPrimary: false,
+    percentCap: 0.01,
+    maxPerRecipe: 1,
+    examples: ['kelp', 'eggshell_powder', 'vitamin_premix'],
+  },
+};
+
+// ============================================================================
+// STRUCTURAL COMPOSITION RULES (Hard Gates)
+// ============================================================================
+
+export interface CompositionRuleResult {
+  passed: boolean;
+  ruleId: string;
+  message: string;
+}
+
+export function validateStructuralComposition(
+  ingredients: Ingredient[],
+  species: Species,
+  lifeStage: 'puppy' | 'adult' | 'senior'
+): CompositionRuleResult[] {
+  const results: CompositionRuleResult[] = [];
+
+  // S1: Exactly 1 protein source (STRICT) - Species-aware
+  // Dogs/cats: Must have 1 'protein' category (any protein, not just "primary")
+  // Birds: Can have seeds/nuts as protein
+  // Reptiles: Can have insects as protein
+  // Pocket-pets: Can have hay/seeds as protein
+  
+  // Helper to normalize categories
+  const canonicalCategory = (cat: any): string => {
+    const c = String(cat ?? '').toLowerCase().trim();
+    if (c === 'protein' || c.includes('protein') || c.includes('meat') || 
+        c.includes('poultry') || c.includes('fish') || c.includes('seafood') || c.includes('egg')) {
+      return 'protein';
+    }
+    return c;
+  };
+  
+  let primaryProteins: Ingredient[];
+  if (species === 'dogs' || species === 'cats') {
+    // Accept ANY protein ingredient (chicken, turkey, sardines, mackerel, etc.)
+    primaryProteins = ingredients.filter(ing => canonicalCategory(ing.category) === 'protein');
+  } else if (species === 'birds') {
+    // Birds: seeds/nuts/insects, but exclude oils (they're fats, not protein sources)
+    primaryProteins = ingredients.filter(ing =>
+      ['seed', 'nut', 'insect'].includes(ing.category) &&
+      !ing.name.toLowerCase().includes('oil')
+    );
+  } else if (species === 'reptiles') {
+    primaryProteins = ingredients.filter(ing =>
+      ['insect', 'protein'].includes(ing.category)
+    );
+  } else if (species === 'pocket-pets') {
+    primaryProteins = ingredients.filter(ing =>
+      ['hay', 'seed'].includes(ing.category)
+    );
+  } else {
+    // Default: accept any protein
+    primaryProteins = ingredients.filter(ing => canonicalCategory(ing.category) === 'protein');
+  }
+  
+  // Dogs/cats need exactly 1, exotic species can have 1-2 for variety
+  const minRequired = (species === 'dogs' || species === 'cats') ? 1 : 1;
+  const maxAllowed = (species === 'dogs' || species === 'cats') ? 1 : 3;
+  
+  results.push({
+    passed: primaryProteins.length >= minRequired && primaryProteins.length <= maxAllowed,
+    ruleId: 'S1',
+    message: `Primary protein sources: ${primaryProteins.length} (species: ${species}, range: ${minRequired}-${maxAllowed})`,
+  });
+
+  // S2: Organ meats ≤ 1 per recipe (count-based, not weight)
+  // NOTE: Weight-based cap moved to quality scoring as soft gate
+  const organMeatNames = ['liver', 'kidney', 'heart'];
+  const organMeats = ingredients.filter(ing => {
+    const name = ing.name.toLowerCase();
+    return ing.feedingRole === 'supplement' && organMeatNames.some(organ => name.includes(organ));
+  });
+  
+  results.push({
+    passed: organMeats.length <= 1,
+    ruleId: 'S2',
+    message: `Organ meats ≤ 1 per recipe (found ${organMeats.length})`,
+  });
+
+  // S3: Organ meats cannot be primary protein
+  const organAsPrimary = ingredients.filter(ing =>
+    ing.feedingRole === 'staple' &&
+    (ing.name.toLowerCase().includes('liver') ||
+      ing.name.toLowerCase().includes('kidney') ||
+      ing.name.toLowerCase().includes('heart'))
+  );
+  results.push({
+    passed: organAsPrimary.length === 0,
+    ruleId: 'S3',
+    message: `Organ meats cannot be primary protein (found ${organAsPrimary.length})`,
+  });
+
+  // S4: Must include carb/energy source (species-aware)
+  // Dogs: need 'carb' (grains)
+  // Birds: need 'seed' or 'nut' (energy-dense)
+  // Pocket-pets: need 'hay' (fiber/energy)
+  // Cats/reptiles: optional carbs
+  let hasEnergySource = false;
+  if (species === 'dogs') {
+    hasEnergySource = ingredients.some(ing => ing.category === 'carb');
+  } else if (species === 'birds') {
+    hasEnergySource = ingredients.some(ing => ['seed', 'nut', 'carb'].includes(ing.category));
+  } else if (species === 'pocket-pets') {
+    hasEnergySource = ingredients.some(ing => ['hay', 'seed', 'carb'].includes(ing.category));
+  } else {
+    hasEnergySource = true; // Cats/reptiles don't require carbs
+  }
+  
+  results.push({
+    passed: hasEnergySource,
+    ruleId: 'S4',
+    message: `${species} energy source requirement met: ${hasEnergySource}`,
+  });
+
+  // S5: Carnivores may be carb-free (informational, not a gate)
+  const isCarnivore = ['cats', 'reptiles'].includes(species);
+  results.push({
+    passed: true, // Always pass - this is permissive
+    ruleId: 'S5',
+    message: `${species} may be carb-free (allowed)`,
+  });
+
+  // S6: Minimum ingredient categories
+  // All species need at least 2 different categories for nutritional balance
+  const categories = new Set(ingredients.map(ing => ing.category));
+  results.push({
+    passed: categories.size >= 2,
+    ruleId: 'S6',
+    message: `Minimum 2 ingredient categories required (found ${categories.size})`,
+  });
+
+  // S7: Added fat sources ≤ 1
+  const addedFats = ingredients.filter(ing => ing.category === 'fat');
+  results.push({
+    passed: addedFats.length <= 1,
+    ruleId: 'S7',
+    message: `Maximum 1 added fat source (found ${addedFats.length})`,
+  });
+
+  // S8: Ingredient diversity ≥ 3 unique foods
+  const uniqueIngredients = new Set(ingredients.map(ing => ing.id));
+  results.push({
+    passed: uniqueIngredients.size >= 3,
+    ruleId: 'S8',
+    message: `Minimum 3 unique ingredients required (found ${uniqueIngredients.size})`,
+  });
+
+  return results;
+}
+
+// ============================================================================
+// SAFETY & TOXICITY RULES (Hard Gates)
+// ============================================================================
+
+export interface SafetyRuleResult {
+  passed: boolean;
+  ruleId: string;
+  message: string;
+  value?: number;
+  ceiling?: number;
+}
+
+export function validateSafetyAndToxicity(
+  ingredients: Ingredient[],
+  species: Species,
+  allergies?: string[]
+): SafetyRuleResult[] {
+  const results: SafetyRuleResult[] = [];
+  const ceilings = NUTRIENT_CEILINGS[species];
+
+  // T1: Vitamin A ceiling (HARD for dogs/cats, SOFT for exotic pets)
+  const proteinAndOrganMeats = ingredients.filter(ing => 
+    ing.category === 'protein' || 
+    ing.name.toLowerCase().includes('liver') ||
+    ing.name.toLowerCase().includes('kidney') ||
+    ing.name.toLowerCase().includes('heart')
+  );
+  
+  const totalVitaminA = ingredients.reduce((sum, ing) => sum + (ing.composition.vitaminA || 0), 0);
+  const hasVitaminAData = proteinAndOrganMeats.every(ing => ing.composition.vitaminA !== undefined);
+  
+  // Only enforce for dogs/cats (AAFCO standards exist)
+  const enforceT1 = species === 'dogs' || species === 'cats';
+  results.push({
+    passed: enforceT1 ? (hasVitaminAData && totalVitaminA <= ceilings.vitaminA_IU) : true,
+    ruleId: 'T1',
+    message: hasVitaminAData 
+      ? `Vitamin A: ${totalVitaminA} IU (ceiling: ${ceilings.vitaminA_IU})`
+      : enforceT1 
+        ? `Vitamin A data incomplete for proteins/organs - cannot validate`
+        : `Vitamin A data incomplete (soft warning for ${species})`,
+    value: totalVitaminA,
+    ceiling: ceilings.vitaminA_IU,
+  });
+
+  // T2: Copper ceiling (HARD for dogs/cats, SOFT for exotic pets)
+  const totalCopper = ingredients.reduce((sum, ing) => sum + (ing.composition.copper_mg_per_100g || 0), 0);
+  const hasAllCopperData = ingredients.every(ing => ing.composition.copper_mg_per_100g !== undefined);
+  
+  // Only enforce for dogs/cats
+  const enforceT2 = species === 'dogs' || species === 'cats';
+  results.push({
+    passed: enforceT2 ? (hasAllCopperData && totalCopper <= ceilings.copper_mg) : true,
+    ruleId: 'T2',
+    message: hasAllCopperData 
+      ? `Copper: ${totalCopper.toFixed(2)} mg (ceiling: ${ceilings.copper_mg})`
+      : enforceT2
+        ? `Copper data incomplete - cannot validate`
+        : `Copper data incomplete (soft warning for ${species})`,
+    value: totalCopper,
+    ceiling: ceilings.copper_mg,
+  });
+
+  // T3: Iodine ceiling (PHASE 2: Now using class-based defaults + measured overrides)
+  const totalIodine = ingredients.reduce((sum, ing) => sum + (ing.composition.iodine_mcg_per_100g || 0), 0);
+  const hasAllIodineData = ingredients.every(ing => ing.composition.iodine_mcg_per_100g !== undefined);
+  results.push({
+    passed: hasAllIodineData && totalIodine <= ceilings.iodine_mcg,
+    ruleId: 'T3',
+    message: hasAllIodineData 
+      ? `Iodine: ${totalIodine.toFixed(1)} mcg (ceiling: ${ceilings.iodine_mcg})`
+      : `Iodine data incomplete - cannot validate`,
+    value: totalIodine,
+    ceiling: ceilings.iodine_mcg,
+  });
+
+  // T4: Known toxic ingredient present
+  const toxicIngredients = ['grape', 'raisin', 'onion', 'garlic', 'chocolate', 'xylitol'];
+  const hasToxic = ingredients.some(ing =>
+    toxicIngredients.some(toxic => ing.name.toLowerCase().includes(toxic))
+  );
+  results.push({
+    passed: !hasToxic,
+    ruleId: 'T4',
+    message: `No known toxic ingredients (found: ${hasToxic})`,
+  });
+
+  // T5: Allergen or derivative present
+  const hasAllergen =
+    allergies && allergies.length > 0
+      ? ingredients.some(ing =>
+          allergies.some(allergen =>
+            ing.name.toLowerCase().includes(allergen.toLowerCase()) ||
+            ing.id.includes(allergen.toLowerCase())
+          )
+        )
+      : false;
+  results.push({
+    passed: !hasAllergen,
+    ruleId: 'T5',
+    message: `No allergens present (found: ${hasAllergen})`,
+  });
+
+  // T6: Ca:P ratio (SOFT WARNING - hard gate disabled until supplements available)
+  // Phase 1: Just track it. Phase 2: Apply soft penalties if out of range.
+  // Real fix: Add calcium supplement ingredients (eggshell powder, bone meal, etc.)
+  const totalCalcium = ingredients.reduce((sum, ing) => sum + (ing.composition.calcium || 0), 0);
+  const totalPhosphorus = ingredients.reduce((sum, ing) => sum + (ing.composition.phosphorus || 0), 0);
+  const caPRatio = totalPhosphorus > 0 ? totalCalcium / totalPhosphorus : 1;
+  const hasCalciumSupplement = ingredients.some(ing =>
+    ing.name.toLowerCase().includes('eggshell') ||
+    ing.name.toLowerCase().includes('bone meal') ||
+    ing.name.toLowerCase().includes('calcium')
+  );
+  
+  // Pass if: naturally in range OR has calcium supplement
+  const caPValid = (caPRatio >= 1.0 && caPRatio <= 2.0) || hasCalciumSupplement;
+  
+  results.push({
+    passed: true, // Always pass - this is now a soft warning, not hard gate
+    ruleId: 'T6',
+    message: `Ca:P ratio: ${Math.round(caPRatio * 100) / 100} ${hasCalciumSupplement ? '(supplement present)' : '(natural)'}`,
+    value: Math.round(caPRatio * 100) / 100,
+    ceiling: 2.0,
+  });
+
+  return results;
+}
+
+// ============================================================================
+// LIFE STAGE RULES (Hard Gates)
+// ============================================================================
+
+export interface LifeStageRuleResult {
+  passed: boolean;
+  ruleId: string;
+  message: string;
+}
+
+export function validateLifeStage(
+  ingredients: Ingredient[],
+  species: Species,
+  lifeStage: 'puppy' | 'adult' | 'senior'
+): LifeStageRuleResult[] {
+  const results: LifeStageRuleResult[] = [];
+
+  if (lifeStage === 'puppy') {
+    // L1: Puppy calcium upper limit (prevent skeletal issues)
+    const totalCalcium = ingredients.reduce((sum, ing) => sum + (ing.composition.calcium || 0), 0);
+    const puppyCalciumMax = 2.0; // g per day
+    results.push({
+      passed: totalCalcium <= puppyCalciumMax,
+      ruleId: 'L1',
+      message: `Puppy calcium ≤ ${puppyCalciumMax}g (found ${totalCalcium}g)`,
+    });
+
+    // L4: Growth diets require higher protein
+    const totalProtein = ingredients.reduce((sum, ing) => sum + (ing.composition.protein || 0), 0);
+    const puppyProteinMin = 18; // % of calories
+    results.push({
+      passed: totalProtein >= puppyProteinMin,
+      ruleId: 'L4',
+      message: `Puppy protein ≥ ${puppyProteinMin}% (found ${totalProtein}%)`,
+    });
+  }
+
+  if (lifeStage === 'senior' && species === 'dogs') {
+    // L3: Senior kidney load (reduce phosphorus)
+    const totalPhosphorus = ingredients.reduce((sum, ing) => sum + (ing.composition.phosphorus || 0), 0);
+    const seniorPhosphorusMax = 1.0; // g per day
+    results.push({
+      passed: totalPhosphorus <= seniorPhosphorusMax,
+      ruleId: 'L3',
+      message: `Senior phosphorus ≤ ${seniorPhosphorusMax}g (found ${totalPhosphorus}g)`,
+    });
+  }
+
+  return results;
+}
+
+// ============================================================================
+// QUALITY / PLAUSIBILITY RULES (Soft Gates → Penalty)
+// ============================================================================
+
+export interface QualityRuleResult {
+  passed: boolean;
+  ruleId: string;
+  message: string;
+  penalty: number; // 0-100, applied to score
+}
+
+export function validateQualityAndPlausibility(
+  ingredients: Ingredient[],
+  estimatedCost: number
+): QualityRuleResult[] {
+  const results: QualityRuleResult[] = [];
+
+  // Q1: "Two mains in disguise" (multiple high-protein ingredients)
+  const highProteinCount = ingredients.filter(ing =>
+    ing.composition.protein && ing.composition.protein > 20
+  ).length;
+  const twoMainsPenalty = highProteinCount > 1 ? 30 : 0;
+  results.push({
+    passed: highProteinCount <= 1,
+    ruleId: 'Q1',
+    message: `Multiple high-protein ingredients detected (${highProteinCount})`,
+    penalty: twoMainsPenalty,
+  });
+
+  // Q2: Excessive powders / oils (low ingredient diversity)
+  const powderOilCount = ingredients.filter(ing =>
+    ing.name.toLowerCase().includes('oil') ||
+    ing.name.toLowerCase().includes('powder') ||
+    ing.name.toLowerCase().includes('premix')
+  ).length;
+  const excessivePowderPenalty = powderOilCount > 2 ? 25 : 0;
+  results.push({
+    passed: powderOilCount <= 2,
+    ruleId: 'Q2',
+    message: `Excessive powders/oils (${powderOilCount})`,
+    penalty: excessivePowderPenalty,
+  });
+
+  // Q3: Human implausibility heuristic
+  // Recipes that are technically complete but no one would actually make
+  const implausiblePatterns = [
+    ingredients.length === 2, // Too simple
+    estimatedCost < 0.50, // Suspiciously cheap
+    ingredients.every(ing => ing.category === 'supplement'), // All supplements
+  ];
+  const implausiblePenalty = implausiblePatterns.filter(p => p).length > 0 ? 20 : 0;
+  results.push({
+    passed: implausiblePenalty === 0,
+    ruleId: 'Q3',
+    message: `Recipe may be implausible (${implausiblePatterns.filter(p => p).length} flags)`,
+    penalty: implausiblePenalty,
+  });
+
+  // Q4: Repetitive cheap filler pattern
+  const cheapFillers = ingredients.filter(ing =>
+    (ing.name.toLowerCase().includes('rice') ||
+      ing.name.toLowerCase().includes('corn') ||
+      ing.name.toLowerCase().includes('wheat')) &&
+    (ing.pricePerLb || 1) < 0.50
+  ).length;
+  const fillerPenalty = cheapFillers >= 2 ? 15 : 0;
+  results.push({
+    passed: cheapFillers < 2,
+    ruleId: 'Q4',
+    message: `Repetitive cheap filler pattern (${cheapFillers})`,
+    penalty: fillerPenalty,
+  });
+
+  // Q5: Organ meat weight cap (soft gate - penalize if >10%)
+  const organMeatNames = ['liver', 'kidney', 'heart'];
+  const organMeats = ingredients.filter(ing => {
+    const name = ing.name.toLowerCase();
+    return ing.feedingRole === 'supplement' && organMeatNames.some(organ => name.includes(organ));
+  });
+  
+  const totalWeight = ingredients.reduce((sum, ing) => sum + (ing.composition.protein || 1), 0);
+  const organMeatWeight = organMeats.reduce((sum, ing) => sum + (ing.composition.protein || 1), 0);
+  const organMeatPercent = totalWeight > 0 ? (organMeatWeight / totalWeight) * 100 : 0;
+  
+  let organMeatPenalty = 0;
+  if (organMeatPercent > 15) organMeatPenalty = 30; // Way over
+  else if (organMeatPercent > 10) organMeatPenalty = 15; // Slightly over
+  
+  results.push({
+    passed: organMeatPercent <= 10,
+    ruleId: 'Q5',
+    message: `Organ meat weight: ${organMeatPercent.toFixed(1)}% (soft cap 10%)`,
+    penalty: organMeatPenalty,
+  });
+
+  return results;
+}
+
+// ============================================================================
+// MASTER VALIDATION FUNCTION
+// ============================================================================
+
+export interface RecipeValidationResult {
+  isValid: boolean;
+  hardGates: {
+    structural: CompositionRuleResult[];
+    safety: SafetyRuleResult[];
+    lifeStage: LifeStageRuleResult[];
+  };
+  softGates: QualityRuleResult[];
+  totalPenalty: number;
+  failedRules: string[];
+}
+
+export function validateRecipeComprehensive(
+  ingredients: Ingredient[],
+  species: Species,
+  lifeStage: 'puppy' | 'adult' | 'senior',
+  estimatedCost: number,
+  allergies?: string[]
+): RecipeValidationResult {
+  const structural = validateStructuralComposition(ingredients, species, lifeStage);
+  const safety = validateSafetyAndToxicity(ingredients, species, allergies);
+  const lifeStageRules = validateLifeStage(ingredients, species, lifeStage);
+  const quality = validateQualityAndPlausibility(ingredients, estimatedCost);
+
+  const hardGateFailed = [
+    ...structural,
+    ...safety,
+    ...lifeStageRules,
+  ].filter(r => !r.passed);
+
+  const totalPenalty = quality.reduce((sum, q) => sum + q.penalty, 0);
+
+  return {
+    isValid: hardGateFailed.length === 0,
+    hardGates: {
+      structural,
+      safety,
+      lifeStage: lifeStageRules,
+    },
+    softGates: quality,
+    totalPenalty,
+    failedRules: hardGateFailed.map(r => r.ruleId),
+  };
+}
+</file>
+
+<file path="lib/generator/RecipePriorScoring.ts">
+/**
+ * RECIPE PRIOR SCORING
+ * Soft scoring boosts based on learned patterns from scraped recipes
+ * Integrates with RecipeBuilder to improve realism and variety
+ */
+
+import recipePriors from '../data/recipePriors.json';
+import { Ingredient } from '../data/ingredients';
+
+interface RecipePriors {
+  coOccurrence: {
+    [species: string]: {
+      pairs: Record<string, number>;
+      triples: Record<string, number>;
+    };
+  };
+  categoryRatios: {
+    [species: string]: {
+      protein: { mean: number; stdDev: number };
+      vegetable: { mean: number; stdDev: number };
+      fat: { mean: number; stdDev: number };
+      carbohydrate: { mean: number; stdDev: number };
+    };
+  };
+  ingredientCounts: {
+    [species: string]: {
+      mean: number;
+      median: number;
+      min: number;
+      max: number;
+    };
+  };
+}
+
+const priors = recipePriors as RecipePriors;
+
+/**
+ * Calculate co-occurrence boost for an ingredient based on already-selected ingredients
+ * Returns a score boost (0-1) based on how often this ingredient appears with the selected ones
+ */
+export function calculateCoOccurrenceBoost(
+  candidateIngredient: Ingredient,
+  selectedIngredients: Ingredient[],
+  species: string
+): number {
+  if (selectedIngredients.length === 0) return 0;
+  
+  const speciesPriors = priors.coOccurrence[species];
+  if (!speciesPriors) return 0;
+
+  let totalBoost = 0;
+  let pairCount = 0;
+
+  // Check pairs with each selected ingredient
+  for (const selected of selectedIngredients) {
+    const pair1 = `${candidateIngredient.name}+${selected.name}`;
+    const pair2 = `${selected.name}+${candidateIngredient.name}`;
+    
+    const count = speciesPriors.pairs[pair1] || speciesPriors.pairs[pair2] || 0;
+    if (count > 0) {
+      totalBoost += Math.log(count + 1) / 10; // Logarithmic scaling
+      pairCount++;
+    }
+  }
+
+  // Check triples if we have 2+ selected ingredients
+  if (selectedIngredients.length >= 2) {
+    for (let i = 0; i < selectedIngredients.length - 1; i++) {
+      for (let j = i + 1; j < selectedIngredients.length; j++) {
+        const ingredients = [
+          candidateIngredient.name,
+          selectedIngredients[i].name,
+          selectedIngredients[j].name,
+        ].sort();
+        
+        const triple = ingredients.join('+');
+        const count = speciesPriors.triples[triple] || 0;
+        
+        if (count > 0) {
+          totalBoost += Math.log(count + 1) / 5; // Higher weight for triples
+        }
+      }
+    }
+  }
+
+  // Normalize to 0-1 range
+  return Math.min(totalBoost, 1.0);
+}
+
+/**
+ * Calculate category ratio penalty based on deviation from learned distributions
+ * Returns a penalty (0-1) where 0 = perfect match, 1 = very far from typical
+ */
+export function calculateCategoryRatioPenalty(
+  categoryRatios: Record<string, number>,
+  species: string
+): number {
+  const speciesPriors = priors.categoryRatios[species];
+  if (!speciesPriors) return 0;
+
+  let totalDeviation = 0;
+  let categoryCount = 0;
+
+  for (const [category, ratio] of Object.entries(categoryRatios)) {
+    const prior = speciesPriors[category as keyof typeof speciesPriors];
+    if (!prior) continue;
+
+    // Calculate z-score (how many standard deviations away)
+    const zScore = Math.abs(ratio - prior.mean) / prior.stdDev;
+    
+    // Convert to penalty (0-1)
+    // z-score of 0 = 0 penalty, z-score of 3+ = 1 penalty
+    const penalty = Math.min(zScore / 3, 1.0);
+    
+    totalDeviation += penalty;
+    categoryCount++;
+  }
+
+  return categoryCount > 0 ? totalDeviation / categoryCount : 0;
+}
+
+/**
+ * Calculate ingredient count penalty based on deviation from typical recipe sizes
+ * Returns a penalty (0-1) where 0 = typical count, 1 = very unusual count
+ */
+export function calculateIngredientCountPenalty(
+  ingredientCount: number,
+  species: string
+): number {
+  const speciesPriors = priors.ingredientCounts[species];
+  if (!speciesPriors) return 0;
+
+  const { mean, min, max } = speciesPriors;
+
+  // Within typical range = no penalty
+  if (ingredientCount >= min && ingredientCount <= max) {
+    // Small penalty for being far from mean
+    const deviation = Math.abs(ingredientCount - mean);
+    return Math.min(deviation / (max - min), 0.3);
+  }
+
+  // Outside typical range = higher penalty
+  if (ingredientCount < min) {
+    const deficit = min - ingredientCount;
+    return Math.min(0.5 + (deficit / min) * 0.5, 1.0);
+  }
+
+  // Too many ingredients
+  const excess = ingredientCount - max;
+  return Math.min(0.5 + (excess / max) * 0.5, 1.0);
+}
+
+/**
+ * Get typical ingredient count range for a species
+ */
+export function getTypicalIngredientCount(species: string): { min: number; max: number; median: number } {
+  const speciesPriors = priors.ingredientCounts[species];
+  if (!speciesPriors) {
+    return { min: 3, max: 10, median: 6 };
+  }
+  return {
+    min: speciesPriors.min,
+    max: speciesPriors.max,
+    median: speciesPriors.median,
+  };
+}
+
+/**
+ * Check if an ingredient is commonly paired with a protein for this species
+ * Used to boost vegetables/fats that commonly appear with the selected protein
+ */
+export function isCommonProteinPairing(
+  ingredient: Ingredient,
+  protein: Ingredient,
+  species: string,
+  pairingType: 'fat' | 'vegetable'
+): boolean {
+  const speciesPriors = priors.categoryPairs?.[species];
+  if (!speciesPriors) return false;
+
+  const pairings = pairingType === 'fat' 
+    ? speciesPriors.proteinWithFat 
+    : speciesPriors.proteinWithVeg;
+
+  const commonPairs = pairings?.[protein.name] || [];
+  return commonPairs.includes(ingredient.name);
+}
+
+/**
+ * Apply all prior-based scoring adjustments to a base score
+ * This is the main integration point for RecipeBuilder
+ */
+export function applyPriorScoring(
+  ingredient: Ingredient,
+  baseScore: number,
+  selectedIngredients: Ingredient[],
+  species: string,
+  options: {
+    coOccurrenceWeight?: number;
+    proteinPairingWeight?: number;
+  } = {}
+): number {
+  const {
+    coOccurrenceWeight = 0.15,
+    proteinPairingWeight = 0.1,
+  } = options;
+
+  let adjustedScore = baseScore;
+
+  // 1. Co-occurrence boost
+  const coOccurrenceBoost = calculateCoOccurrenceBoost(
+    ingredient,
+    selectedIngredients,
+    species
+  );
+  adjustedScore += coOccurrenceBoost * coOccurrenceWeight;
+
+  // 2. Protein pairing boost
+  const selectedProtein = selectedIngredients.find(i => i.category === 'protein');
+  if (selectedProtein) {
+    if (ingredient.category === 'fat') {
+      const isCommon = isCommonProteinPairing(ingredient, selectedProtein, species, 'fat');
+      if (isCommon) {
+        adjustedScore += proteinPairingWeight;
+      }
+    } else if (ingredient.category === 'vegetable') {
+      const isCommon = isCommonProteinPairing(ingredient, selectedProtein, species, 'vegetable');
+      if (isCommon) {
+        adjustedScore += proteinPairingWeight;
+      }
+    }
+  }
+
+  return adjustedScore;
+}
+</file>
+
+<file path="lib/utils/enhancedCompatibilityScoring.ts">
+// lib/utils/enhancedCompatibilityScoring.ts
+// Enhanced compatibility scoring system with ingredient-level analysis
+// and multi-factor evaluation
+
+import type { Recipe } from '@/lib/types';
+import { getIngredientComposition, INGREDIENT_COMPOSITIONS } from '@/lib/data/ingredientCompositions';
+import { getSpeciesCompatibility, shouldAvoid, shouldLimit, normalizeSpecies } from './ingredientCompatibility';
+import { AAFCO_NUTRIENT_PROFILES, validateCriticalNutrients } from '@/lib/data/aafco-standards';
+import { getAvianStandards, AVIAN_NUTRITION_STANDARDS } from '@/lib/data/avian-nutrition-standards';
+import { getReptileStandards, validateReptileNutrition } from '@/lib/data/reptile-nutrition';
+import { getFallbackNutrition } from './nutritionFallbacks';
+import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
+import {
+  getHealthConcernBenefits,
+  normalizeHealthConcern,
+  isBeneficialIngredient,
+  isAvoidIngredient,
+  checkMacroAlignment,
+} from './healthConcernMatching';
+import { calculateIngredientQualityScore } from '@/lib/data/ingredientTiers';
+import { matchesSpecies } from './recipeRecommendations';
+
+export interface Pet {
+  id: string;
+  name: string;
+  type: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
+  breed: string;
+  age: number;
+  weight: number;
+  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
+  healthConcerns: string[];
+  dietaryRestrictions: string[];
+  allergies?: string[];
+  dislikes?: string[];
+  savedRecipes?: string[];
+  names?: string[];
+  weightKg?: number;
+}
+
+export interface EnhancedCompatibilityScore {
+  overallScore: number; // 0-100
+  grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
+  usesFallbackNutrition?: boolean; // True if any ingredient used fallback nutrition
+  fallbackIngredients?: string[]; // List of ingredients that used fallback nutrition
+  factors: {
+    ingredientSafety: FactorScore;
+    nutritionalAdequacy: FactorScore;
+    healthAlignment: FactorScore;
+    lifeStageFit: FactorScore;
+    activityFit: FactorScore;
+    allergenSafety: FactorScore;
+    ingredientQuality: FactorScore;
+  };
+  detailedBreakdown: {
+    ingredientAnalysis: IngredientAnalysis[];
+    nutritionalGaps: string[];
+    nutritionalStrengths: string[];
+    healthBenefits: string[];
+    warnings: string[];
+    recommendations: string[];
+  };
+}
+
+interface FactorScore {
+  score: number; // 0-100
+  weight: number; // 0-1, how much this factor contributes
+  reasoning: string;
+  issues: string[];
+  strengths: string[];
+}
+
+interface IngredientAnalysis {
+  ingredient: string;
+  compatibility: 'excellent' | 'good' | 'caution' | 'avoid';
+  speciesCompat: 'ok' | 'avoid' | 'limit' | 'caution' | null;
+  healthImpact: 'positive' | 'neutral' | 'negative';
+  notes: string[];
+}
+
+/**
+ * Enhanced compatibility scoring with ingredient-level analysis
+ * 
+ * This system provides:
+ * 1. Deep ingredient-by-ingredient compatibility checking
+ * 2. Real nutritional analysis using USDA data
+ * 3. Multi-factor weighted scoring
+ * 4. Detailed breakdown for transparency
+ */
+export function calculateEnhancedCompatibility(
+  recipe: Recipe,
+  pet: Pet
+): EnhancedCompatibilityScore {
+  // All recipes go through full scoring pipeline - no short-circuits
+  const normalizedSpecies = normalizeSpecies(pet.type);
+  const factors = {
+    ingredientSafety: calculateIngredientSafety(recipe, pet, normalizedSpecies),
+    nutritionalAdequacy: calculateNutritionalAdequacy(recipe, pet, normalizedSpecies),
+    healthAlignment: calculateHealthAlignment(recipe, pet),
+    lifeStageFit: calculateLifeStageFit(recipe, pet),
+    activityFit: calculateActivityFit(recipe, pet),
+    allergenSafety: calculateAllergenSafety(recipe, pet),
+    ingredientQuality: calculateIngredientQuality(recipe),
+  };
+
+  // Calculate safety score (gate) - used to prevent unsafe recipes from scoring high
+  const safetyScore = calculateSafetyScore(recipe, pet, normalizedSpecies);
+  
+  // Calculate optimality score (quality) - considers quality, ideal ranges, health alignment
+  const optimalityScore = calculateOptimalityScore(recipe, pet, normalizedSpecies, factors);
+  
+  // Safety gates the overall score: if safety < 60, cap at 30-40
+  // This prevents unsafe recipes from scoring high regardless of other factors
+  let gatedScore: number;
+  if (safetyScore < 60) {
+    // Unsafe recipes: cap at 30-40 based on safety level
+    // Still allow some differentiation based on optimality, but heavily penalized
+    gatedScore = Math.min(40, safetyScore * 0.5 + optimalityScore * 0.1);
+  } else {
+    // Safe recipes: combine safety and optimality, but safety doesn't dominate
+    // Use 70% optimality + 30% safety for safe recipes
+    gatedScore = optimalityScore * 0.70 + safetyScore * 0.30;
+  }
+  
+  // Add bonus points for perfect matches (reduced generosity)
+  const bonuses = calculateBonuses(recipe, pet);
+  
+  // Perfect match bonus: adds 2-5 points if recipe meets strict perfect match criteria
+  // This is a bonus, not an override - all recipes go through full scoring
+  const perfectMatchBonus = isPerfectMatch(recipe, pet) ? 3 : 0; // 3 points for perfect match
+  
+  // Ingredient quality is a bonus, not a requirement (0-2% bonus, reduced to prevent clustering)
+  const qualityBonus = factors.ingredientQuality.score * 0.02;
+  
+  // Calculate final score with bonuses, capped at 100
+  // Use maximum precision before rounding
+  const scoreWithBonuses = gatedScore + bonuses + qualityBonus + perfectMatchBonus;
+  
+  let finalScore = scoreWithBonuses;
+  
+  // Add small deterministic variation (±1-2 points) based on recipe ID to break ties
+  // This prevents identical recipes from getting identical scores
+  function hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
+  }
+  const variation = (hashString(recipe.id) % 5) - 2; // -2 to +2 (as specified in plan)
+  
+  const overallScore = Math.round(Math.max(0, Math.min(100, finalScore + variation)));
+
+  // Calculate grade
+  const grade = getGrade(overallScore);
+
+  // Detailed breakdown
+  const ingredientAnalysis = analyzeIngredients(recipe, pet, normalizedSpecies);
+  const nutritionalAnalysis = analyzeNutrition(recipe, pet, normalizedSpecies);
+  
+  // Check for fallback nutrition usage
+  const nutrition = calculateRecipeNutrition(recipe);
+  const usesFallback = nutrition.usesFallbackNutrition || false;
+  const fallbackIngs = nutrition.fallbackIngredients || [];
+  
+  const healthBenefits: string[] = [];
+  const warnings: string[] = [];
+  const recommendations: string[] = [];
+  
+  // Add warning if fallback nutrition is used
+  if (usesFallback && fallbackIngs.length > 0) {
+    warnings.push(`Recipe uses estimated nutrition data for: ${fallbackIngs.join(', ')}. Recipe should be marked as needsReview.`);
+  }
+
+  // Collect health benefits
+  if (factors.healthAlignment.strengths.length > 0) {
+    healthBenefits.push(...factors.healthAlignment.strengths);
+  }
+
+  // Collect warnings
+  Object.values(factors).forEach(factor => {
+    if (factor.issues.length > 0) {
+      warnings.push(...factor.issues);
+    }
+  });
+
+  // Generate recommendations
+  if (factors.nutritionalAdequacy.score < 70) {
+    recommendations.push('Consider adding supplements to meet nutritional requirements');
+  }
+  if (factors.healthAlignment.score < 60 && pet.healthConcerns.length > 0) {
+    recommendations.push('This recipe may not address your pet\'s specific health concerns');
+  }
+  if (factors.activityFit.score < 70 && pet.activityLevel === 'very-active') {
+    recommendations.push('This recipe may need additional calories for very active pets');
+  }
+  if (factors.ingredientQuality.score < 50) {
+    recommendations.push('Consider recipes with higher-quality, less processed ingredients');
+  }
+
+  return {
+    overallScore: Math.max(0, Math.min(100, overallScore)),
+    grade,
+    factors,
+    usesFallbackNutrition: usesFallback,
+    fallbackIngredients: fallbackIngs,
+    detailedBreakdown: {
+      ingredientAnalysis,
+      nutritionalGaps: nutritionalAnalysis.gaps,
+      nutritionalStrengths: nutritionalAnalysis.strengths,
+      healthBenefits,
+      warnings: [...new Set(warnings)], // Remove duplicates
+      recommendations: [...new Set(recommendations)],
+    },
+  };
+}
+
+/**
+ * Factor 1: Ingredient Safety (Weight: 0.25)
+ * Checks each ingredient for species compatibility
+ */
+function calculateIngredientSafety(
+  recipe: Recipe,
+  pet: Pet,
+  normalizedSpecies: string
+): FactorScore {
+  const ingredients = recipe.ingredients || [];
+  let safeCount = 0;
+  let cautionCount = 0;
+  let avoidCount = 0;
+  const issues: string[] = [];
+  const strengths: string[] = [];
+
+  // Check for banned ingredients
+  const bannedIngredients = (pet as any).bannedIngredients || [];
+  const bannedLower = bannedIngredients.map((b: string) => b.toLowerCase());
+
+  for (const ing of ingredients) {
+    const ingName = typeof ing === 'string' ? ing : ing.name;
+    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingNameLower = ingName.toLowerCase();
+    
+    // Check if ingredient is banned by user
+    const isBanned = bannedLower.some((banned: string) => 
+      ingNameLower.includes(banned) || banned.includes(ingNameLower) || ingKey.includes(banned.toLowerCase())
+    );
+    
+    if (isBanned) {
+      avoidCount++;
+      issues.push(`${ingName} is banned for this pet`);
+      continue; // Skip other checks for banned ingredients
+    }
+    
+    // Check species compatibility
+    const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
+    
+    if (compat === 'avoid') {
+      avoidCount++;
+      issues.push(`${ingName} should be avoided for ${pet.type}s`);
+    } else if (compat === 'limit' || compat === 'caution') {
+      cautionCount++;
+      issues.push(`${ingName} should be used with caution for ${pet.type}s`);
+    } else if (compat === 'ok') {
+      safeCount++;
+    } else {
+      // Unknown ingredient - assume safe but note
+      safeCount++;
+    }
+  }
+
+  // Calculate score with gradual, proportional penalties for better granularity
+  const totalIngredients = ingredients.length || 1;
+  let score = 100;
+  
+  // Avoid ingredients: -20 per avoid (reduced from -30), scaled by proportion for gradual penalties
+  // This allows recipes with many safe ingredients + one avoid to score better than recipes with mostly avoids
+  const avoidRatio = avoidCount / totalIngredients;
+  const avoidPenalty = avoidCount * 20 * (1 + avoidRatio); // More gradual
+  score -= Math.min(avoidPenalty, 60); // Max -60 for avoids (reduced from -70)
+  
+  // Caution ingredients: -5 per caution (reduced from -10), scaled by proportion
+  const cautionRatio = cautionCount / totalIngredients;
+  const cautionPenalty = cautionCount * 5 * (1 + cautionRatio); // More gradual
+  score -= Math.min(cautionPenalty, 30); // Max -30 for cautions (reduced from -40)
+  
+  score = Math.max(0, score);
+
+  if (avoidCount > 0) {
+    // Cap at 50 if any avoids (increased from 40 to allow more differentiation)
+    score = Math.min(score, 50);
+  }
+
+  if (safeCount === ingredients.length && ingredients.length > 0) {
+    strengths.push('All ingredients are safe for this species');
+  }
+
+  return {
+    score: Math.max(0, Math.min(100, score)),
+    weight: 0.25, // Weight already correct
+    reasoning: avoidCount > 0
+      ? `${avoidCount} ingredient(s) should be avoided`
+      : cautionCount > 0
+      ? `${cautionCount} ingredient(s) need caution`
+      : 'All ingredients are species-appropriate',
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Calculate continuous score for a nutrient based on distance from ideal range
+ * Returns score from 0-100, where 100 = at ideal midpoint, lower = further from ideal
+ */
+function calculateNutrientScore(
+  actual: number,
+  min: number,
+  max: number
+): { score: number; bonus: number } {
+  if (max <= min) return { score: 50, bonus: 0 }; // Invalid range
+  
+  const ideal = (min + max) / 2;
+  const range = max - min;
+  
+  // Calculate distance from ideal (normalized to 0-1)
+  const distance = Math.abs(actual - ideal) / range;
+  
+  // Score: 100 at ideal, decreases linearly with distance
+  // Cap at 0 for values way outside range
+  let score = Math.max(0, 100 - (distance * 100));
+  
+  // Bonus for exceeding minimums (up to +8 points, reduced from +15)
+  let bonus = 0;
+  if (min > 0 && actual > min) {
+    const excessPercent = ((actual - min) / min) * 100;
+    // +2 points per 5% over minimum, capped at +8 (reduced to prevent over-scoring)
+    bonus = Math.min(8, Math.floor(excessPercent / 5) * 2);
+  }
+  
+  return { score, bonus };
+}
+
+/**
+ * Calculate ingredient diversity bonus (Phase 2.3)
+ * Rewards recipes with varied ingredient categories
+ */
+function calculateIngredientDiversity(recipe: Recipe): number {
+  const ingredients = (recipe.ingredients || []).map(ing => {
+    const name = typeof ing === 'string' ? ing : ing.name;
+    return name.toLowerCase();
+  });
+  
+  if (ingredients.length === 0) return 0;
+  
+  // Categorize ingredients
+  const categories = new Set<string>();
+  ingredients.forEach(ing => {
+    if (ing.includes('chicken') || ing.includes('turkey') || ing.includes('beef') || 
+        ing.includes('fish') || ing.includes('salmon') || ing.includes('lamb') ||
+        ing.includes('pork') || ing.includes('duck') || ing.includes('egg')) {
+      categories.add('protein');
+    } else if (ing.includes('rice') || ing.includes('quinoa') || ing.includes('oats') ||
+               ing.includes('barley') || ing.includes('wheat') || ing.includes('corn')) {
+      categories.add('grain');
+    } else if (ing.includes('carrot') || ing.includes('broccoli') || ing.includes('spinach') ||
+               ing.includes('kale') || ing.includes('peas') || ing.includes('green-bean') ||
+               ing.includes('sweet-potato') || ing.includes('pumpkin')) {
+      categories.add('vegetable');
+    } else if (ing.includes('apple') || ing.includes('blueberry') || ing.includes('banana') ||
+               ing.includes('cranberry')) {
+      categories.add('fruit');
+    } else if (ing.includes('oil') || ing.includes('fat')) {
+      categories.add('fat');
+    } else if (ing.includes('supplement') || ing.includes('vitamin') || ing.includes('mineral')) {
+      categories.add('supplement');
+    }
+  });
+  
+  // Bonus: +1 point per unique category (max +10)
+  const diversityBonus = Math.min(10, categories.size);
+  
+  return diversityBonus;
+}
+
+/**
+ * Factor 2: Nutritional Adequacy (Weight: 0.30)
+ * Continuous scoring based on distance from ideal nutritional ranges
+ */
+function calculateNutritionalAdequacy(
+  recipe: Recipe,
+  pet: Pet,
+  normalizedSpecies: string
+): FactorScore {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+  
+  // Calculate recipe nutrition from ingredients
+  const nutrition = calculateRecipeNutrition(recipe);
+  
+  // Get pet's age group for nutritional guidelines
+  let ageGroup: 'puppy' | 'adult' | 'senior' = 'adult';
+  if (normalizedSpecies === 'dog' || normalizedSpecies === 'cat') {
+    if (pet.age < 1) ageGroup = 'puppy';
+    else if (pet.age >= 7) ageGroup = 'senior';
+  }
+  
+  // Map normalized species to PetCategory
+  const speciesMap: Record<string, keyof typeof nutritionalGuidelines> = {
+    'dog': 'dogs',
+    'cat': 'cats',
+    'bird': 'birds',
+    'reptile': 'reptiles',
+    'pocket-pet': 'pocket-pets',
+  };
+  
+  const petCategory = speciesMap[normalizedSpecies];
+  let requirements = petCategory ? nutritionalGuidelines[petCategory]?.[ageGroup] : null;
+  
+  // Fallback to adult if specific age group not available
+  if (!requirements && petCategory) {
+    requirements = nutritionalGuidelines[petCategory]?.adult;
+  }
+  
+  // Initialize nutrient scores
+  const nutrientScores: { name: string; score: number; bonus: number }[] = [];
+  let totalScore = 0;
+  let totalWeight = 0;
+  
+  if (requirements) {
+    // Protein scoring (weight: 0.30)
+    if (requirements.protein) {
+      const { score, bonus } = calculateNutrientScore(
+        nutrition.protein,
+        requirements.protein.min,
+        requirements.protein.max
+      );
+      nutrientScores.push({ name: 'protein', score, bonus });
+      totalScore += score * 0.30;
+      totalWeight += 0.30;
+      
+      if (nutrition.protein < requirements.protein.min) {
+        issues.push(`Protein (${nutrition.protein.toFixed(1)}%) below minimum (${requirements.protein.min}%)`);
+      } else if (nutrition.protein > requirements.protein.max) {
+        issues.push(`Protein (${nutrition.protein.toFixed(1)}%) above maximum (${requirements.protein.max}%)`);
+      } else {
+        strengths.push(`Protein (${nutrition.protein.toFixed(1)}%) within ideal range`);
+      }
+    }
+    
+    // Fat scoring (weight: 0.25)
+    if (requirements.fat) {
+      const { score, bonus } = calculateNutrientScore(
+        nutrition.fat,
+        requirements.fat.min,
+        requirements.fat.max
+      );
+      nutrientScores.push({ name: 'fat', score, bonus });
+      totalScore += score * 0.25;
+      totalWeight += 0.25;
+      
+      if (nutrition.fat < requirements.fat.min) {
+        issues.push(`Fat (${nutrition.fat.toFixed(1)}%) below minimum (${requirements.fat.min}%)`);
+      } else if (nutrition.fat > requirements.fat.max) {
+        issues.push(`Fat (${nutrition.fat.toFixed(1)}%) above maximum (${requirements.fat.max}%)`);
+      }
+    }
+    
+    // Fiber scoring (weight: 0.15)
+    if (requirements.fiber) {
+      const { score, bonus } = calculateNutrientScore(
+        nutrition.fiber,
+        requirements.fiber.min,
+        requirements.fiber.max
+      );
+      nutrientScores.push({ name: 'fiber', score, bonus });
+      totalScore += score * 0.15;
+      totalWeight += 0.15;
+    }
+    
+    // Calcium scoring (weight: 0.15)
+    if (requirements.calcium) {
+      const { score, bonus } = calculateNutrientScore(
+        nutrition.calcium,
+        requirements.calcium.min,
+        requirements.calcium.max
+      );
+      nutrientScores.push({ name: 'calcium', score, bonus });
+      totalScore += score * 0.15;
+      totalWeight += 0.15;
+    }
+    
+    // Phosphorus scoring (weight: 0.15)
+    if (requirements.phosphorus) {
+      const { score, bonus } = calculateNutrientScore(
+        nutrition.phosphorus,
+        requirements.phosphorus.min,
+        requirements.phosphorus.max
+      );
+      nutrientScores.push({ name: 'phosphorus', score, bonus });
+      totalScore += score * 0.15;
+      totalWeight += 0.15;
+    }
+    
+    // Ca:P ratio precision scoring (Phase 2.2)
+    if (nutrition.calcium && nutrition.phosphorus && requirements.calcium && requirements.phosphorus) {
+      const caPRatio = nutrition.calcium / nutrition.phosphorus;
+      // Ideal Ca:P ratio varies by species, but generally 1.2:1 to 2:1
+      const idealCaP = petCategory === 'dogs' || petCategory === 'cats' ? 1.5 : 1.8;
+      const minCaP = 1.2;
+      const maxCaP = 2.0;
+      
+      if (caPRatio >= minCaP && caPRatio <= maxCaP) {
+        // Calculate distance from ideal
+        const distance = Math.abs(caPRatio - idealCaP) / (maxCaP - minCaP);
+        const ratioScore = 100 - (distance * 50); // Max penalty -50
+        totalScore += ratioScore * 0.10; // 10% weight for ratio
+        totalWeight += 0.10;
+        
+        if (distance < 0.1) {
+          strengths.push(`Optimal Ca:P ratio (${caPRatio.toFixed(2)})`);
+        } else if (distance < 0.3) {
+          strengths.push(`Good Ca:P ratio (${caPRatio.toFixed(2)})`);
+        } else {
+          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) could be closer to ideal (${idealCaP})`);
+        }
+      } else {
+        // Outside ideal range - elastic thresholds with diminishing returns
+        const safeMin = 0.8; // Animals tolerate broader ranges
+        const safeMax = 3.0;
+        
+        if (caPRatio >= safeMin && caPRatio < minCaP) {
+          // Slightly low - small penalty
+          const deviation = minCaP - caPRatio;
+          const penalty = Math.min(deviation * 5, 10); // Reduced penalty
+          totalScore -= penalty * 0.10;
+          totalWeight += 0.10;
+          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) slightly below ideal range`);
+        } else if (caPRatio > maxCaP && caPRatio <= safeMax) {
+          // Slightly high - small penalty
+          const deviation = caPRatio - maxCaP;
+          const penalty = Math.min(deviation * 5, 10); // Reduced penalty
+          totalScore -= penalty * 0.10;
+          totalWeight += 0.10;
+          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) slightly above ideal range`);
+        } else {
+          // Outside safe range - larger penalty
+          const penalty = caPRatio < safeMin ? (safeMin - caPRatio) * 20 : (caPRatio - safeMax) * 20;
+          totalScore -= Math.min(penalty, 50) * 0.10;
+          totalWeight += 0.10;
+          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) outside safe range (${safeMin}-${safeMax})`);
+        }
+      }
+    }
+  }
+  
+  // Calculate weighted average score
+  let finalScore = totalWeight > 0 ? totalScore / totalWeight : 50;
+  
+  // Add bonuses for exceeding minimums (average across nutrients)
+  const avgBonus = nutrientScores.length > 0
+    ? nutrientScores.reduce((sum, n) => sum + n.bonus, 0) / nutrientScores.length
+    : 0;
+  finalScore += avgBonus;
+  
+  // Add ingredient diversity bonus (Phase 2.3)
+  const diversityBonus = calculateIngredientDiversity(recipe);
+  finalScore += diversityBonus;
+  
+  // Safety validation check (still important for critical failures)
+  if (normalizedSpecies === 'dog' || normalizedSpecies === 'cat') {
+    const lifeStage = pet.age < 1 ? 'growth' : 'adult';
+    const validation = validateCriticalNutrients(
+      recipe,
+      normalizedSpecies as 'dog' | 'cat',
+      lifeStage
+    );
+    
+    if (!validation.isValid) {
+      // Critical violations reduce score gradually using distance-based penalty
+      // Penalty = violations^2 * scalingFactor for better granularity
+      const violationPenalty = Math.min(30, validation.violations.length * validation.violations.length * 2);
+      finalScore -= violationPenalty;
+      validation.violations.forEach(v => {
+        issues.push(`Critical nutritional gap: ${v}`);
+      });
+    }
+  } else if (normalizedSpecies === 'bird') {
+    const standards = getAvianStandards(pet.breed) || AVIAN_NUTRITION_STANDARDS.psittacines;
+    if (nutrition.protein < (standards.protein?.min || 12)) {
+      // Gradual penalty based on how far below minimum
+      const deviation = (standards.protein?.min || 12) - nutrition.protein;
+      const penalty = Math.min(20, deviation * deviation * 2); // Quadratic penalty
+      finalScore -= penalty;
+      issues.push('Protein critically low for birds');
+    }
+  } else if (normalizedSpecies === 'reptile') {
+    const standards = getReptileStandards(pet.breed);
+    if (standards) {
+      const validation = validateReptileNutrition(recipe, pet.breed || 'unknown');
+      if (!validation.isValid) {
+        finalScore -= validation.violations.length * 5; // Reduced from -10 to -5
+        validation.violations.forEach(v => {
+          issues.push(`Reptile nutrition gap: ${v}`);
+        });
+      }
+    }
+  } else if (normalizedSpecies === 'pocket-pet') {
+    const breed = (pet.breed || '').toLowerCase();
+    const isLowFiber = ['sugar', 'glider', 'hamster', 'rat', 'mouse', 'ferret'].some(b => breed.includes(b));
+    const isHayEater = ['rabbit', 'guinea', 'chinchilla'].some(b => breed.includes(b));
+    
+    if (isLowFiber && nutrition.protein < 12) {
+      // Gradual penalty based on deviation
+      const deviation = 12 - nutrition.protein;
+      const penalty = Math.min(20, deviation * deviation * 2);
+      finalScore -= penalty;
+      issues.push('Protein critically low for this pocket-pet type');
+    }
+    if (isHayEater && nutrition.fiber < 15) {
+      // Gradual penalty based on deviation
+      const deviation = 15 - nutrition.fiber;
+      const penalty = Math.min(20, deviation * deviation * 2);
+      finalScore -= penalty;
+      issues.push('Fiber critically low for hay-eating pocket-pets');
+    }
+    if (breed.includes('ferret') && nutrition.protein < 30) {
+      // Gradual penalty based on deviation
+      const deviation = 30 - nutrition.protein;
+      const penalty = Math.min(25, deviation * deviation * 1.5);
+      finalScore -= penalty;
+      issues.push('Ferrets require high protein (30%+) as obligate carnivores');
+    }
+  }
+  
+  // Add missing data penalty - FIXED: Only penalize for pets with health concerns requiring precise nutrition
+  // Use gradual penalty: (100 - coverage) / 10 instead of binary thresholds
+  if (nutrition.usesFallbackNutrition && nutrition.fallbackIngredients && pet.healthConcerns.length > 0) {
+    const totalIngredients = (recipe.ingredients || []).length;
+    const missingPercentage = totalIngredients > 0 
+      ? nutrition.fallbackIngredients.length / totalIngredients 
+      : 0;
+    const coverage = (1 - missingPercentage) * 100;
+    const penalty = Math.min(15, (100 - coverage) / 10); // Gradual: -1 per 10% missing
+    finalScore -= penalty;
+    
+    if (penalty > 0) {
+      issues.push(`Uses estimated nutrition data for ${nutrition.fallbackIngredients.length} ingredient(s) (${Math.round(missingPercentage * 100)}%)`);
+    }
+  }
+  // For perfect pets, fallback data is acceptable and doesn't penalize
+  
+  // Add strength messages for good scores
+  if (finalScore >= 85) {
+    strengths.push('Excellent nutritional profile');
+  } else if (finalScore >= 75) {
+    strengths.push('Good nutritional profile');
+  } else if (finalScore >= 65) {
+    strengths.push('Adequate nutritional profile');
+  }
+
+  return {
+    score: Math.max(0, Math.min(100, Math.round(finalScore))),
+    weight: 0.35, // Updated weight to match new distribution
+    reasoning: issues.length === 0
+      ? `Nutritional score: ${Math.round(finalScore)}% (${strengths[0] || 'within acceptable ranges'})`
+      : `${issues.length} nutritional concern(s) identified`,
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Factor 3: Health Alignment (Weight: 0.20)
+ * Tiered scoring based on precision of health concern matching
+ */
+function calculateHealthAlignment(
+  recipe: Recipe,
+  pet: Pet
+): FactorScore {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+
+  if (pet.healthConcerns.length === 0) {
+    return {
+      score: 100,
+      weight: 0.15, // Updated weight to match new distribution
+      reasoning: 'No specific health concerns to evaluate',
+      issues: [],
+      strengths: ['Recipe suitable for healthy pets'],
+    };
+  }
+
+  // Calculate recipe nutrition for macro alignment checks
+  const nutrition = calculateRecipeNutrition(recipe);
+  
+  // Get recipe ingredients
+  const recipeIngredients = (recipe.ingredients || []).map(ing => {
+    const name = typeof ing === 'string' ? ing : ing.name;
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  });
+  
+  const recipeConcerns = (recipe.healthConcerns || []).map(c => normalizeHealthConcern(c));
+  const recipeNotSuitable = (recipe.notSuitableFor || []).map(c => normalizeHealthConcern(c));
+  
+  const petConcerns = pet.healthConcerns.map(c => normalizeHealthConcern(c));
+  
+  // Calculate tiered scores for each concern
+  const concernScores: number[] = [];
+  const concernWeights: number[] = [];
+  
+  for (let i = 0; i < petConcerns.length; i++) {
+    const concern = petConcerns[i];
+    const concernData = getHealthConcernBenefits(concern);
+    
+    // Weight: Primary concern (first) gets full weight, others get 0.7x
+    const weight = i === 0 ? 1.0 : 0.7;
+    
+    // Check if recipe explicitly says it's not suitable
+    const notSuitable = recipeNotSuitable.some(ns => 
+      ns.includes(concern) || concern.includes(ns)
+    );
+    
+    if (notSuitable) {
+      // Tier 5: Negative match - contains problematic elements
+      concernScores.push(20);
+      concernWeights.push(weight);
+      issues.push(`Recipe is not suitable for ${concern.replace(/-/g, ' ')}`);
+      continue;
+    }
+    
+    // Check if recipe explicitly targets this concern
+    const explicitlyTargets = recipeConcerns.some(rc => 
+      rc.includes(concern) || concern.includes(rc)
+    );
+    
+    if (concernData) {
+      // Check for beneficial ingredients
+      const beneficialCount = recipeIngredients.filter(ing => 
+        isBeneficialIngredient(ing, concernData.beneficialIngredients)
+      ).length;
+      
+      // Check for avoid ingredients
+      const avoidCount = recipeIngredients.filter(ing => 
+        isAvoidIngredient(ing, concernData.avoidIngredients, pet.allergies)
+      ).length;
+      
+      // Check macro alignment
+      const macroAlignment = checkMacroAlignment(nutrition, concernData.targetMacros);
+      
+      // Tier 1: Perfect match - explicitly targets + has beneficial + avoids problematic + good macros
+      if (explicitlyTargets && beneficialCount > 0 && avoidCount === 0 && macroAlignment >= 25) {
+        concernScores.push(100);
+        concernWeights.push(weight);
+        strengths.push(`Perfect match for ${concern.replace(/-/g, ' ')}: targets concern with beneficial ingredients`);
+      }
+      // Tier 2: Strong match - explicitly targets + has some beneficial ingredients
+      else if (explicitlyTargets && beneficialCount > 0) {
+        const tier2Score = 70 + Math.min(beneficialCount * 5, 15) + (avoidCount === 0 ? 10 : -avoidCount * 5);
+        concernScores.push(Math.min(100, tier2Score));
+        concernWeights.push(weight);
+        strengths.push(`Strong match for ${concern.replace(/-/g, ' ')}: targets concern with ${beneficialCount} beneficial ingredient(s)`);
+      }
+      // Tier 3: Supportive match - has beneficial ingredients but doesn't explicitly target
+      else if (beneficialCount > 0 && avoidCount === 0) {
+        const tier3Score = 50 + Math.min(beneficialCount * 5, 20) + (macroAlignment >= 25 ? 10 : 0);
+        concernScores.push(Math.min(100, tier3Score));
+        concernWeights.push(weight);
+        strengths.push(`Supportive for ${concern.replace(/-/g, ' ')}: contains ${beneficialCount} beneficial ingredient(s)`);
+      }
+      // Tier 4: Neutral - no alignment but no conflicts
+      else if (avoidCount === 0) {
+        concernScores.push(50);
+        concernWeights.push(weight);
+      }
+      // Tier 5: Negative - contains problematic ingredients
+      else {
+        const tier5Score = Math.max(0, 30 - (avoidCount * 10));
+        concernScores.push(tier5Score);
+        concernWeights.push(weight);
+        issues.push(`Contains ${avoidCount} problematic ingredient(s) for ${concern.replace(/-/g, ' ')}`);
+      }
+    } else {
+      // No specific data for this concern - use basic tag matching
+      if (explicitlyTargets) {
+        concernScores.push(85);
+        concernWeights.push(weight);
+        strengths.push(`Recipe targets ${concern.replace(/-/g, ' ')}`);
+      } else {
+        concernScores.push(50);
+        concernWeights.push(weight);
+      }
+    }
+  }
+  
+  // Calculate weighted average across all concerns
+  let totalScore = 0;
+  let totalWeight = 0;
+  for (let i = 0; i < concernScores.length; i++) {
+    totalScore += concernScores[i] * concernWeights[i];
+    totalWeight += concernWeights[i];
+  }
+  
+  const finalScore = totalWeight > 0 ? totalScore / totalWeight : 50;
+
+  return {
+    score: Math.max(0, Math.min(100, Math.round(finalScore))),
+    weight: 0.15, // Updated weight to match new distribution
+    reasoning: concernScores.length > 0
+      ? `Health alignment: ${Math.round(finalScore)}% (${strengths.length > 0 ? strengths[0] : 'neutral'})`
+      : 'Neutral health alignment',
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Factor 4: Life Stage Fit (Weight: 0.10)
+ * Checks if recipe is appropriate for pet's age
+ */
+function calculateLifeStageFit(
+  recipe: Recipe,
+  pet: Pet
+): FactorScore {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+  
+  const petAgeGroup = pet.age < 1 ? 'baby' : pet.age < 2 ? 'young' : pet.age < 7 ? 'adult' : 'senior';
+  const recipeAgeGroups = recipe.ageGroup || [];
+  
+  const isMatch = recipeAgeGroups.includes(petAgeGroup) || 
+                  recipeAgeGroups.includes('all') ||
+                  recipeAgeGroups.length === 0;
+
+  if (isMatch) {
+    strengths.push(`Appropriate for ${petAgeGroup} pets`);
+  } else {
+    issues.push(`Recipe designed for ${recipeAgeGroups.join(', ')}, but pet is ${petAgeGroup}`);
+  }
+
+  return {
+    score: isMatch ? 100 : 60,
+    weight: 0.10, // Weight already correct
+    reasoning: isMatch
+      ? `Recipe is appropriate for ${petAgeGroup} pets`
+      : `Age group mismatch`,
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Factor 5: Activity Fit (Weight: 0.05)
+ * Checks if calorie content matches activity level
+ */
+function calculateActivityFit(
+  recipe: Recipe,
+  pet: Pet
+): FactorScore {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+  
+  if (!pet.activityLevel) {
+    return {
+      score: 100,
+      weight: 0.05,
+      reasoning: 'Activity level not specified',
+      issues: [],
+      strengths: [],
+    };
+  }
+
+  const nutrition = calculateRecipeNutrition(recipe);
+  const calories = nutrition.calories || 150; // Default estimate
+
+  // Rough calorie needs by activity (kcal per kg body weight per day)
+  const activityMultipliers = {
+    'sedentary': 80,
+    'moderate': 100,
+    'active': 120,
+    'very-active': 150,
+  };
+
+  const estimatedNeeds = (activityMultipliers[pet.activityLevel] || 100) * pet.weight;
+  const recipeCalories = calories * (pet.weight / 10); // Rough estimate for portion
+
+  if (pet.activityLevel === 'very-active' && recipeCalories < estimatedNeeds * 0.8) {
+    issues.push('Recipe may be too low in calories for very active pets');
+  } else if (pet.activityLevel === 'sedentary' && recipeCalories > estimatedNeeds * 1.2) {
+    issues.push('Recipe may be too high in calories for sedentary pets');
+  } else {
+    strengths.push(`Calorie content appropriate for ${pet.activityLevel} activity level`);
+  }
+
+  return {
+    score: issues.length > 0 ? 70 : 100,
+    weight: 0.05,
+    reasoning: issues.length > 0
+      ? 'Calorie content may not match activity level'
+      : 'Calorie content matches activity level',
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Factor 6.5: Ingredient Quality (Weight: 0.10)
+ * Scores based on ingredient sophistication and quality
+ */
+function calculateIngredientQuality(
+  recipe: Recipe
+): FactorScore {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+  
+  const ingredients = (recipe.ingredients || []).map(ing => 
+    typeof ing === 'string' ? { name: ing } : ing
+  );
+  
+  const qualityResult = calculateIngredientQualityScore(ingredients);
+  
+  if (qualityResult.premiumCount > 0) {
+    strengths.push(`${qualityResult.premiumCount} premium ingredient(s)`);
+  }
+  
+  if (qualityResult.basicCount > 0) {
+    issues.push(`${qualityResult.basicCount} processed/basic ingredient(s)`);
+  }
+  
+  if (qualityResult.freshRatio > 0.5) {
+    strengths.push('High proportion of fresh ingredients');
+  }
+  
+  return {
+    score: qualityResult.score,
+    weight: 0.00, // FIXED: Quality is now a bonus, not part of base weight
+    reasoning: qualityResult.score >= 70
+      ? `High-quality ingredients (${qualityResult.premiumCount} premium)`
+      : qualityResult.score >= 50
+      ? 'Standard ingredient quality'
+      : 'Contains processed/basic ingredients',
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Factor 6: Allergen Safety (Weight: 0.10)
+ * Critical safety check for allergies
+ */
+function calculateAllergenSafety(
+  recipe: Recipe,
+  pet: Pet
+): FactorScore {
+  const issues: string[] = [];
+  const strengths: string[] = [];
+  
+  const allAllergens = [
+    ...(pet.allergies || []),
+    ...pet.dietaryRestrictions.filter(r => 
+      ['chicken', 'beef', 'dairy', 'wheat', 'egg', 'fish', 'pork'].some(a => 
+        r.toLowerCase().includes(a)
+      )
+    ),
+  ];
+
+  if (allAllergens.length === 0) {
+    return {
+      score: 100,
+      weight: 0.10,
+      reasoning: 'No known allergies or restrictions',
+      issues: [],
+      strengths: ['No allergen concerns'],
+    };
+  }
+
+  const ingredients = (recipe.ingredients || []).map(i => 
+    (typeof i === 'string' ? i : i.name).toLowerCase()
+  ).join(' ');
+
+  let hasAllergen = false;
+  for (const allergen of allAllergens) {
+    if (ingredients.includes(allergen.toLowerCase())) {
+      hasAllergen = true;
+      issues.push(`Contains ${allergen} - AVOID`);
+    }
+  }
+
+  if (!hasAllergen) {
+    strengths.push('Recipe avoids all known allergens');
+  }
+
+  return {
+    score: hasAllergen ? 0 : 100, // Zero if allergen present
+    weight: 0.10, // Weight already correct
+    reasoning: hasAllergen
+      ? 'Contains known allergens - NOT SAFE'
+      : 'No allergens detected',
+    issues,
+    strengths,
+  };
+}
+
+/**
+ * Calculate safety score (0-100) - only considers hard safety requirements
+ * This is used as a gate to prevent unsafe recipes from scoring high
+ */
+function calculateSafetyScore(
+  recipe: Recipe,
+  pet: Pet,
+  normalizedSpecies: string
+): number {
+  const ingredients = recipe.ingredients || [];
+  let hasAvoid = false;
+  let hasAllergen = false;
+  
+  // Check for banned ingredients
+  const bannedIngredients = (pet as any).bannedIngredients || [];
+  const bannedLower = bannedIngredients.map((b: string) => b.toLowerCase());
+  
+  for (const ing of ingredients) {
+    const ingName = typeof ing === 'string' ? ing : ing.name;
+    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingNameLower = ingName.toLowerCase();
+    
+    // Check if ingredient is banned
+    const isBanned = bannedLower.some((banned: string) => 
+      ingNameLower.includes(banned) || banned.includes(ingNameLower) || ingKey.includes(banned.toLowerCase())
+    );
+    
+    if (isBanned) {
+      hasAvoid = true;
+      continue;
+    }
+    
+    // Check species compatibility
+    const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
+    if (compat === 'avoid') {
+      hasAvoid = true;
+    }
+  }
+  
+  // Check for allergens
+  const allergies = pet.allergies || [];
+  const dietaryRestrictions = pet.dietaryRestrictions || [];
+  const allAllergens = [...allergies, ...dietaryRestrictions];
+  
+  if (allAllergens.length > 0) {
+    const recipeIngNames = ingredients.map(ing => 
+      (typeof ing === 'string' ? ing : ing.name).toLowerCase()
+    ).join(' ');
+    
+    hasAllergen = allAllergens.some(a => 
+      recipeIngNames.includes(a.toLowerCase())
+    );
+  }
+  
+  // Safety score: 0 if unsafe, 100 if completely safe
+  if (hasAvoid || hasAllergen) {
+    return 0; // Unsafe - will gate overall score
+  }
+  
+  // Check hard nutritional minimums (meets core species standards)
+  const nutrition = calculateRecipeNutrition(recipe);
+  const petCategory = normalizedSpecies === 'dog' ? 'dogs' : 
+                      normalizedSpecies === 'cat' ? 'cats' :
+                      normalizedSpecies === 'bird' ? 'birds' :
+                      normalizedSpecies === 'reptile' ? 'reptiles' : 'pocket-pets';
+  const ageGroup = pet.age < 1 ? 'puppy' : pet.age >= 7 ? 'senior' : 'adult';
+  const requirements = nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult;
+  
+  if (requirements) {
+    // Check critical minimums
+    if (requirements.protein && nutrition.protein < requirements.protein.min * 0.8) {
+      return 30; // Critically low protein
+    }
+    if (requirements.fat && nutrition.fat < requirements.fat.min * 0.8) {
+      return 40; // Critically low fat
+    }
+  }
+  
+  // All safety checks passed
+  return 100;
+}
+
+/**
+ * Calculate optimality score (0-100) - considers quality, ideal ranges, health alignment
+ * This is the "how good is it" score, separate from safety
+ */
+function calculateOptimalityScore(
+  recipe: Recipe,
+  pet: Pet,
+  normalizedSpecies: string,
+  factors: {
+    ingredientSafety: FactorScore;
+    nutritionalAdequacy: FactorScore;
+    healthAlignment: FactorScore;
+    lifeStageFit: FactorScore;
+    activityFit: FactorScore;
+    allergenSafety: FactorScore;
+    ingredientQuality: FactorScore;
+  }
+): number {
+  // Optimality weights (different from safety)
+  const optimalityWeights = {
+    nutritionalAdequacy: 0.40, // How close to ideal nutrient bands
+    healthAlignment: 0.20, // Health concern matching
+    lifeStageFit: 0.15, // Age appropriateness
+    activityFit: 0.10, // Activity level matching
+    ingredientQuality: 0.15, // Quality of ingredients
+  };
+  
+  // Calculate weighted optimality score
+  const optimalityScore = 
+    factors.nutritionalAdequacy.score * optimalityWeights.nutritionalAdequacy +
+    factors.healthAlignment.score * optimalityWeights.healthAlignment +
+    factors.lifeStageFit.score * optimalityWeights.lifeStageFit +
+    factors.activityFit.score * optimalityWeights.activityFit +
+    factors.ingredientQuality.score * optimalityWeights.ingredientQuality;
+  
+  return Math.max(0, Math.min(100, optimalityScore));
+}
+
+/**
+ * Analyze each ingredient individually
+ */
+function analyzeIngredients(
+  recipe: Recipe,
+  pet: Pet,
+  normalizedSpecies: string
+): IngredientAnalysis[] {
+  const ingredients = recipe.ingredients || [];
+  const analysis: IngredientAnalysis[] = [];
+
+  for (const ing of ingredients) {
+    const ingName = typeof ing === 'string' ? ing : ing.name;
+    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    
+    const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
+    const composition = getIngredientComposition(ingKey);
+    
+    let compatibility: 'excellent' | 'good' | 'caution' | 'avoid';
+    let healthImpact: 'positive' | 'neutral' | 'negative' = 'neutral';
+    const notes: string[] = [];
+
+    if (compat === 'avoid') {
+      compatibility = 'avoid';
+      healthImpact = 'negative';
+      notes.push('Should be avoided for this species');
+    } else if (compat === 'limit' || compat === 'caution') {
+      compatibility = 'caution';
+      notes.push('Use with caution');
+    } else if (compat === 'ok') {
+      compatibility = 'good';
+    } else {
+      compatibility = 'good'; // Unknown, assume safe
+    }
+
+    // Check health concerns
+    const recipeConcerns = (recipe.healthConcerns || []).map(c => c.toLowerCase());
+    const petConcerns = pet.healthConcerns.map(c => c.toLowerCase());
+    
+    // Check if ingredient benefits health concerns
+    if (composition) {
+      if (composition.omega3 && petConcerns.some(c => c.includes('joint') || c.includes('skin'))) {
+        healthImpact = 'positive';
+        notes.push('Rich in omega-3, beneficial for joint/skin health');
+      }
+      if (composition.taurine && pet.type === 'cat') {
+        healthImpact = 'positive';
+        notes.push('Contains taurine, essential for cats');
+      }
+    }
+
+    analysis.push({
+      ingredient: ingName,
+      compatibility,
+      speciesCompat: compat,
+      healthImpact,
+      notes,
+    });
+  }
+
+  return analysis;
+}
+
+/**
+ * Analyze nutritional profile
+ */
+function analyzeNutrition(
+  recipe: Recipe,
+  pet: Pet,
+  normalizedSpecies: string
+): { gaps: string[]; strengths: string[] } {
+  const gaps: string[] = [];
+  const strengths: string[] = [];
+  
+  const nutrition = calculateRecipeNutrition(recipe);
+  
+  if (normalizedSpecies === 'dog' || normalizedSpecies === 'cat') {
+    if (nutrition.protein < 18) {
+      gaps.push('Protein content may be below optimal');
+    } else {
+      strengths.push('Adequate protein content');
+    }
+    
+    if (nutrition.calcium && nutrition.phosphorus) {
+      const caPRatio = nutrition.calcium / nutrition.phosphorus;
+      if (caPRatio < 1.0 || caPRatio > 2.0) {
+        gaps.push(`Ca:P ratio (${caPRatio.toFixed(2)}) outside ideal range`);
+      } else {
+        strengths.push('Ideal Ca:P ratio');
+      }
+    }
+  }
+
+  if (nutrition.source === 'real') {
+    strengths.push('Nutritional data based on USDA values');
+  }
+
+  return { gaps, strengths };
+}
+
+/**
+ * Calculate recipe nutrition from ingredients
+ * Returns nutrition values as percentages (dry matter basis)
+ */
+export function calculateRecipeNutrition(recipe: Recipe): {
+  protein: number;
+  fat: number;
+  fiber: number;
+  calcium: number;
+  phosphorus: number;
+  calories: number;
+  source: 'real' | 'estimated';
+  usesFallbackNutrition?: boolean;
+  fallbackIngredients?: string[];
+} {
+  // Check if recipe has pre-calculated nutritional data (from custom meal analysis)
+  const nutritionalCalc = (recipe as any).nutritionalCalculation;
+  if (nutritionalCalc) {
+    const totalGrams = nutritionalCalc.totalGrams || 100;
+    // Convert from grams to percentages
+    return {
+      protein: totalGrams > 0 ? ((nutritionalCalc.protein_g || 0) / totalGrams) * 100 : 0,
+      fat: totalGrams > 0 ? ((nutritionalCalc.fat_g || 0) / totalGrams) * 100 : 0,
+      fiber: totalGrams > 0 ? ((nutritionalCalc.fiber_g || 0) / totalGrams) * 100 : 0,
+      calcium: totalGrams > 0 ? ((nutritionalCalc.ca_mg || 0) / totalGrams) * 100 : 0,
+      phosphorus: totalGrams > 0 ? ((nutritionalCalc.p_mg || 0) / totalGrams) * 100 : 0,
+      calories: totalGrams > 0 ? ((nutritionalCalc.calories_kcal || nutritionalCalc.kcal || 0) / totalGrams) * 100 : 0,
+      source: 'real',
+    };
+  }
+
+  const ingredients = recipe.ingredients || [];
+  const supplements = (recipe as any).supplements || [];
+  
+  let totalProtein = 0;
+  let totalFat = 0;
+  let totalFiber = 0;
+  let totalCalcium = 0;
+  let totalPhosphorus = 0;
+  let totalCalories = 0;
+  let totalWeight = 0;
+  let realDataCount = 0;
+  const fallbackIngredients: string[] = [];
+
+  // Helper function to map supplement names to ingredient composition keys
+  const mapSupplementToCompositionKey = (supplementName: string): string | null => {
+    const lower = supplementName.toLowerCase();
+    // Map common supplement names to ingredient composition keys
+    if (lower.includes('taurine')) return 'taurine_powder';
+    if (lower.includes('calcium') && (lower.includes('carbonate') || lower.includes('supplement'))) return 'calcium_carbonate';
+    if (lower.includes('omega') || lower.includes('fish oil') || lower.includes('krill') || lower.includes('salmon oil')) return 'fish_oil';
+    // Note: psyllium, probiotics, vitamins don't have composition data yet
+    // They can still be added but won't contribute to macro calculations
+    return null;
+  };
+
+  // Process ingredients
+  for (const ingredient of ingredients) {
+    const name = typeof ingredient === 'string' ? ingredient : ingredient.name;
+    const amount = typeof ingredient === 'string' ? 100 : (ingredient.amount ? parseFloat(String(ingredient.amount).replace(/[^0-9.]/g, '')) : 100);
+
+    const ingKey = name.toLowerCase().replace(/\s+/g, '_');
+    const composition = getIngredientComposition(ingKey);
+    
+    if (composition && composition.protein !== undefined) {
+      // Check if composition uses fallback (has needsReview and source is estimated_fallback)
+      const usesFallback = (composition as any).needsReview === true && 
+                          (composition.source === 'estimated_fallback' || composition.source?.includes('fallback'));
+      
+      if (usesFallback) {
+        fallbackIngredients.push(name);
+      }
+      
+      totalProtein += (composition.protein || 0) * (amount / 100);
+      totalFat += (composition.fat || 0) * (amount / 100);
+      totalFiber += (composition.fiber || 0) * (amount / 100);
+      totalCalcium += (composition.calcium || 0) * (amount / 100);
+      totalPhosphorus += (composition.phosphorus || 0) * (amount / 100);
+      totalCalories += (composition.kcal || 0) * (amount / 100);
+      totalWeight += amount;
+      realDataCount++;
+    } else {
+      // Try fallback nutrition
+      const fallback = getFallbackNutrition(name);
+      if (fallback) {
+        fallbackIngredients.push(name);
+        totalProtein += (fallback.protein || 0) * (amount / 100);
+        totalFat += (fallback.fat || 0) * (amount / 100);
+        totalFiber += (fallback.fiber || 0) * (amount / 100);
+        totalCalcium += (fallback.calcium || 0) * (amount / 100);
+        totalPhosphorus += (fallback.phosphorus || 0) * (amount / 100);
+        totalCalories += (fallback.kcal || 0) * (amount / 100);
+        totalWeight += amount;
+        realDataCount++;
+      }
+    }
+  }
+
+  // Process supplements - add their nutritional contributions
+  for (const supplement of supplements) {
+    const name = supplement.name || supplement.productName || '';
+    if (!name) continue;
+    
+    // Map supplement name to ingredient composition key
+    const compositionKey = mapSupplementToCompositionKey(name);
+    if (!compositionKey) continue;
+    
+    // Get composition data
+    const composition = getIngredientComposition(compositionKey);
+    if (!composition) continue;
+    
+    // Supplements are typically added in small amounts (mg or grams)
+    // Parse amount from supplement.amount (e.g., "250mg", "1g", "As directed")
+    let supplementAmount = 0;
+    const amountStr = supplement.amount || supplement.defaultAmount || '';
+    if (amountStr) {
+      // Extract numeric value
+      const numericMatch = amountStr.match(/([\d.]+)/);
+      if (numericMatch) {
+        supplementAmount = parseFloat(numericMatch[1]);
+        // Convert mg to grams if needed
+        if (amountStr.toLowerCase().includes('mg')) {
+          supplementAmount = supplementAmount / 1000;
+        }
+      } else {
+        // Default supplement amount (typically 1-5g for powders)
+        supplementAmount = 2; // 2g default
+      }
+    } else {
+      supplementAmount = 2; // 2g default
+    }
+    
+    // Add supplement nutrition to totals
+    // Supplements contribute nutrients but typically don't add significant weight to the meal
+    // We'll add them proportionally to the existing meal weight
+    if (totalWeight > 0) {
+      // Add supplement nutrients as if they were part of the meal
+      totalCalcium += (composition.calcium || 0) * (supplementAmount / 100);
+      totalPhosphorus += (composition.phosphorus || 0) * (supplementAmount / 100);
+      totalProtein += (composition.protein || 0) * (supplementAmount / 100);
+      totalFat += (composition.fat || 0) * (supplementAmount / 100);
+      totalFiber += (composition.fiber || 0) * (supplementAmount / 100);
+      totalCalories += (composition.kcal || 0) * (supplementAmount / 100);
+      // Add supplement weight to total (small contribution)
+      totalWeight += supplementAmount;
+      realDataCount++;
+    }
+  }
+
+  if (realDataCount > 0 && totalWeight > 0) {
+    return {
+      protein: (totalProtein / totalWeight) * 100,
+      fat: (totalFat / totalWeight) * 100,
+      fiber: (totalFiber / totalWeight) * 100,
+      calcium: (totalCalcium / totalWeight) * 100,
+      phosphorus: (totalPhosphorus / totalWeight) * 100,
+      calories: (totalCalories / totalWeight) * 100,
+      source: fallbackIngredients.length > 0 ? 'estimated' : 'real',
+      usesFallbackNutrition: fallbackIngredients.length > 0,
+      fallbackIngredients: fallbackIngredients.length > 0 ? fallbackIngredients : undefined,
+    };
+  }
+
+  // Fallback estimates
+  return {
+    protein: 25,
+    fat: 15,
+    fiber: 3,
+    calcium: 0.8,
+    phosphorus: 0.6,
+    calories: 150,
+    source: 'estimated',
+  };
+}
+
+/**
+ * Perfect path short-circuit: Check if recipe is a perfect match for a perfect pet
+ */
+function isPerfectMatch(recipe: Recipe, pet: Pet): boolean {
+  // Pet must have no health concerns and no allergies
+  if (pet.healthConcerns.length > 0) return false;
+  if ((pet.allergies?.length ?? 0) > 0) return false;
+  if (pet.dietaryRestrictions.length > 0) return false;
+  
+  // Recipe must match species
+  if (!matchesSpecies(recipe, pet)) return false;
+  
+  // Recipe must match age group
+  const petAgeGroup = pet.age < 1 ? 'baby' : pet.age < 2 ? 'young' : pet.age < 7 ? 'adult' : 'senior';
+  if (!recipe.ageGroup || !recipe.ageGroup.includes(petAgeGroup)) {
+    if (!recipe.ageGroup?.includes('all') && recipe.ageGroup && recipe.ageGroup.length > 0) {
+      return false;
+    }
+  }
+  
+  // All ingredients must be safe for species
+  const normalizedSpecies = normalizeSpecies(pet.type);
+  const ingredients = recipe.ingredients || [];
+  for (const ing of ingredients) {
+    const ingName = typeof ing === 'string' ? ing : ing.name;
+    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
+    if (compat === 'avoid') return false;
+  }
+  
+  // Check for banned ingredients
+  const bannedIngredients = (pet as any).bannedIngredients || [];
+  if (bannedIngredients.length > 0) {
+    const recipeIngNames = ingredients.map(ing => 
+      (typeof ing === 'string' ? ing : ing.name).toLowerCase()
+    );
+    for (const banned of bannedIngredients) {
+      if (recipeIngNames.some(name => name.includes(banned.toLowerCase()) || banned.toLowerCase().includes(name))) {
+        return false;
+      }
+    }
+  }
+  
+  // Recipe must meet OPTIMAL nutrient requirements (not just minimums)
+  const nutrition = calculateRecipeNutrition(recipe);
+  const petCategory = normalizedSpecies === 'dog' ? 'dogs' : 
+                      normalizedSpecies === 'cat' ? 'cats' :
+                      normalizedSpecies === 'bird' ? 'birds' :
+                      normalizedSpecies === 'reptile' ? 'reptiles' : 'pocket-pets';
+  const ageGroup = pet.age < 1 ? 'puppy' : pet.age >= 7 ? 'senior' : 'adult';
+  const requirements = nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult;
+  
+  if (requirements) {
+    // Require nutrition to be in IDEAL range (middle 30% of min-max range - very strict for perfect match)
+    if (requirements.protein) {
+      const range = requirements.protein.max - requirements.protein.min;
+      const idealMin = requirements.protein.min + (range * 0.35); // Middle 30% of range
+      const idealMax = requirements.protein.max - (range * 0.35);
+      if (nutrition.protein < idealMin || nutrition.protein > idealMax) {
+        return false;
+      }
+    }
+    if (requirements.fat) {
+      const range = requirements.fat.max - requirements.fat.min;
+      const idealMin = requirements.fat.min + (range * 0.35);
+      const idealMax = requirements.fat.max - (range * 0.35);
+      if (nutrition.fat < idealMin || nutrition.fat > idealMax) {
+        return false;
+      }
+    }
+    
+    // Require Ca:P ratio to be in OPTIMAL range (1.4-1.7, very tight for perfect match)
+    if (nutrition.calcium && nutrition.phosphorus && requirements.calcium && requirements.phosphorus) {
+      const ratio = nutrition.calcium / nutrition.phosphorus;
+      if (ratio < 1.4 || ratio > 1.7) {
+        return false;
+      }
+    }
+  }
+  
+  // Require NO fallback nutrition (100% data coverage required for perfect match)
+  if (nutrition.usesFallbackNutrition) {
+    return false; // Perfect matches must have complete nutritional data
+  }
+  
+  // Require data coverage > 95% (not just "no fallback")
+  const totalIngredients = ingredients.length;
+  if (nutrition.fallbackIngredients && nutrition.fallbackIngredients.length > 0) {
+    const coverage = ((totalIngredients - nutrition.fallbackIngredients.length) / totalIngredients) * 100;
+    if (coverage < 95) {
+      return false; // Must have >95% data coverage
+    }
+  }
+  
+  // Require all core nutrients in ideal bands (not just protein/fat)
+  if (requirements) {
+    // Check fiber if required
+    if (requirements.fiber) {
+      const range = requirements.fiber.max - requirements.fiber.min;
+      const idealMin = requirements.fiber.min + (range * 0.35);
+      const idealMax = requirements.fiber.max - (range * 0.35);
+      if (nutrition.fiber < idealMin || nutrition.fiber > idealMax) {
+        return false;
+      }
+    }
+    // Check calcium if required
+    if (requirements.calcium) {
+      const range = requirements.calcium.max - requirements.calcium.min;
+      const idealMin = requirements.calcium.min + (range * 0.35);
+      const idealMax = requirements.calcium.max - (range * 0.35);
+      if (nutrition.calcium < idealMin || nutrition.calcium > idealMax) {
+        return false;
+      }
+    }
+    // Check phosphorus if required
+    if (requirements.phosphorus) {
+      const range = requirements.phosphorus.max - requirements.phosphorus.min;
+      const idealMin = requirements.phosphorus.min + (range * 0.35);
+      const idealMax = requirements.phosphorus.max - (range * 0.35);
+      if (nutrition.phosphorus < idealMin || nutrition.phosphorus > idealMax) {
+        return false;
+      }
+    }
+  }
+  
+  // Require ingredient quality to be above threshold (at least 85% - very strict for perfect match)
+  const qualityScore = calculateIngredientQualityScore(recipe.ingredients || []);
+  if (qualityScore.score < 85) {
+    return false;
+  }
+  
+  // Require sufficient ingredient diversity (at least 3 different ingredient types)
+  const ingredientTypes = new Set<string>();
+  for (const ing of ingredients) {
+    const ingName = typeof ing === 'string' ? ing : ing.name;
+    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
+    if (compat === 'ok') {
+      // Categorize ingredient type
+      if (ingKey.includes('chicken') || ingKey.includes('turkey') || ingKey.includes('beef') || 
+          ingKey.includes('lamb') || ingKey.includes('fish') || ingKey.includes('salmon') ||
+          ingKey.includes('pork') || ingKey.includes('duck') || ingKey.includes('organ') ||
+          ingKey.includes('heart') || ingKey.includes('liver') || ingKey.includes('egg')) {
+        ingredientTypes.add('protein');
+      } else if (ingKey.includes('rice') || ingKey.includes('potato') || ingKey.includes('oats') ||
+                 ingKey.includes('quinoa') || ingKey.includes('barley') || ingKey.includes('grain')) {
+        ingredientTypes.add('carb');
+      } else if (ingKey.includes('carrot') || ingKey.includes('broccoli') || ingKey.includes('spinach') ||
+                 ingKey.includes('kale') || ingKey.includes('vegetable') || ingKey.includes('green')) {
+        ingredientTypes.add('vegetable');
+      } else if (ingKey.includes('blueberry') || ingKey.includes('apple') || ingKey.includes('fruit')) {
+        ingredientTypes.add('fruit');
+      } else if (ingKey.includes('oil') || ingKey.includes('fat') || ingKey.includes('supplement')) {
+        ingredientTypes.add('supplement');
+      }
+    }
+  }
+  if (ingredientTypes.size < 3) {
+    return false; // Need at least 3 different ingredient types
+  }
+  
+  return true;
+}
+
+/**
+ * Calculate bonus points for perfect matches
+ */
+export function calculateBonuses(recipe: Recipe, pet: Pet): number {
+  let bonus = 0;
+  
+  // Exact species fit (reduced from 2 to 1)
+  if (matchesSpecies(recipe, pet)) {
+    bonus += 1;
+  }
+  
+  // Exact life stage match (reduced from 2 to 1)
+  const petAgeGroup = pet.age < 1 ? 'baby' : pet.age < 2 ? 'young' : pet.age < 7 ? 'adult' : 'senior';
+  if (recipe.ageGroup?.includes(petAgeGroup) || recipe.ageGroup?.includes('all')) {
+    bonus += 1;
+  }
+  
+  // No allergens (reduced from 2 to 1)
+  if ((pet.allergies?.length ?? 0) === 0 && pet.dietaryRestrictions.length === 0) {
+    bonus += 1;
+  } else {
+    // Check if recipe avoids allergens
+    const allAllergens = [...(pet.allergies || []), ...pet.dietaryRestrictions];
+    const recipeIngNames = (recipe.ingredients || []).map(ing => 
+      (typeof ing === 'string' ? ing : ing.name).toLowerCase()
+    ).join(' ');
+    const hasAllergen = allAllergens.some(a => recipeIngNames.includes(a.toLowerCase()));
+    if (!hasAllergen) {
+      bonus += 1;
+    }
+  }
+  
+  // No fallback nutritional data (reduced from 2 to 1)
+  const nutrition = calculateRecipeNutrition(recipe);
+  if (!nutrition.usesFallbackNutrition) {
+    bonus += 1;
+  }
+  
+  // Ideal nutrient ratios (reduced from 2 to 1)
+  if (nutrition.calcium && nutrition.phosphorus) {
+    const ratio = nutrition.calcium / nutrition.phosphorus;
+    if (ratio >= 1.2 && ratio <= 2.0) {
+      bonus += 1;
+    }
+  }
+  
+  // Complete ingredient data (check coverage) (reduced from 2 to 1)
+  const totalIngredients = (recipe.ingredients || []).length;
+  if (nutrition.fallbackIngredients) {
+    const coverage = totalIngredients > 0 
+      ? 1 - (nutrition.fallbackIngredients.length / totalIngredients)
+      : 0;
+    if (coverage >= 0.9) {
+      bonus += 1;
+    }
+  } else if (totalIngredients > 0) {
+    bonus += 1; // All ingredients have data
+  }
+  
+  return Math.min(2, bonus); // Cap at 2% bonus (further reduced to prevent clustering at 100%)
+}
+
+/**
+ * Convert score to letter grade
+ */
+export function getGrade(score: number): 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F' {
+  if (score >= 95) return 'A+';
+  if (score >= 90) return 'A';
+  if (score >= 85) return 'B+';
+  if (score >= 80) return 'B';
+  if (score >= 75) return 'C+';
+  if (score >= 70) return 'C';
+  if (score >= 60) return 'D';
+  return 'F';
+}
+
+/**
+ * Scoring tier system for better UX
+ */
+export type ScoreTier = 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
+
+export function getScoreTier(score: number): ScoreTier {
+  if (score >= 95) return 'A+';
+  if (score >= 90) return 'A';
+  if (score >= 85) return 'B+';
+  if (score >= 80) return 'B';
+  if (score >= 75) return 'C+';
+  if (score >= 70) return 'C';
+  if (score >= 60) return 'D';
+  return 'F';
+}
+
+/**
+ * Check if recipe is gold-standard for a simple pet (perfect match criteria)
+ */
+export function isGoldStandardForSimplePet(recipe: Recipe, pet: Pet): boolean {
+  // Species & age correct
+  if (!matchesSpecies(recipe, pet)) return false;
+  
+  const petAgeGroup = pet.age < 1 ? 'baby' : pet.age < 2 ? 'young' : pet.age < 7 ? 'adult' : 'senior';
+  if (!recipe.ageGroup || !recipe.ageGroup.includes(petAgeGroup)) {
+    if (!recipe.ageGroup?.includes('all') && recipe.ageGroup && recipe.ageGroup.length > 0) {
+      return false;
+    }
+  }
+  
+  // No allergens/never-feed ingredients
+  const allAllergens = [...(pet.allergies || []), ...pet.dietaryRestrictions];
+  if (allAllergens.length > 0) {
+    const recipeIngNames = (recipe.ingredients || []).map(ing => 
+      (typeof ing === 'string' ? ing : ing.name).toLowerCase()
+    ).join(' ');
+    const hasAllergen = allAllergens.some(a => recipeIngNames.includes(a.toLowerCase()));
+    if (hasAllergen) return false;
+  }
+  
+  // Check for banned ingredients
+  const bannedIngredients = (pet as any).bannedIngredients || [];
+  if (bannedIngredients.length > 0) {
+    const recipeIngNames = (recipe.ingredients || []).map(ing => 
+      (typeof ing === 'string' ? ing : ing.name).toLowerCase()
+    );
+    for (const banned of bannedIngredients) {
+      if (recipeIngNames.some(name => name.includes(banned.toLowerCase()) || banned.toLowerCase().includes(name))) {
+        return false;
+      }
+    }
+  }
+  
+  // No health concerns OR recipe is neutral/beneficial
+  if (pet.healthConcerns.length > 0) {
+    const recipeNotSuitable = (recipe.notSuitableFor || []).map(c => normalizeHealthConcern(c));
+    const petConcerns = pet.healthConcerns.map(c => normalizeHealthConcern(c));
+    const hasConflict = recipeNotSuitable.some(ns => 
+      petConcerns.some(pc => ns.includes(pc) || pc.includes(ns))
+    );
+    if (hasConflict) return false;
+  }
+  
+  // Core nutrients within ideal bands
+  const nutrition = calculateRecipeNutrition(recipe);
+  const normalizedSpecies = normalizeSpecies(pet.type);
+  const petCategory = normalizedSpecies === 'dog' ? 'dogs' : 
+                      normalizedSpecies === 'cat' ? 'cats' :
+                      normalizedSpecies === 'bird' ? 'birds' :
+                      normalizedSpecies === 'reptile' ? 'reptiles' : 'pocket-pets';
+  const ageGroup = pet.age < 1 ? 'puppy' : pet.age >= 7 ? 'senior' : 'adult';
+  const requirements = nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult;
+  
+  if (requirements) {
+    if (requirements.protein) {
+      if (nutrition.protein < requirements.protein.min || nutrition.protein > requirements.protein.max) {
+        return false;
+      }
+    }
+    if (requirements.fat) {
+      if (nutrition.fat < requirements.fat.min || nutrition.fat > requirements.fat.max) {
+        return false;
+      }
+    }
+    
+    // Ca:P ratio in safe range
+    if (nutrition.calcium && nutrition.phosphorus && requirements.calcium && requirements.phosphorus) {
+      const ratio = nutrition.calcium / nutrition.phosphorus;
+      if (ratio < 1.0 || ratio > 2.5) return false;
+    }
+  }
+  
+  // No fallback nutrition (or confidence threshold met)
+  if (nutrition.usesFallbackNutrition && nutrition.fallbackIngredients) {
+    const totalIngredients = (recipe.ingredients || []).length;
+    const confidence = totalIngredients > 0 
+      ? 1 - (nutrition.fallbackIngredients.length / totalIngredients)
+      : 0;
+    if (confidence < 0.8) return false; // Require 80% data coverage
+  }
+  
+  return true;
+}
+
+/**
+ * Per-pet calibration: Rescale scores so best gold-standard recipe becomes 100%
+ */
+/**
+ * Calibrate scores for a pet across multiple recipes
+ * Rescales scores so the best perfect match becomes 95-100, or caps at 90-95 if no perfect matches
+ * Preserves ranking while improving distribution
+ */
+export function calibrateScoresForPet(
+  recipes: Recipe[],
+  pet: Pet
+): Map<string, number> {
+  // Score all recipes
+  const scored = recipes.map(recipe => ({
+    recipe,
+    rawScore: calculateEnhancedCompatibility(recipe, pet).overallScore,
+    isPerfectMatch: isPerfectMatch(recipe, pet)
+  }));
+  
+  // Find best perfect match recipe
+  const perfectMatchRecipes = scored.filter(s => s.isPerfectMatch);
+  const bestPerfectMatch = perfectMatchRecipes.length > 0
+    ? perfectMatchRecipes.reduce((best, current) => 
+        current.rawScore > best.rawScore ? current : best
+      )
+    : null;
+  
+  // If we have a perfect match recipe, rescale so it becomes 95-100
+  if (bestPerfectMatch && bestPerfectMatch.rawScore > 0) {
+    // Target: best perfect match should be 98 (allows room for variation)
+    const targetScore = 98;
+    const scaleFactor = targetScore / bestPerfectMatch.rawScore;
+    const calibrated = new Map<string, number>();
+    
+    // Calculate mean and std dev for monotonic transform
+    const scores = scored.map(s => s.rawScore);
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const variance = scores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / scores.length;
+    const stdDev = Math.sqrt(variance);
+    
+    scored.forEach(({ recipe, rawScore, isPerfectMatch }) => {
+      // Rescale proportionally
+      let calibratedScore = rawScore * scaleFactor;
+      
+      // Perfect matches can reach 100, others capped at 95
+      if (isPerfectMatch) {
+        calibratedScore = Math.min(100, calibratedScore);
+      } else {
+        calibratedScore = Math.min(95, calibratedScore);
+      }
+      
+      calibrated.set(recipe.id, Math.max(0, Math.min(100, Math.round(calibratedScore))));
+    });
+    
+    return calibrated;
+  }
+  
+  // No perfect match found - cap top score at 90-95 to honestly reflect "no perfect match"
+  const maxRawScore = Math.max(...scored.map(s => s.rawScore));
+  const calibrated = new Map<string, number>();
+  
+  if (maxRawScore > 0) {
+    // Rescale so max becomes 92 (honest "no perfect match" ceiling)
+    const scaleFactor = 92 / maxRawScore;
+    
+    scored.forEach(({ recipe, rawScore }) => {
+      const calibratedScore = rawScore * scaleFactor;
+      calibrated.set(recipe.id, Math.max(0, Math.min(92, Math.round(calibratedScore))));
+    });
+  } else {
+    // All scores are 0 - return as-is
+    scored.forEach(({ recipe, rawScore }) => {
+      calibrated.set(recipe.id, rawScore);
+    });
+  }
+  
+  return calibrated;
+}
+
+/**
+ * Calculate enhanced compatibility with per-pet calibration applied
+ * This is a convenience function that scores a single recipe but applies calibration
+ * if a recipe set is provided. For batch operations, use calibrateScoresForPet() directly.
+ */
+export function calculateEnhancedCompatibilityWithCalibration(
+  recipe: Recipe,
+  pet: Pet,
+  allRecipes?: Recipe[]
+): EnhancedCompatibilityScore {
+  const rawScore = calculateEnhancedCompatibility(recipe, pet);
+  
+  // If all recipes provided, apply calibration
+  if (allRecipes && allRecipes.length > 1) {
+    const calibratedScores = calibrateScoresForPet(allRecipes, pet);
+    const calibratedScore = calibratedScores.get(recipe.id);
+    
+    if (calibratedScore !== undefined) {
+      // Return score with calibrated overallScore
+      return {
+        ...rawScore,
+        overallScore: calibratedScore,
+        grade: getGrade(calibratedScore),
+      };
+    }
+  }
+  
+  return rawScore;
+}
+</file>
+
+</files>

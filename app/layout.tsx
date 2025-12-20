@@ -11,8 +11,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app'),
   title: {
-    default: "Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets",
-    template: "%s | Paw & Plate"
+    default: "Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets",
+    template: "%s | Paws & Plates"
   },
   description: "Free vet-approved meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO & WSAVA compliant.",
   keywords: [
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     "balanced dog nutrition",
     "cat diet recipes"
   ],
-  authors: [{ name: "Paw & Plate Team" }],
-  creator: "Paw & Plate",
-  publisher: "Paw & Plate",
+  authors: [{ name: "Paws & Plates Team" }],
+  creator: "Paws & Plates",
+  publisher: "Paws & Plates",
   robots: {
     index: true,
     follow: true,
@@ -51,21 +51,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app',
-    siteName: 'Paw & Plate',
-    title: 'Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
+    siteName: 'Paws & Plates',
+    title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering. AAFCO & WSAVA compliant nutrition.',
     images: [
       {
         url: '/images/emojis/Mascots/HeroPics/HeroBanner-v3.png',
         width: 1200,
         height: 630,
-        alt: 'Paw & Plate - Meal prep for all pets',
+        alt: 'Paws & Plates - Meal prep for all pets',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
+    title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering.',
     images: ['/images/emojis/Mascots/HeroPics/HeroBanner-v3.png'],
   },
@@ -90,7 +90,7 @@ export default function RootLayout({
     <ClerkProvider
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <head>
           {/* Additional SEO tags */}
           <link rel="icon" href="/favicon.ico" />
@@ -106,7 +106,7 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "Paw & Plate",
+                "name": "Paws & Plates",
                 "description": "Free vet-approved meal plans for dogs, cats, birds, reptiles, and pocket pets",
                 "url": "https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app",
                 "potentialAction": {

@@ -21,12 +21,12 @@
   },
   {
     "ingredient": "ground beef (lean)",
-    "asin": "B07VHR2WNZ",
-    "url": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20",
+    "asin": "B08LJVQSL2",
+    "url": "https://www.amazon.com/dp/B08LJVQSL2?tag=robinfrench-20",
     "price": {
-      "amount": 29.9,
+      "amount": 8.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:46:59.487Z"
+      "lastUpdated": "2025-12-15T00:00:00.000Z"
     }
   },
   {
@@ -34,9 +34,9 @@
     "asin": "B0082C00P8",
     "url": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20",
     "price": {
-      "amount": 37.98,
+      "amount": 22.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:47:04.185Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -104,29 +104,29 @@
     "asin": "B0BXZ3JJL9",
     "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
     "price": {
-      "amount": 47.99,
+      "amount": 24.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:47:36.945Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "sardines (canned in water)",
-    "asin": "B01FUWYO2M",
-    "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+    "asin": "B001EO5QW8",
+    "url": "https://www.amazon.com/dp/B001EO5QW8?tag=robinfrench-20",
     "price": {
-      "amount": 41.99,
+      "amount": 4.49,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:47:41.989Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "eggs",
-    "asin": "B001DY6U9M",
-    "url": "https://www.amazon.com/dp/B001DY6U9M?tag=robinfrench-20",
+    "asin": "B08P4C7QYZ",
+    "url": "https://www.amazon.com/dp/B08P4C7QYZ?tag=robinfrench-20",
     "price": {
-      "amount": 53.19,
+      "amount": 13,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:47:46.815Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -134,9 +134,9 @@
     "asin": "B0BXZ3JJL9",
     "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
     "price": {
-      "amount": 47.99,
+      "amount": 24.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:47:51.513Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -151,32 +151,32 @@
   },
   {
     "ingredient": "duck breast",
-    "asin": "B01KAOGE5U",
-    "url": "https://www.amazon.com/dp/B01KAOGE5U?tag=robinfrench-20",
+    "asin": "B0BXZ3JJL9",
+    "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
     "price": {
-      "amount": 41.99,
+      "amount": 24.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:00.969Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "venison",
-    "asin": "B07VHR2WNZ",
-    "url": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20",
+    "asin": "B0BJ5PTR5S",
+    "url": "https://www.amazon.com/dp/B0BJ5PTR5S?tag=robinfrench-20",
     "price": {
-      "amount": 29.9,
+      "amount": 24.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:05.490Z"
+      "lastUpdated": "2025-12-15T00:00:00.000Z"
     }
   },
   {
     "ingredient": "rabbit meat",
-    "asin": "B0082C00P8",
-    "url": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20",
+    "asin": "B07ZYNJ456",
+    "url": "https://www.amazon.com/dp/B07ZYNJ456?tag=robinfrench-20",
     "price": {
-      "amount": 37.98,
+      "amount": 28,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:10.314Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -231,42 +231,42 @@
   },
   {
     "ingredient": "quinoa",
-    "asin": "B07ZJNYGW4",
-    "url": "https://www.amazon.com/dp/B07ZJNYGW4?tag=robinfrench-20",
+    "asin": "B000EDG598",
+    "url": "https://www.amazon.com/dp/B000EDG598?tag=robinfrench-20",
     "price": {
-      "amount": 74.98,
+      "amount": 12.49,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:38.310Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "sweet potato",
-    "asin": "B07D92VQ9C",
-    "url": "https://www.amazon.com/dp/B07D92VQ9C?tag=robinfrench-20",
+    "asin": "B07YNQ6T9Z",
+    "url": "https://www.amazon.com/dp/B07YNQ6T9Z?tag=robinfrench-20",
     "price": {
-      "amount": 68.35,
+      "amount": 12.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:43.264Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
-    "ingredient": "pumpkin puree",
-    "asin": "B0062A87HA",
-    "url": "https://www.amazon.com/dp/B0062A87HA?tag=robinfrench-20",
+    "ingredient": "sage",
+    "asin": "B00BUSL1SO",
+    "url": "https://www.amazon.com/dp/B00BUSL1SO?tag=robinfrench-20",
     "price": {
-      "amount": 43.11,
+      "amount": 6.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:48.126Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
-    "ingredient": "butternut squash",
-    "asin": "B000HDCSTG",
-    "url": "https://www.amazon.com/dp/B000HDCSTG?tag=robinfrench-20",
+    "ingredient": "beta-glucans",
+    "asin": "B08CXQV9V7",
+    "url": "https://www.amazon.com/dp/B08CXQV9V7?tag=robinfrench-20",
     "price": {
-      "amount": 52.89,
+      "amount": 29.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:48:52.886Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -331,12 +331,12 @@
   },
   {
     "ingredient": "broccoli",
-    "asin": "B07SV522V9",
-    "url": "https://www.amazon.com/dp/B07SV522V9?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 89.95,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:49:25.907Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -351,22 +351,22 @@
   },
   {
     "ingredient": "kale",
-    "asin": "B09VKDGT39",
-    "url": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 82.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:49:35.263Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "celery",
-    "asin": "B09VKDGT39",
-    "url": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 82.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:49:39.664Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -431,22 +431,22 @@
   },
   {
     "ingredient": "endive",
-    "asin": "B0006L2XNK",
-    "url": "https://www.amazon.com/dp/B0006L2XNK?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 46.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:50:11.704Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "escarole",
-    "asin": "B084ZVBGQ6",
-    "url": "https://www.amazon.com/dp/B084ZVBGQ6?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 47.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:50:16.480Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -461,12 +461,12 @@
   },
   {
     "ingredient": "collard greens",
-    "asin": "B000P6H23W",
-    "url": "https://www.amazon.com/dp/B000P6H23W?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 124.95,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:50:25.731Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -491,12 +491,12 @@
   },
   {
     "ingredient": "beet greens",
-    "asin": "B0F9LNFLTK",
-    "url": "https://www.amazon.com/dp/B0F9LNFLTK?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 41.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:50:39.361Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -524,19 +524,19 @@
     "asin": "B00GGBLPVU",
     "url": "https://www.amazon.com/dp/B00GGBLPVU?tag=robinfrench-20",
     "price": {
-      "amount": 50.32,
+      "amount": 12.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:50:53.799Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "salmon oil",
-    "asin": "B09RYYWHH1",
-    "url": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20",
+    "asin": "B01N9SSTG8",
+    "url": "https://www.amazon.com/dp/B01N9SSTG8?tag=robinfrench-20",
     "price": {
-      "amount": 43.99,
+      "amount": 21.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:50:58.582Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -551,12 +551,12 @@
   },
   {
     "ingredient": "fish oil",
-    "asin": "B00CBY93XS",
-    "url": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20",
+    "asin": "B01N9SSTG8",
+    "url": "https://www.amazon.com/dp/B01N9SSTG8?tag=robinfrench-20",
     "price": {
-      "amount": 39.91,
+      "amount": 21.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:51:08.406Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -634,9 +634,9 @@
     "asin": "B004OA5XP4",
     "url": "https://www.amazon.com/dp/B004OA5XP4?tag=robinfrench-20",
     "price": {
-      "amount": 45.49,
+      "amount": 29.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:51:47.416Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -658,15 +658,16 @@
       "currency": "USD",
       "lastUpdated": "2025-12-12T20:51:57.071Z"
     }
-  },
+  }, 
   {
     "ingredient": "chicken broth",
-    "asin": "B07DFNP37Y",
-    "url": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20",
+    "asin": "B079N7WGXJ",
+    "url": "https://www.amazon.com/dp/B079N7WGXJ?tag=robinfrench-20",
+    "quantity": "32 oz",
     "price": {
-      "amount": 30.48,
+      "amount": 8.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:02.004Z"
+      "lastUpdated": "2025-12-16T04:00:00.000Z"
     }
   },
   {
@@ -691,112 +692,112 @@
   },
   {
     "ingredient": "canary seed",
-    "asin": "B00027ZVG4",
-    "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+    "asin": "B001ODB3YE",
+    "url": "https://www.amazon.com/dp/B001ODB3YE?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:16.396Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "niger seed",
-    "asin": "B086211R4H",
-    "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+    "asin": "B001ODB3YE",
+    "url": "https://www.amazon.com/dp/B001ODB3YE?tag=robinfrench-20",
     "price": {
-      "amount": 47.96,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:21.154Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "oat groats",
-    "asin": "B086211R4H",
-    "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+    "asin": "B000EDG52O",
+    "url": "https://www.amazon.com/dp/B000EDG52O?tag=robinfrench-20",
     "price": {
-      "amount": 47.96,
+      "amount": 7.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:25.839Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "hemp seeds",
-    "asin": "B086211R4H",
-    "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+    "asin": "B01N7GJVNH",
+    "url": "https://www.amazon.com/dp/B01N7GJVNH?tag=robinfrench-20",
     "price": {
-      "amount": 47.96,
+      "amount": 14.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:30.495Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "flaxseeds",
-    "asin": "B00027ZVG4",
-    "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+    "asin": "B00JL2X39O",
+    "url": "https://www.amazon.com/dp/B00JL2X39O?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 8.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:35.165Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "sesame seeds",
-    "asin": "B086211R4H",
-    "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+    "asin": "B07ZYNJ43K",
+    "url": "https://www.amazon.com/dp/B07ZYNJ43K?tag=robinfrench-20",
     "price": {
-      "amount": 47.96,
+      "amount": 8.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:39.810Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "chia seeds",
-    "asin": "B086211R4H",
-    "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+    "asin": "B00JL2X3D4",
+    "url": "https://www.amazon.com/dp/B00JL2X3D4?tag=robinfrench-20",
     "price": {
-      "amount": 47.96,
+      "amount": 9.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:44.334Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "quinoa (cooked)",
-    "asin": "B001CCOVB4",
-    "url": "https://www.amazon.com/dp/B001CCOVB4?tag=robinfrench-20",
+    "asin": "B000EDG598",
+    "url": "https://www.amazon.com/dp/B000EDG598?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 12.49,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:49.228Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "rapeseed",
-    "asin": "B00027ZVG4",
-    "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+    "asin": "B001ODB3YE",
+    "url": "https://www.amazon.com/dp/B001ODB3YE?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:54.052Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "sunflower seeds (small amounts)",
-    "asin": "B00027ZVG4",
-    "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+    "asin": "B07ZXF9876",
+    "url": "https://www.amazon.com/dp/B07ZXF9876?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 10.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:52:58.686Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "pumpkin seeds",
-    "asin": "B00027ZVG4",
-    "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+    "asin": "B00JL2X2KW",
+    "url": "https://www.amazon.com/dp/B00JL2X2KW?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 9.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:53:03.279Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -831,12 +832,12 @@
   },
   {
     "ingredient": "blueberries",
-    "asin": "B07Z568Y3N",
-    "url": "https://www.amazon.com/dp/B07Z568Y3N?tag=robinfrench-20",
+    "asin": "B08NCDSV82",
+    "url": "https://www.amazon.com/dp/B08NCDSV82?tag=robinfrench-20",
     "price": {
-      "amount": 36.99,
+      "amount": 14,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:53:21.369Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -911,22 +912,22 @@
   },
   {
     "ingredient": "pellets (fortified)",
-    "asin": "B086211R4H",
-    "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20",
+    "asin": "B0002ARAFI",
+    "url": "https://www.amazon.com/dp/B0002ARAFI?tag=robinfrench-20",
     "price": {
-      "amount": 47.96,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:53:57.999Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "cuttlebone",
-    "asin": "B00027ZVG4",
-    "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20",
+    "asin": "B0002AR0I2",
+    "url": "https://www.amazon.com/dp/B0002AR0I2?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 5.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:54:02.666Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1041,12 +1042,12 @@
   },
   {
     "ingredient": "meadow hay",
-    "asin": "B07CJ2FRNC",
-    "url": "https://www.amazon.com/dp/B07CJ2FRNC?tag=robinfrench-20",
+    "asin": "B001ODB40G",
+    "url": "https://www.amazon.com/dp/B001ODB40G?tag=robinfrench-20",
     "price": {
-      "amount": 36.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:54:58.942Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1121,12 +1122,12 @@
   },
   {
     "ingredient": "duck liver",
-    "asin": "B0BWBV5PRJ",
-    "url": "https://www.amazon.com/dp/B0BWBV5PRJ?tag=robinfrench-20",
+    "asin": "B0BXZ3JJL9",
+    "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20",
     "price": {
-      "amount": 59.99,
+      "amount": 24.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:55:36.929Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1171,12 +1172,12 @@
   },
   {
     "ingredient": "ground herring",
-    "asin": "B00B3G89MQ",
-    "url": "https://www.amazon.com/dp/B00B3G89MQ?tag=robinfrench-20",
+    "asin": "B001EO5QRM",
+    "url": "https://www.amazon.com/dp/B001EO5QRM?tag=robinfrench-20",
     "price": {
-      "amount": 37.99,
+      "amount": 5.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:56:00.545Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1201,12 +1202,12 @@
   },
   {
     "ingredient": "herring (canned)",
-    "asin": "B01FUWYO2M",
-    "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+    "asin": "B001EO5QRM",
+    "url": "https://www.amazon.com/dp/B001EO5QRM?tag=robinfrench-20",
     "price": {
-      "amount": 41.99,
+      "amount": 5.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:56:14.974Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1281,12 +1282,12 @@
   },
   {
     "ingredient": "sunflower oil",
-    "asin": "B00MNTRVPS",
-    "url": "https://www.amazon.com/dp/B00MNTRVPS?tag=robinfrench-20",
+    "asin": "B00C11W8YW",
+    "url": "https://www.amazon.com/dp/B00C11W8YW?tag=robinfrench-20",
     "price": {
-      "amount": 51.85,
+      "amount": 8.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:56:52.300Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1301,12 +1302,12 @@
   },
   {
     "ingredient": "herring oil",
-    "asin": "B00CBY93XS",
-    "url": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20",
+    "asin": "B01N9SSTG8",
+    "url": "https://www.amazon.com/dp/B01N9SSTG8?tag=robinfrench-20",
     "price": {
-      "amount": 39.91,
+      "amount": 21.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:57:01.793Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1371,22 +1372,22 @@
   },
   {
     "ingredient": "avocado oil",
-    "asin": "B0C3WCRNPN",
-    "url": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20",
+    "asin": "B00KN93TJU",
+    "url": "https://www.amazon.com/dp/B00KN93TJU?tag=robinfrench-20",
     "price": {
-      "amount": 40.91,
+      "amount": 12.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:57:34.935Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "avocado oil (tiny amounts)",
-    "asin": "B0C3WCRNPN",
-    "url": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20",
+    "asin": "B00KN93TJU",
+    "url": "https://www.amazon.com/dp/B00KN93TJU?tag=robinfrench-20",
     "price": {
-      "amount": 40.91,
+      "amount": 12.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:57:39.404Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1401,12 +1402,12 @@
   },
   {
     "ingredient": "krill oil",
-    "asin": "B004HIQ9CY",
-    "url": "https://www.amazon.com/dp/B004HIQ9CY?tag=robinfrench-20",
+    "asin": "B01N9SSTG8",
+    "url": "https://www.amazon.com/dp/B01N9SSTG8?tag=robinfrench-20",
     "price": {
-      "amount": 78.97,
+      "amount": 21.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:57:48.832Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1421,12 +1422,12 @@
   },
   {
     "ingredient": "omega-3 oil",
-    "asin": "B09RYYWHH1",
-    "url": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20",
+    "asin": "B01N9SSTG8",
+    "url": "https://www.amazon.com/dp/B01N9SSTG8?tag=robinfrench-20",
     "price": {
-      "amount": 43.99,
+      "amount": 21.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:57:58.533Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1441,12 +1442,12 @@
   },
   {
     "ingredient": "joint health powder",
-    "asin": "B00PXK1G50",
-    "url": "https://www.amazon.com/dp/B00PXK1G50?tag=robinfrench-20",
+    "asin": "B0002APQY2",
+    "url": "https://www.amazon.com/dp/B0002APQY2?tag=robinfrench-20",
     "price": {
-      "amount": 43.8,
+      "amount": 29.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:58:08.122Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1481,12 +1482,12 @@
   },
   {
     "ingredient": "electrolyte powder",
-    "asin": "B0FMZHN6M1",
-    "url": "https://www.amazon.com/dp/B0FMZHN6M1?tag=robinfrench-20",
+    "asin": "B07X6LNK99",
+    "url": "https://www.amazon.com/dp/B07X6LNK99?tag=robinfrench-20",
     "price": {
-      "amount": 37.99,
+      "amount": 14.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:58:27.368Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1621,22 +1622,22 @@
   },
   {
     "ingredient": "amaranth (tiny amounts)",
-    "asin": "B000V1O40U",
-    "url": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20",
+    "asin": "B00028QE9C",
+    "url": "https://www.amazon.com/dp/B00028QE9C?tag=robinfrench-20",
     "price": {
-      "amount": 44.1,
+      "amount": 8.49,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:59:34.311Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "amaranth seeds",
-    "asin": "B000V1O40U",
-    "url": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20",
+    "asin": "B00028QE9C",
+    "url": "https://www.amazon.com/dp/B00028QE9C?tag=robinfrench-20",
     "price": {
-      "amount": 44.1,
+      "amount": 8.49,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:59:39.129Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1671,12 +1672,12 @@
   },
   {
     "ingredient": "oatmeal (cooked, small amounts)",
-    "asin": "B00CTLAIH8",
-    "url": "https://www.amazon.com/dp/B00CTLAIH8?tag=robinfrench-20",
+    "asin": "B000EDG52O",
+    "url": "https://www.amazon.com/dp/B000EDG52O?tag=robinfrench-20",
     "price": {
-      "amount": 59.99,
+      "amount": 7.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T20:59:58.329Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -1691,12 +1692,12 @@
   },
   {
     "ingredient": "safflower seeds",
-    "asin": "B0FWLFGG21",
-    "url": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20",
+    "asin": "B001ODB3YE",
+    "url": "https://www.amazon.com/dp/B001ODB3YE?tag=robinfrench-20",
     "price": {
-      "amount": 41.02,
+      "amount": 13.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:00:07.947Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2070,16 +2071,6 @@
     }
   },
   {
-    "ingredient": "sage",
-    "asin": "B0CH3R9TVY",
-    "url": "https://www.amazon.com/dp/B0CH3R9TVY?tag=robinfrench-20",
-    "price": {
-      "amount": 329.99,
-      "currency": "USD",
-      "lastUpdated": "2025-12-12T21:03:03.477Z"
-    }
-  },
-  {
     "ingredient": "mint",
     "asin": "B097F3NT7N",
     "url": "https://www.amazon.com/dp/B097F3NT7N?tag=robinfrench-20",
@@ -2121,12 +2112,12 @@
   },
   {
     "ingredient": "apricots (pitted)",
-    "asin": "B07FZWBPC5",
-    "url": "https://www.amazon.com/dp/B07FZWBPC5?tag=robinfrench-20",
+    "asin": "B00028QE9C",
+    "url": "https://www.amazon.com/dp/B00028QE9C?tag=robinfrench-20",
     "price": {
-      "amount": 39.55,
+      "amount": 12,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:03:27.321Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2331,22 +2322,22 @@
   },
   {
     "ingredient": "barley hay",
-    "asin": "B08YM9VJC5",
-    "url": "https://www.amazon.com/dp/B08YM9VJC5?tag=robinfrench-20",
+    "asin": "B07ZYNJ123",
+    "url": "https://www.amazon.com/dp/B07ZYNJ123?tag=robinfrench-20",
     "price": {
-      "amount": 39.99,
+      "amount": 18.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:05:05.786Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "guinea pig pellets (with vitamin c)",
-    "asin": "B00E4KT5NA",
-    "url": "https://www.amazon.com/dp/B00E4KT5NA?tag=robinfrench-20",
+    "asin": "B001ODB40U",
+    "url": "https://www.amazon.com/dp/B001ODB40U?tag=robinfrench-20",
     "price": {
-      "amount": 36.99,
+      "amount": 12.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:05:10.639Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2371,22 +2362,12 @@
   },
   {
     "ingredient": "wild bird mix",
-    "asin": "B0FWLFGG21",
-    "url": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20",
+    "asin": "B001ODB3YE",
+    "url": "https://www.amazon.com/dp/B001ODB3YE?tag=robinfrench-20",
     "price": {
-      "amount": 41.02,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:05:24.990Z"
-    }
-  },
-  {
-    "ingredient": "beta-glucans",
-    "asin": "B01LWVNL9J",
-    "url": "https://www.amazon.com/dp/B01LWVNL9J?tag=robinfrench-20",
-    "price": {
-      "amount": 134.95,
-      "currency": "USD",
-      "lastUpdated": "2025-12-12T21:05:29.791Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2400,13 +2381,14 @@
     }
   },
   {
-    "ingredient": "bone broth (low sodium)",
-    "asin": "B07DFNP37Y",
-    "url": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20",
+    "ingredient": "chicken broth",
+    "asin": "B079N7WGXJ",
+    "url": "https://www.amazon.com/dp/B079N7WGXJ?tag=robinfrench-20",
+    "quantity": "32 oz",
     "price": {
-      "amount": 30.48,
+      "amount": 8.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:05:39.622Z"
+      "lastUpdated": "2025-12-16T04:00:00.000Z"
     }
   },
   {
@@ -2461,12 +2443,12 @@
   },
   {
     "ingredient": "d-mannose",
-    "asin": "B01N6X9YBS",
-    "url": "https://www.amazon.com/dp/B01N6X9YBS?tag=robinfrench-20",
+    "asin": "B07FC4ZY34",
+    "url": "https://www.amazon.com/dp/B07FC4ZY34?tag=robinfrench-20",
     "price": {
-      "amount": 39.97,
+      "amount": 19.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:06:08.330Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2531,8 +2513,8 @@
   },
   {
     "ingredient": "green beans",
-    "asin": "B0DDTC6QNY",
-    "url": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20",
+    "asin": "B06X95VQY5",
+    "url": "https://www.amazon.com/dp/B06X95VQY5?tag=robinfrench-20",
     "price": {
       "amount": 25.56,
       "currency": "USD",
@@ -2541,8 +2523,8 @@
   },
   {
     "ingredient": "green beans (cooked)",
-    "asin": "B0DDTC6QNY",
-    "url": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20",
+    "asin": "B06X95VQY5",
+    "url": "https://www.amazon.com/dp/B06X95VQY5?tag=robinfrench-20",
     "price": {
       "amount": 25.56,
       "currency": "USD",
@@ -2731,12 +2713,12 @@
   },
   {
     "ingredient": "quercetin",
-    "asin": "B08M5L372P",
-    "url": "https://www.amazon.com/dp/B08M5L372P?tag=robinfrench-20",
+    "asin": "B0742YS3TG",
+    "url": "https://www.amazon.com/dp/B0742YS3TG?tag=robinfrench-20",
     "price": {
-      "amount": 37.95,
+      "amount": 19.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:08:16.972Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2761,22 +2743,22 @@
   },
   {
     "ingredient": "s-adenosyl methionine (sam-e)",
-    "asin": "B000OSSQFY",
-    "url": "https://www.amazon.com/dp/B000OSSQFY?tag=robinfrench-20",
+    "asin": "B0002APQVQ",
+    "url": "https://www.amazon.com/dp/B0002APQVQ?tag=robinfrench-20",
     "price": {
-      "amount": 40.25,
+      "amount": 29.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:08:31.107Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
     "ingredient": "sardines (in water)",
-    "asin": "B01FUWYO2M",
-    "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20",
+    "asin": "B001EO5QW8",
+    "url": "https://www.amazon.com/dp/B001EO5QW8?tag=robinfrench-20",
     "price": {
-      "amount": 41.99,
+      "amount": 4.49,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:08:36.179Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {
@@ -2791,22 +2773,22 @@
   },
   {
     "ingredient": "snow peas",
-    "asin": "B07MGSDD7L",
-    "url": "https://www.amazon.com/dp/B07MGSDD7L?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 3.99,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:08:45.145Z"
+      "lastUpdated": "2025-12-16T03:10:00.000Z"
     }
   },
   {
     "ingredient": "snow peas (mashed)",
-    "asin": "B08KRNKC9G",
-    "url": "https://www.amazon.com/dp/B08KRNKC9G?tag=robinfrench-20",
+    "asin": "B07MGZKB9V",
+    "url": "https://www.amazon.com/dp/B07MGZKB9V?tag=robinfrench-20",
     "price": {
-      "amount": 64.95,
+      "amount": 16.99,
       "currency": "USD",
-      "lastUpdated": "2025-12-12T21:08:49.515Z"
+      "lastUpdated": "2025-12-16T03:25:47.431Z"
     }
   },
   {

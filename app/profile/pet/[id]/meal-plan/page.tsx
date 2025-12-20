@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
 import type { Recipe, CustomMeal } from '@/lib/types';
+import { getProductPrice } from '@/lib/data/product-prices';
 import { VETTED_PRODUCTS, getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
@@ -158,11 +158,8 @@ export default function MealPlanPage() {
             savedRecipes: foundPet.savedRecipes || [],
           });
 
-          // Load saved recipes
-          const savedRecipeMeals = (foundPet.savedRecipes || [])
-            .map((recipeId) => recipes.find((recipe) => recipe.id === recipeId))
-            .filter(Boolean) as Recipe[];
-          setSavedMeals(savedRecipeMeals);
+          // Saved recipes are no longer stored statically
+          setSavedMeals([]);
           
           // Load custom meals
           const customMealsList = await getCustomMeals(userId, petId);
@@ -378,23 +375,8 @@ export default function MealPlanPage() {
                       {/* Price Display */}
                       {(() => {
                         const mealTotalPrice = meal.ingredients?.reduce((sum, ing) => {
-                          const genericName = ing.name.toLowerCase().trim();
-                          const vettedProduct = VETTED_PRODUCTS[genericName];
-                          const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
-                          // Try multiple lookup methods
-                          let product = getVettedProduct(ing.name.toLowerCase());
-                          if (!product && vettedProduct) {
-                            product = vettedProduct;
-                          }
-                          if (!product) {
-                            product = getVettedProductByAnyIdentifier(ing.name);
-                          }
-                          if (!product && link) {
-                            product = getVettedProductByAnyIdentifier(link);
-                          }
-                          if (product?.price?.amount) {
-                            return sum + product.price.amount;
-                          }
+                          const price = getProductPrice(ing.name);
+                          if (typeof price === 'number') return sum + price;
                           return sum;
                         }, 0) || 0;
                         return mealTotalPrice > 0 ? (

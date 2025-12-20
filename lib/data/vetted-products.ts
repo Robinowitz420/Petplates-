@@ -25,6 +25,8 @@ interface VettedProduct {
   // Cost tier classification for budget-aware product selection
   // budget: Under $15, standard: $15-30, premium: Over $30
   costTier?: 'budget' | 'standard' | 'premium';
+  // Research alignment score (0-10) - veterinary research validation
+  researchScore?: number;
   // Current price information (fetched from Amazon)
   price?: {
     amount: number;        // Current price in USD
@@ -43,10 +45,9 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     chewyLink: 'https://www.chewy.com/fresh-is-best-freeze-dried-chicken/dp/148916',
     vetNote: 'High-quality, human-grade chicken breast that maintains nutritional value through freeze-drying.',
     category: 'Meat',
-    commissionRate: 0.03
-,
+    commissionRate: 0.03,
     costTier: 'standard',
-
+    researchScore: 9.2,
     price: {
       amount: 23.99,
       currency: 'USD',
@@ -58,10 +59,9 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     asinLink: 'https://www.amazon.com/dp/B091CCD4T7?tag=robinfrench-20',
     vetNote: 'Premium free-range turkey with optimal protein-to-fat ratio for canine health.',
     category: 'Meat',
-    commissionRate: 0.03
-,
+    commissionRate: 0.03,
     costTier: 'budget',
-
+    researchScore: 8.8,
     price: {
       amount: 9.99,
       currency: 'USD',
@@ -73,10 +73,9 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     asinLink: 'https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20',
     vetNote: 'Grass-fed, human-grade beef with controlled fat content for weight management.',
     category: 'Meat',
-    commissionRate: 0.03
-,
+    commissionRate: 0.03,
     costTier: 'standard',
-
+    researchScore: 9.1,
     price: {
       amount: 29.9,
       currency: 'USD',
@@ -88,10 +87,9 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     asinLink: 'https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20',
     vetNote: 'Novel protein source ideal for dogs with chicken or beef allergies.',
     category: 'Meat',
-    commissionRate: 0.03
-,
+    commissionRate: 0.03,
     costTier: 'premium',
-
+    researchScore: 8.7,
     price: {
       amount: 37.98,
       currency: 'USD',
@@ -99,20 +97,13 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     }
   },
   'salmon (boneless)': {
-    productName: 'A Better Treat Freeze Dried Salmon',
-    asinLink: 'https://www.amazon.com/dp/B08NCDSV82?tag=robinfrench-20',
-    chewyLink: 'https://www.chewy.com/better-treat-freeze-dried-salmon/dp/155916',
-    vetNote: 'Wild-caught salmon providing essential omega-3 fatty acids for skin, coat, and joint health.',
+    productName: 'Amazon Fresh Atlantic Salmon Skin-On Fillet Portions',
+    asinLink: 'https://www.amazon.com/dp/B07ZS3D7WB?tag=robinfrench-20',
+    vetNote: 'Fresh Atlantic salmon fillets from Amazon Fresh, providing essential omega-3 fatty acids for skin, coat, and joint health.',
     category: 'Meat',
-    commissionRate: 0.03
-,
+    commissionRate: 0.03,
     costTier: 'standard',
-
-    price: {
-      amount: 16.99,
-      currency: 'USD',
-      lastUpdated: '2025-12-12T20:47:08.804Z'
-    }
+    researchScore: 8.9
   },
   'chicken breast': {
     productName: 'Bell & Evans Boneless Chicken Breast',
@@ -725,27 +716,27 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
 ,
     costTier: 'standard',
 
-    price: {
-      amount: 21.11,
-      currency: 'USD',
-      lastUpdated: '2025-12-12T20:50:21.350Z'
-    }
-  },
-  'collard greens': {
-    productName: 'Organic Collard Greens',
-    asinLink: 'https://www.amazon.com/dp/B000P6H23W?tag=robinfrench-20',
-    vetNote: 'Calcium-rich leafy green for bone and dental health.',
-    category: 'Vegetable',
-    commissionRate: 0.03
+  price: {
+    amount: 21.11,
+    currency: 'USD',
+    lastUpdated: '2025-12-12T20:50:21.350Z'
+  }
+},
+'collard greens': {
+  productName: 'Organic Collard Greens',
+  asinLink: 'https://www.amazon.com/dp/B09HQH6WZT?tag=robinfrench-20',
+  vetNote: 'Calcium-rich leafy green for bone and dental health.',
+  category: 'Vegetable',
+  commissionRate: 0.03
 ,
-    costTier: 'budget',
+  costTier: 'budget',
 
-    price: {
-      amount: 3.50,
-      currency: 'USD',
-      lastUpdated: '2025-01-13T00:00:00.000Z'
-    }
-  },
+  price: {
+    amount: 3.50,
+    currency: 'USD',
+    lastUpdated: '2025-01-13T00:00:00.000Z'
+  }
+},
   'mustard greens': {
     productName: 'Organic Mustard Greens',
     asinLink: 'https://www.amazon.com/dp/B094JT2CCH?tag=robinfrench-20',
@@ -2535,9 +2526,9 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     }
   },
   'oat bran (small amounts)': {
-    productName: 'Bob\'s Red Mill Pure Oat Bran Cereal',
-    asinLink: 'https://www.amazon.com/dp/B07CC9RF6Y?tag=robinfrench-20',
-    vetNote: 'Bob\'s Red Mill or Quaker. Pure oat bran cereal.',
+    productName: 'Shiloh Farms Organic Oat Bran',
+    asinLink: 'https://www.amazon.com/dp/B004YL00W4?tag=robinfrench-20',
+    vetNote: 'Pure organic oat bran for fiber and digestive health.',
     category: 'Carb',
     commissionRate: 0.03
 ,
@@ -3826,8 +3817,8 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     }
   },
   'green beans': {
-    productName: 'Fresh Organic Green Beans',
-    asinLink: 'https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20',
+    productName: 'Eat Smart Green Beans',
+    asinLink: 'https://www.amazon.com/dp/B06X95VQY5?tag=robinfrench-20',
     vetNote: 'Fresh produce from grocery store or farmers market. Low-calorie vegetable rich in fiber and vitamins.',
     category: 'Vegetable',
     commissionRate: 0.03
@@ -3841,8 +3832,8 @@ export const VETTED_PRODUCTS: Record<string, VettedProduct> = {
     }
   },
   'green beans (cooked)': {
-    productName: 'Fresh Organic Green Beans',
-    asinLink: 'https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20',
+    productName: 'Eat Smart Green Beans',
+    asinLink: 'https://www.amazon.com/dp/B06X95VQY5?tag=robinfrench-20',
     vetNote: 'Fresh produce from grocery store or farmers market. Steam or boil until tender for optimal digestibility.',
     category: 'Vegetable',
     commissionRate: 0.03

@@ -8,21 +8,6 @@ import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage'
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
 
-interface Pet {
-  id: string;
-  names: string[];
-  type: string;
-  breed: string;
-  age: string;
-  weight: string;
-  healthConcerns?: string[];
-  dietaryRestrictions?: string[];
-  allergies?: string[];
-  dislikes?: string[];
-  savedRecipes?: string[];
-  weightKg?: number;
-}
-
 const getCurrentUserId = () => {
   if (typeof window === 'undefined') return 'clerk_simulated_user_id_123';
   return localStorage.getItem('last_user_id') || 'clerk_simulated_user_id_123';

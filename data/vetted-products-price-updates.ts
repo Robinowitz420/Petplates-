@@ -1053,7 +1053,7 @@ export const PRICE_UPDATES: Record<string, any> = {
       lastUpdated: '2025-12-12T20:58:32.356Z'
     }
   },
-  'brewer's yeast': {
+  "brewer's yeast": {
     price: {
       amount: 11.12,
       currency: 'USD',

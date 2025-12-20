@@ -1,0 +1,772 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: lib/data/ingredients.ts, lib/data/aafco-standards.ts, lib/data/healthBenefitMap.ts
+- Files matching these patterns are excluded: **/*.xml, **/*.json, **/*.md
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+lib/data/aafco-standards.ts
+lib/data/healthBenefitMap.ts
+lib/data/ingredients.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="lib/data/aafco-standards.ts">
+// lib/data/aafco-standards.ts
+// AAFCO (Association of American Feed Control Officials) nutritional standards
+// for dog and cat food - based on 2023 guidelines
+// Also includes research-based standards for birds, reptiles, and pocket-pets
+
+export interface NutritionalStandard {
+  protein: { min: number; max: number }; // % on dry matter basis
+  fat: { min: number; max: number }; // % on dry matter basis
+  calcium: { min: number; max: number }; // mg per 1000 kcal
+  phosphorus: { min: number; max: number }; // mg per 1000 kcal
+  caPRatio: { min: number; max: number }; // calcium to phosphorus ratio
+  fiber: { min: number; max: number }; // % on dry matter basis
+  omega6: { min: number }; // % on dry matter basis
+  omega3?: { min: number }; // % on dry matter basis (optional for dogs)
+}
+
+export const AAFCO_STANDARDS: {
+  dogs: {
+    puppy: NutritionalStandard;
+    adult: NutritionalStandard;
+    senior: NutritionalStandard;
+  };
+  cats: {
+    puppy: NutritionalStandard; // kitten
+    adult: NutritionalStandard;
+    senior: NutritionalStandard;
+  };
+} = {
+  // Dog Standards
+  dogs: {
+    // Growth and Reproduction (Puppies, Pregnant/Lactating)
+    puppy: {
+      protein: { min: 22.5, max: 35 }, // Higher for growth
+      fat: { min: 8.5, max: 20 },
+      calcium: { min: 1000, max: 2500 }, // mg per 1000 kcal (1.0% - 2.5% DM)
+      phosphorus: { min: 800, max: 1600 }, // mg per 1000 kcal (0.8% - 1.6% DM)
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 1.3 },
+      omega3: { min: 0.13 },
+    },
+    
+    // Adult Maintenance
+    adult: {
+      protein: { min: 18, max: 32 },
+      fat: { min: 5.5, max: 18 },
+      calcium: { min: 500, max: 2500 }, // mg per 1000 kcal (0.5% - 2.5% DM)
+      phosphorus: { min: 400, max: 1600 }, // mg per 1000 kcal (0.4% - 1.6% DM)
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 1.1 },
+    },
+    
+    // Senior (same as adult but often lower protein/phosphorus recommended)
+    senior: {
+      protein: { min: 18, max: 28 }, // Slightly lower max
+      fat: { min: 5.5, max: 15 },
+      calcium: { min: 500, max: 1800 }, // Lower max for kidney health
+      phosphorus: { min: 400, max: 1200 }, // Lower max for kidney health
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 1.1 },
+    },
+  },
+
+  // Cat Standards
+  cats: {
+    // Growth and Reproduction (Kittens, Pregnant/Lactating)
+    puppy: { // Using 'puppy' key for kittens to match the interface
+      protein: { min: 30, max: 45 }, // Cats are obligate carnivores - higher protein
+      fat: { min: 9, max: 25 },
+      calcium: { min: 1000, max: 2500 }, // mg per 1000 kcal
+      phosphorus: { min: 800, max: 1600 }, // mg per 1000 kcal
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 0.6 },
+    },
+    
+    // Adult Maintenance
+    adult: {
+      protein: { min: 26, max: 40 }, // Higher than dogs
+      fat: { min: 9, max: 22 },
+      calcium: { min: 600, max: 2500 }, // mg per 1000 kcal
+      phosphorus: { min: 500, max: 1600 }, // mg per 1000 kcal
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 0.6 },
+    },
+    
+    // Senior (lower phosphorus for kidney health)
+    senior: {
+      protein: { min: 26, max: 35 },
+      fat: { min: 9, max: 20 },
+      calcium: { min: 600, max: 1800 },
+      phosphorus: { min: 500, max: 1200 }, // Lower max for kidney health
+      caPRatio: { min: 1.0, max: 2.0 },
+      fiber: { min: 0, max: 5 },
+      omega6: { min: 0.6 },
+    },
+  },
+};
+
+// Species-specific nutritional guidelines (non-AAFCO, research-based)
+export const SPECIES_NUTRITIONAL_GUIDELINES = {
+  birds: {
+    // Based on avian nutrition research
+    small: { // Parakeets, canaries, finches
+      protein: { min: 12, max: 18 },
+      fat: { min: 3, max: 8 },
+      fiber: { min: 3, max: 8 },
+      calcium: { min: 0.3, max: 1.2 }, // % of diet
+    },
+    medium: { // Cockatiels, conures
+      protein: { min: 14, max: 20 },
+      fat: { min: 4, max: 10 },
+      fiber: { min: 4, max: 10 },
+      calcium: { min: 0.4, max: 1.5 },
+    },
+    large: { // Macaws, cockatoos, African greys
+      protein: { min: 15, max: 22 },
+      fat: { min: 5, max: 12 },
+      fiber: { min: 5, max: 12 },
+      calcium: { min: 0.5, max: 2.0 },
+    },
+  },
+
+  reptiles: {
+    // Based on herpetological nutrition research
+    herbivore: { // Iguanas, tortoises
+      protein: { min: 15, max: 25 },
+      fiber: { min: 20, max: 35 },
+      caPRatio: { min: 1.5, max: 2.5 }, // Critical for bone health
+      calcium: { min: 0.8, max: 2.0 }, // % of diet
+    },
+    carnivore: { // Monitors, snakes
+      protein: { min: 30, max: 50 },
+      fat: { min: 10, max: 25 },
+      caPRatio: { min: 1.2, max: 2.0 },
+      calcium: { min: 0.6, max: 1.5 },
+    },
+    omnivore: { // Bearded dragons, blue-tongue skinks
+      protein: { min: 20, max: 35 },
+      fiber: { min: 10, max: 25 },
+      caPRatio: { min: 1.5, max: 2.5 },
+      calcium: { min: 0.8, max: 2.0 },
+    },
+  },
+
+  'pocket-pets': {
+    // Based on small mammal nutrition research
+    hamster: {
+      protein: { min: 16, max: 24 },
+      fat: { min: 4, max: 10 },
+      fiber: { min: 8, max: 15 },
+      caPRatio: { min: 1.5, max: 2.0 },
+    },
+    'guinea-pig': {
+      protein: { min: 16, max: 20 },
+      fat: { min: 3, max: 6 },
+      fiber: { min: 12, max: 20 }, // High fiber requirement
+      caPRatio: { min: 1.5, max: 2.0 },
+      vitaminC: { min: 10 }, // mg per kg body weight per day - guinea pigs can't synthesize vitamin C
+    },
+    rabbit: {
+      protein: { min: 14, max: 18 },
+      fat: { min: 2, max: 5 },
+      fiber: { min: 18, max: 25 }, // Very high fiber requirement
+      caPRatio: { min: 1.5, max: 2.0 },
+    },
+    ferret: {
+      protein: { min: 32, max: 38 }, // Obligate carnivores like cats
+      fat: { min: 15, max: 20 },
+      fiber: { min: 0, max: 3 }, // Low fiber tolerance
+      caPRatio: { min: 1.0, max: 2.0 },
+    },
+  },
+};
+
+/**
+ * Get the appropriate nutritional standard for a given species and life stage
+ */
+export function getNutritionalStandard(
+  species: string,
+  lifeStage: 'puppy' | 'adult' | 'senior' = 'adult',
+  subtype?: string // for birds (small/medium/large) or reptiles (herbivore/carnivore/omnivore)
+): NutritionalStandard | any {
+  if (species === 'dogs' || species === 'cats') {
+    return AAFCO_STANDARDS[species][lifeStage];
+  }
+
+  if (species === 'birds' && subtype) {
+    return SPECIES_NUTRITIONAL_GUIDELINES.birds[subtype as keyof typeof SPECIES_NUTRITIONAL_GUIDELINES.birds];
+  }
+
+  if (species === 'reptiles' && subtype) {
+    return SPECIES_NUTRITIONAL_GUIDELINES.reptiles[subtype as keyof typeof SPECIES_NUTRITIONAL_GUIDELINES.reptiles];
+  }
+
+  if (species === 'pocket-pets' && subtype) {
+    return SPECIES_NUTRITIONAL_GUIDELINES['pocket-pets'][subtype as keyof typeof SPECIES_NUTRITIONAL_GUIDELINES['pocket-pets']];
+  }
+
+  // Default fallback
+  return AAFCO_STANDARDS.dogs.adult;
+}
+
+// Legacy exports for backward compatibility
+export interface NutrientRange {
+  min?: number;
+  max?: number;
+  unit: string;
+  critical?: boolean;
+  note?: string;
+}
+
+export interface NutrientProfile {
+  protein: NutrientRange;
+  fat: NutrientRange;
+  calcium: NutrientRange;
+  phosphorus: NutrientRange;
+  CaP_ratio?: NutrientRange;
+  linoleic_acid?: NutrientRange;
+  arachidonic_acid?: NutrientRange;
+  taurine?: NutrientRange;
+  omega3?: NutrientRange;
+  vitaminE?: NutrientRange;
+  vitaminA?: NutrientRange;
+  vitaminD?: NutrientRange;
+  source: string;
+}
+
+export const AAFCO_NUTRIENT_PROFILES = {
+  dog: {
+    adultMaintenance: {
+      protein: { min: 18.0, unit: '% DM', critical: true },
+      fat: { min: 5.5, unit: '% DM' },
+      calcium: { min: 0.6, max: 2.5, unit: '% DM', critical: true },
+      phosphorus: { min: 0.5, unit: '% DM', critical: true },
+      CaP_ratio: { min: 1.0, max: 2.0, unit: 'ratio', critical: true },
+      linoleic_acid: { min: 1.0, unit: '% DM' },
+      vitaminE: { min: 50, unit: 'IU/kg' },
+      vitaminA: { min: 5000, unit: 'IU/kg' },
+      vitaminD: { min: 500, unit: 'IU/kg' },
+      source: "AAFCO 2023 Dog Food Nutrient Profiles"
+    } as NutrientProfile,
+
+    growthReproduction: {
+      protein: { min: 22.0, unit: '% DM', critical: true },
+      fat: { min: 8.0, unit: '% DM' },
+      calcium: { min: 1.0, max: 1.8, unit: '% DM', critical: true },
+      phosphorus: { min: 0.8, unit: '% DM', critical: true },
+      CaP_ratio: { min: 1.0, max: 2.0, unit: 'ratio', critical: true },
+      linoleic_acid: { min: 1.0, unit: '% DM' },
+      vitaminE: { min: 50, unit: 'IU/kg' },
+      vitaminA: { min: 5000, unit: 'IU/kg' },
+      vitaminD: { min: 500, unit: 'IU/kg' },
+      source: "AAFCO 2023 Dog Food Nutrient Profiles"
+    } as NutrientProfile,
+
+    allLifeStages: {
+      protein: { min: 20.0, unit: '% DM', critical: true },
+      fat: { min: 8.0, unit: '% DM' },
+      calcium: { min: 1.0, max: 1.8, unit: '% DM', critical: true },
+      phosphorus: { min: 0.8, unit: '% DM', critical: true },
+      CaP_ratio: { min: 1.0, max: 2.0, unit: 'ratio', critical: true },
+      linoleic_acid: { min: 1.0, unit: '% DM' },
+      vitaminE: { min: 50, unit: 'IU/kg' },
+      vitaminA: { min: 5000, unit: 'IU/kg' },
+      vitaminD: { min: 500, unit: 'IU/kg' },
+      source: "AAFCO 2023 Dog Food Nutrient Profiles"
+    } as NutrientProfile
+  },
+
+  cat: {
+    adultMaintenance: {
+      protein: { min: 26.0, unit: '% DM', critical: true },
+      fat: { min: 9.0, unit: '% DM' },
+      calcium: { min: 0.6, unit: '% DM', critical: true },
+      phosphorus: { min: 0.5, unit: '% DM', critical: true },
+      CaP_ratio: { min: 1.0, max: 2.5, unit: 'ratio', critical: true },
+      taurine: { min: 0.10, unit: '% DM', critical: true, note: "Essential amino acid" },
+      arachidonic_acid: { min: 0.02, unit: '% DM' },
+      linoleic_acid: { min: 0.5, unit: '% DM' },
+      vitaminE: { min: 30, unit: 'IU/kg' },
+      vitaminA: { min: 3333, unit: 'IU/kg' },
+      vitaminD: { min: 333, unit: 'IU/kg' },
+      source: "AAFCO 2023 Cat Food Nutrient Profiles"
+    } as NutrientProfile,
+
+    growthReproduction: {
+      protein: { min: 30.0, unit: '% DM', critical: true },
+      fat: { min: 9.0, unit: '% DM' },
+      calcium: { min: 1.0, unit: '% DM', critical: true },
+      phosphorus: { min: 0.8, unit: '% DM', critical: true },
+      CaP_ratio: { min: 1.0, max: 2.0, unit: 'ratio', critical: true },
+      taurine: { min: 0.10, unit: '% DM', critical: true },
+      arachidonic_acid: { min: 0.02, unit: '% DM' },
+      linoleic_acid: { min: 0.5, unit: '% DM' },
+      vitaminE: { min: 30, unit: 'IU/kg' },
+      vitaminA: { min: 3333, unit: 'IU/kg' },
+      vitaminD: { min: 333, unit: 'IU/kg' },
+      source: "AAFCO 2023 Cat Food Nutrient Profiles"
+    } as NutrientProfile,
+
+    allLifeStages: {
+      protein: { min: 30.0, unit: '% DM', critical: true },
+      fat: { min: 9.0, unit: '% DM' },
+      calcium: { min: 1.0, unit: '% DM', critical: true },
+      phosphorus: { min: 0.8, unit: '% DM', critical: true },
+      CaP_ratio: { min: 1.0, max: 2.0, unit: 'ratio', critical: true },
+      taurine: { min: 0.10, unit: '% DM', critical: true },
+      arachidonic_acid: { min: 0.02, unit: '% DM' },
+      linoleic_acid: { min: 0.5, unit: '% DM' },
+      vitaminE: { min: 30, unit: 'IU/kg' },
+      vitaminA: { min: 3333, unit: 'IU/kg' },
+      vitaminD: { min: 333, unit: 'IU/kg' },
+      source: "AAFCO 2023 Cat Food Nutrient Profiles"
+    } as NutrientProfile
+  }
+};
+
+export function getAAFCOStandards(species: 'dog' | 'cat', lifeStage: 'adult' | 'growth' | 'all' = 'adult'): NutrientProfile {
+  const speciesData = AAFCO_NUTRIENT_PROFILES[species];
+
+  switch (lifeStage) {
+    case 'adult':
+      return speciesData.adultMaintenance;
+    case 'growth':
+      return speciesData.growthReproduction;
+    case 'all':
+      return speciesData.allLifeStages;
+    default:
+      return speciesData.adultMaintenance;
+  }
+}
+
+export function validateCriticalNutrients(recipe: any, species: 'dog' | 'cat', lifeStage: 'adult' | 'growth' = 'adult'): {
+  isValid: boolean;
+  violations: string[];
+  warnings: string[];
+} {
+  const standards = getAAFCOStandards(species, lifeStage);
+  const violations: string[] = [];
+  const warnings: string[] = [];
+
+  const getNutrientValue = (nutrient: any): number => {
+    if (typeof nutrient === 'number') return nutrient;
+    if (nutrient?.min) return nutrient.min;
+    if (nutrient?.max) return nutrient.max;
+    if (nutrient?.value) return nutrient.value;
+    return 0;
+  };
+
+  const protein = getNutrientValue(recipe.protein);
+  const calcium = getNutrientValue(recipe.calcium);
+  const phosphorus = getNutrientValue(recipe.phosphorus);
+  const fat = getNutrientValue(recipe.fat);
+  const fiber = getNutrientValue(recipe.fiber);
+  const taurine = getNutrientValue(recipe.taurine);
+
+  if (protein < (standards.protein.min || 0)) {
+    violations.push(`Protein too low: ${protein.toFixed(1)}% vs minimum ${standards.protein.min}% (AAFCO requirement)`);
+  } else if (protein > (standards.protein.max || 100)) {
+    warnings.push(`Protein may be high: ${protein.toFixed(1)}% vs maximum ${standards.protein.max}%`);
+  }
+
+  if (fat < (standards.fat?.min || 0)) {
+    violations.push(`Fat too low: ${fat.toFixed(1)}% vs minimum ${standards.fat.min}% (AAFCO requirement)`);
+  } else if (fat > (standards.fat?.max || 100)) {
+    warnings.push(`Fat may be high: ${fat.toFixed(1)}% vs maximum ${standards.fat.max}%`);
+  }
+
+  if (calcium < (standards.calcium.min || 0)) {
+    violations.push(`Calcium too low: ${calcium.toFixed(1)}% vs minimum ${standards.calcium.min}% (AAFCO requirement)`);
+  } else if (calcium > (standards.calcium.max || 999)) {
+    violations.push(`Calcium too high: ${calcium.toFixed(1)}% vs maximum ${standards.calcium.max}% (may cause skeletal issues)`);
+  }
+
+  if (phosphorus < (standards.phosphorus.min || 0)) {
+    violations.push(`Phosphorus too low: ${phosphorus.toFixed(1)}% vs minimum ${standards.phosphorus.min}% (AAFCO requirement)`);
+  } else if (phosphorus > (standards.phosphorus.max || 999)) {
+    warnings.push(`Phosphorus may be high: ${phosphorus.toFixed(1)}% vs maximum ${standards.phosphorus.max}%`);
+  }
+
+  if (phosphorus > 0) {
+    const caPRatio = calcium / phosphorus;
+    const caPStandard = standards.CaP_ratio;
+    if (caPStandard) {
+      if (caPRatio < (caPStandard.min || 0)) {
+        violations.push(`Ca:P ratio too low: ${caPRatio.toFixed(2)} vs minimum ${caPStandard.min} (may cause bone issues)`);
+      } else if (caPRatio > (caPStandard.max || 999)) {
+        warnings.push(`Ca:P ratio high: ${caPRatio.toFixed(2)} vs maximum ${caPStandard.max}`);
+      }
+    }
+  }
+
+  if (fiber > 0 && (standards as any).fiber) {
+    const fiberStandard = (standards as any).fiber;
+    if (fiber < (fiberStandard.min || 0)) {
+      warnings.push(`Fiber may be low: ${fiber.toFixed(1)}% vs recommended ${fiberStandard.min}%`);
+    } else if (fiber > (fiberStandard.max || 100)) {
+      warnings.push(`Fiber may be high: ${fiber.toFixed(1)}% vs maximum ${fiberStandard.max}%`);
+    }
+  }
+
+  if (species === 'cat' && standards.taurine) {
+    const taurineMin = standards.taurine.min || 0;
+    if (taurine < taurineMin) {
+      violations.push(`Taurine too low: ${taurine.toFixed(3)}% vs minimum ${taurineMin}% (CRITICAL for cats - can cause heart/eye issues)`);
+    }
+  }
+
+  return {
+    isValid: violations.length === 0,
+    violations,
+    warnings
+  };
+}
+</file>
+
+<file path="lib/data/healthBenefitMap.ts">
+import type { HealthConcern } from '../recipe-generator';
+
+// Minimal, high-signal mappings to boost condition-aware selection/scoring.
+export const HEALTH_BENEFIT_MAP: Record<string, string[]> = {
+  // Joint / anti-inflammatory
+  'joint-health': ['salmon', 'sardines', 'mackerel', 'fish oil', 'turmeric', 'sweet potato', 'pumpkin', 'spinach', 'kale'],
+  'arthritis': ['salmon', 'sardines', 'fish oil', 'turmeric', 'ginger', 'blueberries', 'sweet potato'],
+
+  // Weight management / low fat
+  'weight-management': ['green beans', 'pumpkin', 'zucchini', 'cauliflower', 'broccoli', 'turkey breast', 'chicken breast', 'white fish'],
+  'obesity': ['green beans', 'pumpkin', 'carrots', 'celery', 'cucumber', 'turkey', 'chicken', 'white fish'],
+
+  // Digestive
+  'digestive-issues': ['pumpkin', 'sweet potato', 'rice', 'bone broth', 'oats', 'bananas'],
+  'sensitive-stomach': ['pumpkin', 'sweet potato', 'rice', 'chicken', 'turkey', 'bone broth', 'oats'],
+
+  // Kidney / urinary (lower phosphorus, hydration-friendly)
+  'kidney-disease': ['apples', 'blueberries', 'green beans', 'cauliflower', 'white rice', 'eggs', 'white fish'],
+  'urinary-health': ['cranberries', 'blueberries', 'pumpkin', 'green beans', 'white fish', 'chicken'],
+
+  // Diabetes / blood sugar (lower glycemic)
+  'diabetes': ['green beans', 'broccoli', 'spinach', 'cauliflower', 'chicken breast', 'turkey', 'white fish', 'eggs', 'pumpkin'],
+
+  // Skin / coat
+  'skin-coat': ['salmon', 'sardines', 'fish oil', 'flaxseed', 'eggs', 'sweet potato', 'pumpkin', 'spinach'],
+
+  // Pancreatitis (low fat)
+  'pancreatitis': ['white fish', 'turkey breast', 'chicken breast', 'rice', 'sweet potato', 'pumpkin', 'green beans'],
+};
+
+export const HEALTH_CONTRAINDICATIONS: Record<string, string[]> = {
+  'kidney-disease': ['liver', 'organ', 'sardines', 'cheese', 'yogurt', 'high-phosphorus'],
+  'pancreatitis': ['beef', 'pork', 'lamb', 'duck', 'oils', 'cheese', 'high-fat'],
+  'diabetes': ['corn', 'white potato', 'sugar', 'sweetened'],
+};
+
+// Helper to normalize concern keys
+export const normalizeConcernKey = (c: string) => c.toLowerCase().replace(/\s+/g, '-');
+</file>
+
+<file path="lib/data/ingredients.ts">
+/**
+ * UNIFIED INGREDIENTS LAYER
+ * Re-exports from unifiedIngredientRegistry.ts which consolidates all 300+ ingredients
+ * from: ingredientCompositions, allIngredients, vetted-products, vetted-species-map
+ */
+
+import {
+  getAllIngredients,
+  getIngredientsForSpecies as getUnifiedIngredientsForSpecies,
+  type UnifiedIngredient,
+  type Species as RegistrySpecies,
+  type IngredientCategory as RegistryCategory,
+} from './unifiedIngredientRegistry';
+import { getMicronutrients } from './micronutrientDefaults';
+
+export type Species = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
+export type IngredientCategory = 'protein' | 'carb' | 'grain' | 'vegetable' | 'fruit' | 'fat' | 'supplement' | 'seed' | 'nut' | 'insect' | 'hay' | 'pellet';
+export type CompatibilityLevel = 'ok' | 'limit' | 'avoid' | 'caution';
+
+export interface Ingredient {
+  id: string;
+  name: string;
+  category: IngredientCategory;
+  
+  // Protein hierarchy (only for proteins)
+  proteinRole?: 'primary' | 'secondary';  // PHASE 1.7: Explicit protein role
+  
+  // Nutritional data (per 100g)
+  composition: {
+    protein?: number;
+    fat?: number;
+    carbs?: number;
+    fiber?: number;
+    calcium?: number;
+    phosphorus?: number;
+    kcal?: number;
+    vitaminA?: number;
+    vitaminC?: number;
+    omega3?: number;
+    taurine?: number;
+    moisture?: number;
+    CaP_ratio?: number;
+    copper_mg_per_100g?: number;  // PHASE 2: Micronutrient toxicity
+    iodine_mcg_per_100g?: number; // PHASE 2: Micronutrient toxicity
+  };
+  
+  // Species compatibility
+  compatibility: Record<Species, CompatibilityLevel>;
+  
+  // Feeding guidelines
+  feedingRole: 'staple' | 'secondary' | 'supplement' | 'treat' | 'forage';
+  maxInclusionPercent: Record<Species, number>;
+  
+  // Cost & quality
+  pricePerLb?: number;
+  qualityScore: number; // 1-10
+  
+  // Metadata
+  source?: string;
+}
+
+/**
+ * Convert UnifiedIngredient to our Ingredient format
+ */
+function convertUnifiedToIngredient(unified: UnifiedIngredient): Ingredient {
+  // Map registry species to our species format
+  const speciesMap: Record<RegistrySpecies, Species> = {
+    dog: 'dogs',
+    cat: 'cats',
+    bird: 'birds',
+    reptile: 'reptiles',
+    'pocket-pet': 'pocket-pets',
+  };
+
+  // Map compatibility
+  const compatibility: Record<Species, CompatibilityLevel> = {
+    dogs: (unified.speciesCompatibility.dog as CompatibilityLevel) || 'ok',
+    cats: (unified.speciesCompatibility.cat as CompatibilityLevel) || 'ok',
+    birds: (unified.speciesCompatibility.bird as CompatibilityLevel) || 'ok',
+    reptiles: (unified.speciesCompatibility.reptile as CompatibilityLevel) || 'ok',
+    'pocket-pets': (unified.speciesCompatibility['pocket-pet'] as CompatibilityLevel) || 'ok',
+  };
+
+  // Map max inclusion (default to 0.3 if not specified)
+  const maxInclusionPercent: Record<Species, number> = {
+    dogs: 0.3,
+    cats: 0.3,
+    birds: 0.3,
+    reptiles: 0.3,
+    'pocket-pets': 0.3,
+  };
+
+  // Get nutrition data first
+  const nutrition = unified.nutrition;
+
+  // Infer category
+  let category: IngredientCategory = 'supplement';
+  const regCategory = unified.category as string;
+  
+  if (regCategory === 'protein') category = 'protein';
+  else if (regCategory === 'grain') category = 'carb';  // Map 'grain' from registry to 'carb'
+  else if (regCategory === 'vegetable') category = 'vegetable';
+  else if (regCategory === 'fruit') category = 'fruit';
+  else if (regCategory === 'fat') category = 'fat';
+  else if (regCategory === 'seed') category = 'seed';
+  else if (regCategory === 'nut') category = 'nut';
+  else if (regCategory === 'insect') category = 'insect';
+  else if (regCategory === 'hay') category = 'hay';
+  else if (regCategory === 'pellet') category = 'pellet';
+  else if (regCategory === 'supplement') category = 'supplement';
+
+  // PHASE 1.7: Get proteinRole directly from composition data
+  let proteinRole: 'primary' | 'secondary' | undefined;
+  if (category === 'protein') {
+    // Read proteinRole directly from the composition object
+    proteinRole = (nutrition as any).proteinRole;
+    // PHASE 2.4: Default to 'secondary' if not explicitly set
+    if (!proteinRole) {
+      proteinRole = 'secondary';
+    }
+  }
+
+  // PHASE 2: Get micronutrient defaults (copper, iodine)
+  const micronutrients = getMicronutrients(unified.primaryDisplayName, (nutrition as any).feedingRole);
+
+  // Estimate quality score (1-10)
+  let qualityScore = 5;
+  if (nutrition.protein && nutrition.protein > 20) qualityScore += 2;
+  if (nutrition.omega3 && nutrition.omega3 > 0.5) qualityScore += 1;
+  if (nutrition.fiber && nutrition.fiber > 3) qualityScore += 1;
+  if (nutrition.calcium && nutrition.phosphorus) {
+    const ratio = nutrition.calcium / nutrition.phosphorus;
+    if (ratio >= 1.0 && ratio <= 2.0) qualityScore += 1;
+  }
+  qualityScore = Math.min(10, Math.max(1, qualityScore));
+
+  return {
+    id: unified.id,
+    name: unified.primaryDisplayName,
+    category,
+    proteinRole,  // PHASE 1.7: Explicit protein role
+    composition: {
+      protein: nutrition.protein,
+      fat: nutrition.fat,
+      carbs: nutrition.carbs,
+      fiber: nutrition.fiber,
+      calcium: nutrition.calcium,
+      phosphorus: nutrition.phosphorus,
+      kcal: nutrition.kcal,
+      vitaminA: nutrition.vitaminA,
+      vitaminC: nutrition.vitaminC,
+      omega3: nutrition.omega3,
+      taurine: nutrition.taurine,
+      moisture: nutrition.moisture,
+      CaP_ratio: nutrition.CaP_ratio,
+      copper_mg_per_100g: (nutrition as any).copper_mg_per_100g || micronutrients.copper_mg_per_100g,
+      iodine_mcg_per_100g: (nutrition as any).iodine_mcg_per_100g || micronutrients.iodine_mcg_per_100g,
+    },
+    compatibility,
+    feedingRole: (nutrition.feedingRole as any) || 'staple',
+    maxInclusionPercent,
+    qualityScore,
+    source: nutrition.source,
+  };
+}
+
+/**
+ * UNIFIED INGREDIENTS DATABASE
+ * Converts all UnifiedIngredients (300+) to our format
+ */
+export const INGREDIENTS: Record<string, Ingredient> = (() => {
+  const result: Record<string, Ingredient> = {};
+  
+  const allUnified = getAllIngredients();
+  for (const unified of allUnified) {
+    try {
+      result[unified.id] = convertUnifiedToIngredient(unified);
+    } catch (error) {
+      console.warn(`Failed to convert ingredient ${unified.id}:`, error);
+    }
+  }
+  
+  return result;
+})();
+
+/**
+ * Get all ingredients for a specific species
+ * CRITICAL FIX: Species-specific category filtering
+ */
+export function getIngredientsForSpecies(species: Species): Ingredient[] {
+  return Object.values(INGREDIENTS).filter(ing => {
+    // Filter by species compatibility
+    if (ing.compatibility[species] === 'avoid') return false;
+    
+    // Species-specific category filtering
+    if (species === 'birds') {
+      // Birds need: seeds, nuts, fruits, veggies (NOT mammalian proteins)
+      if (ing.category === 'protein') {
+        // Allow eggs only
+        return ing.name.toLowerCase().includes('egg');
+      }
+      return ['seed', 'nut', 'fruit', 'vegetable', 'supplement'].includes(ing.category);
+    }
+    
+    if (species === 'reptiles') {
+      // Reptiles need: insects, veggies, fruits (NO grains/carbs)
+      if (ing.category === 'carb') {
+        return false; // No grains for reptiles
+      }
+      return ['insect', 'protein', 'vegetable', 'fruit', 'supplement'].includes(ing.category);
+    }
+    
+    if (species === 'pocket-pets') {
+      // Pocket-pets need: hay, veggies, fruits, seeds (NO meat proteins except eggs/insects)
+      if (ing.category === 'protein') {
+        const name = ing.name.toLowerCase();
+        return name.includes('egg') || name.includes('mealworm');
+      }
+      return ['hay', 'vegetable', 'fruit', 'seed', 'supplement'].includes(ing.category);
+    }
+    
+    // Dogs and cats: accept all categories
+    return true;
+  });
+}
+
+/**
+ * Get ingredients by category
+ */
+export function getIngredientsByCategory(category: IngredientCategory): Ingredient[] {
+  return Object.values(INGREDIENTS).filter(ing => ing.category === category);
+}
+
+/**
+ * Get ingredient by ID
+ */
+export function getIngredient(id: string): Ingredient | undefined {
+  return INGREDIENTS[id];
+}
+
+/**
+ * Get ingredient by name (case-insensitive)
+ */
+export function getIngredientByName(name: string): Ingredient | undefined {
+  const normalized = name.toLowerCase().trim();
+  return Object.values(INGREDIENTS).find(ing => ing.name.toLowerCase() === normalized);
+}
+
+/**
+ * Get total ingredient count
+ */
+export function getIngredientCount(): number {
+  return Object.keys(INGREDIENTS).length;
+}
+</file>
+
+</files>

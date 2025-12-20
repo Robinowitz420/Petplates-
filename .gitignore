@@ -43,3 +43,11 @@ next-env.d.ts
 # generated images
 images/
 .vercel
+
+# Auto-generated validation artifacts
+.validation-output.log
+.pre-commit-validation.log
+
+# Keep manual review CSVs (tracked for audit trail)
+# PHASE_*_MANUAL_REVIEW.csv - NOT ignored, these are tracked
+# AUTO_CLASSIFICATION_REPORT.md - NOT ignored, these are tracked

@@ -1,11 +1,10 @@
 import type { Recipe, ModifiedRecipeResult, PetNutritionProfile, PortionPlan, ShoppingListItem, WeeklyPlanEntry, AppliedModifierSummary } from './types';
-import { recipes } from './data/recipes-complete';
 import { dogModifiers } from './data/nutrition-dog-modifiers';
 import { catModifiers } from './data/nutrition-cat-modifiers';
 import { scoreRecipeImproved } from './scoreRecipe';
 import { getPortionPlan } from './portionCalc';
 import { scaleAmount } from './portionCalc';
-import { getVettedProduct, getAllAffiliateLinks } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
+import { getVettedProduct, getAllAffiliateLinks, getGenericIngredientName } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
 import { matchesSpecies } from './utils/recipeRecommendations';
 
 interface ApplyModifiersResult {
@@ -29,6 +28,16 @@ const concernToModifierKey: Record<string, string> = {
   'urinary-health': 'urinary_health',
   diabetes: 'diabetes',
   'skin-coat': 'allergies', // approximate
+};
+
+const formatIngredientNameForDisplay = (value: string): string => {
+  return String(value)
+    .trim()
+    .replace(/[-_]+/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 };
 
 export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult & { conflictCount: number; hasHydrationSupport: boolean } {
@@ -75,7 +84,7 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
         // Check if there's a vetted product for this supplement (pass pet.type for species filtering, preferBudget=true for cost control)
         const vettedProduct = getVettedProduct(supplement.name, pet.type, true);
         addedIngredients.push({
-          name: vettedProduct?.productName || supplement.name,
+          name: supplement.name,
           benefit: supplement.benefit,
           amazon: vettedProduct?.asinLink || supplement.amazon, // Use vetted ASIN link if available
           forConcern: concern,
@@ -100,15 +109,17 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
   // 2. Map Ingredients to Vetted Products (The core fix)
   // This is the new logic that replaces generic ingredients with specific vetted products
   modifiedRecipe.ingredients = modifiedRecipe.ingredients.map(ing => {
+    const genericKey = getGenericIngredientName(ing.name);
+    const genericName = genericKey ? formatIngredientNameForDisplay(genericKey) : ing.name;
     // Pass pet.type for species-aware product matching, preferBudget=true for cost control
-    const vettedProduct = getVettedProduct(ing.name, pet.type, true);
+    const vettedProduct = getVettedProduct(genericName, pet.type, true);
     if (vettedProduct) {
         // Overwrite the generic ingredient details with the Vetted Product details
         return {
             ...ing,
-            name: vettedProduct.productName, // Use the specific product name
-            productName: vettedProduct.productName, // Set the specific product name
-            asinLink: vettedProduct.asinLink, // Use the specific ASIN link
+            name: genericName,
+            productName: vettedProduct.productName,
+            asinLink: vettedProduct.asinLink,
             notes: (ing as any).notes ? `${(ing as any).notes} | VET NOTE: ${vettedProduct.vetNote}` : `VET NOTE: ${vettedProduct.vetNote}`,
         };
     }
@@ -122,12 +133,14 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
   // 3. Map Supplements to Vetted Products (ensure all buy links are vetted)
   if ((modifiedRecipe as any).supplements) {
     (modifiedRecipe as any).supplements = (modifiedRecipe as any).supplements.map((supplement: any) => {
+      const genericKey = getGenericIngredientName(supplement.name);
+      const genericName = genericKey ? formatIngredientNameForDisplay(genericKey) : supplement.name;
       // Pass pet.type for species-aware product matching, preferBudget=true for cost control
-      const vettedProduct = getVettedProduct(supplement.name, pet.type, true);
+      const vettedProduct = getVettedProduct(genericName, pet.type, true);
       if (vettedProduct) {
         return {
           ...supplement,
-          name: vettedProduct.productName,
+          name: genericName,
           productName: vettedProduct.productName,
           asinLink: vettedProduct.asinLink,
           notes: supplement.notes ? `${supplement.notes} | VET NOTE: ${vettedProduct.vetNote}` : `VET NOTE: ${vettedProduct.vetNote}`,

@@ -5,10 +5,7 @@
 
 import { getIngredientComposition, INGREDIENT_COMPOSITIONS, type SpeciesCompatibility } from '@/lib/data/ingredientCompositions';
 import { ALL_INGREDIENTS } from './allIngredients';
-import type { GlobalIngredient } from '@/lib/data/globalIngredients';
-
-// Import global ingredients from JSON
-const GLOBAL_INGREDIENTS: Record<string, GlobalIngredient> = require('@/lib/data/globalIngredients.json');
+import { GLOBAL_INGREDIENTS, type GlobalIngredient } from '@/lib/data/globalIngredients';
 
 export type Species = 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
 export type ReptileType = 'herbivore' | 'insectivore' | 'omnivore';
@@ -75,7 +72,7 @@ export const BASE_WHITELISTS: Record<Subtype, string[]> = {
     'parrot_pellets', 'nuts_unsalted', 'pumpkin', 'carrots'
   ],
   reptile_herbivore: [
-    'collard_greens', 'mustard_greens', 'turnip_greens', 'dandelion_greens',
+    'collard_greens', 'turnip_greens', 'dandelion_greens',
     'butternut_squash', 'bell_peppers', 'carrot_grated', 'zucchini',
     'blueberries', 'mango', 'papaya', 'strawberries',
     'calcium_carbonate', 'vitamin_d3', 'kale', 'spinach'
@@ -86,7 +83,7 @@ export const BASE_WHITELISTS: Record<Subtype, string[]> = {
   ],
   reptile_omnivore: [
     // Combination of herbivore + insectivore
-    'collard_greens', 'mustard_greens', 'dandelion_greens',
+    'collard_greens', 'dandelion_greens',
     'crickets', 'dubia_roaches', 'mealworms',
     'blueberries', 'mango', 'calcium_carbonate'
   ],

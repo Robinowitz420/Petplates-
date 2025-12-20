@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-commit hook for validating CSV and artifact changes
+# Only runs if validation-related files are staged
+
+echo "🔍 Checking for validation-related changes..."
+
+# Check if any validation files are staged
+VALIDATION_FILES=$(git diff --cached --name-only | grep -E '(lib/validation|lib/data/vetted-products|retailSpecDefinitions)')
+
+if [ -n "$VALIDATION_FILES" ]; then
+  echo "📋 Validation files changed, running Phase 1.5 classifier..."
+  
+  # Run the classifier
+  npx tsx lib/generator/Phase1_5_AutoClassify.ts > .pre-commit-validation.log 2>&1
+  
+  # Check if it succeeded
+  if [ $? -eq 0 ]; then
+    echo "✅ Validation passed"
+    
+    # Stage the generated CSV if it exists
+    if [ -f "PHASE_1_5_MANUAL_REVIEW.csv" ]; then
+      git add PHASE_1_5_MANUAL_REVIEW.csv
+      echo "📊 Staged updated PHASE_1_5_MANUAL_REVIEW.csv"
+    fi
+  else
+    echo "❌ Validation failed - check .pre-commit-validation.log"
+    exit 1
+  fi
+fi
+
+# Check if CSV files are being committed
+CSV_FILES=$(git diff --cached --name-only | grep '\.csv$')
+
+if [ -n "$CSV_FILES" ]; then
+  echo "⚠️  CSV files being committed:"
+  echo "$CSV_FILES"
+  echo ""
+  echo "Make sure these are intentional changes, not auto-generated artifacts."
+  echo "Press Enter to continue or Ctrl+C to abort..."
+  read
+fi
+
+echo "✅ Pre-commit checks passed"

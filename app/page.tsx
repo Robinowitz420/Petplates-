@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Check, Calendar, ShoppingCart, ArrowRight, Sparkles } from 'lucide-react';
 import { useUser, SignOutButton } from '@clerk/nextjs'; 
-import { recipes } from '@/lib/data/recipes-complete';
 import { PetCategory } from '@/lib/types';
 import QuickPreviewModal from '@/components/QuickPreviewModal';
 import SocialProof, { TestimonialSection } from '@/components/SocialProof';
@@ -41,7 +40,7 @@ const whyCards = [
     title: 'Why Meal Prep?',
     subtitle: 'Fresh prep beats whatever comes in a bag—every single time.',
     hover:
-      'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs. Paw & Plate knows species, age, size, and health concerns, then auto-adjusts portions and links trusted products you can buy today.',
+      'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs. Paws & Plates knows species, age, size, and health concerns, then auto-adjusts portions and links trusted products you can buy today.',
     icon: Calendar,
   },
 ];
@@ -92,10 +91,10 @@ export default function HomePage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <header className="relative w-full border-b border-surface-highlight py-8" style={{ backgroundColor: '#043136' }}>
-          <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[250px] md:h-[300px]">
+          <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[500px] md:h-[600px]">
             <Image
-              src="/images/emojis/Mascots/HeroPics/HeroBanner-v3.png"
-              alt="Paw & Plate Mascots"
+              src="/images/emojis/Mascots/HeroPics/LOGO.png"
+              alt="Paws & Plates - Meal prep for All your pets"
               fill
               className="object-contain"
               priority
@@ -114,7 +113,7 @@ export default function HomePage() {
           </section>
           
           <section className="py-12">
-            <h2 className="text-2xl font-bold text-white mb-8 text-center">Why Paw & Plate?</h2>
+            <h2 className="text-2xl font-bold text-white mb-8 text-center">Why Paws & Plates?</h2>
             <WhyUsSection />
           </section>
         </main>
@@ -130,15 +129,13 @@ export default function HomePage() {
     );
   }
 
-  const categoryRecipes = recipes.filter(r => r.category === selectedCategory).slice(0, 4);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="relative w-full border-b border-surface-highlight py-8" style={{ backgroundColor: '#043136' }}>
         <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[250px] md:h-[300px]">
           <Image
             src="/images/emojis/Mascots/HeroPics/HeroBanner-v3.png"
-            alt="Paw & Plate - Meal prep made easy, for ALL your pets!"
+            alt="Paws & Plates - Meal prep made easy, for ALL your pets!"
             fill
             className="object-contain"
             priority

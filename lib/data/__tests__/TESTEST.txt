@@ -1,0 +1,81 @@
+Test Script to Verify Integration:
+Create a simple test file in your project:
+
+typescript
+// test-nutrition-integration.ts
+import { generateRecipe, getRecipeTemplates } from './recipe-generator';
+
+async function testNutritionIntegration() {
+  console.log('🧪 Testing Nutrition Database Integration...\n');
+  
+  // Get a recipe template
+  const templates = getRecipeTemplates('dogs');
+  if (templates.length === 0) {
+    console.log('❌ No templates found');
+    return;
+  }
+  
+  // Generate a recipe
+  const recipe = generateRecipe({
+    template: templates[0],
+    pet: {
+      id: 'test-pet',
+      name: 'Test Dog',
+      type: 'dog',
+      species: 'Dog',
+      age: 3,
+      weight: 15,
+      healthConcerns: ['digestive-issues'],
+    }
+  });
+  
+  console.log('✅ Recipe Generated:', recipe.name);
+  console.log('📊 Nutritional Calculation:', {
+    calories: recipe.nutritionalCalculation.calories,
+    protein: recipe.nutritionalCalculation.protein,
+    fat: recipe.nutritionalCalculation.fat,
+    fiber: recipe.nutritionalCalculation.fiber,
+    calcium: recipe.nutritionalCalculation.calcium,
+    phosphorus: recipe.nutritionalCalculation.phosphorus,
+    caP_ratio: recipe.nutritionalCalculation.caP_ratio,
+  });
+  
+  console.log('\n🔍 Ingredient Breakdown:');
+  recipe.ingredientBreakdown.forEach((breakdown, index) => {
+    console.log(`${index + 1}. ${breakdown.ingredient.name}:`, {
+      protein: breakdown.contribution.protein,
+      fat: breakdown.contribution.fat,
+      calories: breakdown.contribution.calories,
+      fiber: breakdown.contribution.fiber,
+      calcium: breakdown.contribution.calcium,
+      phosphorus: breakdown.contribution.phosphorus,
+    });
+  });
+  
+  // Check if using real data vs hardcoded
+  const usesRealData = recipe.ingredientBreakdown.some(b => 
+    b.contribution.fiber !== undefined || 
+    b.contribution.calcium !== undefined ||
+    b.contribution.phosphorus !== undefined
+  );
+  
+  console.log('\n📈 Integration Status:', usesRealData ? '✅ USING REAL NUTRITION DATA' : '❌ STILL USING HARCODED DATA');
+  
+  // Quick validation
+  const hasComprehensiveData = 
+    recipe.nutritionalCalculation.fiber !== undefined &&
+    recipe.nutritionalCalculation.calcium !== undefined &&
+    recipe.nutritionalCalculation.phosphorus !== undefined;
+    
+  console.log('📋 Data Completeness:', hasComprehensiveData ? '✅ COMPREHENSIVE' : '❌ INCOMPLETE');
+}
+
+testNutritionIntegration().catch(console.error);
+What to Look For:
+Run this test and check for:
+
+Are fiber, calcium, phosphorus included? (Should see numbers, not just 0)
+
+Are the values realistic? (e.g., chicken breast protein should be ~31g/100g, not 20)
+
+Is Ca:P ratio calculated? (Should be a number like "1.2", not "N/A")

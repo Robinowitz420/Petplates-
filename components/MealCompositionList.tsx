@@ -2,8 +2,8 @@
 
 import { X, ExternalLink } from 'lucide-react';
 import { IngredientSelection } from '@/lib/analyzeCustomMeal';
-import { getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { getProductPriceAmount, getProductPriceUrl } from '@/lib/data/product-prices';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -36,15 +36,9 @@ export default function MealCompositionList({
           ingredients.map(ing => {
             const displayName = getIngredientDisplayName(ing.key);
             const indicator = getCompatibilityIndicator?.(ing.key) || null;
-            const ingredientName = displayName.toLowerCase();
-            // Try multiple lookup methods
-            let vettedProduct = getVettedProduct(ingredientName);
-            if (!vettedProduct) {
-              vettedProduct = getVettedProductByAnyIdentifier(displayName);
-            }
-            const purchaseLink = vettedProduct?.asinLink || vettedProduct?.purchaseLink;
+            const purchaseLink = getProductPriceUrl(displayName);
             const hasPurchaseLink = !!purchaseLink;
-            const price = vettedProduct?.price?.amount;
+            const price = getProductPriceAmount(displayName);
             
             return (
               <div
@@ -89,7 +83,7 @@ export default function MealCompositionList({
                   {/* Buy Button */}
                   {hasPurchaseLink && (
                     <a
-                      href={ensureSellerId(purchaseLink!)}
+                      href={ensureSellerId(purchaseLink)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-all duration-200 text-sm font-semibold whitespace-nowrap hover:shadow-md"

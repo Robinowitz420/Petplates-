@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { generateModifiedRecommendations } from '@/lib/applyModifiers';
 import { PetNutritionProfile } from '@/lib/types';
 import { getRecommendedRecipes } from '@/lib/utils/recipeRecommendations';
-import { recipes } from '@/lib/data/recipes-complete';
 
 const normalizeValue = (value?: string | null) => {
   const normalized = (value || '').trim().toLowerCase();

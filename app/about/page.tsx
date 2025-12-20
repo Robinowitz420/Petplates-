@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -28,14 +28,14 @@ export default function AboutPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Mission */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Paw & Plate was founded on a simple belief: our pets deserve the same quality nutrition we give ourselves.
+        <div className="bg-surface rounded-lg shadow-md p-8 mb-8 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">Our Mission</h2>
+          <p className="text-lg text-gray-300 leading-relaxed mb-4">
+            Paws & Plates was founded on a simple belief: our pets deserve the same quality nutrition we give ourselves.
             Just as meal prep has transformed human health, we're bringing that same personalized, 
             fresh-food approach to pet nutrition.
           </p>
-          <p className="text-lg text-gray-700 leading-relaxed">
+          <p className="text-lg text-gray-300 leading-relaxed">
             Every recipe is scientifically formulated to meet AAFCO and WSAVA guidelines, ensuring your pet 
             gets complete, balanced nutrition tailored to their specific needs.
           </p>
@@ -43,43 +43,43 @@ export default function AboutPage() {
 
         {/* Values */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <Award className="text-green-800 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-surface rounded-lg shadow-md p-6">
+            <Award className="text-primary-400 mb-4" size={40} />
+            <h3 className="text-xl font-bold text-foreground mb-2">
               Science-Based
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               All recipes meet or exceed AAFCO and WSAVA nutritional standards, 
               developed with pet health specialist expertise.
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <Heart className="text-green-800 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-surface rounded-lg shadow-md p-6">
+            <Heart className="text-primary-400 mb-4" size={40} />
+            <h3 className="text-xl font-bold text-foreground mb-2">
               Pet-First
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               Every decision we make prioritizes your pet's health, happiness, and wellbeing.
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <Users className="text-green-800 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-surface rounded-lg shadow-md p-6">
+            <Users className="text-primary-400 mb-4" size={40} />
+            <h3 className="text-xl font-bold text-foreground mb-2">
               Community Driven
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               Our recipes are refined based on feedback from thousands of pet parents like you.
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <CheckCircle className="text-green-800 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-surface rounded-lg shadow-md p-6">
+            <CheckCircle className="text-primary-400 mb-4" size={40} />
+            <h3 className="text-xl font-bold text-foreground mb-2">
               Transparency
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               Complete ingredient lists, full nutritional breakdowns, and clear sourcing information.
             </p>
           </div>
@@ -87,35 +87,35 @@ export default function AboutPage() {
 
 
         {/* Nutritional Standards */}
-        <div className="bg-primary-50 rounded-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <div className="bg-surface rounded-lg p-8 mb-8">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
             Our Nutritional Standards
           </h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+          <p className="text-lg text-gray-300 leading-relaxed mb-6">
             We adhere to the highest standards in pet nutrition:
           </p>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>AAFCO Guidelines:</strong> All recipes meet Association of American Feed Control Officials standards
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>WSAVA Recommendations:</strong> Aligned with World Small Animal Veterinary Association best practices
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>Pet Specialist Reviewed:</strong> Recipes developed and reviewed by pet nutritionists
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>Regular Updates:</strong> Formulations updated as new research emerges
               </span>
             </li>
@@ -123,65 +123,65 @@ export default function AboutPage() {
         </div>
 
         {/* Vetting Process */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <div className="bg-surface rounded-lg shadow-md p-8 mb-8">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
             How We Choose Your Ingredients: The Vetted Vetting Process
           </h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+          <p className="text-lg text-gray-300 leading-relaxed mb-6">
             When you see a specific product recommendation (e.g., "Brand X Fish Oil") instead of a generic item (e.g., "Fish Oil"),
             it means that item has passed our three-tiered pet health specialist screening process.
           </p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+          <p className="text-lg text-gray-300 leading-relaxed mb-6">
             Our goal is to ensure that the products you purchase are as safe and high-quality as the recipes you cook.
             We select the "best pick" for every core ingredient based on:
           </p>
           <ul className="space-y-4 mb-6">
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>Safety & Purity:</strong> Every supplement and oil is vetted for third-party testing (e.g., heavy metal or contaminant checks) to guarantee safety. We choose minimal processing where possible.
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>Nutritional Superiority:</strong> We prioritize sourcing that maximizes the intended benefit—for instance, choosing low-fat meats for sensitive pets or specific fish (like Wild-Caught Alaskan Salmon) for high Omega-3 concentration.
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="text-green-800 flex-shrink-0 mt-1" size={20} />
-              <span className="text-gray-700">
+              <CheckCircle className="text-primary-400 flex-shrink-0 mt-1" size={20} />
+              <span className="text-gray-300">
                 <strong>Dietary Completeness:</strong> For foundational components like multi-vitamin/mineral mixes, we exclusively select professionally formulated products that meet AAFCO/FEDIAF standards to guarantee your homemade meal is 100% balanced and complete.
               </span>
             </li>
           </ul>
-          <p className="text-lg text-gray-700 leading-relaxed">
+          <p className="text-lg text-gray-300 leading-relaxed">
             Our shopping list is designed to be a recommendation from a pet health specialist, not just a search result.
           </p>
         </div>
 
-        {/* Why Paw & Plate */}
-        <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Why Paw & Plate?
+        {/* Why Paws & Plates */}
+        <div className="bg-surface border border-surface-highlight rounded-lg p-8">
+          <h2 className="text-3xl font-bold text-foreground mb-6">
+            Why Paws & Plates?
           </h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-8">
+          <p className="text-lg text-gray-300 leading-relaxed mb-8">
             The global pet food market is undergoing a dramatic shift toward fresh, human-grade diets, growing at 20% CAGR.
-            But this transition creates significant challenges for pet owners. Here's how Paw & Plate solves the key problems:
+            But this transition creates significant challenges for pet owners. Here's how Paws & Plates solves the key problems:
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Problem 1 */}
-            <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-red-100 text-red-600 rounded-full p-2 flex-shrink-0">
                   <span className="text-xl">⚠️</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-foreground">
                   Information Overload
                 </h3>
               </div>
-              <p className="text-sm text-gray-700 mb-3">
+              <p className="text-sm text-gray-300 mb-3">
                 Pet owners face analysis paralysis from countless conflicting recipes, blogs, and studies online.
               </p>
               <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
@@ -194,16 +194,16 @@ export default function AboutPage() {
             </div>
 
             {/* Problem 2 */}
-            <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-red-100 text-red-600 rounded-full p-2 flex-shrink-0">
                   <span className="text-xl">🏥</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-foreground">
                   Specialist Skepticism
                 </h3>
               </div>
-              <p className="text-sm text-gray-700 mb-3">
+              <p className="text-sm text-gray-300 mb-3">
                 Pet health specialists worry about homemade diets due to risks of nutritional imbalance and missing essential minerals.
               </p>
               <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
@@ -215,16 +215,16 @@ export default function AboutPage() {
             </div>
 
             {/* Problem 3 */}
-            <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-red-100 text-red-600 rounded-full p-2 flex-shrink-0">
                   <span className="text-xl">🛒</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-foreground">
                   Cooking Inconvenience
                 </h3>
               </div>
-              <p className="text-sm text-gray-700 mb-3">
+              <p className="text-sm text-gray-300 mb-3">
                 Time investment, shopping complexity, and meal prep work deter most from actually cooking fresh food.
               </p>
               <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
@@ -236,16 +236,16 @@ export default function AboutPage() {
             </div>
 
             {/* Problem 4 */}
-            <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-red-100 text-red-600 rounded-full p-2 flex-shrink-0">
                   <span className="text-xl">🎯</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-foreground">
                   Health Conditions
                 </h3>
               </div>
-              <p className="text-sm text-gray-700 mb-3">
+              <p className="text-sm text-gray-300 mb-3">
                 Most pets have specific health concerns that require non-generic diets. One-size-fits-all recipes fail these pets.
               </p>
               <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
@@ -260,7 +260,7 @@ export default function AboutPage() {
           <div className="mt-8 p-6 bg-green-900/20 border border-green-800/30 rounded-lg">
             <h3 className="text-xl font-bold mb-3 text-green-900">The Result: Fresh Food Made Simple</h3>
             <p className="text-green-800 leading-relaxed">
-              Paw & Plate bridges the gap between pet owners' desire for fresh, healthy food and the nutritional
+              Paws & Plates bridges the gap between pet owners' desire for fresh, healthy food and the nutritional
               safety veterinarians demand. We're not just another recipe site—we're the trusted partner that makes
               homemade pet nutrition accessible, safe, and effective for every pet parent.
             </p>

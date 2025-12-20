@@ -1,4 +1,3 @@
-import { recipes } from '@/lib/data/recipes-complete';
 import { Recipe } from '@/lib/types';
 
 interface Pet {
@@ -172,8 +171,8 @@ export const getRecommendedRecipes = (
   const normalizedConcerns = (healthConcerns || []).map(normalizeHealthConcern);
   const results: RecipeRecommendation[] = [];
 
-  // Use provided recipes or fall back to default recipes
-  const allRecipes = customRecipes || recipes;
+  // Use provided recipes only - static recipes are no longer available
+  const allRecipes = customRecipes || [];
 
   // Normalize pet age to age group string
   const petAgeGroup = normalizePetAgeToGroup(age);
@@ -395,30 +394,13 @@ export const getRecommendedRecipes = (
 
 /**
  * Get count of recipes by priority level for display purposes
+ * Returns empty stats since recipes are now generated dynamically
  */
 export const getRecommendationStats = (pet: Pet) => {
-  const { type, age, healthConcerns } = pet;
-  const petAgeGroup = normalizePetAgeToGroup(age);
-  
-  const perfectCount = recipes.filter(r => 
-    r.category === type &&
-    ((r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all')) &&
-    (healthConcerns.length === 0 || healthConcerns.some(hc => r.healthConcerns.includes(hc)))
-  ).length;
-
-  const typeAgeCount = recipes.filter(r => 
-    r.category === type &&
-    ((r.ageGroup || []).includes(petAgeGroup) || (r.ageGroup || []).includes('all'))
-  ).length - perfectCount;
-
-  const typeOnlyCount = recipes.filter(r => 
-    r.category === type
-  ).length - perfectCount - typeAgeCount;
-
   return {
-    perfect: perfectCount,
-    typeAge: typeAgeCount,
-    typeOnly: typeOnlyCount,
-    total: perfectCount + typeAgeCount + typeOnlyCount
+    perfect: 0,
+    typeAge: 0,
+    typeOnly: 0,
+    total: 0
   };
 };

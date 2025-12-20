@@ -38,43 +38,25 @@ export function generateRecipeIndex(recipes: Recipe[]): RecipeIndexEntry[] {
 }
 
 /**
- * Lazy load full recipe by ID
+ * Load a single recipe by ID
+ * Recipes are now generated dynamically - returns null
  */
 export async function loadRecipeById(id: string): Promise<Recipe | null> {
-  try {
-    const recipesModule = await import('./recipes-complete');
-    const recipes = recipesModule.recipes;
-    return recipes.find(r => r.id === id) || null;
-  } catch (error) {
-    console.error('Failed to load recipe:', error);
-    return null;
-  }
+  return null;
 }
 
 /**
- * Lazy load multiple recipes by IDs
+ * Load multiple recipes by IDs
+ * Recipes are now generated dynamically - returns empty array
  */
 export async function loadRecipesByIds(ids: string[]): Promise<Recipe[]> {
-  try {
-    const recipesModule = await import('./recipes-complete');
-    const recipes = recipesModule.recipes;
-    return recipes.filter(r => ids.includes(r.id));
-  } catch (error) {
-    console.error('Failed to load recipes:', error);
-    return [];
-  }
+  return [];
 }
 
 /**
- * Lazy load all recipes (for when full data is needed)
+ * Load all recipes
+ * Recipes are now generated dynamically - returns empty array
  */
 export async function loadAllRecipes(): Promise<Recipe[]> {
-  try {
-    const recipesModule = await import('./recipes-complete');
-    return recipesModule.recipes;
-  } catch (error) {
-    console.error('Failed to load all recipes:', error);
-    return [];
-  }
+  return [];
 }
-

@@ -1,0 +1,609 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2025-12-19T02:15:52.909Z",
+  "coOccurrence": {
+    "cats": {
+      "pairs": {},
+      "triples": {},
+      "pairPMI": {},
+      "negativePairs": {}
+    },
+    "dogs": {
+      "pairs": {
+        "brown_rice+carrots": 3,
+        "brown_rice+turkey_breast": 2,
+        "carrots+coconut_oil": 2,
+        "carrots+turkey_breast": 3,
+        "coconut_oil+turkey_breast": 2,
+        "carrots+olive_oil": 2
+      },
+      "triples": {
+        "brown_rice+carrots+turkey_breast": 2,
+        "carrots+coconut_oil+turkey_breast": 2
+      },
+      "pairPMI": {
+        "brown_rice+carrots": 0.24,
+        "brown_rice+turkey_breast": 0.41,
+        "carrots+coconut_oil": 0.24,
+        "carrots+turkey_breast": 0.24,
+        "coconut_oil+turkey_breast": 0.89,
+        "carrots+olive_oil": 0.24
+      },
+      "negativePairs": {}
+    },
+    "birds": {
+      "pairs": {},
+      "triples": {},
+      "pairPMI": {},
+      "negativePairs": {}
+    }
+  },
+  "categoryRatios": {
+    "cats": {
+      "protein": {
+        "mean": 0.4,
+        "stdDev": 0.1
+      },
+      "vegetable": {
+        "mean": 0.3,
+        "stdDev": 0.1
+      },
+      "fat": {
+        "mean": 0.15,
+        "stdDev": 0.05
+      },
+      "carbohydrate": {
+        "mean": 0.15,
+        "stdDev": 0.05
+      }
+    },
+    "dogs": {
+      "protein": {
+        "mean": 0.4,
+        "stdDev": 0.1
+      },
+      "vegetable": {
+        "mean": 0.3,
+        "stdDev": 0.1
+      },
+      "fat": {
+        "mean": 0.15,
+        "stdDev": 0.05
+      },
+      "carbohydrate": {
+        "mean": 0.15,
+        "stdDev": 0.05
+      }
+    },
+    "birds": {
+      "protein": {
+        "mean": 0.4,
+        "stdDev": 0.1
+      },
+      "vegetable": {
+        "mean": 0.3,
+        "stdDev": 0.1
+      },
+      "fat": {
+        "mean": 0.15,
+        "stdDev": 0.05
+      },
+      "carbohydrate": {
+        "mean": 0.15,
+        "stdDev": 0.05
+      }
+    }
+  },
+  "ingredientCounts": {
+    "cats": {
+      "mean": 2,
+      "median": 2,
+      "min": 2,
+      "max": 2
+    },
+    "dogs": {
+      "mean": 5.2,
+      "median": 5,
+      "min": 4,
+      "max": 7
+    },
+    "birds": {
+      "mean": 6,
+      "median": 6,
+      "min": 6,
+      "max": 6
+    }
+  },
+  "categoryPairs": {
+    "cats": {
+      "proteinWithFat": {},
+      "proteinWithVeg": {}
+    },
+    "dogs": {
+      "proteinWithFat": {
+        "turkey_breast": [
+          "coconut_oil"
+        ],
+        "eggs": [
+          "olive_oil"
+        ]
+      },
+      "proteinWithVeg": {
+        "turkey_breast": [
+          "spinach",
+          "carrots"
+        ],
+        "eggs": [
+          "carrots"
+        ],
+        "chicken_breast": [
+          "carrots",
+          "sweet_potato",
+          "spinach"
+        ],
+        "chicken_broth": [
+          "carrots"
+        ]
+      }
+    },
+    "birds": {
+      "proteinWithFat": {
+        "eggs": [
+          "olive_oil"
+        ]
+      },
+      "proteinWithVeg": {}
+    }
+  },
+  "negativePatterns": {
+    "toxicIngredients": {
+      "cats": [
+        "onion",
+        "garlic",
+        "grapes",
+        "raisins",
+        "chocolate",
+        "xylitol",
+        "avocado"
+      ],
+      "dogs": [
+        "onion",
+        "garlic",
+        "grapes",
+        "raisins",
+        "chocolate",
+        "xylitol",
+        "macadamia"
+      ],
+      "birds": [
+        "avocado",
+        "chocolate",
+        "caffeine",
+        "salt",
+        "onion",
+        "garlic"
+      ],
+      "reptiles": [
+        "avocado",
+        "rhubarb",
+        "onion"
+      ],
+      "pocket-pets": [
+        "chocolate",
+        "onion",
+        "garlic",
+        "avocado"
+      ]
+    },
+    "structuralIssues": [
+      "all_meat_no_calcium",
+      "excessive_fat_over_70_percent",
+      "single_ingredient",
+      "no_protein_source"
+    ]
+  },
+  "commercialPriors": {
+    "dogs": {
+      "ingredientCounts": {
+        "grain": 77,
+        "beef": 64,
+        "vegetable": 39,
+        "fat": 4,
+        "wheat": 114,
+        "corn": 91,
+        "duck": 22,
+        "duck_fat": 3,
+        "beet_pulp": 4,
+        "chicken": 253,
+        "turkey": 62,
+        "carrot": 11,
+        "chicken_fat": 5,
+        "rice": 63,
+        "lamb": 17,
+        "yeast": 4,
+        "peas": 60,
+        "venison": 3,
+        "potato": 35,
+        "rabbit": 5,
+        "egg": 26,
+        "tuna": 33,
+        "sweet_potato": 1,
+        "meat": 42,
+        "oats": 20,
+        "barley": 12,
+        "salmon": 67,
+        "fish": 60,
+        "pumpkin": 2,
+        "spinach": 1,
+        "cod": 3,
+        "whitefish": 17,
+        "liver": 57,
+        "sole": 3,
+        "shrimp": 3,
+        "mackerel": 3,
+        "trout": 6,
+        "soybean": 26,
+        "apple": 6,
+        "cactus": 3,
+        "mealworms": 9,
+        "squash": 3,
+        "superworms": 3,
+        "grasshoppers": 3,
+        "roaches": 3,
+        "insect_meal": 13,
+        "greens": 6,
+        "fruit": 6,
+        "whey_protein": 7,
+        "silkworms": 3,
+        "grass": 4,
+        "chicory": 2,
+        "mango": 2,
+        "timothy_hay": 6,
+        "alfalfa": 4,
+        "honey": 4,
+        "millet": 7,
+        "safflower_seed": 2
+      },
+      "ingredientFreq": {
+        "grain": 77,
+        "beef": 64,
+        "vegetable": 39,
+        "wheat": 114,
+        "corn": 91,
+        "chicken": 253,
+        "turkey": 62,
+        "rice": 63,
+        "peas": 60,
+        "potato": 35,
+        "tuna": 33,
+        "meat": 42,
+        "salmon": 67,
+        "fish": 60,
+        "liver": 57
+      },
+      "pairCounts": {
+        "grain|vegetable": 36,
+        "corn|wheat": 48,
+        "chicken|turkey": 19,
+        "chicken|grain": 13,
+        "beef|turkey": 6,
+        "chicken|wheat": 32,
+        "wheat|wheat": 5,
+        "chicken|chicken": 94,
+        "chicken|peas": 51,
+        "chicken|potato": 28,
+        "peas|peas": 7,
+        "corn|corn": 17,
+        "corn|rice": 34,
+        "chicken|rice": 34,
+        "chicken|corn": 39,
+        "beef|beef": 43,
+        "peas|potato": 14,
+        "peas|rice": 8,
+        "chicken|salmon": 17,
+        "peas|salmon": 13,
+        "rice|salmon": 10,
+        "peas|turkey": 7,
+        "rice|wheat": 17,
+        "chicken|meat": 13,
+        "beef|chicken": 11,
+        "beef|wheat": 7,
+        "corn|salmon": 9,
+        "salmon|wheat": 15,
+        "corn|peas": 6,
+        "meat|wheat": 5,
+        "meat|turkey": 7,
+        "turkey|wheat": 12,
+        "corn|turkey": 5,
+        "beef|meat": 5,
+        "chicken|fish": 7,
+        "fish|salmon": 18,
+        "fish|tuna": 16,
+        "liver|salmon": 6,
+        "beef|liver": 9,
+        "chicken|liver": 30,
+        "tuna|wheat": 6,
+        "liver|turkey": 12
+      },
+      "pairPMI": {
+        "grain|vegetable": 1.6,
+        "corn|wheat": 0.23,
+        "chicken|turkey": -1.68,
+        "chicken|grain": -2.52,
+        "beef|turkey": -1.29,
+        "chicken|wheat": -1.82,
+        "wheat|wheat": -3.23,
+        "chicken|chicken": -1.42,
+        "chicken|peas": -0.23,
+        "chicken|potato": -0.32,
+        "peas|peas": -0.94,
+        "corn|corn": -0.92,
+        "corn|rice": 0.59,
+        "chicken|rice": -0.88,
+        "chicken|corn": -1.21,
+        "beef|beef": 1.41,
+        "peas|potato": 0.78,
+        "peas|rice": -0.83,
+        "chicken|salmon": -1.95,
+        "peas|salmon": -0.25,
+        "rice|salmon": -0.69,
+        "peas|turkey": -0.99,
+        "rice|wheat": -0.71,
+        "chicken|meat": -1.65,
+        "beef|chicken": -2.49,
+        "beef|wheat": -1.96,
+        "corn|salmon": -1.36,
+        "salmon|wheat": -0.98,
+        "corn|peas": -1.75,
+        "meat|wheat": -1.8,
+        "meat|turkey": -0.48,
+        "turkey|wheat": -1.18,
+        "corn|turkey": -2.04,
+        "beef|meat": -0.98,
+        "chicken|fish": -3.01,
+        "fish|salmon": 0.2,
+        "fish|tuna": 1.05,
+        "liver|salmon": -1.24,
+        "beef|liver": -0.62,
+        "chicken|liver": -0.91,
+        "tuna|wheat": -1.22,
+        "liver|turkey": -0.18
+      },
+      "hardBlockPairs": [
+        "beef|peas",
+        "beef|salmon",
+        "beef|fish",
+        "fish|wheat",
+        "liver|wheat",
+        "corn|liver",
+        "fish|rice",
+        "liver|rice",
+        "liver|peas",
+        "fish|liver"
+      ],
+      "strongPenaltyPairs": [
+        "beef|grain",
+        "beef|vegetable",
+        "tuna|vegetable",
+        "potato|rice",
+        "beef|corn",
+        "grain|rice",
+        "fish|potato",
+        "beef|rice",
+        "fish|fish",
+        "fish|peas",
+        "grain|tuna",
+        "peas|tuna",
+        "tuna|tuna",
+        "grain|grain",
+        "fish|grain",
+        "corn|fish"
+      ]
+    },
+    "cats": {
+      "ingredientCounts": {
+        "grain": 77,
+        "beef": 64,
+        "vegetable": 39,
+        "fat": 4,
+        "wheat": 114,
+        "corn": 91,
+        "duck": 22,
+        "duck_fat": 3,
+        "beet_pulp": 4,
+        "chicken": 253,
+        "turkey": 62,
+        "carrot": 11,
+        "chicken_fat": 5,
+        "rice": 63,
+        "lamb": 17,
+        "yeast": 4,
+        "peas": 60,
+        "venison": 3,
+        "potato": 35,
+        "rabbit": 5,
+        "egg": 26,
+        "tuna": 33,
+        "sweet_potato": 1,
+        "meat": 42,
+        "oats": 20,
+        "barley": 12,
+        "salmon": 67,
+        "fish": 60,
+        "pumpkin": 2,
+        "spinach": 1,
+        "cod": 3,
+        "whitefish": 17,
+        "liver": 57,
+        "sole": 3,
+        "shrimp": 3,
+        "mackerel": 3,
+        "trout": 6,
+        "soybean": 26,
+        "apple": 6,
+        "cactus": 3,
+        "mealworms": 9,
+        "squash": 3,
+        "superworms": 3,
+        "grasshoppers": 3,
+        "roaches": 3,
+        "insect_meal": 13,
+        "greens": 6,
+        "fruit": 6,
+        "whey_protein": 7,
+        "silkworms": 3,
+        "grass": 4,
+        "chicory": 2,
+        "mango": 2,
+        "timothy_hay": 6,
+        "alfalfa": 4,
+        "honey": 4,
+        "millet": 7,
+        "safflower_seed": 2
+      },
+      "ingredientFreq": {
+        "grain": 77,
+        "beef": 64,
+        "vegetable": 39,
+        "wheat": 114,
+        "corn": 91,
+        "chicken": 253,
+        "turkey": 62,
+        "rice": 63,
+        "peas": 60,
+        "potato": 35,
+        "tuna": 33,
+        "meat": 42,
+        "salmon": 67,
+        "fish": 60,
+        "liver": 57
+      },
+      "pairCounts": {
+        "grain|vegetable": 36,
+        "corn|wheat": 48,
+        "chicken|turkey": 19,
+        "chicken|grain": 13,
+        "beef|turkey": 6,
+        "chicken|wheat": 32,
+        "wheat|wheat": 5,
+        "chicken|chicken": 94,
+        "chicken|peas": 51,
+        "chicken|potato": 28,
+        "peas|peas": 7,
+        "corn|corn": 17,
+        "corn|rice": 34,
+        "chicken|rice": 34,
+        "chicken|corn": 39,
+        "beef|beef": 43,
+        "peas|potato": 14,
+        "peas|rice": 8,
+        "chicken|salmon": 17,
+        "peas|salmon": 13,
+        "rice|salmon": 10,
+        "peas|turkey": 7,
+        "rice|wheat": 17,
+        "chicken|meat": 13,
+        "beef|chicken": 11,
+        "beef|wheat": 7,
+        "corn|salmon": 9,
+        "salmon|wheat": 15,
+        "corn|peas": 6,
+        "meat|wheat": 5,
+        "meat|turkey": 7,
+        "turkey|wheat": 12,
+        "corn|turkey": 5,
+        "beef|meat": 5,
+        "chicken|fish": 7,
+        "fish|salmon": 18,
+        "fish|tuna": 16,
+        "liver|salmon": 6,
+        "beef|liver": 9,
+        "chicken|liver": 30,
+        "tuna|wheat": 6,
+        "liver|turkey": 12
+      },
+      "pairPMI": {
+        "grain|vegetable": 1.6,
+        "corn|wheat": 0.23,
+        "chicken|turkey": -1.68,
+        "chicken|grain": -2.52,
+        "beef|turkey": -1.29,
+        "chicken|wheat": -1.82,
+        "wheat|wheat": -3.23,
+        "chicken|chicken": -1.42,
+        "chicken|peas": -0.23,
+        "chicken|potato": -0.32,
+        "peas|peas": -0.94,
+        "corn|corn": -0.92,
+        "corn|rice": 0.59,
+        "chicken|rice": -0.88,
+        "chicken|corn": -1.21,
+        "beef|beef": 1.41,
+        "peas|potato": 0.78,
+        "peas|rice": -0.83,
+        "chicken|salmon": -1.95,
+        "peas|salmon": -0.25,
+        "rice|salmon": -0.69,
+        "peas|turkey": -0.99,
+        "rice|wheat": -0.71,
+        "chicken|meat": -1.65,
+        "beef|chicken": -2.49,
+        "beef|wheat": -1.96,
+        "corn|salmon": -1.36,
+        "salmon|wheat": -0.98,
+        "corn|peas": -1.75,
+        "meat|wheat": -1.8,
+        "meat|turkey": -0.48,
+        "turkey|wheat": -1.18,
+        "corn|turkey": -2.04,
+        "beef|meat": -0.98,
+        "chicken|fish": -3.01,
+        "fish|salmon": 0.2,
+        "fish|tuna": 1.05,
+        "liver|salmon": -1.24,
+        "beef|liver": -0.62,
+        "chicken|liver": -0.91,
+        "tuna|wheat": -1.22,
+        "liver|turkey": -0.18
+      },
+      "hardBlockPairs": [
+        "beef|peas",
+        "beef|salmon",
+        "beef|fish",
+        "fish|wheat",
+        "liver|wheat",
+        "corn|liver",
+        "fish|rice",
+        "liver|rice",
+        "liver|peas",
+        "fish|liver"
+      ],
+      "strongPenaltyPairs": [
+        "beef|grain",
+        "beef|vegetable",
+        "tuna|vegetable",
+        "potato|rice",
+        "beef|corn",
+        "grain|rice",
+        "fish|potato",
+        "beef|rice",
+        "fish|fish",
+        "fish|peas",
+        "grain|tuna",
+        "peas|tuna",
+        "tuna|tuna",
+        "grain|grain",
+        "fish|grain",
+        "corn|fish"
+      ]
+    }
+  },
+  "commercialMetadata": {
+    "totalProducts": 253,
+    "minIngredientCount": 30,
+    "minPairCount": 5,
+    "minCommonIngredient": 40
+  },
+  "commercialVersion": "2.0.0",
+  "commercialGeneratedAt": "2025-12-19T03:56:15.452Z"
+}

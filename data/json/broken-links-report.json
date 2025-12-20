@@ -1,0 +1,386 @@
+{
+  "total": 292,
+  "checked": 292,
+  "valid": 245,
+  "broken": 0,
+  "invalidASIN": 0,
+  "titleMismatch": 47,
+  "errors": [
+    {
+      "ingredient": "alfalfa sprouts (small amounts)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "alfalfa sprouts (small amounts)",
+      "actualTitle": "Amazon.com : Organic Clover Sprout Seeds (16 oz) – Non-GMO, Heirloom Seeds for Sprouting and Microgreens : Patio, Lawn &amp; Garden",
+      "link": "https://www.amazon.com/dp/B0DFZTWLTY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "algae oil (dha)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "algae oil (dha)",
+      "actualTitle": "Amazon.com: Nordic Naturals Prenatal DHA, Strawberry - 120 Soft Gels - 830 mg Omega-3 + 400 IU Vitamin D3 - Supports Brain Development in Babies During Pregnancy &amp; Lactation - Non-GMO - 60 Servings : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B079J5YZSS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "almond oil",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "almond oil",
+      "actualTitle": "Amazon.com : Essencetics Organic Jojoba Oil 16 oz - 100% Pure &amp; Natural Jojoba Massage Oil for Hair, Skin, Body, &amp; Face - Natural Cold Pressed Unrefined - Hexane Free Massage Oil for Massage Therapy &amp; Date Night : Beauty &amp; Personal Care",
+      "link": "https://www.amazon.com/dp/B0BXMMDNJ8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amaranth leaves",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "amaranth leaves",
+      "actualTitle": "Amazon.com: Jtoder 5Pcs Dried Amaranthus Hanging Flowers, Natural Preserved Flower for Wedding Arch, Exhibition, Wall Hanging Lover Tears, Floral Arrangement, Home Decor (White, 24&quot;) : Home &amp; Kitchen",
+      "link": "https://www.amazon.com/dp/B0F2YRBGS6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amaranth seeds",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "amaranth seeds",
+      "actualTitle": "Amazon.com: Bob&#x27;s Red Mill Organic Whole Grain Amaranth, 24 Oz (4 Pack) : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amino acid supplement",
+      "issue": "Title mismatch",
+      "details": "Partial match (33% similar)",
+      "expectedTitle": "amino acid supplement",
+      "actualTitle": "Amazon.com : Purina Pro Plan Veterinary Large Breed Dog Joint Care Supplement with Glucosamine, Chondroitin, and Collagen to Support Hip and Joint Health – 30ct Pouch : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B0C2JFLZHF?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "anchovy oil",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "anchovy oil",
+      "actualTitle": "Amazon.com: Dr. Berg Maximum Strength Omega-3 Cod Liver Fish Oil (1250 mg) from Wild-Caught Cod - Lemon-Flavored Omega-3 Fish Oil for Women &amp; Men - EPA DHA Supplement – 60 Softgels : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B0FDNB2DVS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "apples (no seeds)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "apples (no seeds)",
+      "actualTitle": "Amazon.com: PRODUCE Organic Hnycrisp Apple, 48 OZ : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B00AR0TG44?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "artichokes",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "artichokes",
+      "actualTitle": "Amazon.com : 365 by Whole Foods Market, Artichoke Quarters Marinated, 6.5 Ounce (Pack of 4) : Everything Else",
+      "link": "https://www.amazon.com/dp/B0DF91JXND?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "avocado oil",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "avocado oil",
+      "actualTitle": "Amazon.com : 100% Pure Rendered NON GMO Beef Tallow-Food Grade- 7LBS : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "avocado oil (tiny amounts)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "avocado oil (tiny amounts)",
+      "actualTitle": "Amazon.com : 100% Pure Rendered NON GMO Beef Tallow-Food Grade- 7LBS : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "b-complex",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "b-complex",
+      "actualTitle": "Amazon.com: Nutricost High Potency Vitamin B Complex 462mg, 120 Capsules - with Vitamin C - Energy Complex : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "barley",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "barley",
+      "actualTitle": "Amazon.com : Bob&#x27;s Red Mill Signature Buttermilk Pancake Mix, 20oz (Pack of 4)- Just Add Water, Makes 32-40 Pancakes per Bag : Everything Else",
+      "link": "https://www.amazon.com/dp/B0D481997Z?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "barley hay",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "barley hay",
+      "actualTitle": "Amazon.com : Blue Mountain Hay | Organic Garden Straw (5 lb) | Natural Mulch for Gardening, Flower Beds, Yard Landscaping, New Lawn Grass Seeding, Composting | Covers up to 75 sq ft : Patio, Lawn &amp; Garden",
+      "link": "https://www.amazon.com/dp/B08YM9VJC5?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "beef liver",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "beef liver",
+      "actualTitle": "Amazon.com : Stella &amp; Chewy&#x27;s Freeze-Dried Raw Beef Heart Dog Treats - Single Ingredient, No Additives - Premium Training Treats - Perfect For Picky Eaters - 3oz Bag : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B07G3QFG8N?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "beet greens",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "beet greens",
+      "actualTitle": "Amazon.com: Dr. Berg Raw Organic Beet Powder from Real Earth-Grown Beets – USDA Certified Organic Beet Root Powder to Support Nitric Oxide Levels, Energy, Blood Flow, &amp; Heart Health* – 30 Servings : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B0F9LNFLTK?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bell peppers",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "bell peppers",
+      "actualTitle": "Amazon.com: Organic Green Bell Pepper : Patio, Lawn &amp; Garden",
+      "link": "https://www.amazon.com/dp/B000P6J14K?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "beta-glucans",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "beta-glucans",
+      "actualTitle": "Amazon.com: Glucan Elite – 85% Beta 1,3D Glucan 500mg - 60 vcaps | 85% Minimum Active 1,3 Linkage Ultra-Potency Beta Glucan – Highest Bioavailability with BGF-Immune (Pack of 3) : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B01LWVNL9J?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bluegrass hay",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "bluegrass hay",
+      "actualTitle": "Amazon.com : Small Pet Select Orchard Grass Hay Pet Food for Rabbits, Guinea Pigs, Chinchillas and Other Small Animals, Premium Natural Hay Grown in The US, 10 LB : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "borage oil",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "borage oil",
+      "actualTitle": "Amazon.com: Black Currant Oil - 1000 Mg - 180 Softgels - Cold-Pressed Pure Black Currant Seed Oil - Hexane Free - 140mg GLA Per Serving - Regulates Hormonal Balance - Great For Immune System, Hair and Skin : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "brewer's yeast",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "brewer's yeast",
+      "actualTitle": "Amazon.com: Bob’s Red Mill Large Flake Nutritional Yeast 5 Ounce (Pack of 2) Vegan Parm Cheese Replacement : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B084JL2R77?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "brown rice",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "brown rice",
+      "actualTitle": "Amazon.com : Success Boil-In-Bag Quinoa, Quick Tri-Color Quinoa, 12-Ounce Box : Everything Else",
+      "link": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bulgur",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "bulgur",
+      "actualTitle": "Amazon.com: Bob&#x27;s Red Mill Red Bulgur/Red Wheat, 24oz (Pack of 4)- Whole Grain, Non GMO, Vegan, Kosher",
+      "link": "https://www.amazon.com/dp/B081DQ5NG5?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "butterworms",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "butterworms",
+      "actualTitle": "Amazon.com: Mealworm 3000 Live Mealworms (Medium)-Bulk and Organic from FL : Patio, Lawn &amp; Garden",
+      "link": "https://www.amazon.com/dp/B093BD8NXR?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "calcium supplement",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "calcium supplement",
+      "actualTitle": "Amazon.com: mGanna 100% Natural Pure Calcium Carbonate 227 GMS / 0.5 LBS : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B0CKNK682W?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "canary seed",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "canary seed",
+      "actualTitle": "Amazon.com : LAFEBER&#x27;S Sunny Orchard Nutri-Berries Pet Bird Food, Made with Non-GMO and Human-Grade Ingredients, for Parrots, 3 lb : Pet Food : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "celery",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "celery",
+      "actualTitle": "Amazon.com: EARTHBOUND FARM Organic Power Greens, 16 OZ : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chia seed oil",
+      "issue": "Title mismatch",
+      "details": "Partial match (33% similar)",
+      "expectedTitle": "chia seed oil",
+      "actualTitle": "Amazon.com : Elan Organic Chia Seeds, 8.8 oz, Natural Raw Black Chia Seeds, Plant-Based, Non-GMO, Vegan, Gluten-Free, Kosher, Gels Easily, Superfood : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chia seeds",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "chia seeds",
+      "actualTitle": "Amazon.com : LAFEBER&#x27;S Nutri-Berries Pet Bird Food Variety Sampler Bundles, Made with Non-GMO and Human-Grade Ingredients, for Parrots, 10 oz. Each (4 Pk Bundle) with Free Avi-Cake Sample : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken broth",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "chicken broth",
+      "actualTitle": "The Honest Kitchen Bone Broth POUR OVERS Wet Toppers for Dogs (12 Pack), 5.5 oz - Beef Stew: Pet Supplies: Amazon.com",
+      "link": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken giblets",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "chicken giblets",
+      "actualTitle": "Amazon.com: Vital Essentials Freeze-Dried Raw Beef &amp; Chicken Meal or Mixer Cat Food Crunchy Nibs, 8 oz : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken hearts",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "chicken hearts",
+      "actualTitle": "Amazon.com: Vital Essentials Freeze-Dried Raw Rabbit Meal or Mixer Cat Food Crunchy Nibs, 12 oz : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken liver",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "chicken liver",
+      "actualTitle": "Amazon.com : Chicken Hearts for Dogs - Freeze Dried Chicken Dog Treats - Natural Taurine, Better than Duck, Turkey - Single Ingredient, Dehydrated Chicken, Grain Free for Pets, Puppy, Cats Training - Made in USA : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B07S8JCNTH?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken necks",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "chicken necks",
+      "actualTitle": "Amazon.com : Raw Paws Himalayan Yak Chews for Dogs, Large (3 Pack) - Packed in USA - Tibetan Yak Cheese Dog Chews for Medium to Large Breeds - Hard Milk Dog Chew Bones - Single Ingredient - Long Lasting : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B0821PF71M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chickpeas",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "chickpeas",
+      "actualTitle": "Amazon.com : Goya Organic Chick Peas Garbanzo Beans, Low Sodium with Sea Salt, 15.5 Ounce (Pack of 8) : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B0BYPF1Y79?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicory root",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "chicory root",
+      "actualTitle": "Amazon.com: Organic Prebiotic Fiber 3-in-1 Vegan Powder for Gut Health. USDA Organic Raw Whole Food Plant Based Prebiotics Digestive Supplement with Organic Inulin (Jerusalem Artichoke), Acacia Fibers, SunFiber : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chondroitin sulfate",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "chondroitin sulfate",
+      "actualTitle": "Amazon.com: Nutramax Cosequin for Dogs Joint Health Supplement, Contains Glucosamine for Dogs, Plus Chondroitin and MSM, Supports Healthy Joints, For All Breeds and Sizes, Chewable Tablets, 132 Count",
+      "link": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cranberries",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "cranberries",
+      "actualTitle": "Amazon.com: Organic Goji Berries Dried 16 Oz | Raw, Vegan, Gluten Free Dried Goji Berries | High Plant Based Protein, Vitamin A &amp; Iron | Gogi Berry Snack No | Gogi Berries Dried | Goji Berry Organic : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cuttlebone",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "cuttlebone",
+      "actualTitle": "Amazon.com : LAFEBER&#x27;S Sunny Orchard Nutri-Berries Pet Bird Food, Made with Non-GMO and Human-Grade Ingredients, for Parrots, 3 lb : Pet Food : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "dried grass",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "dried grass",
+      "actualTitle": "Amazon.com : Kaytee Timothy Hay Blend Cubes for Pet Rabbits, Guinea Pigs, Chinchillas, and Other Small Animals, 1 Pound : Dry Pet Food : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B0002DK8OI?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "fructooligosaccharides (fos)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "fructooligosaccharides (fos)",
+      "actualTitle": "Amazon.com: Organic Prebiotic Fiber 3-in-1 Vegan Powder for Gut Health. USDA Organic Raw Whole Food Plant Based Prebiotics Digestive Supplement with Organic Inulin (Jerusalem Artichoke), Acacia Fibers, SunFiber : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground beef (lean)",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "ground beef (lean)",
+      "actualTitle": "Amazon.com : etta says! Yumm Sticks - Real Meat Beef Dog Jerky Treats - Human Grade - Made in The USA (12 Count Pack of 1) : Pet Supplies",
+      "link": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "lettuce (romaine, small amounts)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "lettuce (romaine, small amounts)",
+      "actualTitle": "Amazon.com: 365 by Whole Foods Market, Organic Hearts of Romaine, 3ct, 12 Ounce : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B074H5J9G2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mannanoligosaccharides (mos)",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "mannanoligosaccharides (mos)",
+      "actualTitle": "Amazon.com: Now Foods Supplements, Prebiotic Inulin Fiber, Intestinal Support*, Nourishes Friendly Bacteria*, Made with Organic Inulin, 180 Veg Capsules : Health &amp; Household",
+      "link": "https://www.amazon.com/dp/B0CRFWM2Z6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "regular potato",
+      "issue": "Title mismatch",
+      "details": "Poor match (0% similar)",
+      "expectedTitle": "regular potato",
+      "actualTitle": "Amazon.com: Amazon Grocery, Instant Mashed Potatoes, 26.7 Oz (Previously Amazon Fresh, Packaging May Vary)",
+      "link": "https://www.amazon.com/dp/B09SHBJWBR?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "romaine lettuce",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "romaine lettuce",
+      "actualTitle": "Amazon.com: Organic Girl Organic Romaine Heart Leaves, 6 OZ : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turnip greens",
+      "issue": "Title mismatch",
+      "details": "Partial match (50% similar)",
+      "expectedTitle": "turnip greens",
+      "actualTitle": "Amazon.com: Organic Collard Greens, One Bunch : Grocery &amp; Gourmet Food",
+      "link": "https://www.amazon.com/dp/B09HQH6WZT?tag=robinfrench-20"
+    }
+  ]
+}

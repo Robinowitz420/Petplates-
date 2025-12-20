@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { NutritionDashboard } from '@/components/NutritionDashboard';
 import { calculateDailyNutrition, getNutritionTargets } from '@/lib/nutrition/nutritionHistory';
-import { recipes } from '@/lib/data/recipes-complete';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import type { Recipe, CustomMeal } from '@/lib/types';
 
@@ -86,19 +85,20 @@ export default function NutritionPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userId = getCurrentUserId();
-    const pets = getPetsFromLocalStorage(userId);
-    const foundPet = pets.find((p: any) => p.id === petId) || null;
-    setPet(foundPet);
-    if (foundPet) {
-      const savedRecipeMeals = (foundPet.savedRecipes || [])
-        .map((recipeId: string) => recipes.find((recipe) => recipe.id === recipeId))
-        .filter(Boolean) as Recipe[];
-      setSavedMeals(savedRecipeMeals);
-      const customMealsList = getCustomMeals(userId, petId);
-      setCustomMeals(customMealsList);
+    async function loadPetData() {
+      const userId = getCurrentUserId();
+      const pets = getPetsFromLocalStorage(userId);
+      const foundPet = pets.find((p: any) => p.id === petId) || null;
+      setPet(foundPet);
+      if (foundPet) {
+        // Saved recipes are no longer stored statically
+        setSavedMeals([]);
+        const customMealsList = await getCustomMeals(userId, petId);
+        setCustomMeals(customMealsList);
+      }
+      setLoading(false);
     }
-    setLoading(false);
+    loadPetData();
   }, [petId]);
 
   const weeklyPlan = useMemo(() => {

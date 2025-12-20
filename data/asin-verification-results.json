@@ -1,0 +1,3188 @@
+{
+  "totalChecked": 289,
+  "matches": 0,
+  "mismatches": 289,
+  "errors": 289,
+  "matchRate": 0,
+  "results": [
+    {
+      "ingredient": "ground chicken",
+      "asin": "B0BXZVFN6G",
+      "productName": "Fresh Is Best Freeze Dried Chicken Breast",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground turkey",
+      "asin": "B091CCD4T7",
+      "productName": "Diestel Free Range Ground Turkey",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B091CCD4T7?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground beef (lean)",
+      "asin": "B07VHR2WNZ",
+      "productName": "US Wellness Meats Pet Burger",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground lamb",
+      "asin": "B0082C00P8",
+      "productName": "Raw Paws Lamb Recipe Rolls",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "salmon (boneless)",
+      "asin": "B08NCDSV82",
+      "productName": "A Better Treat Freeze Dried Salmon",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08NCDSV82?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken breast",
+      "asin": "B0787WTY4C",
+      "productName": "Bell & Evans Boneless Chicken Breast",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0787WTY4C?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken thighs",
+      "asin": "B0787YFWYB",
+      "productName": "Bell & Evans Boneless Chicken Thighs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0787YFWYB?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turkey breast",
+      "asin": "B0CZRN7HXT",
+      "productName": "Fresh Is Best Freeze Dried Turkey Tenders",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CZRN7HXT?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "beef liver",
+      "asin": "B07G3QFG8N",
+      "productName": "Fresh Is Best Freeze Dried Beef Liver",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07G3QFG8N?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken liver",
+      "asin": "B07S8JCNTH",
+      "productName": "Fresh Is Best Freeze Dried Chicken Livers",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07S8JCNTH?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken hearts",
+      "asin": "B0BXZ3JJL9",
+      "productName": "Vital Essentials Freeze Dried Chicken Hearts",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sardines (canned in water)",
+      "asin": "B01FUWYO2M",
+      "productName": "Wild Planet Sardines in Water No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "eggs",
+      "asin": "B001DY6U9M",
+      "productName": "Whole Life Pet Freeze Dried Diced Eggs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B001DY6U9M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turkey giblets",
+      "asin": "B0BXZ3JJL9",
+      "productName": "Vital Essentials Freeze Dried Turkey Giblets",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BXZ3JJL9?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken giblets",
+      "asin": "B0BXZVFN6G",
+      "productName": "Fresh Is Best Freeze Dried Chicken Giblets",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BXZVFN6G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "duck breast",
+      "asin": "B01KAOGE5U",
+      "productName": "Fresh Is Best Freeze Dried Duck Breast",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01KAOGE5U?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "venison",
+      "asin": "B07VHR2WNZ",
+      "productName": "Fresh Is Best Freeze Dried Venison Bites",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07VHR2WNZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "rabbit meat",
+      "asin": "B0082C00P8",
+      "productName": "Evanger\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0082C00P8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "quail",
+      "asin": "B0DK1SJ2Z7",
+      "productName": "Wholesome Beast Freeze Dried Quail Chicks",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DK1SJ2Z7?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground pork (lean)",
+      "asin": "B0CLJW1P6D",
+      "productName": "Momentum Freeze Dried Pork Tenderloin",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CLJW1P6D?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turkey necks",
+      "asin": "B0FHJ6G2NZ",
+      "productName": "Northwest Naturals Freeze Dried Turkey Necks",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FHJ6G2NZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "brown rice",
+      "asin": "B072JNNB33",
+      "productName": "Lundberg Family Farms Organic Brown Rice",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "white rice",
+      "asin": "B00IDQY2PW",
+      "productName": "Nishiki Premium Medium Grain White Rice",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00IDQY2PW?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "quinoa",
+      "asin": "B07ZJNYGW4",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07ZJNYGW4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sweet potato",
+      "asin": "B07D92VQ9C",
+      "productName": "Farmer\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07D92VQ9C?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pumpkin puree",
+      "asin": "B0062A87HA",
+      "productName": "Farmer\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0062A87HA?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "butternut squash",
+      "asin": "B000HDCSTG",
+      "productName": "Farmer\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000HDCSTG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "lentils",
+      "asin": "B000VDZ2GI",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000VDZ2GI?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chickpeas",
+      "asin": "B0BYPF1Y79",
+      "productName": "Goya Organic Chickpeas No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BYPF1Y79?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "black beans",
+      "asin": "B094WYT2BK",
+      "productName": "Eden Organic Black Beans No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B094WYT2BK?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "green peas",
+      "asin": "B074H4SHTD",
+      "productName": "Nature\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B074H4SHTD?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "carrots",
+      "asin": "B074H64BPW",
+      "productName": "Nature\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B074H64BPW?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "spinach",
+      "asin": "B0013ABAJG",
+      "productName": "Earthbound Farm Organic Spinach Frozen",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0013ABAJG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "broccoli",
+      "asin": "B07SV522V9",
+      "productName": "Cascadian Farm Organic Broccoli Florets",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07SV522V9?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "zucchini",
+      "asin": "B07Q9WV1LY",
+      "productName": "Nature\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07Q9WV1LY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "kale",
+      "asin": "B09VKDGT39",
+      "productName": "Earthbound Farm Organic Kale",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "celery",
+      "asin": "B09VKDGT39",
+      "productName": "Earthbound Farm Organic Celery",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09VKDGT39?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "brussels sprouts",
+      "asin": "B004DAQPR0",
+      "productName": "Cascadian Farm Organic Brussels Sprouts",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004DAQPR0?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "asparagus",
+      "asin": "B07QV5G8HY",
+      "productName": "Cascadian Farm Organic Asparagus Spears",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07QV5G8HY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "parsley",
+      "asin": "B0D8C4N4WY",
+      "productName": "McCormick Culinary Parsley Flakes",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0D8C4N4WY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cucumber",
+      "asin": "B001PLETDC",
+      "productName": "Nature\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B001PLETDC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "lettuce (romaine)",
+      "asin": "B0F3YTY4XQ",
+      "productName": "Organic Girl Romaine Lettuce",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "arugula",
+      "asin": "B00JXR8RYW",
+      "productName": "Organic Girl Baby Arugula",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00JXR8RYW?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "endive",
+      "asin": "B0006L2XNK",
+      "productName": "Organic Endive Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0006L2XNK?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "escarole",
+      "asin": "B084ZVBGQ6",
+      "productName": "Organic Escarole Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B084ZVBGQ6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "dandelion greens",
+      "asin": "B000WR4A5M",
+      "productName": "Organic Dandelion Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000WR4A5M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "collard greens",
+      "asin": "B000P6H23W",
+      "productName": "Organic Collard Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000P6H23W?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mustard greens",
+      "asin": "B094JT2CCH",
+      "productName": "Organic Mustard Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B094JT2CCH?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turnip greens",
+      "asin": "B09HQH6WZT",
+      "productName": "Organic Turnip Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09HQH6WZT?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "beet greens",
+      "asin": "B0F9LNFLTK",
+      "productName": "Organic Beet Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0F9LNFLTK?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "radish greens",
+      "asin": "B07CHNV4S1",
+      "productName": "Organic Radish Greens",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07CHNV4S1?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "coconut oil",
+      "asin": "B00UHCJKVG",
+      "productName": "Nutiva Organic Virgin Coconut Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00UHCJKVG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "olive oil",
+      "asin": "B00GGBLPVU",
+      "productName": "California Olive Ranch Extra Virgin Olive Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00GGBLPVU?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "salmon oil",
+      "asin": "B09RYYWHH1",
+      "productName": "Grizzly Salmon Plus Omega-3 Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "flaxseed oil",
+      "asin": "B002VLZ830",
+      "productName": "Barlean\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B002VLZ830?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "fish oil",
+      "asin": "B00CBY93XS",
+      "productName": "Nordic Naturals Omega-3 Pet",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "taurine powder",
+      "asin": "B00VAOKFO6",
+      "productName": "NOW Supplements Taurine Powder 8 oz",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00VAOKFO6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "calcium carbonate",
+      "asin": "B004421K68",
+      "productName": "NOW Supplements Calcium Carbonate Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004421K68?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "vitamin e",
+      "asin": "B01I5OB3LW",
+      "productName": "Solgar Vitamin E 400 IU",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01I5OB3LW?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "b-complex",
+      "asin": "B01INRFW0E",
+      "productName": "Thorne B-Complex #12",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "probiotic powder",
+      "asin": "B0BGV8L7L2",
+      "productName": "Purina FortiFlora Probiotic Supplement",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BGV8L7L2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "psyllium husk",
+      "asin": "B0016AXN7A",
+      "productName": "Organic India Whole Husk Psyllium",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0016AXN7A?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "joint supplement",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "omega-3 capsules",
+      "asin": "B004OA5XP4",
+      "productName": "Nordic Naturals Omega-3 Pet Capsules",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004OA5XP4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "digestive enzymes",
+      "asin": "B00O6FINFO",
+      "productName": "NaturVet Digestive Enzymes Plus Probiotics",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00O6FINFO?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "hairball paste",
+      "asin": "B07B282MR4",
+      "productName": "Tomlyn Laxatone Hairball Remedy",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07B282MR4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken broth",
+      "asin": "B07DFNP37Y",
+      "productName": "Brutus Bone Broth for Dogs No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "vitamin e oil",
+      "asin": "B0DZ5ZCC85",
+      "productName": "NOW Solutions Vitamin E Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DZ5ZCC85?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "millet (white/red)",
+      "asin": "B0002DH3FU",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0002DH3FU?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "canary seed",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "niger seed",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "oat groats",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "hemp seeds",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "flaxseeds",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sesame seeds",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chia seeds",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "quinoa (cooked)",
+      "asin": "B001CCOVB4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B001CCOVB4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "rapeseed",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sunflower seeds (small amounts)",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pumpkin seeds",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bell peppers",
+      "asin": "B000P6J14K",
+      "productName": "Earthbound Farm Organic Bell Peppers",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000P6J14K?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "corn (fresh)",
+      "asin": "B000REL738",
+      "productName": "Cascadian Farm Organic Corn on the Cob",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000REL738?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "apples (no seeds)",
+      "asin": "B00AR0TG44",
+      "productName": "Organic Honeycrisp Apples",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00AR0TG44?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "blueberries",
+      "asin": "B07Z568Y3N",
+      "productName": "Driscoll\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07Z568Y3N?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "strawberries",
+      "asin": "B002B8Z98W",
+      "productName": "Driscoll\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B002B8Z98W?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mango",
+      "asin": "B00WM6CHFQ",
+      "productName": "Organic Mango",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "banana",
+      "asin": "B07ZLFKBFD",
+      "productName": "Organic Bananas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07ZLFKBFD?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "grapes (chopped)",
+      "asin": "B000RGYJI6",
+      "productName": "Organic Red Seedless Grapes",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000RGYJI6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "papaya",
+      "asin": "B07FZ159ZB",
+      "productName": "Organic Papaya",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07FZ159ZB?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "melon",
+      "asin": "B000NSGULC",
+      "productName": "Organic Cantaloupe Melon",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000NSGULC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "egg (hard-boiled)",
+      "asin": "B0BWBNT8JX",
+      "productName": "Vital Essentials Freeze Dried Egg Yolk Treats",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BWBNT8JX?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pellets (fortified)",
+      "asin": "B086211R4H",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086211R4H?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cuttlebone",
+      "asin": "B00027ZVG4",
+      "productName": "Lafeber\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00027ZVG4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "honey (tiny amounts)",
+      "asin": "B0791X9GSG",
+      "productName": "Local Raw Honey",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0791X9GSG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "peanut butter (unsalted, tiny amounts)",
+      "asin": "B06ZXZ3JPZ",
+      "productName": "Teddie All Natural Peanut Butter",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B06ZXZ3JPZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "dubia roaches",
+      "asin": "B09QD6PBB8",
+      "productName": "Josh\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09QD6PBB8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "crickets",
+      "asin": "B000YFGS52",
+      "productName": "Fluker\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000YFGS52?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mealworms",
+      "asin": "B07TKDYMMP",
+      "productName": "Fluker\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07TKDYMMP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "superworms",
+      "asin": "B01018SX5Y",
+      "productName": "Josh\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01018SX5Y?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "black soldier fly larvae",
+      "asin": "B0BLZ88Q3R",
+      "productName": "Grubblies Black Soldier Fly Larvae",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BLZ88Q3R?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "hornworms",
+      "asin": "B09Y4RTNK9",
+      "productName": "Josh\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09Y4RTNK9?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "acorn squash",
+      "asin": "B07FZ34ZS4",
+      "productName": "Organic Acorn Squash",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07FZ34ZS4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "figs",
+      "asin": "B08MDKF98D",
+      "productName": "Organic Dried Figs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08MDKF98D?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "timothy hay",
+      "asin": "B006AYMMRY",
+      "productName": "Oxbow Animal Health Western Timothy Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B006AYMMRY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "meadow hay",
+      "asin": "B07CJ2FRNC",
+      "productName": "Small Pet Select Meadow Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07CJ2FRNC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "orchard grass hay",
+      "asin": "B00S6Y8MHU",
+      "productName": "Oxbow Animal Health Orchard Grass Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "alfalfa hay",
+      "asin": "B0CM34Z4BQ",
+      "productName": "Kaytee Natural Alfalfa Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CM34Z4BQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "romaine lettuce",
+      "asin": "B0F3YTY4XQ",
+      "productName": "Organic Girl Romaine Lettuce",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0F3YTY4XQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cilantro",
+      "asin": "B07M9FWTRC",
+      "productName": "Organic Cilantro",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07M9FWTRC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "basil",
+      "asin": "B097F282FC",
+      "productName": "Organic Basil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B097F282FC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "duck hearts",
+      "asin": "B0BWBNT8JX",
+      "productName": "Vital Essentials Freeze Dried Duck Hearts",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BWBNT8JX?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "lamb liver",
+      "asin": "B0015G862M",
+      "productName": "Stella & Chewy\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0015G862M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "duck liver",
+      "asin": "B0BWBV5PRJ",
+      "productName": "Vital Essentials Freeze Dried Duck Liver",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BWBV5PRJ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken necks",
+      "asin": "B0821PF71M",
+      "productName": "Raw Paws Pet Food Raw Chicken Necks",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0821PF71M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turkey thighs",
+      "asin": "B00AR100NE",
+      "productName": "Boneless Skinless Turkey Thighs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00AR100NE?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground duck",
+      "asin": "B0BY3CNR3Q",
+      "productName": "Raw Paws Pet Food Raw Ground Duck",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BY3CNR3Q?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground lamb (lean)",
+      "asin": "B088Y2N6WC",
+      "productName": "Lean Ground Lamb Meat",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B088Y2N6WC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground herring",
+      "asin": "B00B3G89MQ",
+      "productName": "K9 Natural Hoki Fish Blend",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00B3G89MQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground mackerel",
+      "asin": "B079Z4MZTG",
+      "productName": "Northwest Naturals Raw Fish Blend",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B079Z4MZTG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mackerel (canned)",
+      "asin": "B017J9X8IA",
+      "productName": "Wild Planet Canned Mackerel",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B017J9X8IA?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "herring (canned)",
+      "asin": "B01FUWYO2M",
+      "productName": "Crown Prince Canned Herring",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicken sausage (no additives)",
+      "asin": "B001JO4O80",
+      "productName": "Applegate Naturals Chicken Sausage",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B001JO4O80?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turkey sausage (no additives)",
+      "asin": "B00I2VLI5A",
+      "productName": "Applegate Naturals Turkey Sausage",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00I2VLI5A?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ground pork (lean, small amounts)",
+      "asin": "B01H0AI6J4",
+      "productName": "Lean Ground Pork",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01H0AI6J4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "regular potato",
+      "asin": "B09SHBJWBR",
+      "productName": "Fresh Russet Potatoes",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09SHBJWBR?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "walnut oil",
+      "asin": "B00QGWLZ3C",
+      "productName": "La Tourangelle Walnut Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00QGWLZ3C?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "black currant oil",
+      "asin": "B01FXEM0BY",
+      "productName": "NOW Foods Black Currant Seed Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "almond oil",
+      "asin": "B0BXMMDNJ8",
+      "productName": "Viva Naturals Sweet Almond Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BXMMDNJ8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sunflower oil",
+      "asin": "B00MNTRVPS",
+      "productName": "High Oleic Sunflower Oil Cold Pressed",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00MNTRVPS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chia seed oil",
+      "asin": "B00WM6CHFQ",
+      "productName": "Healthworks Organic Chia Seed Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00WM6CHFQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "herring oil",
+      "asin": "B00CBY93XS",
+      "productName": "Nordic Naturals Pet Herring Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "anchovy oil",
+      "asin": "B0FDNB2DVS",
+      "productName": "Carlson Labs Fish Oil Anchovy",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FDNB2DVS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "evening primrose oil",
+      "asin": "B07FPBQ31W",
+      "productName": "Nature\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07FPBQ31W?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mackerel oil",
+      "asin": "B01NBTJFJB",
+      "productName": "Jarrow Formulas Fish Oil Supplement",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01NBTJFJB?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sardine oil",
+      "asin": "B0CXKHT5K2",
+      "productName": "Zesty Paws Sardine Oil for Dogs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CXKHT5K2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "borage oil",
+      "asin": "B01FXEM0BY",
+      "productName": "NOW Foods Borage Oil Softgels",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01FXEM0BY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sesame oil",
+      "asin": "B0797GTG2C",
+      "productName": "Spectrum Cold Pressed Sesame Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0797GTG2C?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "avocado oil",
+      "asin": "B0C3WCRNPN",
+      "productName": "Chosen Foods Pure Avocado Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "avocado oil (tiny amounts)",
+      "asin": "B0C3WCRNPN",
+      "productName": "Chosen Foods Pure Avocado Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0C3WCRNPN?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "wheat germ oil",
+      "asin": "B001GAOHK2",
+      "productName": "NOW Foods Wheat Germ Oil Liquid",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B001GAOHK2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "krill oil",
+      "asin": "B004HIQ9CY",
+      "productName": "Kori Krill Oil Pure Supplement",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004HIQ9CY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "algae oil (dha)",
+      "asin": "B079J5YZSS",
+      "productName": "Nordic Naturals Algae Omega DHA",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B079J5YZSS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "omega-3 oil",
+      "asin": "B09RYYWHH1",
+      "productName": "Grizzly Salmon Oil for Pets",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09RYYWHH1?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "kelp powder",
+      "asin": "B0002JG1GG",
+      "productName": "NOW Foods Organic Kelp Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0002JG1GG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "joint health powder",
+      "asin": "B00PXK1G50",
+      "productName": "Nutramax Dasuquin Joint Health Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00PXK1G50?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amino acid supplement",
+      "asin": "B0C2JFLZHF",
+      "productName": "Purina Pro Plan Amino Acid Supplement",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0C2JFLZHF?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "calcium supplement",
+      "asin": "B0CKNK682W",
+      "productName": "Thomas Labs Calcium Carbonate Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CKNK682W?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "spirulina powder",
+      "asin": "B08S4982CC",
+      "productName": "Vimergy Organic Spirulina Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08S4982CC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "electrolyte powder",
+      "asin": "B0FMZHN6M1",
+      "productName": "ReptoBoost Electrolyte Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FMZHN6M1?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "vitamin d3 drops",
+      "asin": "B0062QD5LM",
+      "productName": "Ddrops Liquid Vitamin D3 Drops",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0062QD5LM?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "buckwheat",
+      "asin": "B00KQ17MDG",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00KQ17MDG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "buckwheat (tiny amounts)",
+      "asin": "B00KQ17MDG",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00KQ17MDG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "buckwheat (hulled)",
+      "asin": "B0D15QDVW7",
+      "productName": "Anthony\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0D15QDVW7?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sorghum",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "barley",
+      "asin": "B0D481997Z",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0D481997Z?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "barley (cooked, minimal)",
+      "asin": "B00QKP257A",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00QKP257A?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "barley (hulled)",
+      "asin": "B00QKP257A",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00QKP257A?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "millet",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "millet (tiny amounts)",
+      "asin": "B07XPCWYP2",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07XPCWYP2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "farro",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bulgur",
+      "asin": "B081DQ5NG5",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B081DQ5NG5?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amaranth (tiny amounts)",
+      "asin": "B000V1O40U",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amaranth seeds",
+      "asin": "B000V1O40U",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000V1O40U?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "teff seeds",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "wheat (hulled)",
+      "asin": "B000YFB5NC",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000YFB5NC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "oat bran (small amounts)",
+      "asin": "B07CC9RF6Y",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07CC9RF6Y?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "oatmeal (cooked, small amounts)",
+      "asin": "B00CTLAIH8",
+      "productName": "Quaker Rolled Oats Old Fashioned",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00CTLAIH8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "corn (cracked)",
+      "asin": "B01HHGD81C",
+      "productName": "Scratch and Peck Cracked Corn Non-GMO",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01HHGD81C?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "safflower seeds",
+      "asin": "B0FWLFGG21",
+      "productName": "Wagner\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "nyjer seeds",
+      "asin": "B0D6688V7C",
+      "productName": "Wagner\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0D6688V7C?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bok choi",
+      "asin": "B0FN4YGSK6",
+      "productName": "Fresh Baby Bok Choy",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FN4YGSK6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bok choy (small amounts)",
+      "asin": "B0FN4YGSK6",
+      "productName": "Fresh Baby Bok Choy",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FN4YGSK6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "navy beans (mashed)",
+      "asin": "B006AZE13G",
+      "productName": "Goya Canned Navy Beans Low Sodium",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B006AZE13G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "kidney beans (mashed)",
+      "asin": "B00552005I",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00552005I?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "kidney beans (mashed, tiny amounts)",
+      "asin": "B00552005I",
+      "productName": "Goya Canned Dark Red Kidney Beans Low Sodium",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00552005I?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pinto beans (mashed)",
+      "asin": "B0C4G2PR58",
+      "productName": "Bush\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0C4G2PR58?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "purslane",
+      "asin": "B09MDXM2YQ",
+      "productName": "Fresh Purslane Leaves",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09MDXM2YQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "purslane (small amounts)",
+      "asin": "B0BWY8JWVL",
+      "productName": "Fresh Purslane Leaves",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BWY8JWVL?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "flaxseed (ground)",
+      "asin": "B075XC6C69",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B075XC6C69?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "fennel",
+      "asin": "B00E3J6RC4",
+      "productName": "Fresh Fennel Bulb",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00E3J6RC4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "delicata squash",
+      "asin": "B07KHH8K4L",
+      "productName": "Fresh Delicata Squash",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07KHH8K4L?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "yellow squash",
+      "asin": "B08QVBFGDC",
+      "productName": "Fresh Yellow Summer Squash",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08QVBFGDC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "leeks",
+      "asin": "B09HQJGQDG",
+      "productName": "Fresh Leeks",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09HQJGQDG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "shallots",
+      "asin": "B09B2ZWHKQ",
+      "productName": "Fresh Shallots",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09B2ZWHKQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "tomatoes (small amounts)",
+      "asin": "B086WX15TH",
+      "productName": "Fresh Ripe Vine Tomatoes",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B086WX15TH?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "napa cabbage",
+      "asin": "B07FTVYNM3",
+      "productName": "Fresh Napa Cabbage",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07FTVYNM3?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "napa cabbage (small amounts)",
+      "asin": "B079VV1K9L",
+      "productName": "Fresh Napa Cabbage",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B079VV1K9L?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "artichokes",
+      "asin": "B0DF91JXND",
+      "productName": "Fresh Artichoke Hearts",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DF91JXND?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "frisee",
+      "asin": "B07FZGKZL4",
+      "productName": "Fresh Frisee Lettuce",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07FZGKZL4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "radicchio",
+      "asin": "B00BJPTZLA",
+      "productName": "Fresh Radicchio Lettuce",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00BJPTZLA?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "red cabbage",
+      "asin": "B000RH1MXK",
+      "productName": "Fresh Red Cabbage Head",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000RH1MXK?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "green cabbage",
+      "asin": "B09HQGDCKV",
+      "productName": "Fresh Green Cabbage Head",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09HQGDCKV?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "swiss chard",
+      "asin": "B07F12P248",
+      "productName": "Fresh Swiss Chard",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07F12P248?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "swiss chard (cooked, tiny amounts)",
+      "asin": "B07F12P248",
+      "productName": "Fresh Swiss Chard",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07F12P248?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "lettuce (romaine, small amounts)",
+      "asin": "B074H5J9G2",
+      "productName": "Fresh Romaine Lettuce Hearts",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B074H5J9G2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "red leaf lettuce",
+      "asin": "B0BX76BG5V",
+      "productName": "Fresh Red Leaf Lettuce",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BX76BG5V?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mache",
+      "asin": "B00AWLAQFG",
+      "productName": "Fresh Mache Lamb\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00AWLAQFG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "alfalfa sprouts (small amounts)",
+      "asin": "B0DFZTWLTY",
+      "productName": "Fresh Alfalfa Sprouts",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DFZTWLTY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cat grass (wheatgrass)",
+      "asin": "B0D45F9TGG",
+      "productName": "SmartyKat Cat Grass Growing Kit Wheatgrass",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0D45F9TGG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "squash (cooked)",
+      "asin": "B002QY3U5A",
+      "productName": "Fresh Butternut Squash",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B002QY3U5A?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "amaranth leaves",
+      "asin": "B0F2YRBGS6",
+      "productName": "Fresh Amaranth Leaves",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0F2YRBGS6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "ginger (small amounts)",
+      "asin": "B0C6V3416T",
+      "productName": "Simply Organic Fresh Ginger Root",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0C6V3416T?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turmeric",
+      "asin": "B018GPDCV4",
+      "productName": "Simply Organic Pure Turmeric Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B018GPDCV4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "rosemary",
+      "asin": "B004JWLMNY",
+      "productName": "Frontier Co-op Dried Organic Rosemary",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004JWLMNY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sage",
+      "asin": "B0CH3R9TVY",
+      "productName": "Simply Organic Dried Sage Leaf",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CH3R9TVY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mint",
+      "asin": "B097F3NT7N",
+      "productName": "Fresh Mint Leaves",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B097F3NT7N?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "garlic chives",
+      "asin": "B097F3J1PY",
+      "productName": "Fresh Garlic Chives",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B097F3J1PY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "raisins (unsweetened)",
+      "asin": "B01GXPRIQY",
+      "productName": "Sun-Maid Organic Raisins Unsweetened",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01GXPRIQY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "plums (pitted)",
+      "asin": "B07P6Z8L76",
+      "productName": "Fresh Plums Pitted",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07P6Z8L76?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "apricots (pitted)",
+      "asin": "B07FZWBPC5",
+      "productName": "NOW Foods Dried Apricots Unsulphured",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07FZWBPC5?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "kiwi",
+      "asin": "B01LASWK7G",
+      "productName": "Fresh Kiwi Fruit",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01LASWK7G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mulberries",
+      "asin": "B074153BXC",
+      "productName": "Terrasoul Dried Mulberries Organic",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "raspberries",
+      "asin": "B000P6G12U",
+      "productName": "Fresh Raspberries Organic",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000P6G12U?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cranberries",
+      "asin": "B074153BXC",
+      "productName": "NOW Foods Dried Cranberries Unsweetened",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B074153BXC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pineapple (small amounts)",
+      "asin": "B000P6L3V4",
+      "productName": "Fresh Pineapple Fruit",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000P6L3V4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pears (no seeds)",
+      "asin": "B0DYKVQ3XZ",
+      "productName": "Fresh Pears No Seeds",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DYKVQ3XZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pinhead crickets",
+      "asin": "B07196FX9W",
+      "productName": "Josh\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07196FX9W?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "locusts",
+      "asin": "B000CMKHBS",
+      "productName": "Exo Terra Canned Locusts Reptile Food",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000CMKHBS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "butterworms",
+      "asin": "B093BD8NXR",
+      "productName": "Rainbow Mealworms Live Butterworms",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B093BD8NXR?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "grasshoppers",
+      "asin": "B004HSQRG2",
+      "productName": "Fluker\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004HSQRG2?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "small dubia roaches",
+      "asin": "B09QD6PBB8",
+      "productName": "Small Live Dubia Roaches Feeder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B09QD6PBB8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "silkworms",
+      "asin": "B08JKNZPSF",
+      "productName": "Live Silkworms Reptile Food",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08JKNZPSF?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "earthworms",
+      "asin": "B097PDMK47",
+      "productName": "Uncle Jim\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B097PDMK47?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "wheat hay",
+      "asin": "B0CLC76V98",
+      "productName": "Oxbow Wheat Hay Small Animal",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CLC76V98?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "fescue hay",
+      "asin": "B00S6YIF36",
+      "productName": "Small Pet Select Fescue Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00S6YIF36?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "oat hay",
+      "asin": "B000WFKP80",
+      "productName": "Oxbow Oat Hay Small Animal",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000WFKP80?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bluegrass hay",
+      "asin": "B00S6Y8MHU",
+      "productName": "Small Pet Select Bluegrass Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00S6Y8MHU?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "straw (wheat/pine)",
+      "asin": "B0CDQMD1CB",
+      "productName": "Oxbow Wheat Straw Bedding",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CDQMD1CB?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "dried grass",
+      "asin": "B0002DK8OI",
+      "productName": "Kaytee Dried Natural Grass Small Animal",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0002DK8OI?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bermuda hay",
+      "asin": "B0FSVM5P3D",
+      "productName": "Standlee Premium Bermuda Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FSVM5P3D?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "barley hay",
+      "asin": "B08YM9VJC5",
+      "productName": "Standlee Barley Hay",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08YM9VJC5?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "guinea pig pellets (with vitamin c)",
+      "asin": "B00E4KT5NA",
+      "productName": "Oxbow Essentials Cavy Cuisine Guinea Pig Pellets",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00E4KT5NA?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "rabbit pellets (high fiber)",
+      "asin": "B0017JANQY",
+      "productName": "Oxbow Essentials Rabbit Food High Fiber",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0017JANQY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "hamster pellets (higher protein)",
+      "asin": "B0053SYJVA",
+      "productName": "Oxbow Essentials Hamster Food Higher Protein",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0053SYJVA?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "wild bird mix",
+      "asin": "B0FWLFGG21",
+      "productName": "Lyric Wild Bird Mix No Filler",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FWLFGG21?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "beta-glucans",
+      "asin": "B01LWVNL9J",
+      "productName": "NOW Supplements Beta Glucans 60 Capsules",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01LWVNL9J?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "biotin",
+      "asin": "B01AMJCHB8",
+      "productName": "NOW Supplements Biotin 5000 mcg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01AMJCHB8?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "bone broth (low sodium)",
+      "asin": "B07DFNP37Y",
+      "productName": "Brutus Bone Broth for Dogs Low Sodium",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07DFNP37Y?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cauliflower",
+      "asin": "B000P6G0GM",
+      "productName": "Fresh Organic Cauliflower",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000P6G0GM?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chicory root",
+      "asin": "B08Q7KZYKC",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "chondroitin sulfate",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM with Chondroitin",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "cranberry extract",
+      "asin": "B01N7KMPU3",
+      "productName": "NOW Supplements Cranberry Extract 5000 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01N7KMPU3?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "curcumin (turmeric extract)",
+      "asin": "B0CK3C31JP",
+      "productName": "NOW Supplements Curcumin with BioPerine",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CK3C31JP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "d-mannose",
+      "asin": "B01N6X9YBS",
+      "productName": "NOW Supplements D-Mannose Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01N6X9YBS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "egg yolks",
+      "asin": "B00M1QWODW",
+      "productName": "Vital Farms Pasture-Raised Eggs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00M1QWODW?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "eggplant",
+      "asin": "B001PLGQPQ",
+      "productName": "Fresh Organic Eggplant",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B001PLGQPQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "eggshells (crushed)",
+      "asin": "B004421K68",
+      "productName": "NOW Supplements Calcium Carbonate Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B004421K68?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "fish broth (no salt)",
+      "asin": "B07DFQFLJL",
+      "productName": "Brutus Fish Broth for Dogs No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "fructooligosaccharides (fos)",
+      "asin": "B08Q7KZYKC",
+      "productName": "NOW Supplements FOS Prebiotic Fiber",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "glucosamine sulfate",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM Glucosamine",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "green beans",
+      "asin": "B0DDTC6QNY",
+      "productName": "Fresh Organic Green Beans",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "green beans (cooked)",
+      "asin": "B0DDTC6QNY",
+      "productName": "Fresh Organic Green Beans",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DDTC6QNY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "hairball control paste",
+      "asin": "B07B282MR4",
+      "productName": "Tomlyn Laxatone Hairball Remedy",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07B282MR4?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "hyaluronic acid",
+      "asin": "B07XHNCJMC",
+      "productName": "NOW Supplements Hyaluronic Acid 100 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07XHNCJMC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "inulin (prebiotic)",
+      "asin": "B08Q7KZYKC",
+      "productName": "NOW Supplements Inulin Prebiotic Fiber",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08Q7KZYKC?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "jerusalem artichoke",
+      "asin": "B0CQK5XCVZ",
+      "productName": "Fresh Jerusalem Artichoke Sunchokes",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CQK5XCVZ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "joint health supplement",
+      "asin": "B003ULL1NQ",
+      "productName": "Cosequin DS Plus MSM for Dogs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B003ULL1NQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "l-carnitine powder",
+      "asin": "B06Y1BTLGK",
+      "productName": "NOW Supplements L-Carnitine 500 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B06Y1BTLGK?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "lysine powder",
+      "asin": "B00V3MR88G",
+      "productName": "NOW Supplements L-Lysine 1000 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B00V3MR88G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "malabar spinach",
+      "asin": "B0DLT7BSNJ",
+      "productName": "Fresh Malabar Spinach Leaves",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0DLT7BSNJ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "mannanoligosaccharides (mos)",
+      "asin": "B0CRFWM2Z6",
+      "productName": "NOW Supplements MOS Prebiotic",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CRFWM2Z6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "milk thistle",
+      "asin": "B0019LVFD0",
+      "productName": "NOW Supplements Milk Thistle 150 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0019LVFD0?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "new zealand spinach",
+      "asin": "B0C8VD126M",
+      "productName": "Fresh New Zealand Spinach",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0C8VD126M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "niacinamide",
+      "asin": "B0CZMBZPLV",
+      "productName": "NOW Supplements Niacinamide 500 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0CZMBZPLV?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "oats (rolled)",
+      "asin": "B07VCM66N6",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07VCM66N6?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "peas",
+      "asin": "B07D1NGQ6B",
+      "productName": "Fresh Organic Green Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07D1NGQ6B?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "peas (mashed)",
+      "asin": "B07D1NGQ6B",
+      "productName": "Fresh Organic Green Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07D1NGQ6B?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pectin (from apples)",
+      "asin": "B01CO69SYG",
+      "productName": "NOW Supplements Apple Pectin Powder",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01CO69SYG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "pumpkin seed oil",
+      "asin": "B0FKYLMWYG",
+      "productName": "NOW Solutions Pumpkin Seed Oil",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FKYLMWYG?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "quail eggs",
+      "asin": "B0BSRGV9PR",
+      "productName": "Fresh Quail Eggs",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BSRGV9PR?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "quercetin",
+      "asin": "B08M5L372P",
+      "productName": "NOW Supplements Quercetin with Bromelain",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08M5L372P?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "rice (hulled)",
+      "asin": "B072JNNB33",
+      "productName": "Lundberg Organic Brown Rice",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B072JNNB33?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "romanesco broccoli",
+      "asin": "B01I1Q74MQ",
+      "productName": "Fresh Romanesco Broccoli",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01I1Q74MQ?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "s-adenosyl methionine (sam-e)",
+      "asin": "B000OSSQFY",
+      "productName": "NOW Supplements SAM-e 200 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B000OSSQFY?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sardines (in water)",
+      "asin": "B01FUWYO2M",
+      "productName": "Wild Planet Sardines in Water No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01FUWYO2M?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "snap peas",
+      "asin": "B077L6C7YB",
+      "productName": "Fresh Organic Snap Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B077L6C7YB?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "snow peas",
+      "asin": "B07MGSDD7L",
+      "productName": "Fresh Organic Snow Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07MGSDD7L?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "snow peas (mashed)",
+      "asin": "B08KRNKC9G",
+      "productName": "Fresh Organic Snow Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08KRNKC9G?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "split peas",
+      "asin": "B08DVGSW58",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "split peas (mashed)",
+      "asin": "B08DVGSW58",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sugar snap peas",
+      "asin": "B08DVGSW58",
+      "productName": "Fresh Organic Sugar Snap Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "sugar snap peas (mashed)",
+      "asin": "B08DVGSW58",
+      "productName": "Fresh Organic Sugar Snap Peas",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B08DVGSW58?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "turkey broth (no salt)",
+      "asin": "B07DFQFLJL",
+      "productName": "Brutus Turkey Broth for Dogs No Salt",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B07DFQFLJL?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "vitamin b complex",
+      "asin": "B01INRFW0E",
+      "productName": "Thorne B-Complex #12",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B01INRFW0E?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "vitamin c (small amounts)",
+      "asin": "B074GCB1ND",
+      "productName": "NOW Supplements Vitamin C 1000 mg",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B074GCB1ND?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "watercress",
+      "asin": "B0BSK8P8KS",
+      "productName": "Fresh Organic Watercress",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BSK8P8KS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "watercress (small amounts)",
+      "asin": "B0BSK8P8KS",
+      "productName": "Fresh Organic Watercress",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0BSK8P8KS?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "wheat germ",
+      "asin": "B0FKBVN6XP",
+      "productName": "Bob\\",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B0FKBVN6XP?tag=robinfrench-20"
+    },
+    {
+      "ingredient": "wild rice",
+      "asin": "B089CP461X",
+      "productName": "Lundberg Organic Wild Rice",
+      "matchScore": 0,
+      "isMatch": false,
+      "issues": [
+        "Could not fetch Amazon product title"
+      ],
+      "url": "https://www.amazon.com/dp/B089CP461X?tag=robinfrench-20"
+    }
+  ]
+}

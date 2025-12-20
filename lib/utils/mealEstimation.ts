@@ -4,7 +4,7 @@
  */
 
 import { getPackageSize } from '@/lib/data/packageSizes';
-import { getVettedProduct, getVettedProductByAnyIdentifier, getGenericIngredientName } from '@/lib/data/vetted-products';
+import { getProductPrice, getProductQuantity, getProductByIngredient } from '@/lib/data/product-prices';
 
 export interface MealEstimate {
   estimatedMeals: number;
@@ -21,8 +21,10 @@ export interface MealEstimate {
   exceedsBudget?: boolean; // True if costPerMeal > MAX_COST_PER_MEAL
 }
 
-// Maximum cost per meal threshold
-export const MAX_COST_PER_MEAL = 4.50;
+// Maximum cost per meal threshold (matched to commercial pet food pricing)
+// Dog: $0.50-$3.50/meal, Cat: $0.75-$4.00/meal, Bird: $0.10-$0.50/meal, Reptile: $1.00-$3.00/meal
+// Using $4.00 to allow better ingredient variety and quality
+export const MAX_COST_PER_MEAL = 4.00;
 
 export interface ShoppingListItem {
   id: string;
@@ -30,6 +32,62 @@ export interface ShoppingListItem {
   amount: string; // Recipe amount (e.g., "200g", "2 tbsp", "1 tsp")
   asinLink?: string;
   category?: string;
+}
+
+/**
+ * Convert Amazon quantity strings to grams
+ * Examples: "2 lbs", "24 oz", "18 count", "500 count", "32 oz", "1 head", "2 lbs"
+ */
+export function quantityToGrams(quantity: string): number {
+  if (!quantity) return 0;
+  
+  const q = quantity.toLowerCase().trim();
+  
+  // Weight conversions
+  const lbMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:lb|lbs|pound|pounds)/);
+  if (lbMatch) {
+    return parseFloat(lbMatch[1]) * 453.592; // 1 lb = 453.592g
+  }
+  
+  const ozMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:oz|ounce|fl oz|fluid ounce)/);
+  if (ozMatch) {
+    return parseFloat(ozMatch[1]) * 28.3495; // 1 oz = 28.3495g
+  }
+  
+  const kgMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:kg|kilogram)/);
+  if (kgMatch) {
+    return parseFloat(kgMatch[1]) * 1000;
+  }
+  
+  const gMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:g|gram)/);
+  if (gMatch) {
+    return parseFloat(gMatch[1]);
+  }
+  
+  // Count-based items (assume average weights)
+  const countMatch = q.match(/(\d+)\s*(?:count|piece|pieces|can|cans|jar|jars|box|boxes|bag|bags|head|heads|bunch|bunches)/);
+  if (countMatch) {
+    const count = parseInt(countMatch[1]);
+    const unit = countMatch[0].toLowerCase();
+    
+    // Estimate weights based on common items
+    if (unit.includes('egg') || unit.includes('count')) {
+      // Eggs: ~50g each
+      if (q.includes('egg')) return count * 50;
+      // Generic count: assume 100g per unit
+      return count * 100;
+    }
+    if (unit.includes('can')) return count * 400; // Average can ~400g
+    if (unit.includes('jar')) return count * 500; // Average jar ~500g
+    if (unit.includes('box')) return count * 300; // Average box ~300g
+    if (unit.includes('bag')) return count * 500; // Average bag ~500g
+    if (unit.includes('head')) return count * 500; // Lettuce head ~500g
+    if (unit.includes('bunch')) return count * 200; // Bunch of herbs ~200g
+    
+    return count * 100; // Default 100g per unit
+  }
+  
+  return 0;
 }
 
 /**
@@ -135,12 +193,12 @@ export function calculateMealsFromGroceryList(
   preferBudget: boolean = true // Default to true for cost calculations - prefer budget-tier products
 ): MealEstimate {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mealEstimation.ts:136',message:'calculateMealsFromGroceryList entry',data:{hasGetGenericIngredientName:typeof getGenericIngredientName !== 'undefined',hasGetVettedProduct:typeof getVettedProduct !== 'undefined',preferBudget},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mealEstimation.ts:136',message:'calculateMealsFromGroceryList entry',data:{preferBudget},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
   // #endregion
   console.log('[calculateMealsFromGroceryList] ========== Starting calculation ==========');
   console.log('[calculateMealsFromGroceryList] Input shoppingList:', shoppingList);
   console.log('[calculateMealsFromGroceryList] shoppingList.length:', shoppingList?.length);
-  console.log('[calculateMealsFromGroceryList] getGenericIngredientName available:', typeof getGenericIngredientName !== 'undefined');
+  console.log('[calculateMealsFromGroceryList] getProductPrice available:', typeof getProductPrice !== 'undefined');
   
   const breakdown: MealEstimate['breakdown'] = [];
   const notes: string[] = [];
@@ -162,60 +220,58 @@ export function calculateMealsFromGroceryList(
     const item = shoppingList[i];
     console.log(`[calculateMealsFromGroceryList] Processing item ${i + 1}/${shoppingList.length}:`, item);
     
-    const packageInfo = getPackageSize(item.name, item.category);
-    console.log(`[calculateMealsFromGroceryList]   Package info:`, packageInfo);
-    
-    // Try to get vetted product price (same source as ShoppingList uses)
-    // For budget-aware lookups, try to get generic ingredient name from productName
-    let itemCost = packageInfo.estimatedCost;
-    let priceSource = 'package-estimate';
     const ingredientNameLower = item.name.toLowerCase();
     
-    // Try to reverse-lookup generic ingredient name if we have a specific productName
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mealEstimation.ts:171',message:'Before getGenericIngredientName call',data:{itemName:item.name,hasFunction:typeof getGenericIngredientName !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    let genericIngredientName: string | undefined;
-    if (typeof getGenericIngredientName !== 'undefined') {
-      genericIngredientName = getGenericIngredientName(item.name);
-    }
-    const lookupName = genericIngredientName || ingredientNameLower;
+    // Try to get product data from product-prices.json first
+    let packageSizeGrams = 0;
+    let itemCost = 0;
+    let priceSource = 'package-estimate';
     
-    // Pass species for species-aware product matching (if provided), preferBudget for cost control
-    let vettedProduct = getVettedProduct(lookupName, species, preferBudget);
-    if (!vettedProduct) {
-      // Fallback: try direct lookup by the item name
-      vettedProduct = getVettedProduct(ingredientNameLower, species, preferBudget);
-    }
-    if (!vettedProduct) {
-      vettedProduct = getVettedProductByAnyIdentifier(item.name, species, preferBudget);
+    const product = getProductByIngredient(ingredientNameLower);
+    if (product) {
+      // Use actual product quantity from Amazon
+      if (product.quantity) {
+        packageSizeGrams = quantityToGrams(product.quantity);
+        console.log(`[calculateMealsFromGroceryList]   ✅ Got quantity from product-prices.json: "${product.quantity}" = ${packageSizeGrams}g`);
+      }
+      
+      // Use actual product price
+      if (product.price?.amount) {
+        itemCost = product.price.amount;
+        priceSource = 'product-prices-json';
+        console.log(`[calculateMealsFromGroceryList]   ✅ Using product-prices.json price: $${itemCost}`);
+      }
     }
     
-    if (vettedProduct?.price?.amount) {
-      itemCost = vettedProduct.price.amount;
-      priceSource = 'vetted-product';
-      console.log(`[calculateMealsFromGroceryList]   ✅ Using vetted product price: $${itemCost} (from ${vettedProduct.productName})`);
-    } else {
-      console.log(`[calculateMealsFromGroceryList]   ⚠️ No vetted product price found, using package estimate: $${itemCost}`);
+    // Fall back to package size estimates if no product data
+    if (packageSizeGrams === 0) {
+      const packageInfo = getPackageSize(item.name, item.category);
+      packageSizeGrams = packageInfo.typicalSize;
+      if (!itemCost) {
+        itemCost = packageInfo.estimatedCost;
+      }
+      console.log(`[calculateMealsFromGroceryList]   ⚠️ Using package estimate: ${packageSizeGrams}g, $${itemCost}`);
     }
     
     // Parse recipe amount to grams
     const recipeGrams = parseAmountToGrams(item.amount);
+    console.log(`[calculateMealsFromGroceryList]   Recipe amount input: "${item.amount}" (type: ${typeof item.amount})`);
     console.log(`[calculateMealsFromGroceryList]   Recipe grams parsed:`, recipeGrams);
     
     if (recipeGrams <= 0) {
       console.log(`[calculateMealsFromGroceryList]   ❌ Skipping - invalid recipeGrams:`, recipeGrams);
+      notes.push(`⚠️ Could not parse amount for ${item.name}: "${item.amount}"`);
       continue;
     }
     
-    // How many meals can this package make? Use Math.floor for whole meals
-    const mealsFromPackage = Math.floor(packageInfo.typicalSize / recipeGrams);
-    console.log(`[calculateMealsFromGroceryList]   Meals from package: ${packageInfo.typicalSize} / ${recipeGrams} = ${mealsFromPackage}`);
+    // How many meals can this package make? Keep as decimal for accurate calculation
+    const mealsFromPackage = packageSizeGrams / recipeGrams;
+    console.log(`[calculateMealsFromGroceryList]   Meals from package: ${packageSizeGrams} / ${recipeGrams} = ${mealsFromPackage}`);
     
     const breakdownItem = {
       ingredient: item.name,
       recipeAmount: recipeGrams,
-      packageSize: packageInfo.typicalSize,
+      packageSize: packageSizeGrams,
       mealsFromPackage: mealsFromPackage,
       packageCost: itemCost,
     };
@@ -270,8 +326,9 @@ export function calculateMealsFromGroceryList(
   }
   console.log('[calculateMealsFromGroceryList] Estimated meals (before rounding):', estimatedMeals);
   
-  // ✅ FIX: Ensure at least 1 meal if we have ingredients
-  const finalMeals = Math.max(1, Math.round(estimatedMeals));
+  // ✅ FIX: Floor the final result (not individual ingredients) to get whole meals
+  // This gives accurate estimates without compounding rounding errors
+  const finalMeals = Math.max(1, Math.floor(estimatedMeals));
   const costPerMeal = finalMeals > 0 ? totalCost / finalMeals : 0;
   console.log('[calculateMealsFromGroceryList] Final meals after rounding:', finalMeals);
   console.log('[calculateMealsFromGroceryList] Cost per meal:', costPerMeal);

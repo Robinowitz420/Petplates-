@@ -1,0 +1,429 @@
+{
+  "timestamp": "2025-12-17T17:16:02.597Z",
+  "results": [
+    {
+      "species": "dogs",
+      "totalRecipes": 24,
+      "uniqueRecipes": 23,
+      "duplicateRecipes": 1,
+      "uniqueIngredients": 20,
+      "averageIngredientsPerRecipe": 4,
+      "ingredientRotation": 0.968125,
+      "diversityScore": 97.37708333333335,
+      "ingredientFrequency": [
+        [
+          "Borage Oil",
+          1
+        ],
+        [
+          "green beans raw",
+          6
+        ],
+        [
+          "quinoa",
+          8
+        ],
+        [
+          "salmon atlantic",
+          20
+        ],
+        [
+          "Sardine Oil",
+          7
+        ],
+        [
+          "Wheat Germ Oil",
+          3
+        ],
+        [
+          "chicken breast",
+          4
+        ],
+        [
+          "green beans",
+          6
+        ],
+        [
+          "Anchovy Oil",
+          6
+        ],
+        [
+          "brown rice",
+          5
+        ],
+        [
+          "Wheat Germ",
+          1
+        ],
+        [
+          "Evening Primrose Oil",
+          1
+        ],
+        [
+          "Miner's Lettuce",
+          1
+        ],
+        [
+          "Mackerel Oil",
+          7
+        ],
+        [
+          "Olive Oil (small amounts)",
+          1
+        ],
+        [
+          "Watercress",
+          4
+        ],
+        [
+          "green beans (cooked)",
+          7
+        ],
+        [
+          "Barley (cooked, minimal)",
+          1
+        ],
+        [
+          "white rice",
+          6
+        ],
+        [
+          "Herring Oil",
+          1
+        ]
+      ]
+    },
+    {
+      "species": "cats",
+      "totalRecipes": 20,
+      "uniqueRecipes": 12,
+      "duplicateRecipes": 8,
+      "uniqueIngredients": 14,
+      "averageIngredientsPerRecipe": 3,
+      "ingredientRotation": 0.9323469387755102,
+      "diversityScore": 72.9704081632653,
+      "ingredientFrequency": [
+        [
+          "Krill Oil",
+          1
+        ],
+        [
+          "Malabar Spinach",
+          3
+        ],
+        [
+          "salmon atlantic",
+          20
+        ],
+        [
+          "Evening Primrose Oil",
+          1
+        ],
+        [
+          "spinach",
+          6
+        ],
+        [
+          "Borage Oil",
+          1
+        ],
+        [
+          "Collard Greens (cooked, tiny amounts)",
+          1
+        ],
+        [
+          "Herring Oil",
+          10
+        ],
+        [
+          "Watercress",
+          8
+        ],
+        [
+          "Anchovy Oil",
+          2
+        ],
+        [
+          "Mackerel Oil",
+          4
+        ],
+        [
+          "Miner's Lettuce",
+          1
+        ],
+        [
+          "kale",
+          1
+        ],
+        [
+          "Sardine Oil",
+          1
+        ]
+      ]
+    },
+    {
+      "species": "birds",
+      "totalRecipes": 7,
+      "uniqueRecipes": 7,
+      "duplicateRecipes": 0,
+      "uniqueIngredients": 18,
+      "averageIngredientsPerRecipe": 6,
+      "ingredientRotation": 0.9591836734693877,
+      "diversityScore": 95.77551020408163,
+      "ingredientFrequency": [
+        [
+          "Collard Greens (cooked, tiny amounts)",
+          1
+        ],
+        [
+          "Flaxseed (ground)",
+          4
+        ],
+        [
+          "Flaxseed Oil",
+          6
+        ],
+        [
+          "Kiwi",
+          4
+        ],
+        [
+          "brazil nut",
+          2
+        ],
+        [
+          "pistachio",
+          2
+        ],
+        [
+          "Pineapple",
+          1
+        ],
+        [
+          "cashew",
+          1
+        ],
+        [
+          "flaxseed",
+          4
+        ],
+        [
+          "peanut",
+          3
+        ],
+        [
+          "spinach",
+          3
+        ],
+        [
+          "Malabar Spinach",
+          2
+        ],
+        [
+          "Walnut Oil",
+          3
+        ],
+        [
+          "blackberry",
+          1
+        ],
+        [
+          "walnut",
+          1
+        ],
+        [
+          "Miner's Lettuce",
+          1
+        ],
+        [
+          "Papaya",
+          1
+        ],
+        [
+          "almond",
+          2
+        ]
+      ]
+    },
+    {
+      "species": "reptiles",
+      "totalRecipes": 35,
+      "uniqueRecipes": 30,
+      "duplicateRecipes": 5,
+      "uniqueIngredients": 17,
+      "averageIngredientsPerRecipe": 4,
+      "ingredientRotation": 0.9679683638161147,
+      "diversityScore": 88.82476520019773,
+      "ingredientFrequency": [
+        [
+          "Dubia Roaches",
+          16
+        ],
+        [
+          "Small Dubia Roaches",
+          19
+        ],
+        [
+          "date",
+          4
+        ],
+        [
+          "kale",
+          10
+        ],
+        [
+          "Black Soldier Fly Larvae",
+          21
+        ],
+        [
+          "New Zealand Spinach",
+          1
+        ],
+        [
+          "Papaya",
+          11
+        ],
+        [
+          "Collard Greens (cooked, tiny amounts)",
+          3
+        ],
+        [
+          "Phoenix Worms",
+          14
+        ],
+        [
+          "Malabar Spinach",
+          5
+        ],
+        [
+          "mulberry",
+          1
+        ],
+        [
+          "Pineapple",
+          4
+        ],
+        [
+          "Kiwi",
+          10
+        ],
+        [
+          "blackberry",
+          5
+        ],
+        [
+          "spinach",
+          12
+        ],
+        [
+          "Mustard Greens (cooked, tiny amounts)",
+          2
+        ],
+        [
+          "Miner's Lettuce",
+          2
+        ]
+      ]
+    },
+    {
+      "species": "pocket-pets",
+      "totalRecipes": 20,
+      "uniqueRecipes": 18,
+      "duplicateRecipes": 2,
+      "uniqueIngredients": 22,
+      "averageIngredientsPerRecipe": 5,
+      "ingredientRotation": 0.9768801652892561,
+      "diversityScore": 95.30640495867769,
+      "ingredientFrequency": [
+        [
+          "Bluegrass Hay",
+          2
+        ],
+        [
+          "Malabar Spinach",
+          6
+        ],
+        [
+          "New Zealand Spinach",
+          4
+        ],
+        [
+          "flaxseed",
+          7
+        ],
+        [
+          "mulberry",
+          3
+        ],
+        [
+          "Bermuda Hay",
+          2
+        ],
+        [
+          "Flaxseed (ground)",
+          10
+        ],
+        [
+          "Mustard Greens (cooked, tiny amounts)",
+          1
+        ],
+        [
+          "Papaya",
+          7
+        ],
+        [
+          "Orchard Grass Hay",
+          2
+        ],
+        [
+          "blackberry",
+          2
+        ],
+        [
+          "spinach",
+          11
+        ],
+        [
+          "Flaxseed Oil",
+          3
+        ],
+        [
+          "Miner's Lettuce",
+          6
+        ],
+        [
+          "kale",
+          11
+        ],
+        [
+          "Alfalfa Sprouts (small amounts)",
+          5
+        ],
+        [
+          "Collard Greens (cooked, tiny amounts)",
+          1
+        ],
+        [
+          "Kiwi",
+          6
+        ],
+        [
+          "Timothy Hay",
+          4
+        ],
+        [
+          "Meadow Hay",
+          3
+        ],
+        [
+          "Pineapple",
+          2
+        ],
+        [
+          "Alfalfa Hay (babies/pregnant only)",
+          2
+        ]
+      ]
+    }
+  ]
+}

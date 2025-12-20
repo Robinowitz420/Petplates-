@@ -4,10 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
-import type { Recipe } from '@/lib/types';
+import type { Recipe, Pet } from '@/lib/types';
 import RecipeCard from '@/components/RecipeCard';
-import type { Pet } from '@/lib/utils/petRatingSystem';
 import {
   calculateEnhancedCompatibility,
   calibrateScoresForPet,

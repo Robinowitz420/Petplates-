@@ -1,6 +1,7 @@
 {
   "name": "paw-and-plate",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -18,7 +19,15 @@
     "generate:recipes": "tsx scripts/generate-recipes.ts",
     "validate:recipes": "tsx scripts/validate-recipes.ts",
     "validate:links": "tsx scripts/validate-affiliate-links.ts",
-    "audit:links": "tsx scripts/audit-all-purchase-links.ts"
+    "audit:links": "tsx scripts/audit-all-purchase-links.ts",
+    "correct-asins": "tsx scripts/auto-correct-asins.ts",
+    "correct-asins-scraper": "tsx scripts/correct-asins-scraper.ts",
+    "make-generic-names": "tsx scripts/make-product-names-generic.ts",
+    "test-amazon": "tsx scripts/amazon-api-search.ts",
+    "validate:retail": "tsx lib/generator/Phase1_5_AutoClassify.ts",
+    "validate:retail:quick": "tsx lib/generator/Phase1_5_AutoClassify.ts 2>&1 | Select-String -Pattern 'RESULTS|accepted|review'",
+    "audit:comprehensive": "tsx lib/generator/ComprehensiveAudit.ts",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",
@@ -26,10 +35,14 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@react-spring/web": "^10.0.3",
+    "amazon-paapi": "^1.0.7",
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
     "firebase": "^12.6.0",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.294.0",
     "next": "^16.0.3",
+    "puppeteer": "^24.33.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "recharts": "^2.12.7",
@@ -46,7 +59,8 @@
     "jsdom": "^27.2.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
-    "tsx": "^4.20.6",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.0.12"
   }

@@ -2,12 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, ShoppingCart, Check } from 'lucide-react';
-import { recipes } from '@/lib/data/recipes-complete';
 import { Pet } from '@/lib/types';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
-import { getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
+import { getProductPrice } from '@/lib/data/product-prices';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -93,17 +92,8 @@ export default function MultiPetShoppingModal({
   // Calculate total price
   const totalPrice = useMemo(() => {
     return allIngredients.reduce((sum, ing) => {
-      // Try multiple lookup methods
-      let product = getVettedProduct(ing.name.toLowerCase());
-      if (!product) {
-        product = getVettedProductByAnyIdentifier(ing.name);
-      }
-      if (!product && ing.asinLink) {
-        product = getVettedProductByAnyIdentifier(ing.asinLink);
-      }
-      if (product?.price?.amount) {
-        return sum + product.price.amount;
-      }
+      const price = getProductPrice(ing.name);
+      if (typeof price === 'number') return sum + price;
       return sum;
     }, 0);
   }, [allIngredients]);

@@ -52,27 +52,27 @@ export interface AllIngredients {
 export const ALL_INGREDIENTS: AllIngredients = {
   dogs: {
     proteins: [
-      'Ground Chicken', 'Ground Turkey', 'Ground Beef (lean)', 'Ground Lamb', 'Salmon (boneless)',
-      'Chicken Breast', 'Chicken Thighs', 'Turkey Breast', 'Beef Liver', 'Chicken Liver',
-      'Chicken Hearts', 'Sardines (canned in water)', 'Eggs', 'Turkey Giblets', 'Chicken Giblets',
-      'Duck Breast', 'Venison', 'Rabbit Meat', 'Quail', 'Ground Pork (lean)', 'Turkey Necks',
+      'ground chicken', 'ground turkey', 'ground beef (lean)', 'ground lamb', 'salmon (boneless)',
+      'chicken breast', 'chicken thighs', 'turkey breast', 'beef liver', 'chicken liver',
+      'chicken hearts', 'sardines (canned in water)', 'eggs', 'Turkey Giblets', 'Chicken Giblets',
+      'Duck Breast', 'Venison', 'Rabbit Meat', 'quail', 'ground pork (lean)', 'turkey necks',
       'Ground Duck', 'Turkey Thighs', 'Chicken Necks', 'Ground Venison', 'Ground Rabbit',
       'Lamb Liver', 'Turkey Liver', 'Duck Hearts', 'Quail Eggs', 'Ground Quail'
     ],
     carbs: [
-      'Brown Rice', 'White Rice', 'Quinoa', 'Sweet Potato', 'Regular Potato',
-      'Oats (rolled)', 'Barley', 'Pumpkin Puree', 'Butternut Squash', 'Lentils',
-      'Chickpeas (mashed)', 'Black Beans (mashed)', 'Green Peas', 'Wild Rice',
+      'brown rice', 'white rice', 'quinoa', 'sweet potato', 'Regular Potato',
+      'oats', 'Barley', 'pumpkin', 'Butternut Squash', 'lentils',
+      'chickpeas', 'black beans', 'green peas', 'Wild Rice',
       'Amaranth', 'Buckwheat', 'Millet', 'Sorghum', 'Farro', 'Bulgur',
       'Split Peas', 'Kidney Beans (mashed)', 'Pinto Beans (mashed)', 'Navy Beans (mashed)',
       'Acorn Squash', 'Spaghetti Squash', 'Delicata Squash', 'Kabocha Squash'
     ],
     vegetables: [
-      'Carrots', 'Green Beans', 'Peas', 'Spinach', 'Broccoli', 'Zucchini',
-      'Kale', 'Celery', 'Bell Peppers (red/green)', 'Brussels Sprouts', 'Asparagus', 'Parsley',
-      'Cucumber (peeled)', 'Lettuce (romaine)', 'Arugula', 'Endive', 'Escarole', 'Dandelion Greens',
-      'Collard Greens', 'Mustard Greens', 'Turnip Greens', 'Beet Greens', 'Radish Greens',
-      'Swiss Chard', 'Bok Choi', 'Napa Cabbage', 'Red Cabbage', 'Green Cabbage',
+      'carrots', 'green beans', 'Peas', 'spinach', 'broccoli', 'zucchini',
+      'kale', 'celery', 'Bell Peppers (red/green)', 'brussels sprouts', 'asparagus', 'parsley',
+      'cucumber', 'lettuce (romaine)', 'arugula', 'Endive', 'Escarole', 'Dandelion Greens',
+      'Collard Greens', 'Turnip Greens', 'Beet Greens', 'Radish Greens',
+      'Swiss Chard', 'bok choy', 'Napa Cabbage', 'Red Cabbage', 'Green Cabbage',
       'Cauliflower', 'Romanesco Broccoli', 'Snow Peas', 'Sugar Snap Peas',
       'Fennel', 'Leeks', 'Shallots', 'Garlic (small amounts)', 'Ginger (small amounts)',
       'Artichokes', 'Eggplant', 'Tomatoes (small amounts)', 'Yellow Squash', 'Pattypan Squash',
@@ -89,32 +89,32 @@ export const ALL_INGREDIENTS: AllIngredients = {
   },
   cats: {
     proteins: [
-      'Ground Chicken', 'Ground Turkey', 'Ground Beef (lean)', 'Chicken Thighs (boneless)',
-      'Turkey Thighs', 'Salmon Fillet', 'Tuna (canned in water)', 'Chicken Liver',
-      'Turkey Liver', 'Sardines (in water)', 'Eggs', 'Ground Duck', 'Rabbit Meat',
-      'Venison', 'Quail', 'Ground Lamb (lean)', 'Turkey Giblets', 'Chicken Giblets',
+      'ground chicken', 'ground turkey', 'ground beef (lean)', 'chicken thighs',
+      'Turkey Thighs', 'salmon (boneless)', 'tuna', 'chicken liver',
+      'Turkey Liver', 'sardines (canned in water)', 'eggs', 'Ground Duck', 'Rabbit Meat',
+      'Venison', 'quail', 'ground lamb', 'Turkey Giblets', 'Chicken Giblets',
       'Ground Venison', 'Ground Rabbit', 'Duck Liver', 'Quail Meat', 'Ground Quail',
-      'Turkey Necks', 'Chicken Necks', 'Duck Hearts', 'Turkey Hearts', 'Mackerel (canned)',
+      'turkey necks', 'Chicken Necks', 'Duck Hearts', 'Turkey Hearts', 'Mackerel (canned)',
       'Herring (canned)', 'Anchovies (canned)', 'Ground Mackerel', 'Ground Herring',
-      'Lamb Liver', 'Beef Liver (small amounts)', 'Ground Pork (lean, small amounts)',
+      'Lamb Liver', 'beef liver', 'ground pork (lean)',
       'Turkey Sausage (no additives)', 'Chicken Sausage (no additives)'
     ],
     carbs: [
-      'Pumpkin Puree (small amounts)', 'Brown Rice (occasional)', 'Oatmeal (cooked, small amounts)',
-      'Sweet Potato (cooked, minimal)', 'Quinoa (tiny amounts)', 'Barley (cooked, minimal)',
-      'Butternut Squash (mashed, minimal)', 'Acorn Squash (mashed, minimal)', 'Canned Pumpkin (plain)',
+      'pumpkin', 'brown rice', 'oats',
+      'sweet potato', 'quinoa', 'Barley (cooked, minimal)',
+      'Butternut Squash (mashed, minimal)', 'Acorn Squash (mashed, minimal)', 'pumpkin',
       'Oat Bran (small amounts)', 'Rice Bran (small amounts)', 'Millet (tiny amounts)',
-      'Amaranth (tiny amounts)', 'Buckwheat (tiny amounts)', 'Lentils (mashed, tiny amounts)',
-      'Chickpeas (mashed, tiny amounts)', 'Green Peas (mashed)', 'Split Peas (mashed)',
-      'Black Beans (mashed, tiny amounts)', 'Kidney Beans (mashed, tiny amounts)'
+      'Amaranth (tiny amounts)', 'Buckwheat (tiny amounts)', 'lentils',
+      'chickpeas', 'green peas', 'Split Peas (mashed)',
+      'black beans', 'Kidney Beans (mashed, tiny amounts)'
     ],
     vegetables: [
-      'Carrots (grated)', 'Peas (mashed)', 'Zucchini (grated)', 'Spinach (cooked)',
-      'Broccoli (tiny amounts)', 'Green Beans (cooked)', 'Asparagus (tips only)',
-      'Celery (small amounts)', 'Parsley (fresh)', 'Cucumber (peeled)', 'Lettuce (romaine, small amounts)',
-      'Kale (cooked, tiny amounts)', 'Collard Greens (cooked, tiny amounts)', 'Mustard Greens (cooked, tiny amounts)',
-      'Dandelion Greens (fresh, small amounts)', 'Endive (small amounts)', 'Arugula (small amounts)',
-      'Bok Choi (small amounts)', 'Napa Cabbage (small amounts)', 'Green Beans (mashed)',
+      'carrots', 'Peas (mashed)', 'zucchini', 'spinach',
+      'broccoli', 'green beans', 'Asparagus (tips only)',
+      'celery', 'parsley', 'cucumber', 'lettuce (romaine)',
+      'kale', 'Collard Greens (cooked, tiny amounts)',
+      'Dandelion Greens (fresh, small amounts)', 'Endive (small amounts)', 'arugula',
+      'bok choy', 'Napa Cabbage (small amounts)', 'green beans',
       'Snow Peas (mashed)', 'Sugar Snap Peas (mashed)', 'Fennel (small amounts)',
       'Swiss Chard (cooked, tiny amounts)', 'Beet Greens (cooked, tiny amounts)', 'Turnip Greens (cooked, tiny amounts)',
       'Radish Greens (cooked, tiny amounts)', 'Watercress (small amounts)', 'Purslane (small amounts)',
@@ -145,7 +145,7 @@ export const ALL_INGREDIENTS: AllIngredients = {
   birds: {
     seeds: [
       'Millet (white/red)', 'Canary Seed', 'Niger Seed', 'Oat Groats', 'Hemp Seeds',
-      'Flaxseeds', 'Sesame Seeds', 'Chia Seeds', 'Quinoa (cooked)', 'Rapeseed',
+      'Flaxseeds', 'Sesame Seeds', 'Chia Seeds', 'quinoa', 'Rapeseed',
       'Sunflower Seeds (small amounts)', 'Pumpkin Seeds', 'Safflower Seeds', 'Nyjer Seeds',
       'Amaranth Seeds', 'Buckwheat (hulled)', 'Barley (hulled)', 'Wheat (hulled)',
       'Rice (hulled)', 'Corn (cracked)', 'Poppy Seeds', 'Teff Seeds', 'Wild Bird Mix'
@@ -155,25 +155,25 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Hazelnuts', 'Pine Nuts', 'Cashews', 'Pistachios', 'Peanuts (unsalted, roasted)'
     ],
     vegetables: [
-      'Carrots (grated)', 'Broccoli', 'Spinach', 'Kale', 'Bell Peppers', 'Zucchini',
-      'Sweet Potato (cooked)', 'Peas', 'Corn (fresh)', 'Lettuce (romaine)', 'Endive',
-      'Escarole', 'Arugula', 'Dandelion Greens', 'Collard Greens', 'Mustard Greens',
-      'Turnip Greens', 'Beet Greens', 'Swiss Chard', 'Bok Choi', 'Napa Cabbage',
-      'Cauliflower', 'Romanesco Broccoli', 'Snow Peas', 'Sugar Snap Peas', 'Asparagus',
-      'Celery', 'Fennel', 'Parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme'
+      'carrots', 'broccoli', 'spinach', 'kale', 'Bell Peppers', 'zucchini',
+      'sweet potato', 'Peas', 'Corn (fresh)', 'lettuce (romaine)', 'Endive',
+      'Escarole', 'arugula', 'Dandelion Greens', 'Collard Greens',
+      'Turnip Greens', 'Beet Greens', 'Swiss Chard', 'bok choy', 'Napa Cabbage',
+      'Cauliflower', 'Romanesco Broccoli', 'Snow Peas', 'Sugar Snap Peas', 'asparagus',
+      'celery', 'Fennel', 'parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme'
     ],
     fruits: [
-      'Apples (no seeds)', 'Blueberries', 'Strawberries', 'Mango', 'Banana',
+      'Apples (no seeds)', 'blueberries', 'Strawberries', 'Mango', 'bananas',
       'Grapes (chopped)', 'Papaya', 'Melon', 'Pineapple (small amounts)', 'Kiwi',
       'Raspberries', 'Blackberries', 'Cranberries', 'Cherries (pitted)', 'Pears (no seeds)',
       'Peaches (pitted)', 'Plums (pitted)', 'Apricots (pitted)', 'Figs', 'Dates (pitted)',
       'Raisins (unsweetened)', 'Currants', 'Goji Berries', 'Mulberries'
     ],
     supplements: [
-      'Egg (hard-boiled)', 'Pellets (fortified)', 'Cuttlebone', 'Honey (tiny amounts)',
+      'eggs', 'Pellets (fortified)', 'Cuttlebone', 'Honey (tiny amounts)',
       'Peanut Butter (unsalted, tiny amounts)', 'Brewer\'s Yeast', 'Spirulina Powder',
-      'Kelp Powder', 'Probiotic Powder', 'Vitamin D3 Drops', 'Calcium Supplement',
-      'Electrolyte Powder', 'Amino Acid Supplement', 'Omega-3 Oil', 'Joint Health Powder'
+      'Kelp Powder', 'Probiotic Powder', 'Vitamin D3 Drops', 'calcium carbonate',
+      'Electrolyte Powder', 'Amino Acid Supplement', 'Fish Oil', 'Joint Health Powder'
     ]
   },
   reptiles: {
@@ -184,20 +184,20 @@ export const ALL_INGREDIENTS: AllIngredients = {
     ],
     whole_prey: [
       'Pinkie Mice (frozen/thawed)', 'Fuzzy Mice', 'Hopper Mice', 'Adult Mice',
-      'Rat Pups', 'Adult Rats', 'Day-Old Chicks', 'Quail', 'Feeder Fish (Guppies)', 'Silversides'
+      'Rat Pups', 'Adult Rats', 'Day-Old Chicks', 'quail', 'Feeder Fish (Guppies)', 'Silversides'
     ],
     vegetables: [
-      'Collard Greens', 'Mustard Greens', 'Turnip Greens', 'Dandelion Greens', 'Butternut Squash',
-      'Bell Peppers', 'Carrots (grated)', 'Zucchini', 'Green Beans', 'Snap Peas',
-      'Acorn Squash', 'Endive', 'Escarole', 'Arugula', 'Kale', 'Swiss Chard', 'Bok Choi',
+      'Collard Greens', 'Turnip Greens', 'Dandelion Greens', 'Butternut Squash',
+      'Bell Peppers', 'carrots', 'zucchini', 'green beans', 'Snap Peas',
+      'Acorn Squash', 'Endive', 'Escarole', 'arugula', 'kale', 'Swiss Chard', 'bok choy',
       'Napa Cabbage', 'Romaine Lettuce', 'Iceberg Lettuce', 'Red Leaf Lettuce', 'Butter Lettuce',
-      'Cauliflower', 'Broccoli', 'Romanesco Broccoli', 'Asparagus', 'Celery', 'Fennel',
-      'Parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme', 'Oregano', 'Sage', 'Rosemary',
-      'Sweet Potato (cooked)', 'Pumpkin (cooked)', 'Squash (various)', 'Cucumber', 'Eggplant'
+      'Cauliflower', 'broccoli', 'Romanesco Broccoli', 'asparagus', 'celery', 'Fennel',
+      'parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme', 'Oregano', 'Sage', 'Rosemary',
+      'sweet potato', 'pumpkin', 'Squash (various)', 'cucumber', 'Eggplant'
     ],
     fruits: [
-      'Blueberries', 'Mango', 'Papaya', 'Strawberries', 'Figs', 'Apples (no seeds)',
-      'Pears (no seeds)', 'Bananas', 'Melon', 'Cantaloupe', 'Honeydew', 'Watermelon',
+      'blueberries', 'Mango', 'Papaya', 'Strawberries', 'Figs', 'Apples (no seeds)',
+      'Pears (no seeds)', 'bananas', 'Melon', 'Cantaloupe', 'Honeydew', 'Watermelon',
       'Pineapple', 'Kiwi', 'Raspberries', 'Blackberries', 'Cranberries', 'Cherries (pitted)',
       'Peaches (pitted)', 'Plums (pitted)', 'Apricots (pitted)', 'Grapes (seedless)',
       'Raisins (unsweetened)', 'Dates (pitted)', 'Prunes', 'Goji Berries', 'Mulberries'
@@ -210,14 +210,14 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Oat Hay', 'Barley Hay', 'Straw (wheat/pine)', 'Dried Grass'
     ],
     vegetables: [
-      'Romaine Lettuce', 'Bell Peppers (high vitamin C)', 'Carrots', 'Cucumber', 'Zucchini',
-      'Celery', 'Parsley', 'Cilantro', 'Kale (limited)', 'Spinach (limited)', 'Broccoli',
-      'Arugula', 'Endive', 'Basil', 'Mint', 'Collard Greens', 'Mustard Greens', 'Turnip Greens',
-      'Dandelion Greens', 'Swiss Chard', 'Bok Choi', 'Napa Cabbage', 'Red Cabbage',
-      'Green Cabbage', 'Cauliflower', 'Asparagus', 'Fennel', 'Leeks', 'Shallots',
+      'lettuce (romaine)', 'Bell Peppers (high vitamin C)', 'carrots', 'cucumber', 'zucchini',
+      'celery', 'parsley', 'Cilantro', 'kale', 'spinach', 'broccoli',
+      'arugula', 'Endive', 'Basil', 'Mint', 'Collard Greens', 'Turnip Greens',
+      'Dandelion Greens', 'Swiss Chard', 'bok choy', 'Napa Cabbage', 'Red Cabbage',
+      'Green Cabbage', 'Cauliflower', 'asparagus', 'Fennel', 'Leeks', 'Shallots',
       'Garlic Chives', 'Radicchio', 'Frisee', 'Mache', 'Watercress', 'Purslane',
       'Miner\'s Lettuce', 'Lamb\'s Quarters', 'Amaranth Leaves', 'Malabar Spinach',
-      'New Zealand Spinach', 'Sweet Potato (cooked)', 'Pumpkin (cooked)', 'Squash (cooked)'
+      'New Zealand Spinach', 'sweet potato', 'pumpkin', 'Squash (cooked)'
     ],
     pellets: [
       'Guinea Pig Pellets (with vitamin C)', 'Rabbit Pellets (high fiber)', 'Hamster Pellets (higher protein)',
@@ -225,22 +225,22 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Fortified Pellets (vitamin C)', 'Timothy-Based Pellets', 'Alfalfa-Based Pellets'
     ],
     fruits: [
-      'Apples (no seeds)', 'Strawberries', 'Blueberries', 'Banana', 'Melon', 'Grapes', 'Papaya',
+      'Apples (no seeds)', 'Strawberries', 'blueberries', 'bananas', 'Melon', 'Grapes', 'Papaya',
       'Pears (no seeds)', 'Peaches (pitted)', 'Plums (pitted)', 'Apricots (pitted)', 'Cherries (pitted)',
       'Raspberries', 'Blackberries', 'Cranberries', 'Kiwi', 'Pineapple (small amounts)',
       'Mango (small amounts)', 'Papaya (small amounts)', 'Figs', 'Dates (pitted)', 'Raisins (unsweetened)',
       'Goji Berries', 'Mulberries', 'Currants', 'Elderberries'
     ],
     hamster_additions: [
-      'Mealworms (freeze-dried)', 'Eggs (hard-boiled, tiny amounts)', 'Whole Grain Cheerios',
+      'Mealworms (freeze-dried)', 'eggs', 'Whole Grain Cheerios',
       'Sunflower Seeds (unsalted)', 'Pumpkin Seeds (unsalted)', 'Flaxseeds', 'Chia Seeds',
       'Hemp Seeds', 'Sesame Seeds', 'Popcorn (plain)', 'Whole Wheat Pasta (cooked)',
-      'Brown Rice (cooked)', 'Quinoa (cooked)', 'Amaranth (cooked)', 'Buckwheat (cooked)',
-      'Millet (cooked)', 'Barley (cooked)', 'Oats (cooked)', 'Corn (cooked)', 'Peas (cooked)'
+      'brown rice', 'quinoa', 'Amaranth (cooked)', 'Buckwheat (cooked)',
+      'Millet (cooked)', 'Barley (cooked)', 'oats', 'Corn (cooked)', 'Peas (cooked)'
     ],
     sugar_glider_special: [
       'Nectar Mix (commercial)', 'Gum Arabic', 'Eucalyptus Leaves', 'Acacia Gum', 
-      'Bee Pollen', 'Manuka Honey', 'Calcium Carbonate (Glider-safe)'
+      'Bee Pollen', 'Manuka Honey', 'calcium carbonate'
     ]
   }
 };
