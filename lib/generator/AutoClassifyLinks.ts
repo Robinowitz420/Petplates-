@@ -71,7 +71,7 @@ for (const [ingredientName, product] of Object.entries(VETTED_PRODUCTS)) {
     );
     
     confidence = validationResult.confidence;
-    issues = validationResult.issues.map(i => `${i.severity.toUpperCase()}: ${i.message}`);
+    issues = [...validationResult.structuralIssues, ...validationResult.semanticIssues].map(i => `${i.severity.toUpperCase()}: ${i.message}`);
     
     if (validationResult.status === 'valid') {
       status = 'auto-valid';

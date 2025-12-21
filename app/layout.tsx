@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering. AAFCO & WSAVA compliant nutrition.',
     images: [
       {
-        url: '/images/emojis/Mascots/HeroPics/HeroBanner-v3.png',
+        url: '/images/emojis/Mascots/HeroPics/hero4.jpg',
         width: 1200,
         height: 630,
         alt: 'Paws & Plates - Meal prep for all pets',
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering.',
-    images: ['/images/emojis/Mascots/HeroPics/HeroBanner-v3.png'],
+    images: ['/images/emojis/Mascots/HeroPics/hero4.jpg'],
   },
   alternates: {
     canonical: 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app',

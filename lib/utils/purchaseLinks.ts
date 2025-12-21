@@ -1,5 +1,5 @@
 import { ensureSellerId, isValidAmazonUrl } from '@/lib/utils/affiliateLinks';
-import { getProductPriceUrl } from '@/lib/data/product-prices';
+import { getProductUrl } from '@/lib/data/product-prices';
 
 export function buildAmazonSearchUrl(query: string): string {
   const q = String(query || '').trim();
@@ -14,7 +14,7 @@ export function getIngredientPurchaseUrl(
 ): string {
   const baseName = String(ingredientName || '').trim();
 
-  const pricedUrl = getProductPriceUrl(baseName);
+  const pricedUrl = getProductUrl(baseName);
   if (pricedUrl) return ensureSellerId(pricedUrl);
 
   const candidate = String(existingUrl || '').trim();

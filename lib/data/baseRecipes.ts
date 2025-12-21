@@ -29,7 +29,7 @@ export interface BaseRecipe {
   instructions: string[];
   servingSize: {
     amount: number;
-    unit: 'g' | 'oz';
+    unit: 'g' | 'oz' | 'count';
     frequency: string;
   };
   nutritionalTargets?: {

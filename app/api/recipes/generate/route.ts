@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateRecipesForPet } from '@/lib/recipe-generator-v3';
-import type { Pet } from '@/lib/types';
+import type { Recipe } from '@/lib/types';
+import { getIngredientsForSpecies } from '@/lib/data/ingredients';
+import { HEALTH_CONTRAINDICATIONS, normalizeConcernKey } from '@/lib/data/healthBenefitMap';
+import { generateRecipesJsonWithFallback } from '@/lib/services/geminiRecipeService';
 
 export const runtime = 'nodejs';
 
@@ -14,7 +16,101 @@ interface RecipeRequest {
     age?: string;
     allergies?: string[];
     healthConcerns?: string[];
+    bannedIngredients?: string[];
   };
+}
+
+const normalizeTerm = (value: string): string =>
+  String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+const includesAnyTerm = (haystack: string, terms: string[]): boolean => {
+  if (!terms.length) return false;
+  const h = normalizeTerm(haystack);
+  return terms.some((t) => {
+    const term = normalizeTerm(t);
+    if (!term) return false;
+    return h.includes(term);
+  });
+};
+
+type GeminiRecipePayload = {
+  recipes: Array<{
+    name: string;
+    description?: string;
+    servings?: number;
+    ingredients: Array<{ name: string; amount: string }>;
+    instructions?: string[];
+    estimatedCostPerMeal?: number;
+  }>;
+};
+
+function validateAndNormalizeRecipes(params: {
+  species: string;
+  petProfile: RecipeRequest['petProfile'];
+  payload: GeminiRecipePayload;
+}): Array<Recipe & { estimatedCostPerMeal?: number }> {
+  const { species, petProfile, payload } = params;
+  const allergies = (petProfile?.allergies || []).filter(Boolean);
+  const bannedIngredients = (petProfile?.bannedIngredients || []).filter(Boolean);
+  const healthConcerns = (petProfile?.healthConcerns || []).filter(Boolean);
+  const contraindications = healthConcerns.flatMap((c) => {
+    const key = normalizeConcernKey(c);
+    return HEALTH_CONTRAINDICATIONS[key] || HEALTH_CONTRAINDICATIONS[c] || [];
+  });
+
+  const allowed = new Set(getIngredientsForSpecies(species as any).map((i) => normalizeTerm(i.name)));
+  const now = Date.now();
+
+  const results: Array<Recipe & { estimatedCostPerMeal?: number }> = [];
+
+  for (let idx = 0; idx < payload.recipes.length; idx++) {
+    const r = payload.recipes[idx];
+    if (!r || typeof r.name !== 'string' || !Array.isArray(r.ingredients) || r.ingredients.length === 0) {
+      continue;
+    }
+
+    // Enforce vocabulary + hard blockers
+    const ingredientNames = r.ingredients.map((i) => String(i?.name || '')).filter(Boolean);
+    const combined = ingredientNames.join(' | ');
+
+    const hasBlocked =
+      includesAnyTerm(combined, allergies) ||
+      includesAnyTerm(combined, bannedIngredients) ||
+      includesAnyTerm(combined, contraindications);
+    if (hasBlocked) continue;
+
+    const vocabOk = ingredientNames.every((n) => allowed.has(normalizeTerm(n)));
+    if (!vocabOk) continue;
+
+    const recipe: Recipe & { estimatedCostPerMeal?: number } = {
+      id: `gemini-${species}-${now}-${idx}`,
+      name: r.name,
+      category: species,
+      ageGroup: [String(petProfile?.age || 'adult')],
+      healthConcerns: healthConcerns.map(normalizeConcernKey),
+      description: r.description || `Generated meal for ${petProfile?.name || 'your pet'}`,
+      servings: typeof r.servings === 'number' && r.servings > 0 ? r.servings : 1,
+      ingredients: r.ingredients.map((ing, j) => ({
+        id: `gemini-${species}-${now}-${idx}-ing-${j}`,
+        name: String(ing?.name || ''),
+        amount: String(ing?.amount || ''),
+      })),
+      instructions: Array.isArray(r.instructions) && r.instructions.length > 0 ? r.instructions : ['Mix and serve.'],
+      tags: ['Generated'],
+    };
+
+    if (typeof r.estimatedCostPerMeal === 'number' && Number.isFinite(r.estimatedCostPerMeal)) {
+      recipe.estimatedCostPerMeal = r.estimatedCostPerMeal;
+    }
+
+    results.push(recipe);
+  }
+
+  return results;
 }
 
 /**
@@ -27,65 +123,65 @@ export async function POST(request: NextRequest) {
     const body: RecipeRequest = await request.json();
     const { species = 'dogs', count = 50, petProfile } = body;
 
-    // Create a mock pet for recipe generation
-    const mockPet: any = {
-      id: `mock-${species}-${Date.now()}`,
-      name: petProfile?.name || 'Your Pet',
-      type: species,
-      breed: 'Mixed',
-      age: petProfile?.age || 'adult',
-      weight: petProfile?.weight || '10',
-      weightKg: petProfile?.weightKg || 10,
-      allergies: petProfile?.allergies || [],
+    const requestedCount = 10;
+
+    console.log('[API] Generating Gemini recipes for pet:', {
+      name: petProfile?.name,
+      species,
+      requestedCount,
       healthConcerns: petProfile?.healthConcerns || [],
-    };
-
-    // Generate recipes using pragmatic system
-    console.log('[API] Generating recipes for pet:', {
-      name: mockPet.name,
-      type: mockPet.type,
-      healthConcerns: mockPet.healthConcerns,
-      allergies: mockPet.allergies,
+      allergies: petProfile?.allergies || [],
+      bannedIngredients: petProfile?.bannedIngredients || [],
     });
-    
-    const recipes = generateRecipesForPet(
-      {
-        pet: mockPet as Pet,
-      },
-      count
-    );
 
-    console.log('[API] Generated recipes count:', recipes?.length || 0);
+    const allowedIngredientNames = getIngredientsForSpecies(species as any)
+      .map((i) => i.name)
+      .filter(Boolean);
 
-    const generatedRecipes = recipes.map((recipe: any, index: number) => ({
-      ...recipe,
-      id: recipe.id || `generated-${species}-${index}-${Date.now()}`,
-      generatedAt: new Date().toISOString(),
-    }));
+    const { payload, modelUsed } = await generateRecipesJsonWithFallback({
+      species,
+      count: requestedCount,
+      petProfile,
+      allowedIngredientNames,
+    });
+    console.info(`[API] Gemini generation completed using model: ${modelUsed}`);
+
+    const generatedRecipes = validateAndNormalizeRecipes({
+      species,
+      petProfile,
+      payload,
+    }).slice(0, requestedCount);
 
     if (generatedRecipes.length === 0) {
-      console.error('[API] No recipes generated - returning 500');
       return NextResponse.json(
-        { error: 'Failed to generate any recipes', species, attemptedCount: count, petProfile: mockPet },
+        {
+          error: 'Gemini returned no valid recipes after validation',
+          species,
+          attemptedCount: requestedCount,
+          diagnostics: {
+            requestedCount,
+            rawRecipeCount: Array.isArray(payload?.recipes) ? payload.recipes.length : 0,
+            validRecipeCount: generatedRecipes.length,
+          },
+        },
         { status: 500 }
       );
     }
-
-    // Sort by overall score (best first)
-    generatedRecipes.sort((a: any, b: any) => (b.scores?.overall || 0) - (a.scores?.overall || 0));
 
     return NextResponse.json({
       success: true,
       recipes: generatedRecipes,
       stats: {
         total: generatedRecipes.length,
-        avgScore: (generatedRecipes.reduce((sum: number, r: any) => sum + (r.scores?.overall || 0), 0) / generatedRecipes.length).toFixed(1),
       },
     });
   } catch (error) {
     console.error('Recipe generation error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate recipes', details: String(error) },
+      {
+        error: 'Failed to generate recipes',
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

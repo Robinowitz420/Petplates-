@@ -30,6 +30,12 @@ interface RecipePriors {
       max: number;
     };
   };
+  categoryPairs?: {
+    [species: string]: {
+      proteinWithFat?: Record<string, string[]>;
+      proteinWithVeg?: Record<string, string[]>;
+    };
+  };
 }
 
 const priors = recipePriors as RecipePriors;

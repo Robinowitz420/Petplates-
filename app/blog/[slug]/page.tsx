@@ -134,7 +134,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-surface border border-gray-200 rounded-lg p-6">
           <h3 className="font-bold text-gray-900 mb-3">Adult Maintenance</h3>
           <ul className="text-sm text-gray-700 space-y-1">
             <li>1 lb ground chicken</li>
@@ -145,7 +145,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             <li>Calcium supplement</li>
           </ul>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-surface border border-gray-200 rounded-lg p-6">
           <h3 className="font-bold text-gray-900 mb-3">Weight Management</h3>
           <ul className="text-sm text-gray-700 space-y-1">
             <li>¾ lb ground turkey</li>
@@ -156,7 +156,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             <li>Calcium supplement</li>
           </ul>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-surface border border-gray-200 rounded-lg p-6">
           <h3 className="font-bold text-gray-900 mb-3">Senior Dog</h3>
           <ul className="text-sm text-gray-700 space-y-1">
             <li>¾ lb ground chicken</li>
@@ -183,9 +183,9 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-surface border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <Link
             href="/blog"
@@ -305,7 +305,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link
               href="/blog/cat-nutrition-myths-debunked"
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="bg-surface rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
             >
               <h4 className="font-semibold text-gray-900 mb-2">
                 Cat Nutrition Myths Debunked
@@ -316,7 +316,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             </Link>
             <Link
               href="/blog/supplements-every-pet-needs"
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="bg-surface rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
             >
               <h4 className="font-semibold text-gray-900 mb-2">
                 Essential Supplements Every Pet Needs

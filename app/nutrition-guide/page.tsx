@@ -19,7 +19,7 @@ const adjustments = [
 
 export default function NutritionGuidePage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
+    <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
           <Link href="/" className="text-orange-600 font-semibold hover:underline">
@@ -29,12 +29,12 @@ export default function NutritionGuidePage() {
         <header>
           <h1 className="text-4xl font-extrabold text-gray-900 mb-3">Nutrition Guide</h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            Paw & Plate uses peer-reviewed science, pet health specialist standards, and functional ingredients to
+            Paws & Plates uses peer-reviewed science, pet health specialist standards, and functional ingredients to
             keep every fresh meal nutritionally complete.
           </p>
         </header>
 
-        <section className="bg-white rounded-2xl shadow p-6 border border-gray-100">
+        <section className="bg-surface rounded-2xl shadow p-6 border border-surface-highlight">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Our foundation</h2>
           <p className="text-gray-600 mb-4">
             We build meal templates using the following evidence-based references:
@@ -49,7 +49,7 @@ export default function NutritionGuidePage() {
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-100">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Key philosophy</h2>
           <p className="text-gray-600 mb-4">
-            Nutrition isn’t one-size-fits-all. Every Paw & Plate meal starts balanced, then adapts to
+            Nutrition isn’t one-size-fits-all. Every Paws & Plates meal starts balanced, then adapts to
             your pet’s unique context.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

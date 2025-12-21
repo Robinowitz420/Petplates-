@@ -24,8 +24,8 @@ export default function SEOHead({
   const canonicalUrl = `${baseUrl}${pathname}`;
 
   const fullTitle = title 
-    ? `${title} | Paw & Plate` 
-    : 'Paw & Plate - Fresh Meal Prep for All Pets';
+    ? `${title} | Paws & Plates` 
+    : 'Paws & Plates - Fresh Meal Prep for All Pets';
 
   return (
     <Head>

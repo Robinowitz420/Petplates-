@@ -8,7 +8,7 @@ export const healthConcernsBySpecies = {
     'Dental problems',
     'Digestive issues',
     'Ear infections',
-    'Obesity/weight management',
+    'Obesity',
     'Kidney disease',
     'Heart disease',
     'Urinary problems',
@@ -27,7 +27,7 @@ export const healthConcernsBySpecies = {
     'Diabetes',
     'Inflammatory Bowel Disease',
     'Hairballs',
-    'Obesity/weight management',
+    'Obesity',
     'Respiratory issues',
     'Skin allergies',
     'Pancreatitis',
@@ -124,7 +124,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
 
   // Dogs
   'Labrador Retriever': [
-    'Obesity/weight management',
+    'Obesity',
     'Arthritis/joint pain',
     'Hip dysplasia',
     'Ear infections',
@@ -140,21 +140,21 @@ export const healthConcernsByBreed: Record<string, string[]> = {
   'Golden Retriever': [
     'Hip dysplasia',
     'Arthritis/joint pain',
-    'Obesity/weight management',
+    'Obesity',
     'Skin allergies',
     'Ear infections'
   ],
   'French Bulldog': [
     'Respiratory issues',
     'Skin allergies',
-    'Obesity/weight management',
+    'Obesity',
     'Dental problems',
     'Digestive issues'
   ],
   'Bulldog': [
     'Respiratory issues',
     'Skin allergies',
-    'Obesity/weight management',
+    'Obesity',
     'Hip dysplasia',
     'Dental problems'
   ],
@@ -166,7 +166,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
     'Diabetes'
   ],
   'Beagle': [
-    'Obesity/weight management',
+    'Obesity',
     'Ear infections',
     'Epilepsy',
     'Hip dysplasia',
@@ -174,7 +174,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
   ],
   'Dachshund': [
     'Intervertebral disc disease',
-    'Obesity/weight management',
+    'Obesity',
     'Dental problems',
     'Diabetes',
     'Skin conditions'
@@ -184,14 +184,14 @@ export const healthConcernsByBreed: Record<string, string[]> = {
     'Bloat (GDV)',
     'Heart disease',
     'Arthritis/joint pain',
-    'Obesity/weight management'
+    'Obesity'
   ],
   'Siberian Husky': [
     'Hip dysplasia',
     'Eye problems',
     'Skin allergies',
     'Digestive issues',
-    'Obesity/weight management'
+    'Obesity'
   ],
 
   // Cats
@@ -207,7 +207,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
     'Hip dysplasia',
     'Heart disease (HCM)',
     'Kidney disease',
-    'Obesity/weight management',
+    'Obesity',
     'Dental disease'
   ],
   'Siamese': [
@@ -220,7 +220,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
   'Ragdoll': [
     'Heart disease (HCM)',
     'Urinary tract issues',
-    'Obesity/weight management',
+    'Obesity',
     'Dental disease',
     'Kidney disease'
   ],
@@ -232,7 +232,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
     'Digestive issues'
   ],
   'British Shorthair': [
-    'Obesity/weight management',
+    'Obesity',
     'Heart disease (HCM)',
     'Dental disease',
     'Kidney disease',
@@ -243,7 +243,7 @@ export const healthConcernsByBreed: Record<string, string[]> = {
     'Heart disease (HCM)',
     'Dental disease',
     'Respiratory issues',
-    'Obesity/weight management'
+    'Obesity'
   ],
 
   // Birds

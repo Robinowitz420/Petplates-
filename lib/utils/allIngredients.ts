@@ -83,7 +83,7 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Coconut Oil', 'Olive Oil', 'Salmon Oil', 'Flaxseed (ground)', 'Hemp Seeds',
       'Eggshells (crushed)', 'Kelp Powder', 'Turmeric', 'Fish Oil', 'Avocado Oil',
       'Sunflower Oil', 'Sesame Oil', 'Pumpkin Seed Oil', 'Walnut Oil', 'Almond Oil',
-      'Cod Liver Oil', 'Herring Oil', 'Mackerel Oil', 'Sardine Oil', 'Anchovy Oil',
+      'Herring Oil', 'Mackerel Oil', 'Sardine Oil', 'Anchovy Oil',
       'Evening Primrose Oil', 'Borage Oil', 'Black Currant Oil', 'Chia Seed Oil'
     ]
   },
@@ -121,7 +121,7 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Cat Grass (wheatgrass)', 'Barley Grass', 'Alfalfa Sprouts (small amounts)'
     ],
     fats: [
-      'Salmon Oil', 'Fish Oil', 'Cod Liver Oil', 'Herring Oil', 'Sardine Oil',
+      'Salmon Oil', 'Fish Oil', 'Herring Oil', 'Sardine Oil',
       'Mackerel Oil', 'Anchovy Oil', 'Krill Oil', 'Algae Oil (DHA)', 'Evening Primrose Oil',
       'Borage Oil', 'Black Currant Oil', 'Chia Seed Oil', 'Hemp Seed Oil', 'Flaxseed Oil',
       'Coconut Oil', 'Olive Oil (small amounts)', 'Avocado Oil (tiny amounts)', 'Wheat Germ Oil'

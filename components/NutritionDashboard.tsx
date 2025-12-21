@@ -41,7 +41,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow border">
+        <div className="bg-surface p-4 rounded-lg shadow border border-surface-highlight">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Calories</p>
@@ -51,7 +51,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow border">
+        <div className="bg-surface p-4 rounded-lg shadow border border-surface-highlight">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Protein (g)</p>
@@ -64,7 +64,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow border">
+        <div className="bg-surface p-4 rounded-lg shadow border border-surface-highlight">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Fat (g)</p>
@@ -77,7 +77,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow border">
+        <div className="bg-surface p-4 rounded-lg shadow border border-surface-highlight">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Carbs (g)</p>
@@ -90,7 +90,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow border">
+        <div className="bg-surface p-4 rounded-lg shadow border border-surface-highlight">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg Fiber (g)</p>
@@ -107,7 +107,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Calories Chart */}
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-surface p-6 rounded-lg shadow border border-surface-highlight">
           <h3 className="text-lg font-semibold mb-4">Daily Calories</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={daily}>
@@ -121,7 +121,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
         </div>
 
         {/* Protein Chart */}
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-surface p-6 rounded-lg shadow border border-surface-highlight">
           <h3 className="text-lg font-semibold mb-4">Daily Protein</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={daily}>
@@ -135,7 +135,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
         </div>
 
         {/* Fat Chart */}
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-surface p-6 rounded-lg shadow border border-surface-highlight">
           <h3 className="text-lg font-semibold mb-4">Daily Fat</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={daily}>
@@ -149,7 +149,7 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
         </div>
 
         {/* Carbs & Fiber Chart */}
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-surface p-6 rounded-lg shadow border border-surface-highlight">
           <h3 className="text-lg font-semibold mb-4">Daily Carbs & Fiber</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={daily}>

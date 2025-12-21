@@ -37,7 +37,7 @@ nuts.slice(0, 10).forEach(n => {
 });
 
 // Step 4: Filter by quality tier (standard = qualityScore >= 5)
-const qualityTier = 'standard';
+const qualityTier = 'standard' as 'standard' | 'premium' | 'budget';
 const minQuality = qualityTier === 'premium' ? 7 : qualityTier === 'standard' ? 5 : 0;
 
 console.log(`\nStep 4: Filtering by quality tier '${qualityTier}' (min quality: ${minQuality})`);

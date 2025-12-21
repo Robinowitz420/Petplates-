@@ -61,12 +61,12 @@ export default function MealPlansPage() {
       title: 'Why Meal Prep?',
       subtitle: 'Fresh prep beats whatever comes in a bag—every single time.',
       hover:
-        'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs—not generic kibble. Paw & Plate knows species, age, size, and health concerns, then auto-adjusts portions and links the exact products you can buy today.',
+        'Meal prepping keeps pets healthier with fresh ingredients tailored to their needs—not generic kibble. Paws & Plates knows species, age, size, and health concerns, then auto-adjusts portions and links the exact products you can buy today.',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12 px-4">
         <div className="max-w-7xl mx-auto">
@@ -229,7 +229,7 @@ export default function MealPlansPage() {
           </div>
         </div>
 
-        {/* Why Pet Plates */}
+        {/* Why Paws & Plates */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {whyCards.map((card) => {
             const Icon =

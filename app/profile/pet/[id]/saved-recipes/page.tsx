@@ -130,7 +130,7 @@ export default function SavedRecipesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <p className="text-xl text-green-800 font-medium">Loading pet profile...</p>
       </div>
     );
@@ -164,7 +164,7 @@ export default function SavedRecipesPage() {
     : (pet.name || 'Your Pet');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4">
+    <div className="min-h-screen bg-background py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/profile"
@@ -173,7 +173,7 @@ export default function SavedRecipesPage() {
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Pet Profiles
         </Link>
 
-        <header className="mb-4 p-3 bg-white rounded-lg shadow border-l-4 border-primary-600">
+        <header className="mb-4 p-3 bg-surface rounded-lg shadow border-l-4 border-primary-600">
           <h1 className="text-xl font-bold text-gray-900 flex items-center">
             <Utensils className="w-5 h-5 mr-2 text-primary-600" />
             Saved Meals for {petDisplayName}
@@ -207,7 +207,7 @@ export default function SavedRecipesPage() {
             savedRecipeDetails.map((recipe) => (
               <div
                 key={recipe.id}
-                className="flex items-center p-4 bg-white rounded-xl shadow hover:shadow-md transition-shadow justify-between"
+                className="flex items-center p-4 bg-surface rounded-xl shadow hover:shadow-md transition-shadow justify-between border border-surface-highlight"
               >
                 <Link
                   href={`/recipe/${recipe.id}?petId=${pet.id}`}
@@ -257,7 +257,7 @@ export default function SavedRecipesPage() {
               </div>
             ))
           ) : (
-            <div className="text-center p-10 bg-white rounded-xl shadow-inner border border-gray-200">
+            <div className="text-center p-10 bg-surface rounded-xl shadow-inner border border-surface-highlight">
               <HeartOff className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-xl font-medium text-gray-700">No Saved Meals Yet!</p>
               <p className="text-gray-500 mt-2">

@@ -311,6 +311,27 @@ export default function MealCompleteView({
 
   const recommendedAmounts = calculateRecommendedAmounts();
 
+  // Estimate how many servings the current recipe batch makes, based on
+  // total grams vs recommended serving size from analysis. This lets the
+  // meal estimation logic work with per-meal ingredient usage instead of
+  // treating the full batch amount as a single meal.
+  const recipeServings = useMemo(() => {
+    if (!analysis?.recommendedServingGrams || analysis.recommendedServingGrams <= 0) {
+      return undefined;
+    }
+    if (totalGrams <= 0) {
+      return undefined;
+    }
+
+    const rawServings = totalGrams / analysis.recommendedServingGrams;
+    if (!Number.isFinite(rawServings) || rawServings <= 0) {
+      return undefined;
+    }
+
+    // Ensure a sensible whole-number serving count (at least 1)
+    return Math.max(1, Math.round(rawServings));
+  }, [analysis?.recommendedServingGrams, totalGrams]);
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
     if (score >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
@@ -418,25 +439,23 @@ export default function MealCompleteView({
       
       console.log('[MealCompleteView] Shopping list items for calculation:', shoppingListItems);
       
-      // Calculate total cost using product-prices.json when available, otherwise fall back to package estimates
-      const totalCost = ingredientsWithASINs.reduce((sum, item) => {
-        const price = getProductPrice(item.name);
-        return typeof price === 'number' ? sum + price : sum;
-      }, 0);
-      
-      const result = calculateMealsFromGroceryList(shoppingListItems);
-      // Override totalCost with the one calculated from ShoppingList logic to ensure they match
-      if (result) {
-        result.totalCost = totalCost;
-        result.costPerMeal = result.estimatedMeals > 0 ? totalCost / result.estimatedMeals : 0;
-      }
+      // Use the dedicated meal estimation utility, passing in inferred
+      // recipeServings so amounts are interpreted as per-meal usage
+      // rather than as a single-meal batch.
+      const result = calculateMealsFromGroceryList(
+        shoppingListItems,
+        undefined,
+        petType,
+        true,
+        recipeServings
+      );
       console.log('[MealCompleteView] mealEstimateForCost result:', result);
       return result;
     } catch (error) {
       console.error('[MealCompleteView] Error calculating meal estimate for cost:', error);
       return null;
     }
-  }, [ingredientsWithASINs]);
+  }, [ingredientsWithASINs, petType, recipeServings]);
 
   // Diagnostic logging - NOW AFTER DECLARATIONS
   useEffect(() => {
@@ -470,10 +489,76 @@ export default function MealCompleteView({
           Back to Pet Profile
         </Link>
 
+        {/* Top-of-page Compatibility Score Banner */}
+        {analysis && (
+          <div
+            className="mb-8 rounded-xl border-2 p-6 shadow-md bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 border-emerald-500/70 text-emerald-50"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div className="flex items-center gap-3">
+                {displayScore >= 80 ? (
+                  <CheckCircle size={28} strokeWidth={2.5} className="text-emerald-300" />
+                ) : displayScore >= 60 ? (
+                  <AlertTriangle size={28} strokeWidth={2.5} className="text-yellow-300" />
+                ) : (
+                  <XCircle size={28} strokeWidth={2.5} className="text-red-300" />
+                )}
+                <div>
+                  <h3 className="font-semibold text-xl leading-tight">Compatibility Score</h3>
+                  <p className="text-xs md:text-sm opacity-80 mt-0.5">
+                    Overall nutritional and safety fit for {petName || 'your pet'} based on this meal.
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-extrabold leading-none">{displayScore}/100</div>
+                <div className="mt-1 text-xs uppercase tracking-wide opacity-75">
+                  {compatibility === 'excellent'
+                    ? 'Excellent match'
+                    : compatibility === 'good'
+                    ? 'Good match'
+                    : compatibility === 'fair'
+                    ? 'Fair match'
+                    : 'Needs adjustments'}
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-black/40 rounded-full h-[3px] mb-3 overflow-hidden">
+              <div
+                className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
+                  displayScore >= 80
+                    ? 'bg-emerald-400'
+                    : displayScore >= 60
+                    ? 'bg-amber-300'
+                    : 'bg-red-400'
+                }`}
+                style={{ width: `${displayScore}%` }}
+              />
+            </div>
+
+            <div className="text-xs md:text-sm opacity-90 flex flex-wrap items-center gap-2 mt-1">
+              {isCalculatingHealthAnalysis && !healthAnalysis && (
+                <span>Calculating enhanced score...</span>
+              )}
+              {!isCalculatingHealthAnalysis && (
+                <span>
+                  {displayScore >= 80
+                    ? '✓ Excellent match for your pet'
+                    : displayScore >= 60
+                    ? '⚠ Good, but could be improved'
+                    : '✗ Needs adjustments for safety'}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">
             {/* Recipe Info Card */}
-            <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
+            <div className="bg-surface rounded-xl shadow-md overflow-hidden mb-8 border border-surface-highlight">
               <div className="p-8">
                 {/* Meal Name Input */}
                 <div className="mb-4">
@@ -498,47 +583,6 @@ export default function MealCompleteView({
                         {concern.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                       </span>
                     ))}
-                  </div>
-                )}
-
-                {/* Compatibility Score - Big Progress Bar */}
-                {analysis && (
-                  <div className={`mb-6 rounded-xl border-2 p-6 ${
-                    displayScore >= 80 ? 'bg-green-900/20 border-green-700/50 text-green-200' :
-                    displayScore >= 60 ? 'bg-yellow-900/20 border-yellow-700/50 text-yellow-200' :
-                    'bg-red-900/20 border-red-700/50 text-red-200'
-                  }`}>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        {displayScore >= 80 ? <CheckCircle size={24} className="text-green-400" /> :
-                         displayScore >= 60 ? <AlertTriangle size={24} className="text-yellow-400" /> :
-                         <XCircle size={24} className="text-red-400" />}
-                        <h3 className="font-semibold text-xl">Compatibility Score</h3>
-                      </div>
-                      <div className="text-4xl font-bold">{displayScore}/100</div>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="w-full bg-black/30 rounded-full h-4 mb-3">
-                      <div
-                        className={`h-4 rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-                          displayScore >= 80 ? 'bg-green-600' :
-                          displayScore >= 60 ? 'bg-yellow-600' :
-                          'bg-red-600'
-                        }`}
-                        style={{ width: `${displayScore}%` }}
-                      />
-                    </div>
-
-                    <div className="text-sm opacity-90">
-                      {isCalculatingHealthAnalysis && !healthAnalysis && 'Calculating enhanced score...'}
-                      {healthAnalysis && (displayScore >= 80 ? '✓ Excellent match for your pet' :
-                                         displayScore >= 60 ? '⚠ Good, but could be improved' :
-                                         '✗ Needs adjustments for safety')}
-                      {!isCalculatingHealthAnalysis && !healthAnalysis && (displayScore >= 80 ? '✓ Excellent match for your pet' :
-                                         displayScore >= 60 ? '⚠ Good, but could be improved' :
-                                         '✗ Needs adjustments for safety')}
-                    </div>
                   </div>
                 )}
 
@@ -593,7 +637,7 @@ export default function MealCompleteView({
       </div>
 
             {/* Ingredients & Supplements Tabs */}
-            <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
+            <div className="bg-surface rounded-xl shadow-md p-8 mb-8 border border-surface-highlight">
               {/* Tab Navigation */}
               <div className="flex border-b border-surface-highlight mb-6">
                 <button

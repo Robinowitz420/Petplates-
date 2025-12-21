@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="text-2xl font-bold mb-4">🐾 Paw & Plate</div>
+            <div className="text-2xl font-bold mb-4">🐾 Paws & Plates</div>
             <p className="text-gray-400">
               Fresh, personalized meal prep for all your pets. Based on AAFCO and WSAVA guidelines.
             </p>
@@ -112,7 +112,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>
-            &copy; {new Date().getFullYear()} Paw & Plate. All rights reserved.
+            &copy; {new Date().getFullYear()} Paws & Plates. All rights reserved.
             Nutritional guidelines based on AAFCO and WSAVA standards.
           </p>
         </div>

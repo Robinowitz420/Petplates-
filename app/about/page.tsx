@@ -3,10 +3,10 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'About Us - Vet-Approved Pet Meal Prep',
-  description: 'Learn how Paw & Plate provides AAFCO & WSAVA compliant meal plans for dogs, cats, birds, reptiles, and pocket pets. Free personalized nutrition planning.',
+  description: 'Learn how Paws & Plates provides AAFCO & WSAVA compliant meal plans for dogs, cats, birds, reptiles, and pocket pets. Free personalized nutrition planning.',
   keywords: ['about pet meal prep', 'vet approved pet food', 'AAFCO compliant', 'pet nutrition platform'],
   openGraph: {
-    title: 'About Paw & Plate - Vet-Approved Pet Meal Prep',
+    title: 'About Paws & Plates - Vet-Approved Pet Meal Prep',
     description: 'AAFCO & WSAVA compliant meal plans for all pet types. Free personalized nutrition planning.',
   },
 };
@@ -18,7 +18,7 @@ export default function AboutPage() {
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            About Paw & Plate
+            About Paws & Plates
           </h1>
           <p className="text-xl text-gray-200">
             Fresh, personalized nutrition for pets we love

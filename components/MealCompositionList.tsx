@@ -3,7 +3,7 @@
 import { X, ExternalLink } from 'lucide-react';
 import { IngredientSelection } from '@/lib/analyzeCustomMeal';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
-import { getProductPriceAmount, getProductPriceUrl } from '@/lib/data/product-prices';
+import { getProductPrice, getProductUrl } from '@/lib/data/product-prices';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -36,9 +36,9 @@ export default function MealCompositionList({
           ingredients.map(ing => {
             const displayName = getIngredientDisplayName(ing.key);
             const indicator = getCompatibilityIndicator?.(ing.key) || null;
-            const purchaseLink = getProductPriceUrl(displayName);
+            const purchaseLink = getProductUrl(displayName);
             const hasPurchaseLink = !!purchaseLink;
-            const price = getProductPriceAmount(displayName);
+            const price = getProductPrice(displayName);
             
             return (
               <div
@@ -72,7 +72,7 @@ export default function MealCompositionList({
                 </div>
 
                 {/* Price Display */}
-                {price && (
+                {typeof price === 'number' && (
                   <div className="text-right mr-3">
                     <div className="text-lg font-bold text-orange-400">{formatPrice(price)}</div>
                   </div>

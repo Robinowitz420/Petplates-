@@ -140,7 +140,7 @@ export class RecipeBuilder {
         // 1. Get candidate ingredients (hard filters)
         let candidates = this.getCandidateIngredients();
         console.log(`[Step 1] Candidates after filters: ${candidates.length}`);
-        
+
         // 🔥 CRITICAL GUARDRAIL: Block small candidate pools (vetted-only path)
         const MIN_POOL = 200;
         if (this.constraints.species === 'cats' && candidates.length < MIN_POOL) {
@@ -150,7 +150,7 @@ export class RecipeBuilder {
             `Minimum required: ${MIN_POOL}`
           );
         }
-        
+
         if (candidates.length === 0) {
           console.warn(`No candidate ingredients found for ${this.constraints.species}`);
           return null;
@@ -214,19 +214,19 @@ export class RecipeBuilder {
         console.log(`[Step 6] Validation result: ${comprehensiveValidation.isValid ? 'PASS' : 'FAIL'}`);
         if (!comprehensiveValidation.isValid) {
           console.warn(`[Step 6] Failed hard gates:`, comprehensiveValidation.failedRules);
-          
+
           // 🔥 NEW: Track which ingredients to exclude next time
           // If S2 (organ meat) failed, exclude organ meats
           if (comprehensiveValidation.failedRules.includes('S2')) {
             selected.forEach(ing => {
               if (ing.name.toLowerCase().includes('liver') ||
-                  ing.name.toLowerCase().includes('kidney') ||
-                  ing.name.toLowerCase().includes('heart')) {
+                ing.name.toLowerCase().includes('kidney') ||
+                ing.name.toLowerCase().includes('heart')) {
                 failedIngredients.add(ing.name);
               }
             });
           }
-          
+
           if (attempt < maxRetries) {
             continue; // Retry with different random selections
           }
@@ -246,7 +246,7 @@ export class RecipeBuilder {
         // 🔥 PHASE 1: Only return if validation passed
         const species = this.constraints.species;
         const isExoticPet = species === 'birds' || species === 'reptiles' || species === 'pocket-pets';
-        
+
         return {
           ingredients: portioned,
           totalGrams: portioned.reduce((sum, p) => sum + p.grams, 0),
@@ -291,7 +291,7 @@ export class RecipeBuilder {
    */
   private getCandidateIngredients(): Ingredient[] {
     let candidates = getIngredientsForSpecies(this.constraints.species);
-    
+
     // 🔥 STACK TRACE: Identify source of small pools
     console.log(`[PoolSource] Initial candidates: ${candidates.length}`, {
       species: this.constraints.species,
@@ -300,7 +300,7 @@ export class RecipeBuilder {
     if (candidates.length < 200) {
       console.trace('[PoolSource] Small pool detected - trace:');
     }
-    
+
     // 🔥 INVARIANT: Full pool must be large enough for cats
     if (this.constraints.species === 'cats' && candidates.length < 200) {
       throw new Error(
@@ -355,24 +355,24 @@ export class RecipeBuilder {
       // Fish oils should only be supplements, not base ingredients
       const lowerName = ing.name.toLowerCase();
       const lowerId = ing.id.toLowerCase();
-      if (lowerName.includes('fish oil') || 
-          lowerName.includes('salmon oil') || 
-          lowerName.includes('anchovy oil') ||
-          lowerName.includes('mackerel oil') ||
-          lowerName.includes('krill oil') ||
-          lowerName.includes('cod liver oil') ||
-          lowerName.includes('sardine oil') ||
-          lowerName.includes('tuna oil') ||
-          lowerName.includes('herring oil') ||
-          lowerId.includes('fish_oil') ||
-          lowerId.includes('salmon_oil') ||
-          lowerId.includes('anchovy_oil') ||
-          lowerId.includes('mackerel_oil') ||
-          lowerId.includes('krill_oil') ||
-          lowerId.includes('cod_liver_oil') ||
-          lowerId.includes('sardine_oil') ||
-          lowerId.includes('tuna_oil') ||
-          lowerId.includes('herring_oil')) {
+      if (lowerName.includes('fish oil') ||
+        lowerName.includes('salmon oil') ||
+        lowerName.includes('anchovy oil') ||
+        lowerName.includes('mackerel oil') ||
+        lowerName.includes('krill oil') ||
+        lowerName.includes('cod liver oil') ||
+        lowerName.includes('sardine oil') ||
+        lowerName.includes('tuna oil') ||
+        lowerName.includes('herring oil') ||
+        lowerId.includes('fish_oil') ||
+        lowerId.includes('salmon_oil') ||
+        lowerId.includes('anchovy_oil') ||
+        lowerId.includes('mackerel_oil') ||
+        lowerId.includes('krill_oil') ||
+        lowerId.includes('cod_liver_oil') ||
+        lowerId.includes('sardine_oil') ||
+        lowerId.includes('tuna_oil') ||
+        lowerId.includes('herring_oil')) {
         console.log(`[FILTER] Excluding fish oil: ${ing.name} (id: ${ing.id})`);
         return false;
       }
@@ -385,18 +385,18 @@ export class RecipeBuilder {
 
       return true;
     });
-    
+
     console.log(`[Filters] After all filters: ${candidates.length} candidates`);
-    
+
     // 🔥 INVARIANT: Check category pools for cats
     if (this.constraints.species === 'cats') {
       const veg = candidates.filter(x => canonicalCategory(x.category) === 'vegetable');
       const fat = candidates.filter(x => canonicalCategory(x.category) === 'fat');
       // Allow all proteins (exotic proteins already filtered out earlier)
       const proteinPool = candidates.filter(x => canonicalCategory(x.category) === 'protein');
-      
+
       console.log(`[CategoryPools] protein=${proteinPool.length}, veg=${veg.length}, fat=${fat.length}`);
-      
+
       if (veg.length < 2 || fat.length < 1 || proteinPool.length < 1) {
         throw new Error(
           `[Invariant] Missing required ingredient categories for cats: ` +
@@ -416,7 +416,7 @@ export class RecipeBuilder {
    */
   private scoreIngredients(candidates: Ingredient[]): ScoredIngredient[] {
     const recentIngredients = this.constraints.recentIngredients || [];
-    
+
     return candidates
       .map(ing => {
         const breakdown = {
@@ -444,12 +444,12 @@ export class RecipeBuilder {
         // Apply diversity penalty for recently used ingredients
         const ingNameLower = ing.name.toLowerCase();
         const timesUsedRecently = recentIngredients.filter(r => r === ingNameLower).length;
-        
+
         if (timesUsedRecently > 0) {
           // Heavy penalty: 50% reduction per recent use
           const diversityPenalty = Math.pow(0.5, timesUsedRecently);
           totalScore *= diversityPenalty;
-          
+
           if (timesUsedRecently >= 2) {
             console.log(`[Diversity] Penalizing ${ing.name}: used ${timesUsedRecently}x recently, score ${totalScore.toFixed(1)} → ${(totalScore * diversityPenalty).toFixed(1)}`);
           }
@@ -537,25 +537,25 @@ export class RecipeBuilder {
    */
   private getRequiredCategoriesForSpecies(): IngredientCategory[] {
     const species = this.constraints.species;
-    
+
     switch (species) {
       case 'dogs':
         return ['protein', 'carb', 'vegetable'];
       case 'cats':
         return ['protein', 'vegetable'];
-      
+
       case 'birds':
         // Birds need seeds/nuts as protein, fruits/veggies for vitamins
         return ['seed', 'nut', 'fruit', 'vegetable'];
-      
+
       case 'reptiles':
         // Reptiles need insects as protein, veggies for fiber
         return ['insect', 'vegetable', 'fruit'];
-      
+
       case 'pocket-pets':
         // Pocket-pets need hay as staple, veggies/fruits for variety
         return ['hay', 'vegetable', 'fruit', 'seed'];
-      
+
       default:
         return ['protein', 'carb', 'vegetable'];
     }
@@ -567,7 +567,7 @@ export class RecipeBuilder {
    */
   private getIngredientCountForCategory(category: IngredientCategory): number {
     const species = this.constraints.species;
-    
+
     // Dogs/Cats
     if (species === 'dogs' || species === 'cats') {
       if (category === 'protein') {
@@ -584,7 +584,7 @@ export class RecipeBuilder {
       }
       return 1; // Default
     }
-    
+
     // Birds
     if (species === 'birds') {
       if (category === 'seed' || category === 'nut') {
@@ -597,7 +597,7 @@ export class RecipeBuilder {
         return 1; // 1 veggie
       }
     }
-    
+
     // Reptiles
     if (species === 'reptiles') {
       if (category === 'insect') {
@@ -610,7 +610,7 @@ export class RecipeBuilder {
         return 1; // 1 fruit (optional)
       }
     }
-    
+
     // Pocket-pets
     if (species === 'pocket-pets') {
       if (category === 'hay') {
@@ -626,7 +626,7 @@ export class RecipeBuilder {
         return 1; // 1 seed type (optional)
       }
     }
-    
+
     return 1; // Default
   }
 
@@ -649,7 +649,7 @@ export class RecipeBuilder {
       const fatPool = scored.filter(s => canonicalCategory(s.ingredient.category) === 'fat');
       // Allow all proteins (exotic proteins already filtered out earlier)
       const proteinPool = scored.filter(s => canonicalCategory(s.ingredient.category) === 'protein');
-      
+
       if (vegPool.length < 2 || fatPool.length < 1 || proteinPool.length < 1) {
         throw new Error(
           `[RecipeBuilder] Insufficient pools for cats: ` +
@@ -667,15 +667,15 @@ export class RecipeBuilder {
 
     for (const category of categories) {
       let inCategory = scored.filter(s => canonicalCategory(s.ingredient.category) === category);
-      
+
       // CRITICAL: For dogs/cats protein category, all proteins allowed (exotic already filtered)
       // No additional filtering needed here
-      
+
       // 🔥 COMMERCIAL PRIORS: Filter candidates using learned commercial pairing rules
       if (hasCommercialPriors(this.constraints.species) && selected.length > 0) {
         const selectedIds = selected.map(ing => ing.id);
         const beforeCommercialFilter = inCategory.length;
-        
+
         // Filter out hardBlockPairs (never co-occur in commercial products)
         inCategory = filterCandidatesByCommercialPriors(
           inCategory.map(s => s.ingredient),
@@ -686,13 +686,13 @@ export class RecipeBuilder {
           // Find the scored ingredient back
           return inCategory.find(s => s.ingredient.id === ing.id)!;
         }).filter(Boolean);
-        
+
         const afterCommercialFilter = inCategory.length;
         if (beforeCommercialFilter !== afterCommercialFilter) {
           console.log(`[Commercial Filter] Removed ${beforeCommercialFilter - afterCommercialFilter} hard-blocked ingredients`);
         }
       }
-      
+
       // 🔥 PMI-BASED: Filter fats using learned pairing intelligence
       if (category === 'fat') {
         const selectedProteins = selected.filter(ing => canonicalCategory(ing.category) === 'protein');
@@ -711,32 +711,32 @@ export class RecipeBuilder {
           }
         }
       }
-      
+
       // 🔥 DEBUG: Log protein pool details for cats
       if (this.constraints.species === 'cats' && category === 'protein') {
         console.log(`[ProteinPool] Total proteins in scored: ${inCategory.length}`);
-        console.log(`[ProteinPool] Top 10 proteins:`, inCategory.slice(0, 10).map(s => 
+        console.log(`[ProteinPool] Top 10 proteins:`, inCategory.slice(0, 10).map(s =>
           `${s.ingredient.name} (score: ${s.totalScore.toFixed(1)}, role: ${s.ingredient.proteinRole || 'none'})`
         ));
       }
-      
+
       if (inCategory.length === 0) {
         console.warn(`No ingredients found for category: ${category} (species: ${this.constraints.species})`);
         continue;
       }
 
       const count = this.getIngredientCountForCategory(category);
-      
+
       // DEBUG: Log selection details for birds
       if (this.constraints.species === 'birds') {
         console.log(`[BIRD DEBUG] Category '${category}': ${inCategory.length} available, selecting ${count}`);
         if (inCategory.length > 0) {
-          console.log(`[BIRD DEBUG]   Top 3 in ${category}:`, inCategory.slice(0, 3).map(s => 
+          console.log(`[BIRD DEBUG]   Top 3 in ${category}:`, inCategory.slice(0, 3).map(s =>
             `${s.ingredient.name} (score: ${s.totalScore.toFixed(1)})`
           ));
         }
       }
-      
+
       // Skip if count is 0 (e.g., cats don't need grains)
       if (count === 0) continue;
 
@@ -761,12 +761,12 @@ export class RecipeBuilder {
         const randomIndex = this.weightedRandomSelection(inCategory.slice(0, poolSize));
         const selectedIng = inCategory[randomIndex].ingredient;
         selected.push(selectedIng);
-        
+
         // 🔥 DEBUG: Log what was selected
         if (this.constraints.species === 'cats' && category === 'protein') {
           console.log(`[Selection] Picked protein: ${selectedIng.name} (from pool of ${poolSize})`);
         }
-        
+
         // Remove selected to avoid duplicates
         inCategory.splice(randomIndex, 1);
       }
@@ -783,12 +783,12 @@ export class RecipeBuilder {
     const MIN_INGREDIENTS = 3;
     if (selected.length < MIN_INGREDIENTS) {
       console.warn(`Only ${selected.length} ingredients selected, need at least ${MIN_INGREDIENTS}`);
-      
+
       // 🔥 NEVER pad with proteins when vegetables/fats are missing
       // Check what categories we're missing
       const selectedCategories = new Set(selected.map(ing => ing.category));
       const missingCategories = categories.filter(cat => !selectedCategories.has(cat));
-      
+
       if (missingCategories.length > 0) {
         console.error(`Missing required categories: ${missingCategories.join(', ')}`);
         console.error('Cannot pad with random ingredients - aborting recipe generation');
@@ -797,33 +797,33 @@ export class RecipeBuilder {
           `This indicates the ingredient pool is too small or filtered incorrectly.`
         );
       }
-      
+
       // Only pad if we have all required categories but just need more variety
       const remainingNeeded = MIN_INGREDIENTS - selected.length;
       const alreadySelectedIds = new Set(selected.map(ing => ing.id));
-      
+
       // Get top-scoring ingredients from EXISTING categories only (no proteins if we already have one)
       const availableToAdd = scored
         .filter(s => {
           // Don't add if already selected
           if (alreadySelectedIds.has(s.ingredient.id)) return false;
-          
+
           // For cats: don't add more proteins (we already have 1)
           if (this.constraints.species === 'cats' && canonicalCategory(s.ingredient.category) === 'protein') {
             return false;
           }
-          
+
           // Only add from categories we already have
           return selectedCategories.has(s.ingredient.category);
         })
         .slice(0, remainingNeeded * 3); // Get 3x needed for variety
-      
+
       for (let i = 0; i < remainingNeeded && availableToAdd.length > 0; i++) {
         const randomIndex = Math.floor(Math.random() * Math.min(5, availableToAdd.length));
         selected.push(availableToAdd[randomIndex].ingredient);
         availableToAdd.splice(randomIndex, 1);
       }
-      
+
       console.log(`Added ${remainingNeeded} ingredients to reach minimum. Total: ${selected.length}`);
     }
 
@@ -872,17 +872,17 @@ export class RecipeBuilder {
   private calculatePortions(ingredients: Ingredient[]): PortionedIngredient[] {
     const petWeightKg = this.constraints.petWeightKg || 5;
     const species = this.constraints.species;
-    
+
     // Step 1: Calculate total meal size
     const totalMealGrams = this.calculateTotalMealSize(petWeightKg, species);
-    
+
     // Step 2: Get nutritional targets for this species
     const targets = this.getNutritionalTargets(species);
-    
+
     // Step 3: Calculate required nutrient grams
     const targetProteinGrams = totalMealGrams * targets.proteinPercent;
     const targetFatGrams = totalMealGrams * targets.fatPercent;
-    
+
     // Step 4: Allocate portions to meet nutrient targets
     return this.allocateNutrientTargetedPortions(
       ingredients,
@@ -892,7 +892,7 @@ export class RecipeBuilder {
       petWeightKg
     );
   }
-  
+
   /**
    * Calculate total meal size based on species and pet weight
    */
@@ -909,7 +909,7 @@ export class RecipeBuilder {
     }
     return petWeightKg * 65;
   }
-  
+
   /**
    * Get nutritional targets (protein %, fat %) for each species
    * Based on AAFCO standards
@@ -933,7 +933,7 @@ export class RecipeBuilder {
         return { proteinPercent: 0.20, fatPercent: 0.08 };
     }
   }
-  
+
   /**
    * Allocate portions to meet nutrient targets
    * Uses iterative approach: start with base allocation, then adjust to hit targets
@@ -946,72 +946,72 @@ export class RecipeBuilder {
     petWeightKg: number
   ): PortionedIngredient[] {
     const species = this.constraints.species;
-    
+
     // Note: highProtein used later for boosting portions if needed
     const highProtein = ingredients.filter(ing => (ing.composition.protein || 0) >= 15);
-    
+
     const portioned: PortionedIngredient[] = [];
     let allocatedGrams = 0;
     let allocatedProtein = 0;
     let allocatedFat = 0;
-    
+
     // USER REQUIREMENT: Distribute portions across ALL selected ingredients
     // Don't allocate 90% to one ingredient - spread it out for variety
-    
+
     // For dogs/cats: Use SELECTED protein (whatever was chosen by scoring)
     if (species === 'dogs' || species === 'cats') {
       // Get ANY protein that was selected (no primary/secondary distinction)
       const proteinIngredients = ingredients.filter(ing => canonicalCategory(ing.category) === 'protein');
-      
+
       if (proteinIngredients.length === 0) {
         console.warn('No protein ingredients available for dogs/cats!');
         console.warn('Selected ingredients:', ingredients.map(i => `${i.name} (cat: ${i.category})`));
         return [];
       }
-      
+
       // Use whichever protein was selected (chicken, sardines, mackerel, turkey, etc.)
       const primaryProtein = proteinIngredients[0];
-      
+
       // Calculate portion needed to hit protein target with THIS protein
       const proteinDensity = (primaryProtein.composition.protein || 20) / 100;
       const requiredIngredientGrams = targetProteinGrams / proteinDensity;
-      
+
       let proteinPortion = requiredIngredientGrams;
-      
+
       // ARCHITECTURAL RULE: Hard upper bound to prevent crowding out micronutrients/fats
       // Cats: 90% max (obligate carnivores, need high protein even with diverse sources)
       // Dogs: 85% max (leaves 15% for variety & micronutrient carriers)
       const maxProteinPercent = species === 'cats' ? 0.90 : 0.85;
       proteinPortion = Math.min(proteinPortion, totalMealGrams * maxProteinPercent);
-      
+
       // ARCHITECTURAL RULE: Never override max-inclusion constraints
       const maxGrams = petWeightKg * 1000 * primaryProtein.maxInclusionPercent[species];
       proteinPortion = Math.min(proteinPortion, maxGrams);
-      
+
       proteinPortion = Math.round(proteinPortion);
-      
+
       if (proteinPortion > 0) {
         portioned.push({ ingredient: primaryProtein, grams: proteinPortion });
         allocatedGrams += proteinPortion;
         allocatedProtein += (primaryProtein.composition.protein || 0) * proteinPortion / 100;
         allocatedFat += (primaryProtein.composition.fat || 0) * proteinPortion / 100;
       }
-      
+
       // Allocate remaining grams to other ingredients
       const remainingGrams = totalMealGrams - allocatedGrams;
       const otherIngredients = ingredients.filter(ing => ing.id !== primaryProtein.id);
-      
+
       if (remainingGrams > 0 && otherIngredients.length > 0) {
         const gramsPerIngredient = remainingGrams / otherIngredients.length;
-        
+
         for (const ing of otherIngredients) {
           let grams = gramsPerIngredient;
           grams *= (0.85 + Math.random() * 0.3);
-          
+
           const maxGrams = petWeightKg * 1000 * ing.maxInclusionPercent[species];
           grams = Math.min(grams, maxGrams);
           grams = Math.round(grams);
-          
+
           if (grams > 0) {
             portioned.push({ ingredient: ing, grams });
             allocatedGrams += grams;
@@ -1023,33 +1023,33 @@ export class RecipeBuilder {
     } else {
       // For exotic pets: Distribute with bias toward higher-protein items
       // Equal grams ≠ equal nutrition - bias toward protein-dense natural foods
-      
+
       // Calculate protein density weights for each ingredient
-      const totalProteinDensity = ingredients.reduce((sum, ing) => 
+      const totalProteinDensity = ingredients.reduce((sum, ing) =>
         sum + (ing.composition.protein || 0), 0);
-      
+
       for (const ing of ingredients) {
         const proteinDensity = ing.composition.protein || 0;
-        
+
         // Base allocation: equal distribution
         const baseGrams = totalMealGrams / ingredients.length;
-        
+
         // Protein bias: allocate more to higher-protein ingredients
         // Weight = 70% equal + 30% protein-density-weighted
-        const proteinWeight = totalProteinDensity > 0 
-          ? proteinDensity / totalProteinDensity 
+        const proteinWeight = totalProteinDensity > 0
+          ? proteinDensity / totalProteinDensity
           : 1 / ingredients.length;
-        
+
         let grams = (baseGrams * 0.70) + (totalMealGrams * proteinWeight * 0.30);
-        
+
         // Add variation (±15%)
         grams *= (0.85 + Math.random() * 0.3);
-        
+
         // ARCHITECTURAL RULE: Never override max-inclusion constraints
         const maxGrams = petWeightKg * 1000 * ing.maxInclusionPercent[species];
         grams = Math.min(grams, maxGrams);
         grams = Math.round(grams);
-        
+
         if (grams > 0) {
           portioned.push({ ingredient: ing, grams });
           allocatedGrams += grams;
@@ -1058,11 +1058,11 @@ export class RecipeBuilder {
         }
       }
     }
-    
+
     // Step 4: Adjust if we're still below protein target
     const currentProteinPercent = allocatedGrams > 0 ? (allocatedProtein / allocatedGrams) : 0;
     const targetProteinPercent = targetProteinGrams / totalMealGrams;
-    
+
     if (currentProteinPercent < targetProteinPercent * 0.95 && highProtein.length > 0) {
       // Boost high-protein portions by 20%
       for (const portioned_ing of portioned) {
@@ -1073,7 +1073,7 @@ export class RecipeBuilder {
         }
       }
     }
-    
+
     return portioned;
   }
 

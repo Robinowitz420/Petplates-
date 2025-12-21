@@ -35,7 +35,7 @@ export const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
+    <div className={`bg-surface rounded-lg shadow-md p-6 border border-surface-highlight ${className}`}>
       <h3 className="text-xl font-bold text-gray-900 mb-6">Compatibility Analysis</h3>
 
       {/* Overall Score */}

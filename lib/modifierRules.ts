@@ -1,4 +1,5 @@
 import { IngredientOption, ModifierRule, Species } from '@/lib/types';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 
 export const ingredientAlternatives: Record<string, string[]> = {
   chicken: ['turkey', 'duck', 'rabbit'],
@@ -183,13 +184,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Pumpkin Puree',
           amountPer10kg: '50g',
-          amazonLink: 'https://www.amazon.com/s?k=organic+pumpkin+puree+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=organic+pumpkin+puree+dog'),
           notes: 'Adds fiber & beta carotene for gut healing.',
         },
         {
           name: 'Fish Oil Supplement',
           amountPer10kg: '250mg',
-          amazonLink: 'https://www.amazon.com/s?k=dog+fish+oil',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=dog+fish+oil'),
           notes: 'Provides EPA/DHA for anti-inflammatory support.',
         },
       ],
@@ -212,7 +213,7 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Green Bean Fiber Boost',
           amountPer10kg: '80g',
-          amazonLink: 'https://www.amazon.com/s?k=freeze+dried+green+beans+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=freeze+dried+green+beans+dog'),
           notes: 'Adds bulk without calories.',
         },
       ],
@@ -238,13 +239,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Fish Oil Supplement',
           amountPer10kg: '250mg',
-          amazonLink: 'https://www.amazon.com/s?k=fish+oil+for+dogs',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=fish+oil+for+dogs'),
           notes: 'EPA/DHA for inflammation control.',
         },
         {
           name: 'Golden Paste (Turmeric + Black Pepper)',
           amountPer10kg: '10g',
-          amazonLink: 'https://www.amazon.com/s?k=turmeric+paste+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=turmeric+paste+dog'),
           notes: 'Natural COX-2 inhibitor to ease joint pain.',
         },
       ],
@@ -267,13 +268,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Bone Broth',
           amountPer10kg: '120ml',
-          amazonLink: 'https://www.amazon.com/s?k=dog+bone+broth',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=dog+bone+broth'),
           notes: 'Adds collagen + hydration for gut lining.',
         },
         {
           name: 'Probiotic Powder',
           amountPer10kg: '1g',
-          amazonLink: 'https://www.amazon.com/s?k=dog+probiotic+powder',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=dog+probiotic+powder'),
           notes: 'Rebalances microbiome after GI upset.',
         },
       ],
@@ -298,12 +299,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Low-Sodium Bone Broth',
           amountPer10kg: '150ml',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=low+sodium+bone+broth+dog'),
           notes: 'Boosts hydration without excess sodium.',
         },
         {
           name: 'Omega-3 Fish Oil',
           amountPer10kg: '200mg',
-          amazonLink: 'https://www.amazon.com/s?k=renal+support+fish+oil+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=renal+support+fish+oil+dog'),
           notes: 'Slows kidney inflammation.',
         },
       ],
@@ -327,12 +329,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Unsalted Bone Broth',
           amountPer10kg: '120ml',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=unsalted+bone+broth+cat'),
           notes: 'Raises moisture intake to dilute urine.',
         },
         {
           name: 'Cranberry Powder',
           amountPer10kg: '500mg',
-          amazonLink: 'https://www.amazon.com/s?k=cranberry+cat+urinary',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=cranberry+cat+urinary'),
           notes: 'Helps acidify urine to reduce crystals.',
         },
       ],
@@ -357,6 +360,7 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Chromium + Cinnamon Blend',
           amountPer10kg: '250mg',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=chromium+cinnamon+blend+cat'),
           notes: 'Helps insulin sensitivity (vet-approved doses).',
         },
       ],
@@ -380,7 +384,7 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'L-Carnitine Supplement',
           amountPer10kg: '200mg',
-          amazonLink: 'https://www.amazon.com/s?k=l-carnitine+for+cats',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=l-carnitine+for+cats'),
           notes: 'Supports muscle mass during hypermetabolic states.',
         },
       ],
@@ -437,7 +441,7 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Sardine Oil',
           amountPer10kg: '150mg',
-          amazonLink: 'https://www.amazon.com/s?k=sardine+oil+for+cats',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=sardine+oil+for+cats'),
           notes: 'Lubricates GI tract and boosts omegas for coat.',
         },
       ],
@@ -458,19 +462,19 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Taurine Supplement',
           amountPer10kg: '500mg',
-          amazonLink: 'https://www.amazon.com/s?k=taurine+supplement+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=taurine+supplement+dog'),
           notes: 'Essential amino acid for heart muscle function.',
         },
         {
           name: 'Omega-3 Fish Oil',
           amountPer10kg: '300mg',
-          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=omega-3+fish+oil+dog'),
           notes: 'EPA/DHA support cardiovascular health.',
         },
         {
           name: 'Coenzyme Q10',
           amountPer10kg: '30mg',
-          amazonLink: 'https://www.amazon.com/s?k=coq10+for+dogs',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=coq10+for+dogs'),
           notes: 'Supports heart muscle energy production.',
         },
       ],
@@ -494,19 +498,19 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Taurine Supplement',
           amountPer10kg: '250mg',
-          amazonLink: 'https://www.amazon.com/s?k=taurine+supplement+cat',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=taurine+supplement+cat'),
           notes: 'Critical for feline heart health - cats cannot synthesize taurine.',
         },
         {
           name: 'Omega-3 Fish Oil',
           amountPer10kg: '200mg',
-          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+cat',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=omega-3+fish+oil+cat'),
           notes: 'EPA/DHA for cardiovascular support.',
         },
         {
           name: 'L-Carnitine',
           amountPer10kg: '250mg',
-          amazonLink: 'https://www.amazon.com/s?k=l-carnitine+for+cats',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=l-carnitine+for+cats'),
           notes: 'Supports heart muscle metabolism.',
         },
       ],
@@ -531,19 +535,19 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Omega-3 Fish Oil',
           amountPer10kg: '400mg',
-          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=omega-3+fish+oil+dog'),
           notes: 'Anti-inflammatory omega-3s for skin health.',
         },
         {
           name: 'Vitamin E Supplement',
           amountPer10kg: '100IU',
-          amazonLink: 'https://www.amazon.com/s?k=vitamin+e+for+dogs',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=vitamin+e+for+dogs'),
           notes: 'Antioxidant support for skin barrier function.',
         },
         {
           name: 'Zinc Supplement',
           amountPer10kg: '15mg',
-          amazonLink: 'https://www.amazon.com/s?k=zinc+supplement+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=zinc+supplement+dog'),
           notes: 'Essential for skin healing and immune function.',
         },
       ],
@@ -566,19 +570,19 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Omega-3 Fish Oil',
           amountPer10kg: '300mg',
-          amazonLink: 'https://www.amazon.com/s?k=omega-3+fish+oil+cat',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=omega-3+fish+oil+cat'),
           notes: 'EPA/DHA for skin health and anti-inflammatory support.',
         },
         {
           name: 'Biotin Supplement',
           amountPer10kg: '250mcg',
-          amazonLink: 'https://www.amazon.com/s?k=biotin+for+cats',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=biotin+for+cats'),
           notes: 'B-vitamin essential for healthy skin and coat.',
         },
         {
           name: 'Vitamin E',
           amountPer10kg: '50IU',
-          amazonLink: 'https://www.amazon.com/s?k=vitamin+e+for+cats',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=vitamin+e+for+cats'),
           notes: 'Antioxidant for skin barrier protection.',
         },
       ],
@@ -606,13 +610,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Chromium Supplement',
           amountPer10kg: '50mcg',
-          amazonLink: 'https://www.amazon.com/s?k=chromium+supplement+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=chromium+supplement+dog'),
           notes: 'Helps improve insulin sensitivity.',
         },
         {
           name: 'Alpha-Lipoic Acid',
           amountPer10kg: '25mg',
-          amazonLink: 'https://www.amazon.com/s?k=alpha-lipoic-acid+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=alpha-lipoic-acid+dog'),
           notes: 'Antioxidant that may help with glucose metabolism.',
         },
       ],
@@ -641,13 +645,13 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Chromium Supplement',
           amountPer10kg: '25mcg',
-          amazonLink: 'https://www.amazon.com/s?k=chromium+supplement+cat',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=chromium+supplement+cat'),
           notes: 'Helps improve insulin sensitivity in cats.',
         },
         {
           name: 'Alpha-Lipoic Acid',
           amountPer10kg: '15mg',
-          amazonLink: 'https://www.amazon.com/s?k=alpha-lipoic-acid+cat',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=alpha-lipoic-acid+cat'),
           notes: 'Antioxidant support for glucose metabolism.',
         },
       ],
@@ -676,19 +680,19 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'MCT Oil',
           amountPer10kg: '5ml',
-          amazonLink: 'https://www.amazon.com/s?k=mct+oil+for+dogs',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=mct+oil+for+dogs'),
           notes: 'Easy energy source that bypasses pancreatic enzymes.',
         },
         {
           name: 'Digestive Enzymes',
           amountPer10kg: '1 capsule',
-          amazonLink: 'https://www.amazon.com/s?k=digestive+enzymes+dog',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=digestive+enzymes+dog'),
           notes: 'Supports digestion during pancreatic recovery.',
         },
         {
           name: 'Probiotics',
           amountPer10kg: '1g',
-          amazonLink: 'https://www.amazon.com/s?k=probiotics+for+dogs',
+          amazonLink: ensureSellerId('https://www.amazon.com/s?k=probiotics+for+dogs'),
           notes: 'Supports gut health during low-fat diet.',
         },
       ],

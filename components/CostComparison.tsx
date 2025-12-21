@@ -22,18 +22,6 @@ export function CostComparison({ costPerMeal, totalCost, estimatedMeals, classNa
     <div className={`bg-gradient-to-r from-green-700/35 to-emerald-700/35 rounded-xl p-6 border-2 border-green-500/65 ${className}`}>
       <h4 className="font-bold text-lg text-green-200 mb-4">💰 Cost Comparison</h4>
       
-      {/* Budget Warning Banner */}
-      {exceedsBudget && (
-        <div className="mb-4 bg-yellow-900/60 border-2 border-yellow-500/70 rounded-lg p-3">
-          <p className="text-sm font-semibold text-yellow-200">
-            ⚠️ This meal exceeds the $4.50 target (${costPerMeal.toFixed(2)}/meal)
-          </p>
-          <p className="text-xs text-yellow-300 mt-1">
-            Consider choosing cheaper ingredient alternatives to reduce cost.
-          </p>
-        </div>
-      )}
-      
       <div className="grid md:grid-cols-2 gap-4">
         {/* Homemade */}
         <div className="bg-surface rounded-lg p-4 border border-green-700/30">

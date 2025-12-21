@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, startTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2, ShoppingCart } from 'lucide-react';
 import { getPrimaryName } from '@/lib/utils/petUtils';
 import type { Pet } from '@/lib/types';
@@ -311,8 +312,8 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-3 z-10">
+      <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
+        <div className="sticky top-0 bg-surface border-b border-gray-200 px-6 py-3 z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-900">
               {editingPet ? 'Edit Pet' : 'Add New Pet'}
@@ -516,12 +517,14 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
 export default function MyPetsPage() {
   const userId = SIMULATED_USER_ID;
   const { setUserId } = useVillageStore();
+  const router = useRouter();
 
   const [pets, setPets] = useState<ProfilePet[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [petsLoaded, setPetsLoaded] = useState(false);
   const [activePetId, setActivePetId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'bio' | 'saved' | 'plan'>('bio');
   const [planOffset, setPlanOffset] = useState(0);
@@ -610,6 +613,7 @@ const buildWeeklyPlan = useCallback(
             : ['Unnamed Pet']),
     }));
     setPets(normalizedPets);
+    setPetsLoaded(true);
   }, [userId]);
 
   // Load custom meals when active pet changes - deferred until pet is actually selected
@@ -635,9 +639,16 @@ const buildWeeklyPlan = useCallback(
       localStorage.setItem('last_user_id', userId);
       
       // Load saved active pet ID - this will be validated once pets are loaded
-      const savedActivePetId = localStorage.getItem(`active_pet_id_${userId}`);
+      const primaryKey = `active_pet_id_${userId}`;
+      const savedActivePetId = localStorage.getItem(primaryKey);
+      const fallbackActivePetId = localStorage.getItem('last_active_pet_id');
+
       if (savedActivePetId) {
         setActivePetId(savedActivePetId);
+      } else if (fallbackActivePetId) {
+        setActivePetId(fallbackActivePetId);
+        // Backfill to the per-user key so subsequent restores are consistent
+        localStorage.setItem(primaryKey, fallbackActivePetId);
       }
     }
   }, [userId]);
@@ -709,6 +720,9 @@ const buildWeeklyPlan = useCallback(
   }, [userId, loadPets, activePetId]);
 
   useEffect(() => {
+    // Important: don't clear persisted selection before we've loaded pets at least once.
+    if (!petsLoaded) return;
+
     if (pets.length === 0) {
       setActivePetId(null);
       setActiveTab('bio');
@@ -732,11 +746,19 @@ const buildWeeklyPlan = useCallback(
     // If no pet is selected and we have pets, check localStorage first
     if (!activePetId && pets.length > 0) {
       if (typeof window !== 'undefined') {
-        const savedActivePetId = localStorage.getItem(`active_pet_id_${userId}`);
+        const primaryKey = `active_pet_id_${userId}`;
+        const savedActivePetId = localStorage.getItem(primaryKey);
+        const fallbackActivePetId = localStorage.getItem('last_active_pet_id');
+
         const savedPetExists = savedActivePetId && pets.some((p) => p.id === savedActivePetId);
+        const fallbackPetExists = fallbackActivePetId && pets.some((p) => p.id === fallbackActivePetId);
+
         if (savedPetExists) {
           // Restore saved selection
           setActivePetId(savedActivePetId);
+        } else if (fallbackPetExists) {
+          setActivePetId(fallbackActivePetId);
+          localStorage.setItem(primaryKey, fallbackActivePetId as string);
         } else {
           // Only auto-select first pet if no valid saved selection exists
           // Don't save this auto-selection to localStorage (only user selections are saved)
@@ -746,7 +768,7 @@ const buildWeeklyPlan = useCallback(
         setActivePetId(pets[0].id);
       }
     }
-  }, [pets, activePetId, userId]);
+  }, [pets, activePetId, userId, petsLoaded]);
 
   // Defer custom meals loading - only load when a pet is actually selected and viewed
   // Don't load on initial mount if no pet is active (saves initial load time)
@@ -880,7 +902,9 @@ const buildWeeklyPlan = useCallback(
       };
       
       // Saving pet with saved recipes
-      
+
+      let newPetIdForNav: string | null = null;
+
       setPets((prevPets) => {
         const isEditing = prevPets.some((p) => p.id === petWithSavedRecipes.id);
         let updatedPets: Pet[];
@@ -897,11 +921,37 @@ const buildWeeklyPlan = useCallback(
         updatedPets.forEach(pet => {
           savePet(userId, pet).catch(err => console.error('Failed to save pet:', err));
         });
-        
+
+        // If this was a brand new pet, auto-select it and navigate to its profile/meal context
+        if (!isEditing) {
+          newPetIdForNav = petWithSavedRecipes.id;
+        }
+
         return updatedPets;
       });
+
+      // Perform navigation and active pet updates after state update to avoid setState during render
+      if (newPetIdForNav) {
+        const newPetId = newPetIdForNav;
+
+        // Update active pet state
+        setActivePetId(newPetId);
+
+        // Persist active pet to localStorage using the same keys as the pet detail page
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`active_pet_id_${userId}`, newPetId);
+            localStorage.setItem('last_active_pet_id', newPetId);
+          } catch {
+            // ignore storage errors
+          }
+        }
+
+        // Navigate to the pet's Sherlock Shells / Find Meals page
+        router.push(`/profile/pet/${newPetId}`);
+      }
     },
-    [userId]
+    [userId, router]
   );
 
   const handleEditPet = useCallback((pet: Pet) => {
@@ -1379,9 +1429,13 @@ const buildWeeklyPlan = useCallback(
                                     const mealName = isCustomMeal ? customMeal?.name || 'Custom Meal' : getRecipeName(rid);
                                     const mealData = isCustomMeal ? customMeal : null;
 
+                                    const recipeForScoring: Recipe | null = isCustomMeal && customMeal
+                                      ? (convertCustomMealToRecipe(customMeal) as unknown as Recipe)
+                                      : null;
+
                                     // Calculate compatibility score
                                     let compatibilityScore: number | null = null;
-                                    if (activePet && mealData) {
+                                    if (activePet && recipeForScoring) {
                                       try {
                                         const enhancedPet: EnhancedPet = {
                                           id: activePet.id,
@@ -1395,7 +1449,7 @@ const buildWeeklyPlan = useCallback(
                                           dietaryRestrictions: activePet.allergies || [],
                                           allergies: activePet.allergies || [],
                                         };
-                                        const result = calculateEnhancedCompatibility(mealData as Recipe, enhancedPet);
+                                        const result = calculateEnhancedCompatibility(recipeForScoring, enhancedPet);
                                         compatibilityScore = result.overallScore;
                                       } catch (error) {
                                         console.error('Error calculating compatibility:', error);

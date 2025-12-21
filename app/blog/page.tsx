@@ -62,7 +62,7 @@ export default function BlogPage() {
   const categories = ['All', 'Nutrition', 'Myths', 'Industry', 'Supplements', 'Education', 'Seasonal'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -81,7 +81,7 @@ export default function BlogPage() {
           {categories.map((category) => (
             <button
               key={category}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium hover:bg-gray-100 hover:border-gray-400 transition-colors"
+              className="px-4 py-2 bg-surface border border-gray-300 rounded-full text-sm font-medium hover:bg-surface-highlight hover:border-gray-400 transition-colors"
             >
               {category}
             </button>
@@ -91,7 +91,7 @@ export default function BlogPage() {
         {/* Blog Posts List - Reddit Style */}
         <div className="space-y-4">
           {blogPosts.map((post) => (
-            <article key={post.id} className="bg-white rounded border border-gray-200 hover:border-gray-300 transition-colors">
+            <article key={post.id} className="bg-surface rounded border border-surface-highlight hover:border-gray-300 transition-colors">
               <div className="p-4">
                 <div className="flex items-start gap-3">
                   {/* Left side - voting area (optional, can be removed) */}

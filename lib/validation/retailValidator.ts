@@ -102,10 +102,23 @@ export class RetailValidator {
       lastFetched: new Date(),
     };
     
+    // Split issues into structural vs semantic buckets for ValidationResult
+    const structuralIssues: ValidationIssue[] = criticalIssues;
+    const semanticIssues: ValidationIssue[] = warningIssues;
+
+    const reasoning = {
+      requiredTokensMatched: spec.requiredTokens.filter(t => !missingRequired.includes(t)),
+      equivalentTokensUsed: [] as Array<{ token: string; synonym: string }>,
+      forbiddenTokensFound: foundForbidden,
+      structurallySound: structuralIssues.length === 0,
+    };
+
     return {
       status,
       confidence,
-      issues,
+      structuralIssues,
+      semanticIssues,
+      reasoning,
       metadata,
     };
   }

@@ -1,0 +1,61 @@
+{
+  "ingredients": [
+    "chicken",
+    "pea",
+    "heart",
+    "kidney"
+  ],
+  "nutritionalInfo": [],
+  "healthRecommendations": [
+    {
+      "text": "Previous\n        \n      \n      \n        Next\n        \n      \n    \n  \n\n  \n    \n      \n            \n            \n          \n            \n            \n          \n            \n            \n          \n            \n            \n          \n            \n            \n          \n    \n  \n\n\n\n    \n      \n        Dr. Judy Morgan's Naturally Healthy Pets\n            Dr. Judy's PEA (Palmitoylethanolamide) - 40g\n          \n  \n    \n      Regular price\n      $59.99\n\n    \n    \n      \n      \n    \n  \n\n  Unit price\n / \n\n  \n    Unavailable\n  \n\n\n      \n              \n                  \n                    Add to cart\n                    \n                  \n                  Add to cart\n                \n                View details",
+      "category": "general-health",
+      "source": "veterinary-nutrition"
+    },
+    {
+      "text": "Previous\n        \n      \n      \n        Next\n        \n      \n    \n  \n\n  \n    \n      \n            \n            \n          \n            \n            \n          \n            \n            \n          \n    \n  \n\n\n\n    \n      \n        Dr. Judy Morgan's Naturally Healthy Pets\n            Dr. Judy's Frozen Treat Molds\n          \n  \n    \n      Regular price\n      $9.99\n\n    \n    \n      \n      \n    \n  \n\n  Unit price\n / \n\n  \n    Unavailable\n  \n\n\n      \n              \n                  \n                    Add to cart\n                    \n                  \n                  Add to cart\n                \n                View details",
+      "category": "general-health",
+      "source": "veterinary-nutrition"
+    },
+    {
+      "text": "Senior Essentials\n        View collection",
+      "category": "general-health",
+      "source": "veterinary-nutrition"
+    }
+  ],
+  "preparationMethods": [
+    {
+      "text": "Differences in Lab Values for Raw Fed vs. Kibble Fed Dogs and CatsVets with an understanding of raw feeding know what values to look for in the blood. Be sure to let your veterinarian know what you are feeding your dog or...\nJudy Morgan | \nOctober 7, 2025",
+      "species": "dogs-cats",
+      "method": "raw-fresh"
+    }
+  ],
+  "veterinaryInsights": [
+    {
+      "text": "Differences in Lab Values for Raw Fed vs. Kibble Fed Dogs and CatsVets with an understanding of raw feeding know what values to look for in the blood. Be sure to let your veterinarian know what you are feeding your dog or...\nJudy Morgan | \nOctober 7, 2025",
+      "type": "veterinary-nutrition",
+      "credibility": 10,
+      "nlpAnalysis": {
+        "sentences": [
+          "Differences in Lab Values for Raw Fed vs",
+          "Kibble Fed Dogs and CatsVets with an understanding of raw feeding know what values to look for in the blood",
+          "Be sure to let your veterinarian know what you are feeding your dog or",
+          "Judy Morgan | \nOctober 7, 2025"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [],
+  "source": "https://drjudymorgan.com/",
+  "type": "veterinary-nutrition",
+  "category": "dogs-cats",
+  "credibility": 10
+}

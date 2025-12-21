@@ -11,6 +11,8 @@ import {
   ChevronLeft,
   X,
   ShoppingCart,
+  CheckCircle,
+  AlertTriangle,
 } from 'lucide-react';
 
 import { loadRecipeById, loadAllRecipes } from '@/lib/data/recipes-index';
@@ -958,6 +960,66 @@ export default function RecipeDetailPage() {
           <ChevronLeft className="w-5 h-5 mr-1" />
           Back to My Pets
         </Link>
+
+        {/* Top-of-page Compatibility Score Banner for selected pet */}
+        {queryPetId && scoreForQueryPet && (
+          <div className="mb-8 rounded-xl border-2 p-6 shadow-md bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 border-emerald-500/80 text-emerald-50">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div className="flex items-center gap-3">
+                {scoreForQueryPet.overallScore >= 80 ? (
+                  <CheckCircle size={28} className="text-emerald-300" />
+                ) : scoreForQueryPet.overallScore >= 60 ? (
+                  <AlertTriangle size={28} className="text-yellow-300" />
+                ) : (
+                  <X size={28} className="text-red-300" />
+                )}
+                <div>
+                  <h3 className="font-semibold text-xl leading-tight">Compatibility Score</h3>
+                  <p className="text-xs md:text-sm opacity-80 mt-0.5">
+                    Overall fit for this recipe and your selected pet profile.
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-extrabold leading-none">{scoreForQueryPet.overallScore}%</div>
+                <div className="mt-1 text-xs uppercase tracking-wide opacity-75">
+                  {scoreForQueryPet.compatibility}
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-black/40 rounded-full h-[3px] mb-3 overflow-hidden">
+              <div
+                className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
+                  scoreForQueryPet.overallScore >= 80
+                    ? 'bg-emerald-400'
+                    : scoreForQueryPet.overallScore >= 60
+                    ? 'bg-amber-300'
+                    : 'bg-red-400'
+                }`}
+                style={{ width: `${scoreForQueryPet.overallScore}%` }}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm opacity-90 mt-1">
+              <span>
+                {scoreForQueryPet.overallScore >= 80
+                  ? '✓ Excellent match for your pet'
+                  : scoreForQueryPet.overallScore >= 60
+                  ? '⚠ Good, but could be improved'
+                  : '✗ Needs adjustments for safety'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsScoreModalOpen(true)}
+                className="text-xs md:text-sm font-medium underline underline-offset-4 hover:opacity-80"
+              >
+                View detailed breakdown
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">

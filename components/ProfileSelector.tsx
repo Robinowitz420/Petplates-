@@ -101,7 +101,7 @@ export default function ProfileSelector() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-surface rounded-lg shadow-md p-6 border border-surface-highlight">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900">My Pets</h2>
         <button 
@@ -167,8 +167,8 @@ export default function ProfileSelector() {
       {/* Add Pet Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+          <div className="bg-surface rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-surface-highlight">
+            <div className="sticky top-0 bg-surface border-b border-surface-highlight px-6 py-4 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Add Your Pet</h2>
               <button 
                 onClick={() => {

@@ -235,7 +235,7 @@ export default function MealPlanPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-gray-600">Loading meal plan...</p>
       </div>
     );
@@ -243,8 +243,8 @@ export default function MealPlanPage() {
 
   if (!pet) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-xl shadow text-center space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="bg-surface p-8 rounded-xl shadow text-center space-y-4 border border-surface-highlight">
           <p className="text-xl font-semibold text-gray-800">Pet not found.</p>
           <Link href="/profile" className="text-green-800 font-semibold">
             Back to Profiles
@@ -258,8 +258,8 @@ export default function MealPlanPage() {
   
   if (allMealsCount < 1) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-lg bg-white rounded-xl shadow p-8 text-center space-y-4">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="max-w-lg bg-surface rounded-xl shadow p-8 text-center space-y-4 border border-surface-highlight">
           <div className="text-5xl">🍽️</div>
           <h1 className="text-2xl font-bold text-gray-900">Add more meals first</h1>
           <p className="text-gray-600">
@@ -291,9 +291,9 @@ export default function MealPlanPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-background py-10 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        <div className="bg-surface rounded-xl shadow p-6 flex flex-col gap-4 border border-surface-highlight">
           <div className="flex items-center gap-3 text-green-800">
             <button
               onClick={() => router.push('/profile')}
@@ -303,23 +303,21 @@ export default function MealPlanPage() {
               Back to pets
             </button>
           </div>
-            <div>
-              <p className="text-sm uppercase tracking-wide text-gray-500 font-semibold">
-                Weekly Meal Prep
-              </p>
-              <h1 className="text-3xl font-bold text-gray-900">
-                7-Day Meal Plan for {pet.name}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Two meals per day. No repeats on the same day. Each saved meal gets equal play.
-              </p>
-            </div>
+          <div>
+            <p className="text-sm uppercase tracking-wide text-gray-500 font-semibold">
+              Weekly Meal Prep
+            </p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              7-Day Meal Plan for {pet.name}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Two meals per day. No repeats on the same day. Each saved meal gets equal play.
+            </p>
           </div>
-        
-
+        </div>
         <div className="grid grid-cols-7 gap-2">
           {weeklyPlan.map((dayPlan, index) => (
-            <div key={dayPlan.day} className="bg-white rounded-lg shadow p-2">
+            <div key={dayPlan.day} className="bg-surface rounded-lg shadow p-2 border border-surface-highlight">
               <div className="text-center mb-2">
                 <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">
                   {dayPlan.day.slice(0, 3)}
@@ -391,10 +389,10 @@ export default function MealPlanPage() {
                         e.preventDefault();
                         setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
                       }}
-                    className="mt-2 w-full inline-flex items-center justify-center gap-1 text-xs px-2 py-1 rounded border border-primary-500 text-primary-700 bg-white hover:bg-primary-50 transition-colors"
+                      className="mt-2 w-full inline-flex items-center justify-center gap-1 text-xs px-2 py-1 rounded border border-primary-500 text-primary-700 bg-surface hover:bg-surface-highlight transition-colors"
                       title="Edit this slot"
                     >
-                    Edit
+                      Edit
                     </button>
                   </div>
                 ))}
@@ -405,7 +403,7 @@ export default function MealPlanPage() {
 
         {swapTarget && (
           <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-5 border border-gray-200">
+            <div className="bg-surface rounded-xl shadow-2xl max-w-lg w-full p-5 border border-surface-highlight">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-bold text-gray-900">Swap Meal</h3>
                 <button
@@ -454,7 +452,7 @@ export default function MealPlanPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow p-6">
+        <div className="bg-surface rounded-xl shadow p-6 border border-surface-highlight">
           <h3 className="text-lg font-bold text-gray-900 mb-2">How rotation works</h3>
           <p className="text-gray-600 text-sm mb-2">
             We loop through every saved meal (recipes and custom meals) equally, then shuffle lightly to keep variety.

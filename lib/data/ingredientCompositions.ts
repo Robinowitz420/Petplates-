@@ -2024,7 +2024,6 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
   // Calcium supplements (Phase 2 fix: enable Ca:P balancing)
   "eggshell_powder": { protein: 0, fat: 0, calcium: 3800, phosphorus: 20, kcal: 0, source: "Natural supplement", speciesCompatibility: { dog: 'ok', cat: 'ok', bird: 'ok', reptile: 'ok', 'pocket-pet': 'ok' }, feedingRole: 'supplement', maxInclusionPercentBySpecies: { dog: 0.02, cat: 0.02, bird: 0.02, reptile: 0.02, 'pocket-pet': 0.02 }, confidenceBySpecies: { dog: 'high', cat: 'high', bird: 'high', reptile: 'high', 'pocket-pet': 'high' } },
   "bone_meal": { protein: 15, fat: 0, calcium: 3000, phosphorus: 1400, kcal: 60, source: "Natural supplement", speciesCompatibility: { dog: 'ok', cat: 'ok', bird: 'limit', reptile: 'ok', 'pocket-pet': 'limit' }, feedingRole: 'supplement', maxInclusionPercentBySpecies: { dog: 0.03, cat: 0.02, bird: 0.01, reptile: 0.02, 'pocket-pet': 0.01 }, confidenceBySpecies: { dog: 'high', cat: 'high', bird: 'medium', reptile: 'high', 'pocket-pet': 'medium' } },
-  "calcium_carbonate": { protein: 0, fat: 0, calcium: 4000, phosphorus: 0, kcal: 0, source: "Mineral supplement", speciesCompatibility: { dog: 'ok', cat: 'ok', bird: 'ok', reptile: 'ok', 'pocket-pet': 'ok' }, feedingRole: 'supplement', maxInclusionPercentBySpecies: { dog: 0.02, cat: 0.02, bird: 0.02, reptile: 0.02, 'pocket-pet': 0.02 }, confidenceBySpecies: { dog: 'high', cat: 'high', bird: 'high', reptile: 'high', 'pocket-pet': 'high' } }
 };
 
 /**

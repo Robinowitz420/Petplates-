@@ -1,0 +1,18 @@
+{
+  "ingredients": [],
+  "nutritionalInfo": [],
+  "healthRecommendations": [
+    {
+      "text": "The Fora platform includes forum software by XenForo.",
+      "category": "general-health",
+      "source": "pet-forum-general"
+    }
+  ],
+  "preparationMethods": [],
+  "veterinaryInsights": [],
+  "researchFindings": [],
+  "source": "https://www.petforums.co.uk/",
+  "type": "pet-forum-general",
+  "category": "dogs-cats",
+  "credibility": 3
+}

@@ -7,6 +7,7 @@ import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getProductPrice } from '@/lib/data/product-prices';
+import { recipes } from '@/lib/data/recipes-complete';
 
 // Format price for display
 const formatPrice = (price: number) => {

@@ -141,7 +141,7 @@ export default function DashboardPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 <header className="flex justify-between items-center mb-10 border-b pb-4">
-                    <h1 className="text-4xl font-extrabold text-gray-900">Your Paw & Plate Dashboard</h1>
+                    <h1 className="text-4xl font-extrabold text-gray-900">Your Paws & Plates Dashboard</h1>
                     <button 
                         // Assuming you have an AddPetModal component (not included here)
                         className="flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-lg"

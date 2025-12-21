@@ -18,7 +18,7 @@ export default function Navigation() {
             <div className="h-10 w-10 relative">
               <Image
                 src="/images/emojis/GREENPAW.jpeg"
-                alt="Paw & Plate logo"
+                alt="Paws & Plates logo"
                 fill
                 className="object-contain rounded-md"
                 sizes="40px"
@@ -26,8 +26,8 @@ export default function Navigation() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-foreground">Paw & Plate</span>
-              <span className="text-xs text-gray-400 -mt-1 leading-tight">Meal prep made easy, for ALL your pets!</span>
+              <span className="text-2xl font-bold text-foreground">Paws & Plates</span>
+              <span className="text-xs text-gray-400 -mt-1 leading-tight">Meal prep for ALL your pets!</span>
             </div>
           </Link>
 

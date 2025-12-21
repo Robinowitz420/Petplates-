@@ -1,5 +1,3 @@
-import type { HealthConcern } from '../recipe-generator';
-
 // Minimal, high-signal mappings to boost condition-aware selection/scoring.
 export const HEALTH_BENEFIT_MAP: Record<string, string[]> = {
   // Joint / anti-inflammatory

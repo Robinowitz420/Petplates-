@@ -18,9 +18,9 @@ export const petSupplements: PetSupplements = {
     'allergy-support': [
       {
         name: 'Omega-3 Fatty Acids',
-        description: 'Fish oil or krill oil supplements',
+        description: 'High-quality fish body oil (salmon/sardine/anchovy) supplements (not cod liver oil)',
         benefits: 'Reduces inflammation and supports immune response',
-        amazonLink: 'https://www.amazon.com/Zesty-Paws-Omega-Bites-Salmon-Supplement/dp/B07P9Q7Z8Z'
+        amazonLink: 'https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20'
       },
       {
         name: 'Quercetin',
@@ -100,7 +100,7 @@ export const petSupplements: PetSupplements = {
         name: 'Salmon Oil',
         description: 'Omega-3 rich fish oil',
         benefits: 'Promotes healthy skin and shiny coat',
-        amazonLink: 'https://www.amazon.com/s?k=dog+salmon+oil'
+        amazonLink: 'https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20'
       },
       {
         name: 'Biotin',
@@ -148,9 +148,9 @@ export const petSupplements: PetSupplements = {
     'allergy-support': [
       {
         name: 'Omega-3 Fatty Acids',
-        description: 'Fish oil supplements for cats',
+        description: 'High-quality fish body oil (salmon/sardine/anchovy) supplements (not cod liver oil)',
         benefits: 'Reduces inflammation and supports skin health',
-        amazonLink: 'https://www.amazon.com/s?k=cat+omega+3+supplements'
+        amazonLink: 'https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20'
       },
       {
         name: 'Quercetin',
@@ -204,7 +204,7 @@ export const petSupplements: PetSupplements = {
         name: 'Glucosamine for Cats',
         description: 'Joint supplements formulated for cats',
         benefits: 'Supports joint health and mobility',
-        amazonLink: 'https://www.amazon.com/s?k=cat+glucosamine+supplement'
+        amazonLink: 'https://www.amazon.com/dp/B0FBTC5HSV?tag=robinfrench-20'
       },
       {
         name: 'Chondroitin',
@@ -218,7 +218,7 @@ export const petSupplements: PetSupplements = {
         name: 'Salmon Oil for Cats',
         description: 'Omega-3 supplements for cats',
         benefits: 'Promotes healthy skin and coat',
-        amazonLink: 'https://www.amazon.com/s?k=cat+salmon+oil'
+        amazonLink: 'https://www.amazon.com/dp/B00CBY93XS?tag=robinfrench-20'
       },
       {
         name: 'Vitamin E',

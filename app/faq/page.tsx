@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const faqItems = [
   {
-    question: 'What is Paw & Plate?',
+    question: 'What is Paws & Plates?',
     answer:
       'A tool that helps you build fresh, personalized meals for your pets based on species, age, breed, size, and health needs — along with links to reputable ingredients and supplements.',
   },
@@ -21,7 +21,7 @@ const faqItems = [
   {
     question: 'Can I use this instead of my vet?',
     answer:
-      'No. Paw & Plate is an educational and planning tool. Always consult your veterinarian when making major dietary changes.',
+      'No. Paws & Plates is an educational and planning tool. Always consult your veterinarian when making major dietary changes.',
   },
   {
     question: 'Does the app calculate how much to feed?',
@@ -49,7 +49,7 @@ export default function FAQPage() {
         </div>
         <h1 className="text-4xl font-extrabold text-gray-900 mb-4">FAQ</h1>
         <p className="text-lg text-gray-600 mb-12">
-          Answers to the most common questions about how Paw & Plate works.
+          Answers to the most common questions about how Paws & Plates works.
         </p>
         <div className="space-y-6">
           {faqItems.map((item) => (

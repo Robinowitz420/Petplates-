@@ -21,6 +21,7 @@ export interface Ingredient {
   id: string;
   name: string;
   category: IngredientCategory;
+  palatability?: Partial<Record<Species, number>>;
   
   // Protein hierarchy (only for proteins)
   proteinRole?: 'primary' | 'secondary';  // PHASE 1.7: Explicit protein role
@@ -138,6 +139,7 @@ function convertUnifiedToIngredient(unified: UnifiedIngredient): Ingredient {
     id: unified.id,
     name: unified.primaryDisplayName,
     category,
+    palatability: (unified as any).palatability,
     proteinRole,  // PHASE 1.7: Explicit protein role
     composition: {
       protein: nutrition.protein,

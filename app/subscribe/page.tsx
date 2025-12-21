@@ -17,8 +17,8 @@ export default function SubscribePage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-surface rounded-lg shadow-lg p-8 text-center">
           <CheckCircle className="text-green-600 mx-auto mb-4" size={64} />
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             You're Subscribed!
@@ -38,7 +38,7 @@ export default function SubscribePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -53,7 +53,7 @@ export default function SubscribePage() {
 
       <div className="max-w-2xl mx-auto px-4 py-12">
         {/* Benefits */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+        <div className="bg-surface rounded-lg shadow-md p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
             What You'll Get
           </h2>
@@ -90,7 +90,7 @@ export default function SubscribePage() {
         </div>
 
         {/* Subscribe Form */}
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-surface rounded-lg shadow-md p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">

@@ -47,7 +47,7 @@ export default function CommunityGalleryPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
@@ -64,19 +64,19 @@ export default function CommunityGalleryPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-surface rounded-lg shadow-md p-6 text-center">
             <ChefHat className="w-8 h-8 mx-auto mb-3 text-primary-600" />
             <div className="text-2xl font-bold text-gray-900 mb-1">{communityRecipes.length}</div>
             <div className="text-sm text-gray-600">Modified Recipes</div>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-surface rounded-lg shadow-md p-6 text-center">
             <Users className="w-8 h-8 mx-auto mb-3 text-green-600" />
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {communityRecipes.reduce((sum, recipe) => sum + recipe.totalModifications, 0)}
             </div>
             <div className="text-sm text-gray-600">Community Contributions</div>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-surface rounded-lg shadow-md p-6 text-center">
             <Star className="w-8 h-8 mx-auto mb-3 text-yellow-600" />
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {communityRecipes.length > 0
@@ -86,7 +86,7 @@ export default function CommunityGalleryPage() {
             </div>
             <div className="text-sm text-gray-600">Average Rating</div>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-surface rounded-lg shadow-md p-6 text-center">
             <Heart className="w-8 h-8 mx-auto mb-3 text-red-600" />
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {communityRecipes.reduce((sum, recipe) => sum + recipe.modifications.reduce((mSum: number, mod: any) => mSum + (mod.helpful || 0), 0), 0)}
@@ -96,7 +96,7 @@ export default function CommunityGalleryPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilter('all')}
@@ -136,7 +136,7 @@ export default function CommunityGalleryPage() {
         {/* Recipe Gallery */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredRecipes.map((recipe) => (
-            <div key={recipe.recipeId} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={recipe.recipeId} className="bg-surface rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 {/* Original Recipe Info */}
                 <div className="mb-4">

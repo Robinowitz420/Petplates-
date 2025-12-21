@@ -1,0 +1,212 @@
+{
+  "ingredients": [
+    "rabbit"
+  ],
+  "nutritionalInfo": [],
+  "healthRecommendations": [],
+  "preparationMethods": [],
+  "veterinaryInsights": [
+    {
+      "text": "Association of\n                                                                Exotic Mammal Veterinarians",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Association of\n                                                                Exotic Mammal Veterinarians"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "AEMV serves as a crucial resource for veterinarians and pet owners, offering them access to the latest research, clinical techniques, and professional development opportunities.",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "AEMV serves as a crucial resource for veterinarians and pet owners, offering them access to the latest research, clinical techniques, and professional development opportunities"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Your exotic mammal has unique medical needs, from diet to disease management, which demands the expertise of a veterinarian who is trained in the care of these species. Use the Find a Vet feature to search for a trusted veterinarian near you who has a specific interest in exotic mammal health.",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Your exotic mammal has unique medical needs, from diet to disease management, which demands the expertise of a veterinarian who is trained in the care of these species",
+          "Use the Find a Vet feature to search for a trusted veterinarian near you who has a specific interest in exotic mammal health"
+        ],
+        "keywords": [
+          "health",
+          "diet",
+          "disease"
+        ],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Joining the Association of Exotic Mammal Veterinarians is essential for any veterinarian or veterinary technician who is committed to providing the best possible care for exotic mammal pets. Membership offers unparalleled access to a wealth of resources, including veterinary research and communications. Additionally, being part of this community connects veterinarians and veterinary technologists with a network of experts and peers who share a passion for advancing the field.",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Joining the Association of Exotic Mammal Veterinarians is essential for any veterinarian or veterinary technician who is committed to providing the best possible care for exotic mammal pets",
+          "Membership offers unparalleled access to a wealth of resources, including veterinary research and communications",
+          "Additionally, being part of this community connects veterinarians and veterinary technologists with a network of experts and peers who share a passion for advancing the field"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 1,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "You will have access to exotic mammal care and disease handouts for both clients and veterinarians, continuing education opportunities around the globe, and lectures and proceedings from previous conferences as well as a community of experts dedicated to the care of exotic mammals.",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "You will have access to exotic mammal care and disease handouts for both clients and veterinarians, continuing education opportunities around the globe, and lectures and proceedings from previous conferences as well as a community of experts dedicated to the care of exotic mammals"
+        ],
+        "keywords": [
+          "disease"
+        ],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Connect with other exotic mammal veterinarians, and ask questions about care, nutrition, and more in our exclusive members-only Facebook page.",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Connect with other exotic mammal veterinarians, and ask questions about care, nutrition, and more in our exclusive members-only Facebook page"
+        ],
+        "keywords": [
+          "nutrition"
+        ],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Stay at the forefront of exotic mammal care with comprehensive continuing education programs, designed to enhance your expertise and keep you updated on the latest veterinary advancements.",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "Stay at the forefront of exotic mammal care with comprehensive continuing education programs, designed to enhance your expertise and keep you updated on the latest veterinary advancements"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "\"I initially joined the AEMV during my first year after graduating in order to step my toes into the world of exotic medicine. I had just adopted my first rabbit as an adult and wanted to make sure I had access to the most up-to-date information on caring for him as a pet owner and new doctor. As I have grown and developed as a doctor, AEMV has been there to provide access to continuing education, the Journal for Exotic Pet Medicine, and access to member forums that have helped me gain my footing as an exotic mammal veterinarian. I would highly recommend membership to anyone interested in stepping into the exotics world and to veterinarians with years of experience.\"",
+      "type": "exotic-mammal-veterinary",
+      "credibility": 9,
+      "nlpAnalysis": {
+        "sentences": [
+          "\"I initially joined the AEMV during my first year after graduating in order to step my toes into the world of exotic medicine",
+          "I had just adopted my first rabbit as an adult and wanted to make sure I had access to the most up-to-date information on caring for him as a pet owner and new doctor",
+          "As I have grown and developed as a doctor, AEMV has been there to provide access to continuing education, the Journal for Exotic Pet Medicine, and access to member forums that have helped me gain my footing as an exotic mammal veterinarian",
+          "I would highly recommend membership to anyone interested in stepping into the exotics world and to veterinarians with years of experience"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "researchFindings": [
+    {
+      "text": "AEMV serves as a crucial resource for veterinarians and pet owners, offering them access to the latest research, clinical techniques, and professional development opportunities.",
+      "source": "https://www.aemv.org/",
+      "category": "pocket-pets",
+      "nlpAnalysis": {
+        "sentences": [
+          "AEMV serves as a crucial resource for veterinarians and pet owners, offering them access to the latest research, clinical techniques, and professional development opportunities"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    },
+    {
+      "text": "Joining the Association of Exotic Mammal Veterinarians is essential for any veterinarian or veterinary technician who is committed to providing the best possible care for exotic mammal pets. Membership offers unparalleled access to a wealth of resources, including veterinary research and communications. Additionally, being part of this community connects veterinarians and veterinary technologists with a network of experts and peers who share a passion for advancing the field.",
+      "source": "https://www.aemv.org/",
+      "category": "pocket-pets",
+      "nlpAnalysis": {
+        "sentences": [
+          "Joining the Association of Exotic Mammal Veterinarians is essential for any veterinarian or veterinary technician who is committed to providing the best possible care for exotic mammal pets",
+          "Membership offers unparalleled access to a wealth of resources, including veterinary research and communications",
+          "Additionally, being part of this community connects veterinarians and veterinary technologists with a network of experts and peers who share a passion for advancing the field"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 1,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "source": "https://www.aemv.org/",
+  "type": "exotic-mammal-veterinary",
+  "category": "pocket-pets",
+  "credibility": 9
+}

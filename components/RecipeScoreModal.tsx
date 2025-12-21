@@ -10,6 +10,7 @@ import {
 import type { Recipe } from '@/lib/types';
 import healthConcerns from '@/lib/data/healthConcerns';
 import { actionNeededBeep } from '@/lib/utils/beep';
+import { ensureSellerId, isValidAmazonUrl } from '@/lib/utils/affiliateLinks';
 
 interface Props {
   recipe: Recipe;
@@ -96,9 +97,7 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
 
   function openAmazon(link: string) {
     if (!link) return;
-    // Add affiliate tag to Amazon links
-    const affiliateLink = link.includes('amazon.com') && !link.includes('tag=') ?
-      link + (link.includes('?') ? '&' : '?') + 'tag=robinfrench-20' : link;
+    const affiliateLink = isValidAmazonUrl(link) ? ensureSellerId(link) : link;
     window.open(affiliateLink, '_blank', 'noopener,noreferrer');
   }
 

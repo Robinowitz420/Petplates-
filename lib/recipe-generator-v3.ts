@@ -259,5 +259,3 @@ function assembleRecipe(raw: GeneratedRecipeRaw, pet: Pet): GeneratedRecipe | nu
     debugInfo: raw.debugInfo,
   };
 }
-
-export type { GeneratedRecipe };

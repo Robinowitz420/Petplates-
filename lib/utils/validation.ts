@@ -2,7 +2,6 @@
 // Input validation and sanitization utilities with Zod schemas
 
 import { z } from 'zod';
-import type { Pet } from '../utils/petUtils';
 import type { Recipe, Ingredient, PetNutritionProfile, CustomMeal } from '../types';
 import type { PurchaseRecord } from './purchaseTracking';
 
@@ -318,8 +317,12 @@ export const CustomMealSchema = z.object({
 
 /**
  * Validate a Pet object using Zod schema
+ *
+ * Note: returns the Zod-inferred type from PetSchema rather than enforcing
+ * a strict match with the runtime Pet interface, to avoid cross-module
+ * type incompatibilities while still giving callers a validated object.
  */
-export function validatePetWithZod(pet: unknown): { valid: boolean; error?: string; data?: Pet } {
+export function validatePetWithZod(pet: unknown): { valid: boolean; error?: string; data?: any } {
   try {
     const validated = PetSchema.parse(pet);
     return { valid: true, data: validated };
@@ -337,8 +340,11 @@ export function validatePetWithZod(pet: unknown): { valid: boolean; error?: stri
 
 /**
  * Validate a Recipe object using Zod schema
+ *
+ * Note: returns the Zod-inferred type from RecipeSchema rather than enforcing
+ * an exact match with the runtime Recipe interface.
  */
-export function validateRecipeWithZod(recipe: unknown): { valid: boolean; error?: string; data?: Recipe } {
+export function validateRecipeWithZod(recipe: unknown): { valid: boolean; error?: string; data?: any } {
   try {
     const validated = RecipeSchema.parse(recipe);
     return { valid: true, data: validated };
@@ -356,8 +362,11 @@ export function validateRecipeWithZod(recipe: unknown): { valid: boolean; error?
 
 /**
  * Validate an Ingredient object using Zod schema
+ *
+ * Note: returns the Zod-inferred type from IngredientSchema rather than enforcing
+ * an exact match with the runtime Ingredient interface.
  */
-export function validateIngredientWithZod(ingredient: unknown): { valid: boolean; error?: string; data?: Ingredient } {
+export function validateIngredientWithZod(ingredient: unknown): { valid: boolean; error?: string; data?: any } {
   try {
     const validated = IngredientSchema.parse(ingredient);
     return { valid: true, data: validated };
@@ -375,8 +384,11 @@ export function validateIngredientWithZod(ingredient: unknown): { valid: boolean
 
 /**
  * Validate a PurchaseRecord object using Zod schema
+ *
+ * Note: returns the Zod-inferred type from PurchaseRecordSchema rather than enforcing
+ * an exact match with the runtime PurchaseRecord interface.
  */
-export function validatePurchaseRecordWithZod(record: unknown): { valid: boolean; error?: string; data?: PurchaseRecord } {
+export function validatePurchaseRecordWithZod(record: unknown): { valid: boolean; error?: string; data?: any } {
   try {
     const validated = PurchaseRecordSchema.parse(record);
     return { valid: true, data: validated };
@@ -394,8 +406,11 @@ export function validatePurchaseRecordWithZod(record: unknown): { valid: boolean
 
 /**
  * Validate a PetNutritionProfile object using Zod schema
+ *
+ * Note: returns the Zod-inferred type from PetNutritionProfileSchema rather than enforcing
+ * an exact match with the runtime PetNutritionProfile interface.
  */
-export function validatePetNutritionProfileWithZod(profile: unknown): { valid: boolean; error?: string; data?: PetNutritionProfile } {
+export function validatePetNutritionProfileWithZod(profile: unknown): { valid: boolean; error?: string; data?: any } {
   try {
     const validated = PetNutritionProfileSchema.parse(profile);
     return { valid: true, data: validated };
@@ -413,8 +428,11 @@ export function validatePetNutritionProfileWithZod(profile: unknown): { valid: b
 
 /**
  * Validate a CustomMeal object using Zod schema
+ *
+ * Note: returns the Zod-inferred type from CustomMealSchema rather than enforcing
+ * an exact match with the runtime CustomMeal interface.
  */
-export function validateCustomMealWithZod(meal: unknown): { valid: boolean; error?: string; data?: CustomMeal } {
+export function validateCustomMealWithZod(meal: unknown): { valid: boolean; error?: string; data?: any } {
   try {
     const validated = CustomMealSchema.parse(meal);
     return { valid: true, data: validated };

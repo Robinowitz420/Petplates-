@@ -46,7 +46,7 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
+    <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
           <Link href="/" className="text-orange-600 font-semibold hover:underline">
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
           </p>
         </header>
         {sections.map((section) => (
-          <section key={section.title} className="bg-white rounded-2xl shadow p-6 border border-gray-100">
+          <section key={section.title} className="bg-surface rounded-2xl shadow p-6 border border-surface-highlight">
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">{section.title}</h2>
             <ul className="space-y-2 list-disc list-inside text-gray-700">
               {section.body.map((item) => (

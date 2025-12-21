@@ -5,7 +5,7 @@ interface Pet {
   name: string;
   type: string;
   breed: string;
-  age: string;
+  age: string | number;
   healthConcerns: string[];
   weight?: number;
   activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
@@ -322,7 +322,7 @@ export const getRecommendedRecipes = (
         id: `template-${template.id}`,
         name: template.name,
         category: type,
-        ageGroup: [age],
+        ageGroup: [petAgeGroup],
         healthConcerns: [normalizedConcerns[0]],
         description: template.description,
         ingredients: (template.rules.preferIngredients || []).map((ing, idx) => ({
@@ -356,12 +356,13 @@ export const getRecommendedRecipes = (
     results.forEach(result => {
       try {
         // Convert pet format for improved scoring
+        const numericAge = typeof pet.age === 'number' ? pet.age : (parseFloat(pet.age) || 1);
         const enhancedPet: EnhancedPet = {
           id: pet.id,
           name: pet.name,
           type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
           breed: pet.breed,
-          age: parseFloat(pet.age) || 1,
+          age: numericAge,
           weight: pet.weight || 10,
           activityLevel: pet.activityLevel,
           healthConcerns: pet.healthConcerns || [],

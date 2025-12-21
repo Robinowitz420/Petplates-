@@ -36,7 +36,7 @@ export default function ForumPage() {
     {
       id: 2,
       title: "STICKY: Community Recipe Contest - Winter Warmers!",
-      author: "Paw & Plate",
+      author: "Paws & Plates",
       avatar: "/images/avatars/admin.jpg",
       category: "recipes",
       replies: 67,
@@ -122,7 +122,8 @@ export default function ForumPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
+
       {/* Header */}
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
@@ -140,7 +141,8 @@ export default function ForumPage() {
         {/* Community Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md p-6 text-center">
+            <div key={index} className="bg-surface rounded-lg shadow-md p-6 text-center">
+
               <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color}`} />
               <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
               <div className="text-sm text-gray-600">{stat.label}</div>
@@ -149,7 +151,8 @@ export default function ForumPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
+
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Explore Community</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
@@ -186,7 +189,8 @@ export default function ForumPage() {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
+
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -225,7 +229,8 @@ export default function ForumPage() {
         {/* Forum Threads */}
         <div className="space-y-4">
           {filteredThreads.map((thread) => (
-            <div key={thread.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <div key={thread.id} className="bg-surface rounded-lg shadow-md hover:shadow-lg transition-shadow">
+
               <div className="p-6">
                 <div className="flex items-start gap-4">
                   {/* Avatar */}

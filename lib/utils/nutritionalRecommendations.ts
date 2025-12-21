@@ -3,6 +3,7 @@
 
 import { petSupplements, type Supplement } from '@/lib/data/supplements';
 import { getVettedProduct } from '@/lib/data/vetted-products';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 
 export interface RecommendedSupplement {
   name: string;
@@ -27,6 +28,9 @@ export function getRecommendationsForDeficiency(
 ): RecommendedSupplement[] {
   const recommendations: RecommendedSupplement[] = [];
   const lowerDeficiency = deficiency.toLowerCase();
+
+  const isCodLiverOil = (value: string | undefined | null): boolean =>
+    /\bcod\s+liver\s+oil\b/i.test(String(value || ''));
 
   // Normalize species for supplement lookup
   const supplementSpecies = species === 'pocket-pet' ? 'pocket-pets' : 
@@ -61,8 +65,27 @@ export function getRecommendationsForDeficiency(
       const categorySupplements = speciesSupplements[category as keyof typeof speciesSupplements];
       if (Array.isArray(categorySupplements)) {
         for (const supplement of categorySupplements) {
+          // Hard safety block: never recommend Cod Liver Oil (vitamin A/D overdose risk)
+          if (isCodLiverOil(supplement.name) || isCodLiverOil(supplement.description) || isCodLiverOil(supplement.amazonLink)) {
+            continue;
+          }
+
           // Check if vetted product exists
-          const vettedProduct = getVettedProduct(supplement.name);
+          // Map omega-3 / salmon oil style supplements to the vetted "fish oil" entry
+          const lowerName = supplement.name.toLowerCase();
+          const lowerDesc = supplement.description.toLowerCase();
+          const isFishOilLike =
+            lowerName.includes('omega') ||
+            lowerName.includes('fish oil') ||
+            lowerName.includes('salmon oil') ||
+            lowerDesc.includes('omega') ||
+            lowerDesc.includes('fish oil') ||
+            lowerDesc.includes('salmon') ||
+            lowerDesc.includes('sardine') ||
+            lowerDesc.includes('anchovy');
+
+          const vettedProduct = isFishOilLike ? getVettedProduct('fish oil') : getVettedProduct(supplement.name);
+          const bestLink = ensureSellerId(vettedProduct?.asinLink || supplement.amazonLink);
           
           recommendations.push({
             name: supplement.name,
@@ -71,7 +94,7 @@ export function getRecommendationsForDeficiency(
             addressesDeficiency: deficiency,
             defaultAmount: 'As directed',
             amazonLink: supplement.amazonLink,
-            asinLink: vettedProduct?.asinLink || supplement.amazonLink,
+            asinLink: bestLink,
             productName: vettedProduct?.productName || supplement.name,
             vetNote: vettedProduct?.vetNote,
           });

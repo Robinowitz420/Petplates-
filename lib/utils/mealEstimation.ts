@@ -65,7 +65,7 @@ export function quantityToGrams(quantity: string): number {
   }
   
   // Count-based items (assume average weights)
-  const countMatch = q.match(/(\d+)\s*(?:count|piece|pieces|can|cans|jar|jars|box|boxes|bag|bags|head|heads|bunch|bunches)/);
+  const countMatch = q.match(/(\d+)\s*(?:count|egg|eggs|piece|pieces|can|cans|jar|jars|box|boxes|bag|bags|head|heads|bunch|bunches)/);
   if (countMatch) {
     const count = parseInt(countMatch[1]);
     const unit = countMatch[0].toLowerCase();
@@ -143,6 +143,16 @@ export function parseAmountToGrams(amount: string | number, unit?: string): numb
     console.log('[parseAmountToGrams] ✅ Weight (oz) conversion:', result);
     return result;
   }
+  if (unitStr === 'mg' || unitStr === 'milligram' || unitStr === 'milligrams') {
+    const result = numAmount / 1000;
+    console.log('[parseAmountToGrams] ✅ Weight (mg) conversion:', result);
+    return result;
+  }
+  if (unitStr === 'mcg' || unitStr === 'μg' || unitStr === 'ug' || unitStr === 'microgram' || unitStr === 'micrograms') {
+    const result = numAmount / 1_000_000;
+    console.log('[parseAmountToGrams] ✅ Weight (mcg) conversion:', result);
+    return result;
+  }
   
   // Volume conversions (approximate, assuming water density for liquids)
   if (unitStr === 'ml' || unitStr === 'milliliter' || unitStr === 'milliliters') {
@@ -190,7 +200,8 @@ export function calculateMealsFromGroceryList(
   shoppingList: ShoppingListItem[],
   recipeGramsPerMeal?: number, // Optional: total recipe grams per meal
   species?: string, // Optional: species for species-aware product matching
-  preferBudget: boolean = true // Default to true for cost calculations - prefer budget-tier products
+  preferBudget: boolean = true, // Default to true for cost calculations - prefer budget-tier products
+  recipeServings?: number // Optional: if ingredient amounts are per-recipe batch, divide by servings to get per-meal
 ): MealEstimate {
   // #region agent log
   fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mealEstimation.ts:136',message:'calculateMealsFromGroceryList entry',data:{preferBudget},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
@@ -252,11 +263,20 @@ export function calculateMealsFromGroceryList(
       }
       console.log(`[calculateMealsFromGroceryList]   ⚠️ Using package estimate: ${packageSizeGrams}g, $${itemCost}`);
     }
+
+    if (packageSizeGrams <= 0) {
+      console.log(`[calculateMealsFromGroceryList]   ❌ Skipping - invalid packageSizeGrams:`, packageSizeGrams);
+      notes.push(`⚠️ Could not determine package size for ${item.name}`);
+      continue;
+    }
     
     // Parse recipe amount to grams
-    const recipeGrams = parseAmountToGrams(item.amount);
+    const parsedBatchGrams = parseAmountToGrams(item.amount);
+    const servings = typeof recipeServings === 'number' && recipeServings > 0 ? recipeServings : 1;
+    const recipeGrams = parsedBatchGrams / servings;
     console.log(`[calculateMealsFromGroceryList]   Recipe amount input: "${item.amount}" (type: ${typeof item.amount})`);
-    console.log(`[calculateMealsFromGroceryList]   Recipe grams parsed:`, recipeGrams);
+    console.log(`[calculateMealsFromGroceryList]   Recipe grams parsed (batch):`, parsedBatchGrams);
+    console.log(`[calculateMealsFromGroceryList]   Recipe grams per meal (batch/servings=${servings}):`, recipeGrams);
     
     if (recipeGrams <= 0) {
       console.log(`[calculateMealsFromGroceryList]   ❌ Skipping - invalid recipeGrams:`, recipeGrams);

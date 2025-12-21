@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
-import { CompatibilityBadge } from './CompatibilityBadge';
+
 import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
 import type { Pet } from '@/lib/utils/petRatingSystem';
 import RecipeScoreModal from './RecipeScoreModal';
@@ -42,7 +42,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
     };
     return calculateEnhancedCompatibility(recipe, enhancedPet);
   })() : null;
-  
+
   const compatibilityRating = enhancedScore ? {
     overallScore: enhancedScore.overallScore,
     compatibility: gradeToCompatibility(enhancedScore.grade),
@@ -56,9 +56,9 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
     <>
       <Link
         href={`/recipe/${recipe.id}${pet ? `?petId=${pet.id}` : ''}`}
-        className="group bg-surface rounded-lg shadow-md border border-surface-highlight hover:shadow-lg hover:border-orange-500/50 transition-shadow duration-200 overflow-hidden"
+        className="group bg-surface rounded-md shadow-sm border border-surface-highlight hover:border-orange-500/40 hover:shadow-md transition-shadow duration-200 overflow-hidden"
       >
-        <div className="bg-surface-highlight px-4 py-3 border-b border-surface-highlight flex items-center justify-between">
+        <div className="bg-surface-highlight/90 px-4 py-3 border-b border-surface-highlight flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="text-xs font-semibold text-foreground uppercase tracking-wide">
               {recipe.category}
@@ -81,31 +81,62 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
             {recipe.description}
           </p>
 
-          {/* Explainable scoring */}
+          {/* Compact compatibility score bar (unified with recipe detail view) */}
           {enhancedScore && (
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-4">
-              <div className="flex items-start gap-2">
-                <span className="text-lg">ℹ️</span>
-                <p className="text-sm text-blue-900">Compatibility score: {enhancedScore.overallScore}% ({enhancedScore.grade})</p>
-              </div>
-            </div>
-          )}
-          {compatibilityRating?.recommendations && compatibilityRating.recommendations.length > 0 && (
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-4">
-              <div className="flex items-start gap-2">
-                <span className="text-lg">💡</span>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-amber-900 mb-2">Suggestions:</h4>
-                  <ul className="text-sm text-amber-800 space-y-1">
-                    {compatibilityRating.recommendations.map((rec, i) => (
-                      <li key={i}>• {rec}</li>
-                    ))}
-                  </ul>
+            <div className="mb-4 rounded-lg border border-emerald-500/60 bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 p-3 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-emerald-200/80">
+                    Compatibility Score
+                  </span>
+                  <span className="text-[11px] text-emerald-100/80">
+                    For this pet profile
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold leading-none text-emerald-50">
+                    {enhancedScore.overallScore}%
+                  </div>
+                  <div className="mt-0.5 text-[10px] uppercase tracking-wide text-emerald-100/80">
+                    {gradeToCompatibility(enhancedScore.grade)} match
+                  </div>
                 </div>
               </div>
+
+              <div className="w-full bg-black/40 rounded-full h-[3px] mb-2 overflow-hidden">
+                <div
+                  className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
+                    enhancedScore.overallScore >= 80
+                      ? 'bg-emerald-400'
+                      : enhancedScore.overallScore >= 60
+                      ? 'bg-amber-300'
+                      : 'bg-red-400'
+                  }`}
+                  style={{ width: `${enhancedScore.overallScore}%` }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-emerald-100/80">
+                <span>
+                  {enhancedScore.overallScore >= 80
+                    ? '✓ Excellent match for your pet'
+                    : enhancedScore.overallScore >= 60
+                    ? '⚠ Good, but could be improved'
+                    : '✗ Needs adjustments for safety'}
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsModalOpen(true);
+                  }}
+                  className="text-[11px] font-medium underline underline-offset-4 hover:opacity-80"
+                >
+                  View details
+                </button>
+              </div>
             </div>
           )}
-
 
           {/* Meta Information */}
           {(recipe as any).meta && (
@@ -130,25 +161,6 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                   <span className="font-medium">Season:</span> {(recipe as any).meta.season.join(', ')}
                 </div>
               )}
-            </div>
-          )}
-  
-          {/* Compatibility Rating Display */}
-          {compatibilityRating && (
-            <div className="flex items-center gap-2 mb-3">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsModalOpen(true);
-                }}
-                className="cursor-pointer"
-              >
-                <CompatibilityBadge
-                  compatibility={compatibilityRating.compatibility}
-                  score={compatibilityRating.overallScore}
-                />
-              </button>
             </div>
           )}
 

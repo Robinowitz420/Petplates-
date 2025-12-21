@@ -4,6 +4,7 @@ import { catModifiers } from './data/nutrition-cat-modifiers';
 import { scoreRecipeImproved } from './scoreRecipe';
 import { getPortionPlan } from './portionCalc';
 import { scaleAmount } from './portionCalc';
+import { recipes } from './data/recipes-complete';
 import { getVettedProduct, getAllAffiliateLinks, getGenericIngredientName } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
 import { matchesSpecies } from './utils/recipeRecommendations';
 

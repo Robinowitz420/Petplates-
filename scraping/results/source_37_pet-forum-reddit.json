@@ -1,0 +1,31 @@
+{
+  "ingredients": [],
+  "nutritionalInfo": [],
+  "healthRecommendations": [],
+  "preparationMethods": [],
+  "veterinaryInsights": [],
+  "researchFindings": [
+    {
+      "text": "When sharing a wild snake include which species you found aa well as a rough geographic location.",
+      "source": "https://www.reddit.com/r/snakes/",
+      "category": "reptiles",
+      "nlpAnalysis": {
+        "sentences": [
+          "When sharing a wild snake include which species you found aa well as a rough geographic location"
+        ],
+        "keywords": [],
+        "relationships": [],
+        "sentiment": 0,
+        "entities": {
+          "ingredients": [],
+          "conditions": [],
+          "nutrients": []
+        }
+      }
+    }
+  ],
+  "source": "https://www.reddit.com/r/snakes/",
+  "type": "pet-forum-reddit",
+  "category": "reptiles",
+  "credibility": 3
+}

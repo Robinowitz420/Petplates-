@@ -117,7 +117,7 @@ export const catModifiers = {
       {
         name: "Glucosamine for Cats",
         benefit: "Supports joint health and mobility",
-        amazon: "https://www.amazon.com/s?k=glucosamine+for+cats"
+        amazon: "https://www.amazon.com/dp/B0FBTC5HSV?tag=robinfrench-20"
       },
       {
         name: "Omega-3 Fatty Acids",

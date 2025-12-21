@@ -3,6 +3,7 @@
 // CORRECTED IMPORTS: Using absolute paths from the root ('@/')
 import { Recipe, PetCategory, NutritionalRequirement } from '@/lib/types';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
+import { recipes } from '@/lib/data/recipes-complete';
 
 /**
  * Defines the complete set of filtering criteria for a pet's profile.

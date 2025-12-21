@@ -1,4 +1,4 @@
-import type { PetCategory } from '../recipe-generator';
+import type { PetCategory } from '../types';
 
 export interface ConditionTemplate {
   id: string;

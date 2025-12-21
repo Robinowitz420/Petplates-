@@ -82,11 +82,11 @@ export const BALANCEIT_ANALYSIS: CompetitorAnalysis = {
   ]
 };
 
-// Key competitive advantages for Paw & Plate
+// Key competitive advantages for Paws & Plates
 export const PAW_PLATE_ADVANTAGES = {
   exoticSupport: {
     title: "Complete Exotic Pet Coverage",
-    description: "While BalanceIT only supports dogs and cats, Paw & Plate covers birds, reptiles, and pocket pets with species-specific nutrition standards.",
+    description: "While BalanceIT only supports dogs and cats, Paws & Plates covers birds, reptiles, and pocket pets with species-specific nutrition standards.",
     impact: "Captures entire exotic pet market (30% of pet owners)"
   },
 

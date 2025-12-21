@@ -25,7 +25,7 @@ export function generateRecipeStructuredData(recipe: any) {
     })) || [],
     "author": {
       "@type": "Organization",
-      "name": "Paw & Plate"
+      "name": "Paws & Plates"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -38,12 +38,12 @@ export function generateRecipeStructuredData(recipe: any) {
 // Page-specific metadata configurations
 export const pageMetadata: Record<string, Metadata> = {
   home: {
-    title: 'Paw & Plate - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
+    title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO & WSAVA compliant.',
     keywords: ['homemade dog food', 'homemade cat food', 'DIY pet meals', 'pet meal prep', 'fresh pet food recipes'],
     openGraph: {
-      title: 'Paw & Plate - Fresh Meal Prep for All Pets',
-      description: 'Free vet-approved meal plans with one-click Amazon ordering',
+      title: 'Paws & Plates - Fresh Meal Prep for All Pets',
+      description: 'Free vet-approved meal plans with one-click Amazon ingredient ordering',
     },
   },
   
@@ -118,11 +118,11 @@ export const pageMetadata: Record<string, Metadata> = {
   },
   
   contact: {
-    title: 'Contact Us - Paw & Plate Support',
-    description: 'Get in touch with the Paw & Plate team. Questions about pet nutrition, meal plans, or account support.',
-    keywords: ['contact pet nutrition', 'Paw & Plate support', 'pet food questions'],
+    title: 'Contact Us - Paws & Plates Support',
+    description: 'Get in touch with the Paws & Plates team. Questions about pet nutrition, meal plans, or account support.',
+    keywords: ['contact pet nutrition', 'Paws & Plates support', 'pet food questions'],
     openGraph: {
-      title: 'Contact Paw & Plate',
+      title: 'Contact Paws & Plates',
       description: 'Get in touch with our pet nutrition team',
     },
   },
@@ -132,7 +132,7 @@ export const pageMetadata: Record<string, Metadata> = {
 export const organizationStructuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Paw & Plate",
+  "name": "Paws & Plates",
   "description": "Free vet-approved meal plans for dogs, cats, birds, reptiles, and pocket pets",
   "url": baseUrl,
   "logo": `${baseUrl}/images/emojis/Mascots/HeroPics/HeroBanner-v3.png`,

@@ -6,6 +6,7 @@ import { Search, CheckCircle, AlertCircle, Edit2, ExternalLink, Download } from 
 // Import the real vetted products data
 import { VETTED_PRODUCTS } from '@/lib/data/vetted-products';
 import { INITIAL_VERIFICATION_STATE } from '@/lib/data/verification-state';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 
 // Import automated correction suggestions (if available)
 let AUTOMATED_CORRECTIONS = {};
@@ -337,7 +338,7 @@ export default function ASINVerificationPage() {
 
                     <div className="flex gap-2">
                       <a
-                        href={product.amazonLink}
+                        href={ensureSellerId(product.amazonLink)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
@@ -369,7 +370,9 @@ export default function ASINVerificationPage() {
                       <div>
                         <strong>Quick Search:</strong>{' '}
                         <a
-                          href={`https://www.amazon.com/s?k=${encodeURIComponent(product.ingredient + ' for dogs')}&i=pet-supplies`}
+                          href={ensureSellerId(
+                            `https://www.amazon.com/s?k=${encodeURIComponent(product.ingredient + ' for dogs')}&i=pet-supplies`
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
@@ -380,7 +383,7 @@ export default function ASINVerificationPage() {
                       <div>
                         <strong>ASIN Check:</strong>{' '}
                         <a
-                          href={`https://www.amazon.com/dp/${product.asin}`}
+                          href={ensureSellerId(`https://www.amazon.com/dp/${product.asin}`)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"

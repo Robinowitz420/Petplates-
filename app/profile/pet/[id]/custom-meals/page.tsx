@@ -84,7 +84,7 @@ export default function CustomMealsHistoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-gray-600">Loading custom meals...</p>
       </div>
     );
@@ -92,8 +92,8 @@ export default function CustomMealsHistoryPage() {
 
   if (!pet) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-xl shadow text-center space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="bg-surface p-8 rounded-xl shadow text-center space-y-4 border border-surface-highlight">
           <p className="text-xl font-semibold text-gray-800">Pet not found.</p>
           <Link href="/profile" className="text-green-800 font-semibold">
             Back to Profiles
@@ -110,9 +110,9 @@ export default function CustomMealsHistoryPage() {
     : 'Pet';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-surface border-b border-surface-highlight sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ export default function CustomMealsHistoryPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-3">
         {customMeals.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <div className="bg-surface rounded-lg border border-surface-highlight p-12 text-center">
             <ChefHat size={48} className="mx-auto text-gray-400 mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No custom meals yet</h2>
             <p className="text-gray-600 mb-6">
@@ -163,7 +163,7 @@ export default function CustomMealsHistoryPage() {
             {customMeals.map((meal) => (
               <div
                 key={meal.id}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                className="bg-surface rounded-lg border border-surface-highlight p-6 hover:shadow-lg transition-shadow"
               >
                 {/* Meal Header */}
                 <div className="flex items-start justify-between mb-4">
