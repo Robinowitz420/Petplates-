@@ -77,6 +77,192 @@ interface IngredientAnalysis {
   notes: string[];
 }
 
+type NutrientRange = { min: number; max: number };
+type MacroRequirements = {
+  protein?: NutrientRange;
+  fat?: NutrientRange;
+  fiber?: NutrientRange;
+  calcium?: NutrientRange;
+  phosphorus?: NutrientRange;
+  idealCaPRatio?: number;
+};
+
+function applyIngredientAliases(s: string): string {
+  const v = (s || '').trim();
+  if (!v) return v;
+
+  const aliases: Array<{ test: (x: string) => boolean; value: string }> = [
+    { test: (x) => x.includes('pellet fortified') || x.includes('pellets fortified') || x.includes('fortified pellet') || x.includes('fortified pellets'), value: 'pellets_fortified' },
+    { test: (x) => x === 'pellet' || x === 'pellets', value: 'pellets' },
+    { test: (x) => x.includes('eggshell') || x.includes('egg shell') || x.includes('egg shells'), value: 'calcium_carbonate' },
+    { test: (x) => x.includes('calcium carbonate'), value: 'calcium_carbonate' },
+    { test: (x) => x.includes('fish oil') || x.includes('salmon oil'), value: 'fish_oil' },
+    { test: (x) => x === 'olive oil', value: 'olive_oil' },
+    { test: (x) => x.includes('timothy hay'), value: 'timothy_hay' },
+    { test: (x) => x.includes('orchard grass hay'), value: 'orchard_grass_hay' },
+    { test: (x) => x.includes('meadow hay'), value: 'meadow_hay' },
+    { test: (x) => x.startsWith('guinea pig pellet') || x.startsWith('guinea pig pellets'), value: 'guinea_pig_pellets' },
+    { test: (x) => x.includes('timothy based pellet') || x.includes('timothy based pellets'), value: 'timothy_pellets' },
+    { test: (x) => x === 'egg yolk', value: 'egg_yolk' },
+    { test: (x) => x.startsWith('egg ') && (x.includes('hard boiled') || x.includes('hard-boiled')), value: 'egg' },
+    { test: (x) => x.includes('quail egg'), value: 'egg' },
+    { test: (x) => x.includes('quail meat'), value: 'quail' },
+    { test: (x) => x.startsWith('ground beef'), value: 'ground_beef' },
+    { test: (x) => x.startsWith('ground turkey'), value: 'ground_turkey' },
+    { test: (x) => x.startsWith('salmon') && !x.includes('oil'), value: 'salmon' },
+    { test: (x) => x === 'chicken liver', value: 'chicken_liver' },
+    { test: (x) => x === 'beef liver', value: 'beef_liver' },
+    { test: (x) => x === 'green bean' || x === 'green beans', value: 'green_beans' },
+    { test: (x) => x.startsWith('bell pepper') || x.startsWith('bell peppers'), value: 'bell_pepper' },
+    { test: (x) => x === 'kale raw', value: 'kale' },
+    { test: (x) => x === 'carrot raw', value: 'carrot' },
+  ];
+
+  for (const a of aliases) {
+    if (a.test(v)) return a.value;
+  }
+  return v;
+}
+
+// IMPORTANT: use the same normalization everywhere we look up compatibility/composition.
+// This fixes "egg (hard-boiled)" / "Bell Peppers (high vitamin C)" missing their data.
+function normalizeIngredientKey(name: string): string {
+  let s = (name || '').toLowerCase().trim();
+  if (!s) return '';
+
+  s = s.replace(/[()]/g, ' ');
+  s = s.replace(/[\/.,]/g, ' ');
+  s = s.replace(/[^a-z0-9\s-]+/g, ' ');
+  s = s.replace(/\s+/g, ' ').trim();
+
+  const words = s
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w));
+
+  s = words.join(' ');
+  s = applyIngredientAliases(s);
+
+  return s.replace(/\s+/g, '_');
+}
+
+function inferReptileDiet(breedRaw: string): 'herbivore' | 'carnivore' | 'omnivore' {
+  const breed = (breedRaw || '').toLowerCase();
+  if (/(tortoise|turtle|uromastyx|iguana)/.test(breed)) return 'herbivore';
+  if (/(python|boa|snake|ball python|corn snake|king snake)/.test(breed)) return 'carnivore';
+  if (/(gecko|chameleon|bearded|dragon|skink)/.test(breed)) return 'omnivore';
+  return 'omnivore';
+}
+
+function inferPocketPetSubtype(breedRaw: string): 'hay_eater' | 'omnivore' | 'carnivore' {
+  const breed = (breedRaw || '').toLowerCase();
+  if (/(ferret)/.test(breed)) return 'carnivore';
+  if (/(guinea|guinea pig|rabbit|chinchilla)/.test(breed)) return 'hay_eater';
+  return 'omnivore';
+}
+
+/**
+ * Species/subtype-aware macro requirements.
+ * These are intentionally broad for non-dog/cat species to avoid false negatives.
+ */
+function getMacroRequirementsForPet(
+  pet: Pet,
+  normalizedSpecies: string,
+  ageGroup: 'puppy' | 'adult' | 'senior'
+): MacroRequirements | null {
+  // Dogs/Cats: keep using existing guidelines (these are what your scorer was built around)
+  if (normalizedSpecies === 'dog' || normalizedSpecies === 'cat') {
+    const speciesMap: Record<string, keyof typeof nutritionalGuidelines> = {
+      dog: 'dogs',
+      cat: 'cats',
+    };
+    const petCategory = speciesMap[normalizedSpecies];
+    return nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult || null;
+  }
+
+  // Birds: prefer avian standards if available, otherwise broad defaults.
+  if (normalizedSpecies === 'bird') {
+    const standards = getAvianStandards(pet.breed) || AVIAN_NUTRITION_STANDARDS.psittacines;
+    return {
+      protein: standards.protein ? { min: standards.protein.min ?? 12, max: standards.protein.max ?? 25 } : { min: 10, max: 25 },
+      fat: standards.fat ? { min: standards.fat.min ?? 3, max: standards.fat.max ?? 12 } : { min: 3, max: 12 },
+      fiber: standards.fiber ? { min: standards.fiber.min ?? 3, max: standards.fiber.max ?? 15 } : { min: 3, max: 15 },
+      calcium: standards.calcium ? { min: standards.calcium.min ?? 0.6, max: standards.calcium.max ?? 2.5 } : { min: 0.6, max: 2.5 },
+      phosphorus: standards.phosphorus ? { min: standards.phosphorus.min ?? 0.4, max: standards.phosphorus.max ?? 2.0 } : { min: 0.4, max: 2.0 },
+      idealCaPRatio: 1.8,
+    };
+  }
+
+  // Reptiles: DO NOT apply dog/cat macro minima. Use diet-based bands.
+  if (normalizedSpecies === 'reptile') {
+    const diet = inferReptileDiet(pet.breed || '');
+    if (diet === 'herbivore') {
+      return {
+        protein: { min: 6, max: 18 },
+        fat: { min: 1, max: 8 },
+        fiber: { min: 10, max: 35 },
+        calcium: { min: 0.8, max: 3.0 },
+        phosphorus: { min: 0.4, max: 2.0 },
+        idealCaPRatio: 2.0,
+      };
+    }
+    if (diet === 'carnivore') {
+      return {
+        protein: { min: 12, max: 35 },
+        fat: { min: 3, max: 25 },
+        fiber: { min: 0, max: 8 },
+        calcium: { min: 0.8, max: 3.0 },
+        phosphorus: { min: 0.6, max: 2.5 },
+        idealCaPRatio: 1.5,
+      };
+    }
+    // omnivore / insectivore-ish defaults
+    return {
+      protein: { min: 10, max: 30 },
+      fat: { min: 2, max: 18 },
+      fiber: { min: 2, max: 20 },
+      calcium: { min: 0.8, max: 3.0 },
+      phosphorus: { min: 0.5, max: 2.5 },
+      idealCaPRatio: 1.8,
+    };
+  }
+
+  // Pocket pets: subtype-aware (guinea pig should not be judged like a dog).
+  if (normalizedSpecies === 'pocket-pet') {
+    const subtype = inferPocketPetSubtype(pet.breed || '');
+    if (subtype === 'hay_eater') {
+      return {
+        protein: { min: 8, max: 18 },
+        fat: { min: 1, max: 8 },
+        fiber: { min: 15, max: 35 },
+        calcium: { min: 0.6, max: 2.5 },
+        phosphorus: { min: 0.4, max: 2.0 },
+        idealCaPRatio: 1.8,
+      };
+    }
+    if (subtype === 'carnivore') {
+      return {
+        protein: { min: 30, max: 45 },
+        fat: { min: 15, max: 30 },
+        fiber: { min: 0, max: 4 },
+        calcium: { min: 0.8, max: 3.0 },
+        phosphorus: { min: 0.6, max: 2.5 },
+        idealCaPRatio: 1.5,
+      };
+    }
+    return {
+      protein: { min: 12, max: 28 },
+      fat: { min: 4, max: 18 },
+      fiber: { min: 5, max: 25 },
+      calcium: { min: 0.6, max: 2.5 },
+      phosphorus: { min: 0.4, max: 2.0 },
+      idealCaPRatio: 1.8,
+    };
+  }
+
+  return null;
+}
+
 /**
  * Enhanced compatibility scoring with ingredient-level analysis
  * 
@@ -238,7 +424,7 @@ function calculateIngredientSafety(
 
   for (const ing of ingredients) {
     const ingName = typeof ing === 'string' ? ing : ing.name;
-    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingKey = normalizeIngredientKey(ingName);
     const ingNameLower = ingName.toLowerCase();
     
     // Check if ingredient is banned by user
@@ -403,22 +589,22 @@ function calculateNutritionalAdequacy(
     if (pet.age < 1) ageGroup = 'puppy';
     else if (pet.age >= 7) ageGroup = 'senior';
   }
-  
-  // Map normalized species to PetCategory
-  const speciesMap: Record<string, keyof typeof nutritionalGuidelines> = {
-    'dog': 'dogs',
-    'cat': 'cats',
-    'bird': 'birds',
-    'reptile': 'reptiles',
-    'pocket-pet': 'pocket-pets',
-  };
-  
-  const petCategory = speciesMap[normalizedSpecies];
-  let requirements = petCategory ? nutritionalGuidelines[petCategory]?.[ageGroup] : null;
-  
-  // Fallback to adult if specific age group not available
-  if (!requirements && petCategory) {
-    requirements = nutritionalGuidelines[petCategory]?.adult;
+
+  let requirements = getMacroRequirementsForPet(pet, normalizedSpecies, ageGroup);
+
+  const breedLower = (pet.breed || '').toLowerCase();
+  const isHerbivoreReptile = normalizedSpecies === 'reptile' && /(tortoise|turtle|iguana)/.test(breedLower);
+  const isHayEaterPocketPet = normalizedSpecies === 'pocket-pet' && /(guinea|rabbit|chinchilla)/.test(breedLower);
+  const shouldSkipMacroBands = isHerbivoreReptile || isHayEaterPocketPet;
+
+  // Must null out requirements BEFORE macro-band scoring runs. For herbivore reptiles and
+  // hay-eater pocket pets, dog/cat-style protein/fat/fiber/calcium/phosphorus bands are not
+  // representative and can incorrectly penalize otherwise-appropriate diets.
+  if (shouldSkipMacroBands) {
+    requirements = null;
+    if ((recipe as any)?.debug === true) {
+      issues.push('Macro bands skipped for herbivore/hay-eater profile');
+    }
   }
   
   // Initialize nutrient scores
@@ -500,55 +686,51 @@ function calculateNutritionalAdequacy(
       totalScore += score * 0.15;
       totalWeight += 0.15;
     }
-    
-    // Ca:P ratio precision scoring (Phase 2.2)
-    if (nutrition.calcium && nutrition.phosphorus && requirements.calcium && requirements.phosphorus) {
-      const caPRatio = nutrition.calcium / nutrition.phosphorus;
-      // Ideal Ca:P ratio varies by species, but generally 1.2:1 to 2:1
-      const idealCaP = petCategory === 'dogs' || petCategory === 'cats' ? 1.5 : 1.8;
-      const minCaP = 1.2;
-      const maxCaP = 2.0;
-      
-      if (caPRatio >= minCaP && caPRatio <= maxCaP) {
-        // Calculate distance from ideal
-        const distance = Math.abs(caPRatio - idealCaP) / (maxCaP - minCaP);
-        const ratioScore = 100 - (distance * 50); // Max penalty -50
-        totalScore += ratioScore * 0.10; // 10% weight for ratio
-        totalWeight += 0.10;
-        
-        if (distance < 0.1) {
-          strengths.push(`Optimal Ca:P ratio (${caPRatio.toFixed(2)})`);
-        } else if (distance < 0.3) {
-          strengths.push(`Good Ca:P ratio (${caPRatio.toFixed(2)})`);
-        } else {
-          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) could be closer to ideal (${idealCaP})`);
-        }
+  }
+
+  // Ca:P ratio precision scoring (Phase 2.2)
+  if (nutrition.calcium && nutrition.phosphorus) {
+    const caPRatio = nutrition.calcium / nutrition.phosphorus;
+    const idealCaP =
+      (requirements as any)?.idealCaPRatio ??
+      (normalizedSpecies === 'dog' || normalizedSpecies === 'cat' ? 1.5 : 1.8);
+    const minCaP = 1.2;
+    const maxCaP = 2.0;
+
+    if (caPRatio >= minCaP && caPRatio <= maxCaP) {
+      const distance = Math.abs(caPRatio - idealCaP) / (maxCaP - minCaP);
+      const ratioScore = 100 - (distance * 50);
+      totalScore += ratioScore * 0.10;
+      totalWeight += 0.10;
+
+      if (distance < 0.1) {
+        strengths.push(`Optimal Ca:P ratio (${caPRatio.toFixed(2)})`);
+      } else if (distance < 0.3) {
+        strengths.push(`Good Ca:P ratio (${caPRatio.toFixed(2)})`);
       } else {
-        // Outside ideal range - elastic thresholds with diminishing returns
-        const safeMin = 0.8; // Animals tolerate broader ranges
-        const safeMax = 3.0;
-        
-        if (caPRatio >= safeMin && caPRatio < minCaP) {
-          // Slightly low - small penalty
-          const deviation = minCaP - caPRatio;
-          const penalty = Math.min(deviation * 5, 10); // Reduced penalty
-          totalScore -= penalty * 0.10;
-          totalWeight += 0.10;
-          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) slightly below ideal range`);
-        } else if (caPRatio > maxCaP && caPRatio <= safeMax) {
-          // Slightly high - small penalty
-          const deviation = caPRatio - maxCaP;
-          const penalty = Math.min(deviation * 5, 10); // Reduced penalty
-          totalScore -= penalty * 0.10;
-          totalWeight += 0.10;
-          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) slightly above ideal range`);
-        } else {
-          // Outside safe range - larger penalty
-          const penalty = caPRatio < safeMin ? (safeMin - caPRatio) * 20 : (caPRatio - safeMax) * 20;
-          totalScore -= Math.min(penalty, 50) * 0.10;
-          totalWeight += 0.10;
-          issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) outside safe range (${safeMin}-${safeMax})`);
-        }
+        issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) could be closer to ideal (${idealCaP})`);
+      }
+    } else {
+      const safeMin = 0.8;
+      const safeMax = 3.0;
+
+      if (caPRatio >= safeMin && caPRatio < minCaP) {
+        const deviation = minCaP - caPRatio;
+        const penalty = Math.min(deviation * 5, 10);
+        totalScore -= penalty * 0.10;
+        totalWeight += 0.10;
+        issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) slightly below ideal range`);
+      } else if (caPRatio > maxCaP && caPRatio <= safeMax) {
+        const deviation = caPRatio - maxCaP;
+        const penalty = Math.min(deviation * 5, 10);
+        totalScore -= penalty * 0.10;
+        totalWeight += 0.10;
+        issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) slightly above ideal range`);
+      } else {
+        const penalty = caPRatio < safeMin ? (safeMin - caPRatio) * 20 : (caPRatio - safeMax) * 20;
+        totalScore -= Math.min(penalty, 50) * 0.10;
+        totalWeight += 0.10;
+        issues.push(`Ca:P ratio (${caPRatio.toFixed(2)}) outside safe range (${safeMin}-${safeMax})`);
       }
     }
   }
@@ -569,8 +751,16 @@ function calculateNutritionalAdequacy(
   // Safety validation check (still important for critical failures)
   if (normalizedSpecies === 'dog' || normalizedSpecies === 'cat') {
     const lifeStage = pet.age < 1 ? 'growth' : 'adult';
+    // validateCriticalNutrients expects % values on the object passed in. We validate against
+    // the computed nutrition percents to avoid defaulting missing recipe.* fields to 0.0%.
     const validation = validateCriticalNutrients(
-      recipe,
+      {
+        protein: nutrition.protein,
+        fat: nutrition.fat,
+        fiber: nutrition.fiber,
+        calcium: nutrition.calcium,
+        phosphorus: nutrition.phosphorus,
+      } as any,
       normalizedSpecies as 'dog' | 'cat',
       lifeStage
     );
@@ -1019,7 +1209,7 @@ function calculateSafetyScore(
   
   for (const ing of ingredients) {
     const ingName = typeof ing === 'string' ? ing : ing.name;
-    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingKey = normalizeIngredientKey(ingName);
     const ingNameLower = ingName.toLowerCase();
     
     // Check if ingredient is banned
@@ -1058,15 +1248,17 @@ function calculateSafetyScore(
   if (hasAvoid || hasAllergen) {
     return 0; // Unsafe - will gate overall score
   }
+
+  // Nutrition deficits are handled by the Nutritional Adequacy factor. For non-dog/cat species
+  // (birds/reptiles/pocket pets), we avoid hard-gating "safety" on macro minimums.
+  if (normalizedSpecies !== 'dog' && normalizedSpecies !== 'cat') {
+    return 100;
+  }
   
   // Check hard nutritional minimums (meets core species standards)
   const nutrition = calculateRecipeNutrition(recipe);
-  const petCategory = normalizedSpecies === 'dog' ? 'dogs' : 
-                      normalizedSpecies === 'cat' ? 'cats' :
-                      normalizedSpecies === 'bird' ? 'birds' :
-                      normalizedSpecies === 'reptile' ? 'reptiles' : 'pocket-pets';
   const ageGroup = pet.age < 1 ? 'puppy' : pet.age >= 7 ? 'senior' : 'adult';
-  const requirements = nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult;
+  const requirements = getMacroRequirementsForPet(pet, normalizedSpecies, ageGroup);
   
   if (requirements) {
     // Check critical minimums
@@ -1133,7 +1325,7 @@ function analyzeIngredients(
 
   for (const ing of ingredients) {
     const ingName = typeof ing === 'string' ? ing : ing.name;
-    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingKey = normalizeIngredientKey(ingName);
     
     const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
     const composition = getIngredientComposition(ingKey);
@@ -1224,7 +1416,10 @@ function analyzeNutrition(
  * Calculate recipe nutrition from ingredients
  * Returns nutrition values as percentages (dry matter basis)
  */
-export function calculateRecipeNutrition(recipe: Recipe): {
+export function calculateRecipeNutrition(
+  recipe: Recipe,
+  options?: { includeBreakdown?: boolean }
+): {
   protein: number;
   fat: number;
   fiber: number;
@@ -1234,6 +1429,14 @@ export function calculateRecipeNutrition(recipe: Recipe): {
   source: 'real' | 'estimated';
   usesFallbackNutrition?: boolean;
   fallbackIngredients?: string[];
+  breakdown?: Array<{
+    name: string;
+    amountG: number;
+    ingKey: string;
+    used: 'composition' | 'fallback' | 'forced_calcium';
+    calciumMg: number;
+    phosphorusMg: number;
+  }>;
 } {
   // Check if recipe has pre-calculated nutritional data (from custom meal analysis)
   const nutritionalCalc = (recipe as any).nutritionalCalculation;
@@ -1244,8 +1447,8 @@ export function calculateRecipeNutrition(recipe: Recipe): {
       protein: totalGrams > 0 ? ((nutritionalCalc.protein_g || 0) / totalGrams) * 100 : 0,
       fat: totalGrams > 0 ? ((nutritionalCalc.fat_g || 0) / totalGrams) * 100 : 0,
       fiber: totalGrams > 0 ? ((nutritionalCalc.fiber_g || 0) / totalGrams) * 100 : 0,
-      calcium: totalGrams > 0 ? ((nutritionalCalc.ca_mg || 0) / totalGrams) * 100 : 0,
-      phosphorus: totalGrams > 0 ? ((nutritionalCalc.p_mg || 0) / totalGrams) * 100 : 0,
+      calcium: totalGrams > 0 ? (((nutritionalCalc.ca_mg || 0) / 1000) / totalGrams) * 100 : 0,
+      phosphorus: totalGrams > 0 ? (((nutritionalCalc.p_mg || 0) / 1000) / totalGrams) * 100 : 0,
       calories: totalGrams > 0 ? ((nutritionalCalc.calories_kcal || nutritionalCalc.kcal || 0) / totalGrams) * 100 : 0,
       source: 'real',
     };
@@ -1263,12 +1466,21 @@ export function calculateRecipeNutrition(recipe: Recipe): {
   let totalWeight = 0;
   let realDataCount = 0;
   const fallbackIngredients: string[] = [];
+  const breakdown: Array<{
+    name: string;
+    amountG: number;
+    ingKey: string;
+    used: 'composition' | 'fallback' | 'forced_calcium';
+    calciumMg: number;
+    phosphorusMg: number;
+  }> = [];
 
   // Helper function to map supplement names to ingredient composition keys
   const mapSupplementToCompositionKey = (supplementName: string): string | null => {
     const lower = supplementName.toLowerCase();
     // Map common supplement names to ingredient composition keys
     if (lower.includes('taurine')) return 'taurine_powder';
+    if (lower.includes('eggshell') || lower.includes('egg shell') || lower.includes('egg shells')) return 'calcium_carbonate';
     if (lower.includes('calcium') && (lower.includes('carbonate') || lower.includes('supplement'))) return 'calcium_carbonate';
     if (lower.includes('omega') || lower.includes('fish oil') || lower.includes('krill') || lower.includes('salmon oil')) return 'fish_oil';
     // Note: psyllium, probiotics, vitamins don't have composition data yet
@@ -1281,7 +1493,7 @@ export function calculateRecipeNutrition(recipe: Recipe): {
     const name = typeof ingredient === 'string' ? ingredient : ingredient.name;
     const amount = typeof ingredient === 'string' ? 100 : (ingredient.amount ? parseFloat(String(ingredient.amount).replace(/[^0-9.]/g, '')) : 100);
 
-    const ingKey = name.toLowerCase().replace(/\s+/g, '_');
+    const ingKey = normalizeIngredientKey(name);
     const composition = getIngredientComposition(ingKey);
     
     if (composition && composition.protein !== undefined) {
@@ -1301,19 +1513,85 @@ export function calculateRecipeNutrition(recipe: Recipe): {
       totalCalories += (composition.kcal || 0) * (amount / 100);
       totalWeight += amount;
       realDataCount++;
+
+      if (options?.includeBreakdown) {
+        breakdown.push({
+          name,
+          amountG: amount,
+          ingKey,
+          used: 'composition',
+          calciumMg: (composition.calcium || 0) * (amount / 100),
+          phosphorusMg: (composition.phosphorus || 0) * (amount / 100),
+        });
+      }
     } else {
-      // Try fallback nutrition
-      const fallback = getFallbackNutrition(name);
-      if (fallback) {
+      if (ingKey === 'calcium_carbonate') {
+        const forced = { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0 };
         fallbackIngredients.push(name);
-        totalProtein += (fallback.protein || 0) * (amount / 100);
-        totalFat += (fallback.fat || 0) * (amount / 100);
-        totalFiber += (fallback.fiber || 0) * (amount / 100);
-        totalCalcium += (fallback.calcium || 0) * (amount / 100);
-        totalPhosphorus += (fallback.phosphorus || 0) * (amount / 100);
-        totalCalories += (fallback.kcal || 0) * (amount / 100);
+        totalProtein += (forced.protein || 0) * (amount / 100);
+        totalFat += (forced.fat || 0) * (amount / 100);
+        totalFiber += (forced.fiber || 0) * (amount / 100);
+        totalCalcium += (forced.calcium || 0) * (amount / 100);
+        totalPhosphorus += (forced.phosphorus || 0) * (amount / 100);
+        totalCalories += (forced.kcal || 0) * (amount / 100);
         totalWeight += amount;
         realDataCount++;
+
+        if (options?.includeBreakdown) {
+          breakdown.push({
+            name,
+            amountG: amount,
+            ingKey,
+            used: 'forced_calcium',
+            calciumMg: (forced.calcium || 0) * (amount / 100),
+            phosphorusMg: (forced.phosphorus || 0) * (amount / 100),
+          });
+        }
+        continue;
+      }
+
+      // Try fallback nutrition
+      const fallback = getFallbackNutrition(name);
+      const nameLower = name.toLowerCase();
+
+      const explicitFallback =
+        ingKey === 'calcium_carbonate'
+          ? { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0 }
+          : (ingKey === 'fish_oil' || ingKey === 'olive_oil')
+          ? { protein: 0, fat: 100, fiber: 0, calcium: 0, phosphorus: 0, kcal: 900 }
+          : ingKey === 'pellets_fortified'
+          ? { protein: 18, fat: 6, fiber: 8, calcium: 1200, phosphorus: 600, kcal: 360 }
+          : null;
+
+      const genericFallback =
+        (nameLower.includes('pellet') || ingKey.includes('pellet'))
+          ? { protein: 14, fat: 5, fiber: 8, calcium: 800, phosphorus: 500, kcal: 350 }
+          : (nameLower.includes('hay') || ingKey.includes('hay'))
+          ? { protein: 8, fat: 2, fiber: 30, calcium: 500, phosphorus: 250, kcal: 200 }
+          : null;
+
+      const chosenFallback = explicitFallback || fallback || genericFallback;
+      if (chosenFallback) {
+        fallbackIngredients.push(name);
+        totalProtein += (chosenFallback.protein || 0) * (amount / 100);
+        totalFat += (chosenFallback.fat || 0) * (amount / 100);
+        totalFiber += (chosenFallback.fiber || 0) * (amount / 100);
+        totalCalcium += (chosenFallback.calcium || 0) * (amount / 100);
+        totalPhosphorus += (chosenFallback.phosphorus || 0) * (amount / 100);
+        totalCalories += (chosenFallback.kcal || 0) * (amount / 100);
+        totalWeight += amount;
+        realDataCount++;
+
+        if (options?.includeBreakdown) {
+          breakdown.push({
+            name,
+            amountG: amount,
+            ingKey,
+            used: 'fallback',
+            calciumMg: (chosenFallback.calcium || 0) * (amount / 100),
+            phosphorusMg: (chosenFallback.phosphorus || 0) * (amount / 100),
+          });
+        }
       }
     }
   }
@@ -1374,12 +1652,13 @@ export function calculateRecipeNutrition(recipe: Recipe): {
       protein: (totalProtein / totalWeight) * 100,
       fat: (totalFat / totalWeight) * 100,
       fiber: (totalFiber / totalWeight) * 100,
-      calcium: (totalCalcium / totalWeight) * 100,
-      phosphorus: (totalPhosphorus / totalWeight) * 100,
+      calcium: ((totalCalcium / totalWeight) * 100) / 1000,
+      phosphorus: ((totalPhosphorus / totalWeight) * 100) / 1000,
       calories: (totalCalories / totalWeight) * 100,
       source: fallbackIngredients.length > 0 ? 'estimated' : 'real',
       usesFallbackNutrition: fallbackIngredients.length > 0,
       fallbackIngredients: fallbackIngredients.length > 0 ? fallbackIngredients : undefined,
+      breakdown: options?.includeBreakdown ? breakdown : undefined,
     };
   }
 
@@ -1420,7 +1699,7 @@ function isPerfectMatch(recipe: Recipe, pet: Pet): boolean {
   const ingredients = recipe.ingredients || [];
   for (const ing of ingredients) {
     const ingName = typeof ing === 'string' ? ing : ing.name;
-    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingKey = normalizeIngredientKey(ingName);
     const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
     if (compat === 'avoid') return false;
   }
@@ -1440,12 +1719,8 @@ function isPerfectMatch(recipe: Recipe, pet: Pet): boolean {
   
   // Recipe must meet OPTIMAL nutrient requirements (not just minimums)
   const nutrition = calculateRecipeNutrition(recipe);
-  const petCategory = normalizedSpecies === 'dog' ? 'dogs' : 
-                      normalizedSpecies === 'cat' ? 'cats' :
-                      normalizedSpecies === 'bird' ? 'birds' :
-                      normalizedSpecies === 'reptile' ? 'reptiles' : 'pocket-pets';
   const ageGroup = pet.age < 1 ? 'puppy' : pet.age >= 7 ? 'senior' : 'adult';
-  const requirements = nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult;
+  const requirements = getMacroRequirementsForPet(pet, normalizedSpecies, ageGroup);
   
   if (requirements) {
     // Require nutrition to be in IDEAL range (middle 30% of min-max range - very strict for perfect match)
@@ -1530,7 +1805,7 @@ function isPerfectMatch(recipe: Recipe, pet: Pet): boolean {
   const ingredientTypes = new Set<string>();
   for (const ing of ingredients) {
     const ingName = typeof ing === 'string' ? ing : ing.name;
-    const ingKey = ingName.toLowerCase().replace(/\s+/g, '_');
+    const ingKey = normalizeIngredientKey(ingName);
     const compat = getSpeciesCompatibility(ingKey, normalizedSpecies);
     if (compat === 'ok') {
       // Categorize ingredient type
@@ -1701,12 +1976,8 @@ export function isGoldStandardForSimplePet(recipe: Recipe, pet: Pet): boolean {
   // Core nutrients within ideal bands
   const nutrition = calculateRecipeNutrition(recipe);
   const normalizedSpecies = normalizeSpecies(pet.type);
-  const petCategory = normalizedSpecies === 'dog' ? 'dogs' : 
-                      normalizedSpecies === 'cat' ? 'cats' :
-                      normalizedSpecies === 'bird' ? 'birds' :
-                      normalizedSpecies === 'reptile' ? 'reptiles' : 'pocket-pets';
   const ageGroup = pet.age < 1 ? 'puppy' : pet.age >= 7 ? 'senior' : 'adult';
-  const requirements = nutritionalGuidelines[petCategory]?.[ageGroup] || nutritionalGuidelines[petCategory]?.adult;
+  const requirements = getMacroRequirementsForPet(pet, normalizedSpecies, ageGroup);
   
   if (requirements) {
     if (requirements.protein) {

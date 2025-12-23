@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
@@ -57,6 +57,7 @@ const getCombinedRecipes = (): Recipe[] => {
 
 export default function RecommendedRecipesPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const [pet, setPet] = useState<Pet | null>(null);
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
   const [engineMeals, setEngineMeals] = useState<ModifiedRecipeResult[] | null>(null);
@@ -73,6 +74,8 @@ export default function RecommendedRecipesPage() {
     const userId = getCurrentUserId();
     return `generated_meals_v1:${userId}:${petId}`;
   }, [petId]);
+
+  const forceRegenerate = searchParams.get('regenerate') === '1';
 
   const petDisplayName = useMemo(() => {
     if (!pet) return 'Pet';
@@ -146,6 +149,15 @@ export default function RecommendedRecipesPage() {
   useEffect(() => {
     if (!pet) return;
 
+    if (forceRegenerate && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(mealsCacheKey);
+      } catch {
+      }
+      lastGeneratedPetIdRef.current = null;
+      setEngineMeals(null);
+    }
+
     if (typeof window !== 'undefined') {
       try {
         const cachedRaw = localStorage.getItem(mealsCacheKey);
@@ -161,9 +173,18 @@ export default function RecommendedRecipesPage() {
       }
     }
 
+    if (forceRegenerate && typeof window !== 'undefined') {
+      try {
+        window.history.replaceState(null, '', `/profile/pet/${petId}`);
+      } catch {
+      }
+    }
+
     if (generationInFlightRef.current) return;
     if (lastGeneratedPetIdRef.current === pet.id && engineMeals && engineMeals.length > 0) return;
     let isMounted = true;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     setLoadingMeals(true);
     setEngineError(null);
     setShowQuotaPopup(false);
@@ -172,9 +193,6 @@ export default function RecommendedRecipesPage() {
 
     (async () => {
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -239,13 +257,22 @@ export default function RecommendedRecipesPage() {
         }
       } catch (error) {
         if (!isMounted) return;
-        console.error('Recipe generation error:', error);
+        const isAbortError =
+          (error as any)?.name === 'AbortError' ||
+          (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError');
+        if (isAbortError) {
+          return;
+        }
+        if (!isAbortError) {
+          console.error('Recipe generation error:', error);
+        }
         const rawMessage = error instanceof Error ? error.message : String(error);
         const isQuotaClosed =
           rawMessage.includes('Gemini quota is not enabled') ||
           rawMessage.includes('RESOURCE_EXHAUSTED') ||
           rawMessage.includes('Quota exceeded') ||
           rawMessage.includes('limit: 0');
+
         if (isQuotaClosed) {
           setEngineError(
             'The Kitchen is currently closed (Google API Quota). Please check back in a few hours!'
@@ -289,17 +316,35 @@ export default function RecommendedRecipesPage() {
           setEngineMeals((data?.results as ModifiedRecipeResult[]) || []);
         } catch (fallbackError) {
           if (!isMounted) return;
+          const isAbortError =
+            (fallbackError as any)?.name === 'AbortError' ||
+            (typeof DOMException !== 'undefined' &&
+              fallbackError instanceof DOMException &&
+              fallbackError.name === 'AbortError');
+          if (isAbortError) {
+            return;
+          }
+          if (!isAbortError) {
+            console.error('Recommendations error:', fallbackError);
+          }
           setEngineMeals(null);
           setEngineError('Unable to load meals—showing standard matches.');
         }
       } finally {
+        clearTimeout(timeoutId);
         if (isMounted) {
           setLoadingMeals(false);
         }
         generationInFlightRef.current = false;
       }
     })();
-  }, [pet, regenerateNonce]);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [pet, regenerateNonce, forceRegenerate, mealsCacheKey, petId]);
 
   const handleRegenerate = () => {
     if (typeof window !== 'undefined') {
