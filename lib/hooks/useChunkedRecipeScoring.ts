@@ -34,6 +34,39 @@ const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 const CHUNK_SIZE = 20; // Recipes per frame
 const MAX_CACHE_SIZE_MB = 5; // Maximum cache size in MB
 const MAX_CACHE_ENTRIES = 50; // Maximum number of cache entries before LRU eviction
+const SCORE_JITTER_STEP = 1;
+const MAX_JITTER_TOTAL = 5;
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+function applyScoreJitter(items: ScoredMeal[]): ScoredMeal[] {
+  const jittered = items.map((item) => ({ ...item }));
+  let i = 0;
+
+  while (i < jittered.length) {
+    const baseScore = jittered[i].score;
+    let j = i + 1;
+
+    while (j < jittered.length && Math.abs(jittered[j].score - baseScore) < 0.001) {
+      j++;
+    }
+
+    const groupSize = j - i;
+    if (groupSize > 1) {
+      const positiveOffset = Math.min(SCORE_JITTER_STEP, MAX_JITTER_TOTAL);
+      jittered[i].score = Math.round(clamp(baseScore + positiveOffset, 0, 100));
+
+      for (let idx = 1; idx < groupSize; idx++) {
+        const negativeOffset = Math.min(SCORE_JITTER_STEP * idx, MAX_JITTER_TOTAL);
+        jittered[i + idx].score = Math.round(clamp(baseScore - negativeOffset, 0, 100));
+      }
+    }
+
+    i = j;
+  }
+
+  return jittered;
+}
 
 /**
  * Simple string hash function for stable hashing
@@ -532,7 +565,9 @@ export function useChunkedRecipeScoring(
       return a.recipeId.localeCompare(b.recipeId);
     });
 
-    return sorted.map(item => {
+    const jittered = applyScoreJitter(sorted);
+
+    return jittered.map(item => {
       if ('score' in item.meal && typeof (item.meal as ModifiedRecipeResult).score === 'number') {
         return { ...(item.meal as ModifiedRecipeResult), score: item.score };
       }

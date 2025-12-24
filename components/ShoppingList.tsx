@@ -5,14 +5,17 @@ import { ShoppingCart, CheckCircle } from 'lucide-react';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { getButtonCopy, trackButtonClick, type ButtonCopyVariant } from '@/lib/utils/abTesting';
-import { getProductByIngredient } from '@/lib/data/product-prices';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
+import { getPackageSize } from '@/lib/data/packageSizes';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 
 interface Ingredient {
   id: string;
   name: string;
   amount: string;
   asinLink?: string;
+  amazonSearchUrl?: string;
 }
 
 interface ShoppingListProps {
@@ -35,21 +38,6 @@ function getGenericIngredientName(name: string): string {
     .replace(/premium/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-// Helper to find product data
-function getProductData(ingredientName: string) {
-  const genericName = getGenericIngredientName(ingredientName);
-  
-  // Try exact match first
-  let product = getProductByIngredient(genericName);
-  
-  // Try partial match if exact fails
-  if (!product) {
-    product = getProductByIngredient(genericName);
-  }
-  
-  return product;
 }
 
 export function ShoppingList({ 
@@ -81,47 +69,51 @@ export function ShoppingList({
       genericName: string;
       recipeAmount: string;
       packageQuantity: string;
-      price: number | null;
+      price: number;
+      pricePerPound: number | null;
+      isEstimatedPrice: boolean;
       asin: string | null;
       link: string;
+      backupLink?: string;
     }> = [];
 
     const unlinked: Ingredient[] = [];
 
     for (const ing of ingredients) {
-      const product = getProductByIngredient(ing.name) || getProductData(ing.name);
+      const normalizedName = getGenericIngredientName(ing.name);
+      const pricing = getIngredientDisplayPricing(normalizedName);
 
-      if (product) {
-        const link = product.asin
-          ? ensureSellerId(`https://www.amazon.com/dp/${product.asin}`)
-          : ensureSellerId(product.url);
+      const packageEstimate = getPackageSize(normalizedName);
+      const estimatedPrice = Number(packageEstimate?.estimatedCost) || 0;
+      const estimatedPounds = (Number(packageEstimate?.typicalSize) || 0) / 453.592;
+      const estimatedPricePerPound = estimatedPounds > 0 ? estimatedPrice / estimatedPounds : null;
 
-        purchasable.push({
-          id: ing.id,
-          genericName: product.ingredient,
-          recipeAmount: ing.amount,
-          packageQuantity: product.quantity || '',
-          price: typeof product.price?.amount === 'number' ? product.price.amount : null,
-          asin: product.asin || null,
-          link,
-        });
-        continue;
-      }
+      const isEstimatedPrice = pricing?.priceSource === 'none' || pricing?.priceSource === 'package' || !(pricing?.packagePrice && pricing.packagePrice > 0);
+      const bestPackagePrice = isEstimatedPrice ? estimatedPrice : (pricing.packagePrice as number);
+      const bestPricePerPound = isEstimatedPrice ? estimatedPricePerPound : (pricing.pricePerPound || null);
+      const bestQuantity = pricing.quantity || '';
 
-      if (ing.asinLink) {
-        purchasable.push({
-          id: ing.id,
-          genericName: ing.name,
-          recipeAmount: ing.amount,
-          packageQuantity: '',
-          price: null,
-          asin: null,
-          link: ensureSellerId(ing.asinLink),
-        });
-        continue;
-      }
+      const searchQuery = pricing?.product?.ingredient || ing.name;
+      const searchUrl = ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(searchQuery));
 
-      unlinked.push(ing);
+      const backupLink = pricing?.product
+        ? (pricing.product.asin
+            ? ensureSellerId(`https://www.amazon.com/dp/${pricing.product.asin}`)
+            : ensureSellerId(pricing.product.url))
+        : (ing.asinLink ? ensureSellerId(ing.asinLink) : undefined);
+
+      purchasable.push({
+        id: ing.id,
+        genericName: pricing?.product?.ingredient || ing.name,
+        recipeAmount: ing.amount,
+        packageQuantity: bestQuantity,
+        price: bestPackagePrice,
+        pricePerPound: bestPricePerPound,
+        isEstimatedPrice,
+        asin: pricing?.product?.asin || null,
+        link: searchUrl,
+        backupLink,
+      });
     }
 
     return { purchasableItems: purchasable, unlinkedIngredients: unlinked };
@@ -226,34 +218,46 @@ export function ShoppingList({
             
             {/* Price Display */}
             <div className="text-right mr-3">
-              {item.price !== null ? (
-                <div className="text-lg font-bold text-orange-400">
-                  ${item.price.toFixed(2)}
-                </div>
-              ) : (
-                <div className="text-sm text-gray-500 italic">Price unavailable</div>
+              <div className="text-lg font-bold text-orange-400">
+                ${item.price.toFixed(2)}{item.isEstimatedPrice ? <span className="text-xs font-semibold text-gray-400"> est.</span> : null}
+              </div>
+              {typeof item.pricePerPound === 'number' && Number.isFinite(item.pricePerPound) && item.pricePerPound > 0 && (
+                <div className="text-xs text-gray-500">${item.pricePerPound.toFixed(2)}/lb</div>
               )}
             </div>
             
-            <a
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                const currentUserId = getUserId();
-                if (currentUserId) {
-                  addPurchase(currentUserId, item.id, false, item.genericName);
-                  refreshFromLocal();
-                }
-                if (buttonCopy) {
-                  trackButtonClick(buttonCopy.id, 'individual', item.genericName);
-                }
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-colors duration-200 text-sm font-semibold whitespace-nowrap"
-            >
-              <ShoppingCart size={16} />
-              {buttonCopy?.text || 'Buy'}
-            </a>
+            <div className="flex flex-col items-end gap-1">
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  const currentUserId = getUserId();
+                  if (currentUserId) {
+                    addPurchase(currentUserId, item.id, false, item.genericName);
+                    refreshFromLocal();
+                  }
+                  if (buttonCopy) {
+                    trackButtonClick(buttonCopy.id, 'individual', item.genericName);
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-colors duration-200 text-sm font-semibold whitespace-nowrap"
+              >
+                <ShoppingCart size={16} />
+                {buttonCopy?.text || 'Buy'}
+              </a>
+
+              {item.backupLink && item.backupLink !== item.link && (
+                <a
+                  href={item.backupLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-400 hover:text-gray-200 underline"
+                >
+                  Direct product link
+                </a>
+              )}
+            </div>
           </div>
         ))}
 

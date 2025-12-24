@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { X, ShoppingCart, Check, Loader2 } from 'lucide-react';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
-import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { ensureCartUrlSellerId, ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { calculateMealsFromShoppingList } from '@/lib/utils/mealCalculator';
 
@@ -103,7 +103,9 @@ export default function OneClickCheckoutModal({
         // Use Amazon's add-to-cart API
         const iframe = document.createElement('iframe');
         iframe.style.cssText = 'position:fixed;top:-10000px;left:-10000px;width:1px;height:1px;opacity:0;pointer-events:none;';
-        iframe.src = `https://www.amazon.com/gp/aws/cart/add.html?ASIN.1=${asin}&Quantity.1=1&tag=robinfrench-20`;
+        iframe.src = ensureCartUrlSellerId(
+          `https://www.amazon.com/gp/aws/cart/add.html?ASIN.1=${asin}&Quantity.1=1`
+        );
         
         iframe.onload = () => {
           setTimeout(() => {

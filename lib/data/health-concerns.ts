@@ -3,7 +3,6 @@
 
 export const healthConcernsBySpecies = {
   dogs: [
-    'Allergies/skin issues',
     'Arthritis/joint pain',
     'Dental problems',
     'Digestive issues',
@@ -29,10 +28,8 @@ export const healthConcernsBySpecies = {
     'Hairballs',
     'Obesity',
     'Respiratory issues',
-    'Skin allergies',
     'Pancreatitis',
-    'Heart disease',
-    'Skin conditions'
+    'Heart disease'
   ],
 
   birds: [
@@ -63,7 +60,6 @@ export const healthConcernsBySpecies = {
     'Digestive issues',
     'Respiratory infection',
     'Urinary problems',
-    'Skin/fur issues',
     'Obesity',
     'Nutritional deficiencies'
   ]

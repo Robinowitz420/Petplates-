@@ -20,6 +20,8 @@ import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import Link from 'next/link';
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -207,13 +209,6 @@ export default function MealCompleteView({
             weight: enhanced.factors.lifeStageFit.weight,
             reason: getReasonWithIssues(enhanced.factors.lifeStageFit)
           },
-          nutritionalFit: { 
-            score: enhanced.factors.nutritionalAdequacy.score,
-            weightedContribution: Math.round(enhanced.factors.nutritionalAdequacy.score * enhanced.factors.nutritionalAdequacy.weight),
-            weight: enhanced.factors.nutritionalAdequacy.weight,
-            reason: getReasonWithIssues(enhanced.factors.nutritionalAdequacy),
-            recommendations: recommendations // Add recommendations to nutritional fit
-          },
           healthCompatibility: { 
             score: enhanced.factors.healthAlignment.score,
             weightedContribution: Math.round(enhanced.factors.healthAlignment.score * enhanced.factors.healthAlignment.weight),
@@ -364,13 +359,75 @@ export default function MealCompleteView({
   const compatibility = healthAnalysis?.compatibility ?? 
     (displayScore >= 80 ? 'excellent' : displayScore >= 60 ? 'good' : displayScore >= 40 ? 'fair' : 'poor');
 
+  const SUPPLEMENT_KEYWORDS = [
+    'vitamin',
+    'mineral',
+    'supplement',
+    'probiotic',
+    'enzyme',
+    'omega',
+    'fish oil',
+    'salmon oil',
+    'anchovy oil',
+    'sardine oil',
+    'mackerel oil',
+    'krill oil',
+    'algae oil',
+    'herring oil',
+    'oil',
+    'calcium',
+    'carbonate',
+    'eggshell',
+    'taurine',
+    'psyllium',
+    'glucosamine',
+    'chondroitin',
+    'sam-e',
+    's-adenosyl',
+    'quercetin',
+    'curcumin',
+    'l-carnitine',
+    'd-mannose',
+    'fructooligosaccharides',
+    'fos',
+    'inulin',
+    'mannanoligosaccharides',
+    'mos',
+    'beta-glucan',
+    'hyaluronic',
+    'b complex',
+  ];
+
+  const isSupplementLikeName = (name: string) => {
+    const n = String(name || '')
+      .toLowerCase()
+      .trim()
+      .replace(/_/g, ' ')
+      .replace(/\s+/g, ' ');
+    if (!n) return false;
+    return SUPPLEMENT_KEYWORDS.some((kw) => n.includes(kw));
+  };
+
+  const { ingredientSelections, supplementSelections } = useMemo(() => {
+    const ingredientSelections: IngredientSelection[] = [];
+    const supplementSelections: IngredientSelection[] = [];
+
+    for (const ing of selectedIngredients) {
+      const displayName = getIngredientDisplayName(ing.key);
+      if (isSupplementLikeName(displayName)) supplementSelections.push(ing);
+      else ingredientSelections.push(ing);
+    }
+
+    return { ingredientSelections, supplementSelections };
+  }, [selectedIngredients, getIngredientDisplayName]);
+
   // Prepare ingredients for ShoppingList (memoized)
   const ingredientsWithASINs = useMemo(() => {
     console.log('[MealCompleteView] ========== ingredientsWithASINs Calculation ==========');
     console.log('[MealCompleteView] selectedIngredients:', selectedIngredients);
     console.log('[MealCompleteView] selectedIngredients.length:', selectedIngredients.length);
     
-    const result = selectedIngredients
+    const result = ingredientSelections
       .map((ing, index) => {
         console.log(`[MealCompleteView] Processing ingredient ${index + 1}:`, ing);
         const displayName = getIngredientDisplayName(ing.key);
@@ -378,30 +435,27 @@ export default function MealCompleteView({
         
         const link = getProductUrl(displayName);
         console.log(`[MealCompleteView]   Product-prices purchase link:`, link);
-        
-        if (link) {
-          const item = {
-            id: ing.key,
-            name: displayName,
-            amount: `${ing.grams}g`,
-            asinLink: ensureSellerId(link)
-          };
-          console.log(`[MealCompleteView]   ✅ Added to ingredientsWithASINs:`, item);
-          return item;
-        }
-        console.log(`[MealCompleteView]   ❌ No link found, skipping ingredient`);
-        return null;
+
+        const item = {
+          id: ing.key,
+          name: displayName,
+          amount: `${ing.grams}g`,
+          ...(link ? { asinLink: ensureSellerId(link) } : {}),
+          amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
+        };
+        console.log(`[MealCompleteView]   ✅ Added to ingredientsWithASINs:`, item);
+        return item;
       })
-      .filter(Boolean) as Array<{ id: string; name: string; amount: string; asinLink: string }>;
+      .filter(Boolean) as Array<{ id: string; name: string; amount: string; asinLink?: string; amazonSearchUrl?: string }>;
     
     console.log('[MealCompleteView] Final ingredientsWithASINs array:', result);
     console.log('[MealCompleteView] ingredientsWithASINs.length:', result.length);
     console.log('[MealCompleteView] =====================================================');
     return result;
-  }, [selectedIngredients, getIngredientDisplayName]);
+  }, [ingredientSelections, getIngredientDisplayName]);
 
   const ingredientsWithoutASINs = useMemo(() => {
-    return selectedIngredients
+    return ingredientSelections
       .filter(ing => {
         const displayName = getIngredientDisplayName(ing.key);
         const link = getProductUrl(displayName);
@@ -412,7 +466,21 @@ export default function MealCompleteView({
         name: getIngredientDisplayName(ing.key),
         amount: `${ing.grams}g`,
       }));
-  }, [selectedIngredients, getIngredientDisplayName]);
+  }, [ingredientSelections, getIngredientDisplayName]);
+
+  const supplementItems = useMemo(() => {
+    return supplementSelections.map((ing) => {
+      const displayName = getIngredientDisplayName(ing.key);
+      const link = getProductUrl(displayName);
+      return {
+        id: ing.key,
+        name: displayName,
+        amount: `${ing.grams}g`,
+        ...(link ? { asinLink: ensureSellerId(link) } : {}),
+        amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
+      };
+    });
+  }, [supplementSelections, getIngredientDisplayName]);
 
   // Get recommended supplements
   const recommendedSupplements = healthAnalysis?.recommendations || [];
@@ -557,84 +625,29 @@ export default function MealCompleteView({
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">
-            {/* Recipe Info Card */}
-            <div className="bg-surface rounded-xl shadow-md overflow-hidden mb-8 border border-surface-highlight">
-              <div className="p-8">
-                {/* Meal Name Input */}
-                <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-400 mb-2">Meal Name</label>
-                  <input
-                    type="text"
-                    value={mealName}
-                    onChange={(e) => setMealName(e.target.value)}
-                    className="w-full px-4 py-2 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Enter meal name..."
-                  />
-            </div>
-
-                {/* Health Concerns */}
-                {pet?.healthConcerns && pet.healthConcerns.length > 0 && (
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {pet.healthConcerns.map((concern: string) => (
-                      <span
-                        key={concern}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-900/40 text-orange-200 border border-orange-700/50"
-                      >
-                        {concern.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-3 mb-6">
-              {isSaved ? (
-                    <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-600 bg-green-900/40 border border-green-700/50 rounded-md">
-                  <CheckCircle size={16} />
-                  Meal Saved
+            {/* Meal Title Card */}
+          <div className="bg-surface rounded-xl shadow-md overflow-hidden mb-8 border border-surface-highlight">
+            <div className="p-8">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <input
+                  type="text"
+                  value={mealName}
+                  onChange={(e) => setMealName(e.target.value)}
+                  className="flex-1 px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Enter meal name..."
+                />
+                <div className="flex flex-col items-center gap-3">
+                  <CompatibilityRadial score={displayScore} size={150} />
+                  {mealEstimateForCost?.costPerMeal ? (
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-sm font-semibold text-orange-200">
+                      <span>Estimated Cost:</span>
+                      <span className="text-white">${mealEstimateForCost.costPerMeal.toFixed(2)}</span>
+                    </div>
+                  ) : null}
                 </div>
-              ) : (
-                <button
-                  onClick={handleSaveMeal}
-                  disabled={isSaving || !analysis || !mealName.trim()}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Save size={16} />
-                  {isSaving ? 'Saving...' : 'Save Meal'}
-                </button>
-              )}
-              <button
-                onClick={onAddMore}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 bg-surface-highlight border border-surface-highlight rounded-md hover:bg-surface-highlight/80 transition-colors"
-              >
-                <Plus size={16} />
-                Add More Ingredients
-              </button>
-              <button
-                onClick={onStartOver}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors"
-              >
-                <Plus size={16} />
-                Create New Meal
-              </button>
+              </div>
             </div>
-
-                {/* Description placeholder */}
-                <p className="text-gray-300 mb-8 leading-relaxed text-lg">
-                  Custom meal created for {petName}. Adjust ingredient amounts to optimize nutritional balance.
-                </p>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-8">
-                  <span className="bg-surface-highlight text-gray-300 px-3 py-1 rounded-full text-sm font-medium border border-surface-highlight">
-                    custom
-                  </span>
-                  <span className="bg-surface-highlight text-gray-300 px-3 py-1 rounded-full text-sm font-medium border border-surface-highlight">
-                    user-created
-                  </span>
           </div>
-        </div>
-      </div>
 
             {/* Ingredients & Supplements Tabs */}
             <div className="bg-surface rounded-xl shadow-md p-8 mb-8 border border-surface-highlight">
@@ -725,6 +738,22 @@ export default function MealCompleteView({
 
               {activeTab === 'supplements' && (
                 <div className="relative space-y-6">
+                  {supplementItems.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-200 mb-4">
+                        Added Supplements
+                      </h3>
+                      <ShoppingList
+                        ingredients={supplementItems}
+                        recipeName={mealName || 'Custom Meal'}
+                        userId={userId}
+                        selectedIngredients={selectedIngredients}
+                        totalGrams={totalGrams}
+                        recommendedServingGrams={analysis?.recommendedServingGrams}
+                      />
+                    </div>
+                  )}
+
                   {/* Recommended Supplements */}
                   {recommendedSupplements.length > 0 && (
                     <div className="bg-orange-900/20 border border-orange-700/50 rounded-lg p-6">
@@ -763,6 +792,12 @@ export default function MealCompleteView({
                     <div className="text-center py-8 text-gray-500">
                       <p>No supplements recommended for this meal.</p>
                       <p className="text-sm mt-2">Check the ingredients tab for all components.</p>
+                    </div>
+                  )}
+
+                  {supplementItems.length === 0 && recommendedSupplements.length === 0 && (
+                    <div className="text-center py-6 text-gray-400 text-sm">
+                      No supplements added yet.
                     </div>
                   )}
                 </div>

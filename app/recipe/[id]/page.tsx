@@ -35,6 +35,7 @@ import { getRecommendationsForRecipe, type RecommendedSupplement } from '@/lib/u
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getProductPrice } from '@/lib/data/product-prices';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 
 // =================================================================
 // 1. CONSTANTS
@@ -269,6 +270,7 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
           productName: vettedProduct.productName,
           name: displayName,
           asinLink: ensureSellerId(vettedLink), // Prefer vetted product link over existing link
+          amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
         };
       }
       // If no vetted product found, keep ingredient but no ASIN link
@@ -276,6 +278,7 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
         ...ingWithoutOldLink,
         name: displayName,
         asinLink: existingLink ? ensureSellerId(existingLink) : undefined,
+        amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
       };
     }),
     // Also vet supplements if they exist
@@ -300,6 +303,7 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
           productName: vettedProduct.productName,
           name: displayName,
           asinLink: ensureSellerId(vettedLink), // Prefer vetted product link over existing link
+          amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
         };
       }
       // Keep supplement but no ASIN link if no vetted product found
@@ -307,10 +311,110 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
         ...supplementWithoutOldLink,
         name: displayName,
         asinLink: existingLink ? ensureSellerId(existingLink) : undefined,
+        amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
       };
     }),
   };
 };
+
+// Supplement splitting helpers
+const SUPPLEMENT_KEYWORDS = [
+  'vitamin',
+  'mineral',
+  'supplement',
+  'probiotic',
+  'enzyme',
+  'omega',
+  'fish oil',
+  'salmon oil',
+  'anchovy oil',
+  'sardine oil',
+  'mackerel oil',
+  'krill oil',
+  'algae oil',
+  'herring oil',
+  'oil',
+  'calcium',
+  'carbonate',
+  'eggshell',
+  'glucosamine',
+  'chondroitin',
+  'sam-e',
+  's-adenosyl',
+  'quercetin',
+  'curcumin',
+  'l-carnitine',
+  'psyllium',
+  'd-mannose',
+  'fructooligosaccharides',
+  'fos',
+  'inulin',
+  'mannanoligosaccharides',
+  'mos',
+  'beta-glucan',
+  'hyaluronic',
+  'b complex',
+];
+
+const normalizeSplitKey = (value: any) =>
+  String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ');
+
+const SUPPLEMENT_NAME_SET: Set<string> = (() => {
+  const set = new Set<string>();
+  try {
+    Object.values(petSupplements || {}).forEach((byConcern: any) => {
+      Object.values(byConcern || {}).forEach((list: any) => {
+        (list || []).forEach((s: any) => {
+          if (s?.name) set.add(normalizeSplitKey(s.name));
+        });
+      });
+    });
+  } catch {
+    // ignore
+  }
+  return set;
+})();
+
+function isSupplementLikeName(name: any) {
+  const n = normalizeSplitKey(name);
+  if (!n) return false;
+  if (SUPPLEMENT_NAME_SET.has(n)) return true;
+  for (const kw of SUPPLEMENT_KEYWORDS) {
+    if (n.includes(kw)) return true;
+  }
+  return false;
+}
+
+function splitIngredientsAndSupplements(base: any) {
+  const ingredients = Array.isArray(base?.ingredients) ? base.ingredients : [];
+  const supplements = Array.isArray(base?.supplements) ? base.supplements : [];
+
+  const supplementKeySet = new Set<string>(supplements.map((s: any) => normalizeSplitKey(s?.name)));
+  const movedSupplements: any[] = [];
+  const keptIngredients: any[] = [];
+
+  for (const ing of ingredients) {
+    const name = ing?.name || ing?.productName;
+    if (isSupplementLikeName(name)) {
+      const key = normalizeSplitKey(name);
+      if (!supplementKeySet.has(key)) {
+        movedSupplements.push({ ...ing, name: String(name) });
+        supplementKeySet.add(key);
+      }
+    } else {
+      keptIngredients.push(ing);
+    }
+  }
+
+  return {
+    ingredients: keptIngredients,
+    supplements: [...supplements, ...movedSupplements],
+  };
+}
 
 // =================================================================
 // 3. MAIN COMPONENT
@@ -386,8 +490,10 @@ export default function RecipeDetailPage() {
       // Check badges if score is 100% (Nutrient Navigator)
       if (enhanced.overallScore === 100 && queryPetId && userId) {
         checkAllBadges(userId, queryPetId, {
-          action: 'recipe_viewed',
-          compatibilityScore: enhanced.overallScore,
+          action: 'recipe_saved',
+          savedRecipesCount: 0, // Will be updated from profile page
+          mealPlanCount: 0, // Will be updated from profile page
+          weeklyPlanCompleted: false,
         }).catch(err => {
           console.error('Failed to check badges:', err);
         });
@@ -840,51 +946,73 @@ export default function RecipeDetailPage() {
   };
 
   // Calculate all shopping items and meal estimate for sidebar (MUST be before early returns)
-  const { allShoppingItems, mealEstimate } = useMemo(() => {
-    const sourceRecipe = vettedRecipe || recipe;
+  const { ingredientShoppingItems, supplementShoppingItems, allShoppingItems, mealEstimate } = useMemo(() => {
+    const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
+    const sourceRecipe = baseRecipe ? splitIngredientsAndSupplements(baseRecipe) : null;
     if (!sourceRecipe) {
-      return { allShoppingItems: [], mealEstimate: null };
+      return { ingredientShoppingItems: [], supplementShoppingItems: [], allShoppingItems: [], mealEstimate: null };
     }
 
     const allIngredients = sourceRecipe.ingredients || [];
+    const allSupplements = sourceRecipe.supplements || [];
 
     const ingredientsEnrichedWithLinks = allIngredients.map((ing: any) => {
       const existingLink = ing?.asinLink || ing?.amazonLink;
-      if (existingLink) return ing;
 
       const lookupName = getGenericIngredientName(ing?.productName || ing?.name) || ing?.name;
       if (!lookupName) return ing;
 
-      const product = getVettedProduct(lookupName, sourceRecipe.category);
+      const product = getVettedProduct(lookupName, (baseRecipe as any)?.category);
       const productLink = product?.asinLink || product?.purchaseLink;
-      if (!productLink) return ing;
+      const displayName = String(ing?.name || lookupName);
+      const amazonSearchUrl = ensureSellerId(buildAmazonSearchUrl(displayName));
+      const enrichedLink = productLink ? ensureSellerId(productLink) : (existingLink ? ensureSellerId(existingLink) : undefined);
 
-      const enrichedLink = ensureSellerId(productLink);
       return {
         ...ing,
-        productName: ing?.productName || product.productName,
-        amazonLink: enrichedLink,
-        asinLink: enrichedLink
+        ...(product?.productName ? { productName: ing?.productName || product.productName } : {}),
+        ...(enrichedLink ? { amazonLink: enrichedLink, asinLink: enrichedLink } : {}),
+        amazonSearchUrl,
       };
     });
 
-    const ingredientsWithASINs = ingredientsEnrichedWithLinks.filter((ing: any) => ing.asinLink || ing.amazonLink);
-    const supplementsWithASINs = (modifiedRecipe as any)?.supplements?.filter((s: any) => s.asinLink || s.amazonLink) || [];
+    const supplementsEnrichedWithLinks = allSupplements.map((supplement: any) => {
+      const existingLink = supplement?.asinLink || supplement?.amazonLink;
 
-    const shoppingItems = [
-      ...ingredientsWithASINs.map((ing: any) => ({
-        id: ing.id,
-        name: ing.name,
-        amount: ing.amount || '',
-        asinLink: ensureSellerId(ing.asinLink || ing.amazonLink)
-      })),
-      ...supplementsWithASINs.map((supplement: any) => ({
-        id: supplement.id || supplement.name,
-        name: supplement.name,
-        amount: supplement.amount || supplement.defaultAmount || '',
-        asinLink: ensureSellerId(supplement.asinLink || supplement.amazonLink)
-      }))
-    ];
+      const lookupName = getGenericIngredientName(supplement?.productName || supplement?.name) || supplement?.name;
+      if (!lookupName) return supplement;
+
+      const product = getVettedProduct(lookupName, (baseRecipe as any)?.category);
+      const productLink = product?.asinLink || product?.purchaseLink;
+      const displayName = String(supplement?.name || lookupName);
+      const amazonSearchUrl = ensureSellerId(buildAmazonSearchUrl(displayName));
+      const enrichedLink = productLink ? ensureSellerId(productLink) : (existingLink ? ensureSellerId(existingLink) : undefined);
+
+      return {
+        ...supplement,
+        ...(product?.productName ? { productName: supplement?.productName || product.productName } : {}),
+        ...(enrichedLink ? { amazonLink: enrichedLink, asinLink: enrichedLink } : {}),
+        amazonSearchUrl,
+      };
+    });
+
+    const ingredientItems = ingredientsEnrichedWithLinks.map((ing: any) => ({
+      id: ing.id,
+      name: ing.name,
+      amount: ing.amount || '',
+      asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
+      amazonSearchUrl: ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(ing.name))
+    }));
+
+    const supplementItems = supplementsEnrichedWithLinks.map((supplement: any) => ({
+      id: supplement.id || supplement.name,
+      name: supplement.name,
+      amount: supplement.amount || supplement.defaultAmount || '',
+      asinLink: supplement.asinLink || supplement.amazonLink ? ensureSellerId(supplement.asinLink || supplement.amazonLink) : undefined,
+      amazonSearchUrl: supplement.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(supplement.name))
+    }));
+
+    const shoppingItems = [...ingredientItems, ...supplementItems];
 
     const totalCost = shoppingItems.reduce((sum: number, item: any) => {
       const price = getProductPrice(item.name);
@@ -897,7 +1025,7 @@ export default function RecipeDetailPage() {
       try {
         const shoppingListItems = shoppingItems.map((item: any) => {
           const genericName = getGenericIngredientName(item.name) || item.name.toLowerCase();
-          const vettedProduct = getVettedProduct(genericName, sourceRecipe.category);
+          const vettedProduct = getVettedProduct(genericName, (baseRecipe as any)?.category);
           return {
             id: item.id,
             name: item.name,
@@ -906,13 +1034,18 @@ export default function RecipeDetailPage() {
           };
         });
 
-        estimate = calculateMealsFromGroceryList(shoppingListItems, undefined, sourceRecipe.category);
+        estimate = calculateMealsFromGroceryList(shoppingListItems, undefined, (baseRecipe as any)?.category);
       } catch (error) {
         estimate = null;
       }
     }
 
-    return { allShoppingItems: shoppingItems, mealEstimate: estimate };
+    return {
+      ingredientShoppingItems: ingredientItems,
+      supplementShoppingItems: supplementItems,
+      allShoppingItems: shoppingItems,
+      mealEstimate: estimate,
+    };
   }, [vettedRecipe, recipe, modifiedRecipe]);
 
   const guidelines =
@@ -1149,7 +1282,9 @@ export default function RecipeDetailPage() {
               {activeTab === 'ingredients' && (
                 <div className="relative">
                   {(() => {
-                    const allIngredients = vettedRecipe?.ingredients || recipe.ingredients || [];
+                    const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
+                    const split = baseRecipe ? splitIngredientsAndSupplements(baseRecipe) : { ingredients: [], supplements: [] };
+                    const allIngredients = split.ingredients || [];
                     
                     const ingredientsWithASINs = allIngredients.filter((ing: any) => ing.asinLink);
                     // Filter out ingredients with old amazonLink - only show truly missing ASINs
@@ -1195,13 +1330,13 @@ export default function RecipeDetailPage() {
                         )}
                         
                         {/* Ingredients with ASIN links - show buy buttons */}
-                        {allShoppingItems.length > 0 && (
+                        {ingredientShoppingItems.length > 0 && (
                           <div className="space-y-6">
                             <h3 className="text-lg font-semibold text-foreground mb-4">
-                              Recipe Ingredients & Supplements
+                              Recipe Ingredients
                             </h3>
                             <ShoppingList
-                              ingredients={allShoppingItems}
+                              ingredients={ingredientShoppingItems}
                               recipeName={recipe.name}
                               userId={userId}
                             />
@@ -1241,6 +1376,9 @@ export default function RecipeDetailPage() {
                 <div className="relative space-y-6">
                   {/* Recommended Supplements Section */}
                   {(() => {
+                    const baseRecipe = modifiedRecipe || recipe;
+                    const split = baseRecipe ? splitIngredientsAndSupplements(baseRecipe) : { ingredients: [], supplements: [] };
+
                     // Filter out ingredients - only show supplements
                     const recommendedSupplementsOnly = recommendedSupplements.filter((rec: any) => !rec.isIngredient);
                     
@@ -1257,7 +1395,7 @@ export default function RecipeDetailPage() {
                         </p>
                         <div className="space-y-3">
                           {recommendedSupplementsOnly.map((supplement, index) => {
-                            const isAlreadyAdded = ((modifiedRecipe || recipe) as any)?.supplements?.some((s: any) => 
+                            const isAlreadyAdded = (split.supplements || []).some((s: any) => 
                               s.name === supplement.name || s.productName === supplement.productName
                             ) || false;
                             
@@ -1299,27 +1437,21 @@ export default function RecipeDetailPage() {
 
                   {/* Existing Recipe Supplements */}
                   {(() => {
-                    const supplementsWithASINs = ((modifiedRecipe || recipe) as any)?.supplements?.filter((s: any) => s.asinLink) || [];
-                    if (supplementsWithASINs.length > 0) {
+                    if (supplementShoppingItems.length > 0) {
                       return (
                         <div>
                           <h3 className="text-lg font-semibold text-gray-200 mb-4">
                             Recipe Supplements
                           </h3>
                           <ShoppingList
-                            ingredients={supplementsWithASINs.map((supplement: any) => ({
-                              id: supplement.id || supplement.name,
-                              name: supplement.name,
-                              amount: supplement.amount || '',
-                              asinLink: ensureSellerId(supplement.asinLink)
-                            }))}
+                            ingredients={supplementShoppingItems}
                             recipeName={`${recipe.name} supplements`}
                             userId={userId}
                           />
                         </div>
                       );
                     } else {
-                      const recipeSupplements = ((modifiedRecipe || recipe) as any)?.supplements || [];
+                      const recipeSupplements = (modifiedRecipe || recipe)?.supplements || [];
                       if (recipeSupplements.length === 0 && recommendedSupplements.length === 0) {
                         return (
                           <div>
@@ -1577,7 +1709,7 @@ export default function RecipeDetailPage() {
         <OneClickCheckoutModal
           isOpen={isCheckoutOpen}
           onClose={() => setIsCheckoutOpen(false)}
-          items={(vettedRecipe?.ingredients || recipe.ingredients || [])
+          items={allShoppingItems
             .filter((ing: any) => ing.asinLink)
             .map((ing: any) => ({
               id: ing.id,

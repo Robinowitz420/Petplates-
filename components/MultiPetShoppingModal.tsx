@@ -6,8 +6,9 @@ import { Pet } from '@/lib/types';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
-import { getProductPrice } from '@/lib/data/product-prices';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
 import { recipes } from '@/lib/data/recipes-complete';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -46,6 +47,7 @@ export default function MultiPetShoppingModal({
     const ingredientMap = new Map<string, {
       name: string;
       asinLink: string;
+      primaryLink: string;
       count: number;
       petNames: string[];
     }>();
@@ -62,9 +64,10 @@ export default function MultiPetShoppingModal({
         
         recipe.ingredients?.forEach(ing => {
           const link = (ing as any).asinLink || ing.amazonLink;
-          if (!link) return;
-          
-          const key = `${ing.name}-${link}`;
+          const primaryLink = ensureSellerId(buildAmazonSearchUrl(ing.name));
+          if (!primaryLink) return;
+
+          const key = `${ing.name}`;
           const existing = ingredientMap.get(key);
           
           if (existing) {
@@ -75,7 +78,8 @@ export default function MultiPetShoppingModal({
           } else {
             ingredientMap.set(key, {
               name: ing.name,
-              asinLink: link,
+              asinLink: link || '',
+              primaryLink,
               count: 1,
               petNames: [petName]
             });
@@ -93,8 +97,9 @@ export default function MultiPetShoppingModal({
   // Calculate total price
   const totalPrice = useMemo(() => {
     return allIngredients.reduce((sum, ing) => {
-      const price = getProductPrice(ing.name);
-      if (typeof price === 'number') return sum + price;
+      const pricing = getIngredientDisplayPricing(ing.name);
+      if (pricing?.packagePrice && pricing.packagePrice > 0) return sum + pricing.packagePrice;
+
       return sum;
     }, 0);
   }, [allIngredients]);
@@ -104,7 +109,7 @@ export default function MultiPetShoppingModal({
 
     // Open first tab
     if (allIngredients.length > 0) {
-      window.open(ensureSellerId(allIngredients[0].asinLink), '_blank');
+      window.open(allIngredients[0].primaryLink, '_blank');
       if (userId) {
         addPurchase(userId, allIngredients[0].name, false, allIngredients[0].name);
       }
@@ -113,7 +118,7 @@ export default function MultiPetShoppingModal({
     // Open remaining tabs
     for (let i = 1; i < allIngredients.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 800));
-      window.open(ensureSellerId(allIngredients[i].asinLink), '_blank');
+      window.open(allIngredients[i].primaryLink, '_blank');
       if (userId) {
         addPurchase(userId, allIngredients[i].name, false, allIngredients[i].name);
       }
