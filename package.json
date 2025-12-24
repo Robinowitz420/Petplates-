@@ -27,7 +27,7 @@
     "validate:retail": "tsx lib/generator/Phase1_5_AutoClassify.ts",
     "validate:retail:quick": "tsx lib/generator/Phase1_5_AutoClassify.ts 2>&1 | Select-String -Pattern 'RESULTS|accepted|review'",
     "audit:comprehensive": "tsx lib/generator/ComprehensiveAudit.ts",
-    "prepare": "husky install"
+    "prepare": "node scripts/prepare.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",
