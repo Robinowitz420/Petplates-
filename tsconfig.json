@@ -43,6 +43,9 @@
     "tests",
     "lib/__tests__",
     "lib/data/__tests__",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
     "pet-ingredient-scraper"
   ]
 }

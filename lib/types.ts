@@ -30,6 +30,7 @@ export interface Ingredient {
   amount: string;
   asinLink?: string; // ASIN-based direct product link
   amazonLink?: string; // Legacy Amazon affiliate link
+  amazonSearchUrl?: string; // Amazon search URL (affiliate-tagged)
   productName?: string; // Vetted product name
   vetNote?: string; // Veterinary note about the product
   isVetted?: boolean; // Whether this ingredient has been vetted

@@ -93,7 +93,7 @@ export default function HomePage() {
         <header className="relative w-full border-b border-surface-highlight py-8" style={{ backgroundColor: '#043136' }}>
           <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[500px] md:h-[600px]">
             <Image
-              src="/images/emojis/Mascots/HeroPics/hero4.jpg"
+              src="/images/emojis/Mascots/HeroPics/LOGO.png"
               alt="Paws & Plates - Meal prep made easy, for ALL your pets!"
               fill
               className="object-contain"
@@ -134,7 +134,7 @@ export default function HomePage() {
       <header className="relative w-full border-b border-surface-highlight py-8" style={{ backgroundColor: '#043136' }}>
         <div className="max-w-4xl mx-auto relative w-full aspect-[16/9] h-[250px] md:h-[300px]">
           <Image
-            src="/images/emojis/Mascots/HeroPics/hero4.jpg"
+            src="/images/emojis/Mascots/HeroPics/LOGO.png"
             alt="Paws & Plates - Meal prep made easy, for ALL your pets!"
             fill
             className="object-contain"

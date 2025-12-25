@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
@@ -14,6 +14,7 @@ import { getPets, savePet } from '@/lib/utils/petStorage';
 import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
 import ScoringProgress from '@/components/ScoringProgress';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
@@ -57,6 +58,7 @@ const getCombinedRecipes = (): Recipe[] => {
 
 export default function RecommendedRecipesPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const [pet, setPet] = useState<Pet | null>(null);
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
   const [engineMeals, setEngineMeals] = useState<ModifiedRecipeResult[] | null>(null);
@@ -73,6 +75,8 @@ export default function RecommendedRecipesPage() {
     const userId = getCurrentUserId();
     return `generated_meals_v1:${userId}:${petId}`;
   }, [petId]);
+
+  const forceRegenerate = searchParams.get('regenerate') === '1';
 
   const petDisplayName = useMemo(() => {
     if (!pet) return 'Pet';
@@ -146,6 +150,15 @@ export default function RecommendedRecipesPage() {
   useEffect(() => {
     if (!pet) return;
 
+    if (forceRegenerate && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(mealsCacheKey);
+      } catch {
+      }
+      lastGeneratedPetIdRef.current = null;
+      setEngineMeals(null);
+    }
+
     if (typeof window !== 'undefined') {
       try {
         const cachedRaw = localStorage.getItem(mealsCacheKey);
@@ -161,9 +174,18 @@ export default function RecommendedRecipesPage() {
       }
     }
 
+    if (forceRegenerate && typeof window !== 'undefined') {
+      try {
+        window.history.replaceState(null, '', `/profile/pet/${petId}`);
+      } catch {
+      }
+    }
+
     if (generationInFlightRef.current) return;
     if (lastGeneratedPetIdRef.current === pet.id && engineMeals && engineMeals.length > 0) return;
     let isMounted = true;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
     setLoadingMeals(true);
     setEngineError(null);
     setShowQuotaPopup(false);
@@ -172,9 +194,6 @@ export default function RecommendedRecipesPage() {
 
     (async () => {
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -220,8 +239,9 @@ export default function RecommendedRecipesPage() {
         if (data?.recipes && data.recipes.length > 0) {
           const generatedMeals = data.recipes.map((recipe: any) => ({
             recipe,
-            explanation: `Cost-optimized meal: $${recipe.estimatedCostPerMeal?.toFixed(2) || 'N/A'} per meal`,
+            explanation: '',
           }));
+
           setEngineMeals(generatedMeals as ModifiedRecipeResult[]);
 
           if (typeof window !== 'undefined') {
@@ -239,30 +259,41 @@ export default function RecommendedRecipesPage() {
         }
       } catch (error) {
         if (!isMounted) return;
-        console.error('Recipe generation error:', error);
+        const isAbortError =
+          (error as any)?.name === 'AbortError' ||
+          (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError');
+        if (!isAbortError) {
+          console.error('Recipe generation error:', error);
+        }
+        if (isAbortError) {
+          setEngineError('Meal generation timed out—showing standard matches.');
+          setEngineMeals(null);
+        }
         const rawMessage = error instanceof Error ? error.message : String(error);
         const isQuotaClosed =
           rawMessage.includes('Gemini quota is not enabled') ||
           rawMessage.includes('RESOURCE_EXHAUSTED') ||
           rawMessage.includes('Quota exceeded') ||
           rawMessage.includes('limit: 0');
+
         if (isQuotaClosed) {
           setEngineError(
             'The Kitchen is currently closed (Google API Quota). Please check back in a few hours!'
           );
           setShowQuotaPopup(true);
         }
+
         try {
           const concerns = (pet.healthConcerns || []).filter((concern) => concern !== 'none');
           const allergies = pet.allergies?.filter((allergy) => allergy !== 'none') || [];
 
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          const fallbackController = new AbortController();
+          const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 30000);
 
           const response = await fetch('/api/recommendations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal,
+            signal: fallbackController.signal,
             body: JSON.stringify({
               profile: {
                 species: pet.type,
@@ -277,7 +308,7 @@ export default function RecommendedRecipesPage() {
             }),
           });
 
-          clearTimeout(timeoutId);
+          clearTimeout(fallbackTimeoutId);
 
           if (!response.ok) {
             throw new Error(`Recommendations failed (${response.status})`);
@@ -289,17 +320,38 @@ export default function RecommendedRecipesPage() {
           setEngineMeals((data?.results as ModifiedRecipeResult[]) || []);
         } catch (fallbackError) {
           if (!isMounted) return;
+          const isAbortError =
+            (fallbackError as any)?.name === 'AbortError' ||
+            (typeof DOMException !== 'undefined' &&
+              fallbackError instanceof DOMException &&
+              fallbackError.name === 'AbortError');
+          if (isAbortError) {
+            setEngineMeals(null);
+            setEngineError('Meal recommendations timed out—showing standard matches.');
+            return;
+          }
+          if (!isAbortError) {
+            console.error('Recommendations error:', fallbackError);
+          }
           setEngineMeals(null);
           setEngineError('Unable to load meals—showing standard matches.');
         }
       } finally {
+        clearTimeout(timeoutId);
         if (isMounted) {
           setLoadingMeals(false);
         }
         generationInFlightRef.current = false;
       }
     })();
-  }, [pet, regenerateNonce]);
+
+    return () => {
+      isMounted = false;
+      generationInFlightRef.current = false;
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [pet, regenerateNonce, forceRegenerate, mealsCacheKey, petId]);
 
   const handleRegenerate = () => {
     if (typeof window !== 'undefined') {
@@ -386,11 +438,9 @@ export default function RecommendedRecipesPage() {
     }));
   }, [pet?.id, pet?.type, pet?.breed, pet?.age, fallbackHealthConcernsKey, fallbackPetName, tieredRecommendations]);
 
-  const MIN_MEALS_THRESHOLD = 9;
-
   const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
-    const hasEnoughFromAPI = engineMeals && Array.isArray(engineMeals) && engineMeals.length >= MIN_MEALS_THRESHOLD;
-    return hasEnoughFromAPI ? engineMeals : fallbackMeals;
+    const hasAnyFromAPI = engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0;
+    return hasAnyFromAPI ? engineMeals : fallbackMeals;
   }, [engineMeals, fallbackMeals]);
 
   const { scoredMeals, isLoading: isScoring, progress, totalMeals: totalMealsToScore, scoredCount } = useChunkedRecipeScoring(
@@ -514,153 +564,117 @@ export default function RecommendedRecipesPage() {
           Back to Profile
         </Link>
 
-        <div
-          className="bg-surface rounded-lg shadow-md border border-surface-highlight px-4 pt-0 pb-1 mb-3"
-        >
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-foreground mb-0 text-center">
-              Sherlock Shells is detecting meals for:
-            </h1>
-            <div className="mt-0 flex justify-center">
+        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex flex-col gap-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3">
+              Sherlock Shells is detecting meals for
               <span className="inline-flex items-center gap-3">
-                <span className="w-16 h-16 rounded-full bg-surface-highlight border border-surface-highlight overflow-hidden inline-flex items-center justify-center align-middle">
+                <span className="w-14 h-14 rounded-full bg-surface-highlight border border-surface-highlight overflow-hidden inline-flex items-center justify-center align-middle">
                   <Image
                     src={getProfilePictureForPetType(pet.type)}
                     alt={`${petDisplayName} profile`}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-cover"
+                    width={56}
+                    height={56}
+                    className="w-14 h-14 object-cover"
                     unoptimized
                   />
                 </span>
                 <span className="font-semibold text-2xl">{petDisplayName}</span>
               </span>
             </div>
+            <button
+              onClick={handleRegenerate}
+              disabled={loadingMeals}
+              className="px-6 py-2 rounded-full text-sm font-semibold transition-colors bg-green-800 text-white hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            >
+              {loadingMeals ? 'Regenerating Meals…' : 'Regenerate Meals'}
+            </button>
+          </div>
 
-            <div className="-mt-20 flex items-end gap-8">
-
-              <div className="flex-shrink-0 flex flex-col items-center ml-20">
-                <Image
-                  src="/images/emojis/Mascots/Sherlock Shells/Shell4.jpg"
-                  alt="Sherlock Shells Detective"
-                  width={288}
-                  height={288}
-                  className="w-40 h-40 object-contain mascot-icon mascot-sherlock-shells"
-                  unoptimized
-                />
-
-                <button
-                  onClick={handleRegenerate}
-                  disabled={loadingMeals}
-                  className="mt-4 px-6 py-2 rounded-full text-sm font-semibold transition-colors bg-green-800 text-white hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-                >
-                  {loadingMeals ? 'Regenerating Meals…' : 'Regenerate Meals'}
-                </button>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-center gap-4 mt-0">
-                  <div className="flex-shrink-0 min-w-[220px]">
-                    <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
-
-                    <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
-                      {pet.breed && (
-                        <div className="flex items-start gap-1.5">
-                          <span className="text-orange-400 mt-0.5">•</span>
-                          <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
-                        </div>
-                      )}
-                      {pet.age && (
-                        <div className="flex items-start gap-1.5">
-                          <span className="text-orange-400 mt-0.5">•</span>
-                          <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
-                        </div>
-                      )}
-                      {(pet.weightKg || pet.weight) && (
-                        <div className="flex items-start gap-1.5">
-                          <span className="text-orange-400 mt-0.5">•</span>
-                          <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
-                        </div>
-                      )}
-                      {pet.activityLevel && (
-                        <div className="flex items-start gap-1.5">
-                          <span className="text-orange-400 mt-0.5">•</span>
-                          <span><strong className="text-gray-200">Activity Level:</strong> {pet.activityLevel}</span>
-                        </div>
-                      )}
-                      {(pet.dietaryRestrictions || []).length > 0 && (
-                        <div className="flex items-start gap-1.5">
-                          <span className="text-orange-400 mt-0.5">•</span>
-                          <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}</span>
-                        </div>
-                      )}
-                      {(pet.dislikes || []).length > 0 && (
-                        <div className="flex items-start gap-1.5">
-                          <span className="text-orange-400 mt-0.5">•</span>
-                          <span><strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}</span>
-                        </div>
-                      )}
-                    </div>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+            <div className="flex-shrink-0 min-w-[220px]">
+              <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
+              <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
+                {pet.breed && (
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
                   </div>
-
-                  <div className="flex-shrink-0 min-w-[180px]">
-                    <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Health Concerns</h3>
-                    <div className="flex flex-col gap-1.5">
-                      {(pet.healthConcerns || []).length > 0 ? (
-                        (pet.healthConcerns || []).map((concern) => (
-                          <div
-                            key={concern}
-                            className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                          >
-                            {concern.replace(/-/g, ' ')}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-2 py-1 text-gray-500 text-xs italic">
-                          None
-                        </div>
-                      )}
-                    </div>
+                )}
+                {pet.age && (
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
                   </div>
-
-                  <div className="flex-shrink-0 min-w-[180px]">
-                    <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Allergies</h3>
-                    <div className="flex flex-col gap-1.5">
-                      {(pet.allergies || []).length > 0 ? (
-                        (pet.allergies || []).map((allergy) => (
-                          <div
-                            key={allergy}
-                            className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                          >
-                            {allergy.replace(/-/g, ' ')}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-2 py-1 text-gray-500 text-xs italic">
-                          None
-                        </div>
-                      )}
-                    </div>
+                )}
+                {(pet.weightKg || pet.weight) && (
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
                   </div>
-                </div>
+                )}
+                {pet.activityLevel && (
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><strong className="text-gray-200">Activity Level:</strong> {pet.activityLevel}</span>
+                  </div>
+                )}
+                {(pet.dietaryRestrictions || []).length > 0 && (
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}</span>
+                  </div>
+                )}
+                {(pet.dislikes || []).length > 0 && (
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-orange-400 mt-0.5">•</span>
+                    <span><strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {engineError && (
-              <p className="mt-2 text-sm text-amber-200 bg-amber-900/30 border border-amber-700/50 px-3 py-2 rounded-lg">
-                {engineError}
-              </p>
-            )}
+            <div className="flex-shrink-0 min-w-[180px]">
+              <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Health Concerns</h3>
+              <div className="flex flex-col gap-1.5">
+                {(pet.healthConcerns || []).length > 0 ? (
+                  (pet.healthConcerns || []).map((concern) => (
+                    <div
+                      key={concern}
+                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                    >
+                      {concern.replace(/-/g, ' ')}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-2 py-1 text-gray-500 text-xs italic">
+                    None
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-shrink-0 min-w-[180px]">
+              <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Allergies</h3>
+              <div className="flex flex-col gap-1.5">
+                {(pet.allergies || []).length > 0 ? (
+                  (pet.allergies || []).map((allergy) => (
+                    <div
+                      key={allergy}
+                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                    >
+                      {allergy.replace(/-/g, ' ')}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-2 py-1 text-gray-500 text-xs italic">
+                    None
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
-        {isScoring && (
-          <ScoringProgress
-            progress={progress}
-            totalMeals={totalMealsToScore}
-            scoredCount={scoredCount}
-          />
-        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...sortedMealsToRender]
@@ -693,53 +707,19 @@ ease-out h-full flex flex-col">
                             {recipe.name}
                           </h3>
                           {enhancedPet && (
-                            <div className="mt-3 flex justify-center">
+                            <div className="mt-4 flex flex-col items-center gap-2">
                               {(() => {
                                 const score =
                                   'score' in meal && typeof meal.score === 'number'
-                                    ? meal.score as number
-                                    : (() => {
-                                        const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
-                                        return enhanced.overallScore;
-                                      })();
-
+                                    ? (meal.score as number)
+                                    : calculateEnhancedCompatibility(recipe, enhancedPet).overallScore;
                                 return (
-                                  <div className="w-full max-w-xs rounded-xl border border-emerald-500/70 bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 p-3">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <div className="flex flex-col">
-                                        <span className="text-[11px] font-semibold uppercase tracking-wide text-emerald-200/80">
-                                          Compatibility Score
-                                        </span>
-                                        <span className="text-[11px] text-emerald-100/80">
-                                          For this pet profile
-                                        </span>
-                                      </div>
-                                      <div className="text-right">
-                                        <div className="text-lg font-bold leading-none text-emerald-50">
-                                          {score}%
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="w-full bg-black/40 rounded-full h-2 mb-2 overflow-hidden">
-                                      <div
-                                        className={`h-2 rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-                                          score >= 80
-                                            ? 'bg-green-500'
-                                            : score >= 60
-                                            ? 'bg-yellow-400'
-                                            : 'bg-red-500'
-                                        }`}
-                                        style={{ width: `${Math.max(0, Math.min(100, score))}%` }}
-                                      />
-                                    </div>
-
-                                    <div className="text-[11px] text-emerald-100/80 text-center">
-                                      {score >= 80
-                                        ? '✓ Excellent match for your pet'
-                                        : score >= 60
-                                        ? '⚠ Good, but could be improved'
-                                        : '✗ Needs adjustments for safety'}
+                                  <div>
+                                    <CompatibilityRadial score={score} size={140} />
+                                    <div className="text-xs text-emerald-100/70 text-center">
+                                      {score >= 60
+                                        ? 'Balanced for your pet'
+                                        : 'Needs adjustments for safety'}
                                     </div>
                                   </div>
                                 );
@@ -747,40 +727,6 @@ ease-out h-full flex flex-col">
                             </div>
                           )}
                         </div>
-
-                        <p className="text-gray-300 text-sm mb-4 flex-1 text-center">
-                          {recipe.description}
-                        </p>
-                        {explanation && (
-                          <p className="text-sm text-gray-300 bg-surface-highlight rounded-lg p-3 mb-3 border border-white/5">
-                            {explanation}
-                          </p>
-                        )}
-                      </div>
-                      <div className="px-6 pb-4 pt-2 border-t border-surface-highlight">
-                        {(() => {
-                          const isSaved = savedRecipeIds.has(recipeId);
-                          return (
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleSaveRecipe(recipeId, recipe.name);
-                              }}
-                              disabled={isSaved}
-                              className={`w-full px-4 py-2 rounded-md shadow-md transition-colors flex items-center justify-center gap-2 text-sm font-semibold ${
-                                isSaved
-                                  ? 'bg-green-600 text-white cursor-not-allowed'
-                                  : 'bg-green-800 text-white hover:bg-green-900'
-                              }`}
-                            >
-                              {isSaved ? '✓ Added to Saved Meals' : (
-                                <>
-                                  <Plus className="h-4 w-4" /> Add Meal
-                                </>
-                              )}
-                            </button>
-                          );
-                        })()}
                       </div>
                     </div>
                   </div>

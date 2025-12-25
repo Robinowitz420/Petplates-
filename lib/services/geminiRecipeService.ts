@@ -1,4 +1,11 @@
 import { HEALTH_CONTRAINDICATIONS, normalizeConcernKey } from '@/lib/data/healthBenefitMap';
+import {
+  buildPrompt as buildSpeciesPrompt,
+  buildRevisionPrompt as buildSpeciesRevisionPrompt,
+  normalizeSpeciesEngineKey,
+  type CandidateIssueSummary,
+  type RecipeCandidate,
+} from '@/lib/services/speciesMealGeneration';
 
 export const MODEL_FALLBACK_LIST = [
   'gemini-3-flash-preview',
@@ -59,15 +66,136 @@ export async function generateRecipesJsonWithFallback(params: {
   };
   allowedIngredientNames: string[];
 }): Promise<{ payload: GeminiRecipePayload; modelUsed: string }> {
+  return generateRecipesJsonWithFallbackAndPrompt({
+    ...params,
+    promptText: buildInitialPromptText(params),
+  });
+}
+
+function buildInitialPromptText(params: {
+  species: string;
+  count: number;
+  petProfile?: {
+    name?: string;
+    weightKg?: number;
+    age?: string;
+    allergies?: string[];
+    healthConcerns?: string[];
+    bannedIngredients?: string[];
+  };
+  allowedIngredientNames: string[];
+}): string {
+  const { species, petProfile } = params;
+  const requestedCount = 10;
+
+  const ageGroup = petProfile?.age || 'adult';
+  const weightKg = petProfile?.weightKg;
+  const allergies = (petProfile?.allergies || []).filter(Boolean);
+  const bannedIngredients = (petProfile?.bannedIngredients || []).filter(Boolean);
+  const healthConcerns = (petProfile?.healthConcerns || []).filter(Boolean);
+
+  const dietaryRestrictionsFromProfile = Array.isArray((petProfile as any)?.dietaryRestrictions)
+    ? ((petProfile as any).dietaryRestrictions as string[]).filter(Boolean)
+    : [];
+  const breed = typeof (petProfile as any)?.breed === 'string' ? String((petProfile as any).breed) : undefined;
+
+  const perfectPet =
+    allergies.length === 0 &&
+    bannedIngredients.length === 0 &&
+    healthConcerns.length === 0 &&
+    dietaryRestrictionsFromProfile.length === 0;
+
+  const engineKey = normalizeSpeciesEngineKey(species);
+  const speciesPrompt = buildSpeciesPrompt({
+    species: engineKey,
+    petName: petProfile?.name || 'Pet',
+    ageGroup,
+    weightKg: typeof weightKg === 'number' ? weightKg : undefined,
+    healthConcerns,
+    allergies,
+    bannedIngredients,
+    breed,
+    requestedCount,
+    perfectPet,
+  });
+
+  // NOTE: Ingredient vocabulary is injected separately by the caller prompt object below.
+  return speciesPrompt;
+}
+
+export function buildRevisionPromptText(params: {
+  species: string;
+  petProfile?: {
+    name?: string;
+    weightKg?: number;
+    age?: string;
+    allergies?: string[];
+    healthConcerns?: string[];
+    bannedIngredients?: string[];
+  };
+  failingCandidates: RecipeCandidate[];
+  topIssuesByCandidate: CandidateIssueSummary[];
+}): string {
+  const { species, petProfile, failingCandidates, topIssuesByCandidate } = params;
+  const requestedCount = 10;
+
+  const ageGroup = petProfile?.age || 'adult';
+  const weightKg = petProfile?.weightKg;
+  const allergies = (petProfile?.allergies || []).filter(Boolean);
+  const bannedIngredients = (petProfile?.bannedIngredients || []).filter(Boolean);
+  const healthConcerns = (petProfile?.healthConcerns || []).filter(Boolean);
+
+  const dietaryRestrictionsFromProfile = Array.isArray((petProfile as any)?.dietaryRestrictions)
+    ? ((petProfile as any).dietaryRestrictions as string[]).filter(Boolean)
+    : [];
+  const breed = typeof (petProfile as any)?.breed === 'string' ? String((petProfile as any).breed) : undefined;
+
+  const perfectPet =
+    allergies.length === 0 &&
+    bannedIngredients.length === 0 &&
+    healthConcerns.length === 0 &&
+    dietaryRestrictionsFromProfile.length === 0;
+
+  return buildSpeciesRevisionPrompt(
+    {
+      species: normalizeSpeciesEngineKey(species),
+      petName: petProfile?.name || 'Pet',
+      ageGroup,
+      weightKg: typeof weightKg === 'number' ? weightKg : undefined,
+      healthConcerns,
+      allergies,
+      bannedIngredients,
+      breed,
+      requestedCount,
+      perfectPet,
+    },
+    failingCandidates,
+    topIssuesByCandidate
+  );
+}
+
+export async function generateRecipesJsonWithFallbackAndPrompt(params: {
+  species: string;
+  count: number;
+  petProfile?: {
+    name?: string;
+    weightKg?: number;
+    age?: string;
+    allergies?: string[];
+    healthConcerns?: string[];
+    bannedIngredients?: string[];
+  };
+  allowedIngredientNames: string[];
+  promptText: string;
+}): Promise<{ payload: GeminiRecipePayload; modelUsed: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('Missing GEMINI_API_KEY');
 
   const preferred = (process.env.GEMINI_API_MODEL || '').trim();
   const models = [preferred, ...MODEL_FALLBACK_LIST].filter(Boolean);
 
-  const { species, count, petProfile, allowedIngredientNames } = params;
-  const desiredCount = 10;
-  const requestedCount = desiredCount; // Super-request engine is always exactly 10
+  const { species, petProfile, allowedIngredientNames, promptText } = params;
+  const requestedCount = 10; // Super-request engine is always exactly 10
 
   const age = petProfile?.age || 'adult';
   const weightKg = petProfile?.weightKg;
@@ -102,6 +230,7 @@ export async function generateRecipesJsonWithFallback(params: {
 
   const userPromptObject = {
     task: 'Generate species-appropriate pet recipes as meal formulations.',
+    engine_instructions: promptText,
     output_format: schemaRequirement,
     hard_constraints: {
       max_recipes: requestedCount,

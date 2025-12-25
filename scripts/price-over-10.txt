@@ -1,0 +1,116 @@
+Omega-3 Capsules — $29.99 [454g] — product
+S-Adenosyl methionine (SAM-e) — $27.50 [454g] — override
+Algae Oil (DHA) — $25.00 [16 oz bottle] ($25.00/lb) — override
+Beta-glucans — $25.00 [454g] — override
+L-Carnitine Powder — $25.00 [227g] — override
+Joint Health Supplement — $25.00 [227g] — override
+Joint Health Powder — $25.00 [227g] — override
+joint supplement — $25.00 [227g] — override
+Ground Venison — $24.99 [454g] — product
+currant — $23.95 [454g] — product
+Glucosamine Sulfate — $22.50 [500g] — override
+Chondroitin Sulfate — $22.50 [500g] — override
+Dubia Roaches — $22.50 [100] — override
+Small Dubia Roaches — $22.50 [100] — override
+cat grass — $21.99 [454g] — product
+Ground Quail — $21.98 [454g] — product
+Quail Meat — $21.98 [1361g] — product
+Herring Oil — $20.00 [16 oz bottle] ($20.00/lb) — override
+Evening Primrose Oil — $20.00 [16 oz bottle] ($20.00/lb) — override
+Borage Oil — $20.00 [16 oz bottle] ($20.00/lb) — override
+Black Currant Oil — $20.00 [16 oz bottle] ($20.00/lb) — override
+Krill Oil — $20.00 [16 oz bottle] ($20.00/lb) — override
+Spirulina Powder — $20.00 [1 lb] ($20.00/lb) — override
+Rabbit Pellets (high fiber) — $20.00 [10 lb bag] ($2.00/lb) — override
+Probiotic Powder — $20.00 [227g] — override
+Digestive Enzymes — $20.00 [454g] — override
+D-Mannose — $20.00 [454g] — override
+Curcumin (turmeric extract) — $20.00 [454g] — override
+Hyaluronic Acid — $20.00 [454g] — override
+Amino Acid Supplement — $20.00 [227g] — override
+Black Soldier Fly Larvae — $20.00 [container] — override
+Barley Grass — $19.92 [454g] — product
+almond — $18.46 [454g] — product
+Quercetin — $17.50 [454g] — override
+Mackerel Oil — $16.00 [16 oz bottle] ($16.00/lb) — override
+Sardine Oil — $16.00 [16 oz bottle] ($16.00/lb) — override
+Anchovy Oil — $16.00 [16 oz bottle] ($16.00/lb) — override
+Mannanoligosaccharides (MOS) — $16.00 [454g] — override
+Fortified Pellets (vitamin C) — $15.00 [113g] ($60.21/lb) — fallback
+vitamin c drops — $15.00 [113g] ($60.21/lb) — fallback
+Pumpkin Seed Oil — $15.00 [16 oz bottle] ($15.00/lb) — override
+Wheat Germ Oil — $15.00 [16 oz bottle] ($15.00/lb) — override
+Earthworms — $15.00 [1 lb] ($15.00/lb) — override
+salmon atlantic — $15.00 [680g] ($10.01/lb) — fallback
+Turkey Liver — $15.00 [1361g] ($5.00/lb) — fallback
+Turkey Hearts — $15.00 [1361g] ($5.00/lb) — fallback
+Feeder Fish (Guppies) — $15.00 [1361g] ($5.00/lb) — fallback
+Pellets (fortified) — $15.00 [5 lb bag] ($3.00/lb) — override
+Superworms — $15.00 [100] — override
+Silkworms — $15.00 [50] — override
+Pinhead Crickets — $15.00 [100] — override
+beef liver — $14.99 [1361g] — product
+Hemp Seeds — $14.99 [907g] — product
+Peanut Butter (unsalted, tiny amounts) — $14.99 [454g] — product
+Electrolyte Powder — $14.99 [227g] — product
+Mealworms — $14.99 [454g] — product
+Mealworms (freeze-dried) — $14.99 [454g] — product
+peanut — $14.99 [454g] — product
+Vitamin B Complex — $14.95 [113g] — product
+Biotin — $14.95 [454g] — product
+Cranberry Extract — $14.95 [454g] — product
+b-complex — $14.95 [454g] — product
+Oat Bran (small amounts) — $14.74 [907g] — product
+Oat Bran — $14.74 [907g] — product
+Vitamin D3 Drops — $14.45 [113g] — product
+Sorghum — $14.33 [454g] — product
+Farro — $14.33 [454g] — product
+Wheat Germ — $14.33 [454g] — product
+Teff Seeds — $14.33 [907g] — product
+millet seed — $14.33 [907g] — product
+Salmon Oil — $14.00 [16 oz bottle] ($14.00/lb) — override
+Fish Oil — $14.00 [16 oz bottle] ($14.00/lb) — override
+omega-3 oil — $14.00 [16 oz bottle] ($14.00/lb) — override
+Inulin (prebiotic) — $14.00 [454g] — override
+Fructooligosaccharides (FOS) — $14.00 [454g] — override
+blueberries — $14.00 [454g] — product
+blueberries raw — $14.00 [454g] — product
+turkey breast — $13.99 [1361g] — product
+Alfalfa Sprouts (small amounts) — $13.99 [454g] — product
+Lysine Powder — $13.99 [227g] — product
+Safflower Seeds — $13.99 [907g] — product
+alfalfa sprouts — $13.99 [454g] — product
+lentils — $13.49 [454g] — product
+Kelp Powder — $13.29 [227g] — product
+eggs whole — $13.00 [660g] — product
+eggshell powder — $13.00 [660g] — product
+sweet potato — $12.99 [1361g] — product
+Olive Oil — $12.99 [500g] — product
+Avocado Oil — $12.99 [500g] — product
+Olive Oil (small amounts) — $12.99 [500g] — product
+Avocado Oil (tiny amounts) — $12.99 [500g] — product
+Guinea Pig Pellets (with vitamin C) — $12.99 [113g] — product
+Taurine Powder — $12.95 [227g] — product
+Niacinamide — $12.95 [454g] — product
+Venison — $12.50 [1 lb] ($12.50/lb) — override
+quail — $12.50 [1 lb] ($12.50/lb) — override
+Almond Oil — $12.50 [16 oz bottle] ($12.50/lb) — override
+Wild Bird Mix — $12.50 [10 lb bag] ($1.25/lb) — override
+quinoa — $12.49 [680g] — product
+quinoa cooked — $12.49 [680g] — product
+calcium powder — $12.00 [227g] ($23.98/lb) — fallback
+Apricots (pitted) — $12.00 [454g] — product
+apricot — $12.00 [454g] — product
+salmon (boneless) — $11.50 [1 lb] ($11.50/lb) — override
+Hornworms — $11.50 [dozen] — override
+Butterworms — $11.50 [container] — override
+vitamin e — $11.50 [113g] — override
+Flaxseed (ground) — $11.42 [907g] — product
+Brewer's Yeast — $11.12 [454g] — product
+Egg Yolks — $10.99 [660g] — product
+Sunflower Seeds (small amounts) — $10.99 [907g] — product
+sunflower seeds — $10.99 [907g] — product
+Sesame Oil — $10.84 [500g] — product
+Raisins (unsweetened) — $10.43 [454g] — product
+raisin — $10.43 [454g] — product
+Milk Thistle — $10.40 [454g] — product
