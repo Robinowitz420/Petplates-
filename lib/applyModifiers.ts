@@ -7,6 +7,7 @@ import { scaleAmount } from './portionCalc';
 import { recipes } from './data/recipes-complete';
 import { getVettedProduct, getAllAffiliateLinks, getGenericIngredientName } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
 import { matchesSpecies } from './utils/recipeRecommendations';
+import { normalizePetCategory } from './utils/petType';
 
 interface ApplyModifiersResult {
   modifiedRecipe: Recipe;
@@ -42,7 +43,8 @@ const formatIngredientNameForDisplay = (value: string): string => {
 };
 
 export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult & { conflictCount: number; hasHydrationSupport: boolean } {
-  const modifiers = pet.type === 'dogs' ? dogModifiers : pet.type === 'cats' ? catModifiers : {};
+  const petCategory = normalizePetCategory(pet?.type, 'applyModifiers');
+  const modifiers = petCategory === 'dogs' ? dogModifiers : petCategory === 'cats' ? catModifiers : {};
   const modifiedRecipe: Recipe = JSON.parse(JSON.stringify(recipe)); // Deep clone to modify
 
   let addedIngredients: ApplyModifiersResult['addedIngredients'] = [];
@@ -83,7 +85,7 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
       // Add supplements required by the modifier
       for (const supplement of modifier.add) {
         // Check if there's a vetted product for this supplement (pass pet.type for species filtering, preferBudget=true for cost control)
-        const vettedProduct = getVettedProduct(supplement.name, pet.type, true);
+        const vettedProduct = getVettedProduct(supplement.name, petCategory, true);
         addedIngredients.push({
           name: supplement.name,
           benefit: supplement.benefit,
@@ -113,7 +115,7 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
     const genericKey = getGenericIngredientName(ing.name);
     const genericName = genericKey ? formatIngredientNameForDisplay(genericKey) : ing.name;
     // Pass pet.type for species-aware product matching, preferBudget=true for cost control
-    const vettedProduct = getVettedProduct(genericName, pet.type, true);
+    const vettedProduct = getVettedProduct(genericName, petCategory, true);
     if (vettedProduct) {
         // Overwrite the generic ingredient details with the Vetted Product details
         return {
@@ -137,7 +139,7 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
       const genericKey = getGenericIngredientName(supplement.name);
       const genericName = genericKey ? formatIngredientNameForDisplay(genericKey) : supplement.name;
       // Pass pet.type for species-aware product matching, preferBudget=true for cost control
-      const vettedProduct = getVettedProduct(genericName, pet.type, true);
+      const vettedProduct = getVettedProduct(genericName, petCategory, true);
       if (vettedProduct) {
         return {
           ...supplement,

@@ -2,10 +2,12 @@ import type { Recipe } from './types';
 import { dogModifiers } from './data/nutrition-dog-modifiers';
 import { catModifiers } from './data/nutrition-cat-modifiers';
 import { matchesSpecies } from './utils/recipeRecommendations';
+import { normalizePetCategory, normalizePetType } from './utils/petType';
 import {
   calculateEnhancedCompatibility,
   type Pet as EnhancedPet,
 } from './utils/enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine } from './utils/speciesScoringEngines';
 
 export interface ScoreReasoning {
   goodMatches: string[];
@@ -302,7 +304,8 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
   }
 
   // Apply modifiers if applicable
-  const modifiers = pet.type === 'dogs' ? dogModifiers : pet.type === 'cats' ? catModifiers : null;
+  const petCategory = normalizePetCategory(pet?.type, 'scoreRecipe');
+  const modifiers = petCategory === 'dogs' ? dogModifiers : petCategory === 'cats' ? catModifiers : null;
   if (modifiers) {
     // Use normalized concerns for modifier matching
     for (let i = 0; i < petConcernsNormalized.length; i++) {
@@ -355,7 +358,7 @@ export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
   const enhancedPet: EnhancedPet = {
     id: pet.id,
     name: pet.name,
-    type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+    type: normalizePetType(pet.type, 'scoreRecipeImproved'),
     breed: pet.breed,
     age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
     weight: pet.weight || pet.weightKg || 10,
@@ -365,11 +368,12 @@ export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
     allergies: pet.allergies || [],
   };
 
-  const result = calculateEnhancedCompatibility(recipe, enhancedPet);
-  const stars = Math.round(result.overallScore / 20);
+  const scored = scoreWithSpeciesEngine(recipe, enhancedPet);
+  const result = scored.raw;
+  const stars = Math.round(scored.overallScore / 20);
   return {
-    compatibilityScore: result.overallScore,
-    matchScore: result.overallScore, // Keep for backward compatibility
+    compatibilityScore: scored.overallScore,
+    matchScore: scored.overallScore, // Keep for backward compatibility
     stars: stars,
     reasoning: {
       goodMatches: result.detailedBreakdown.healthBenefits,
@@ -377,7 +381,7 @@ export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
     },
     conflictCount: result.detailedBreakdown.warnings.length,
     hasHydrationSupport: false,
-    summaryReasoning: `Compatibility score: ${result.overallScore}% (${result.grade})`,
+    summaryReasoning: `Compatibility score: ${scored.overallScore}% (${scored.grade})`,
     recommendations: result.detailedBreakdown.recommendations,
   };
 }

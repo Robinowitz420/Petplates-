@@ -27,8 +27,8 @@ export function getArchetypes(): Archetype[] {
 
 export function getCompletenessMechanismRules(): string[] {
   return [
-    'Recipe MUST include a completeness mechanism: either (A) a canine vitamin/mineral balancer/premix ingredient OR (B) ALL of: a calcium source + an organ ingredient + an omega-3 source.',
-    'Do NOT rely on “multivitamin” vague wording—use a specific allowed ingredient name from the provided vocabulary.',
+    'Do NOT include vitamin/mineral blends, supplements, powders, capsules, or "vitamin" ingredients. This app handles supplement recommendations separately.',
+    'Avoid organ meats (liver/heart/kidney/etc) unless medically indicated by the pet profile health concerns.',
     'Keep ingredients purposeful; avoid filler items.',
   ];
 }
@@ -49,11 +49,12 @@ function baseHeader(ctx: SpeciesEngineContext): string {
 function constraintsBlock(ctx: SpeciesEngineContext): string {
   return [
     'HARD CONSTRAINTS:',
-    `- Output must include exactly ${ctx.requestedCount} recipes in the recipes array.`,
+    `- Output must include up to ${ctx.requestedCount} recipes in the recipes array.`,
     '- Each recipe MUST be a plausible single meal for a dog (not a snack).',
     '- Amounts must be in grams (e.g., "120g").',
     '- Total meal mass MUST be >= 80g (sum of ingredient grams).',
     '- Balanced macro style: protein + carb/veg + fat source.',
+    '- Whole-food meals only: do NOT include supplements, vitamins/minerals, powders, capsules, or oils-as-supplements. Any supplement suggestions will be returned separately by the app.',
     '- Avoid ultra-low-mass meals; dogs must meet minimum meal mass.',
     '- Avoid toxic foods (onion/garlic/grapes/raisins/xylitol/chocolate/macadamia/alcohol/caffeine).',
     ...(ctx.healthConcerns.length

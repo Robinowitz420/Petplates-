@@ -6,9 +6,10 @@ import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
 
 import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import type { Pet } from '@/lib/utils/petRatingSystem';
 import RecipeScoreModal from './RecipeScoreModal';
-
+import { normalizePetType } from '@/lib/utils/petType';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -31,7 +32,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
     const enhancedPet: EnhancedPet = {
       id: pet.id,
       name: pet.name,
-      type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+      type: normalizePetType(pet.type, 'RecipeCard'),
       breed: pet.breed,
       age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
       weight: pet.weight || pet.weightKg || 10,
@@ -40,7 +41,13 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
       dietaryRestrictions: pet.dietaryRestrictions || [],
       allergies: pet.allergies || [],
     };
-    return calculateEnhancedCompatibility(recipe, enhancedPet);
+    const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
+    const scored = scoreWithSpeciesEngine(recipe, enhancedPet);
+    return {
+      ...enhanced,
+      overallScore: scored.overallScore,
+      grade: scored.grade,
+    };
   })() : null;
 
   const compatibilityRating = enhancedScore ? {

@@ -7,37 +7,52 @@ import { useState, useMemo } from 'react';
 
 interface ShoppingListSummaryProps {
   shoppingList: ShoppingListItem[];
+  recipeServings?: number;
+  species?: string;
   className?: string;
 }
 
-export function ShoppingListSummary({ shoppingList, className = '' }: ShoppingListSummaryProps) {
+export function ShoppingListSummary({ shoppingList, recipeServings, species, className = '' }: ShoppingListSummaryProps) {
   const [showBreakdown, setShowBreakdown] = useState(false);
+
+  const filteredShoppingList = useMemo(() => {
+    return (shoppingList || []).filter((item) => {
+      const category = String(item.category || '').toLowerCase();
+      return category !== 'supplement';
+    });
+  }, [shoppingList]);
   
   // Calculate total cost using the same logic as ShoppingList component
   const totalCost = useMemo(() => {
-    if (!shoppingList || shoppingList.length === 0) {
+    if (!filteredShoppingList || filteredShoppingList.length === 0) {
       return 0;
     }
     
-    return shoppingList.reduce((sum, item) => {
+    return filteredShoppingList.reduce((sum, item) => {
       const price = getProductPrice(item.name);
       if (typeof price === 'number') return sum + price;
       return sum;
     }, 0);
-  }, [shoppingList]);
+  }, [filteredShoppingList]);
 
   // Calculate estimate with error handling and memoization
   const estimate = useMemo(() => {
-    if (!shoppingList || shoppingList.length === 0) {
+    if (!filteredShoppingList || filteredShoppingList.length === 0) {
       console.log('[ShoppingListSummary] No shopping list provided');
       return null;
     }
     
-    console.log('[ShoppingListSummary] Calculating estimate for', shoppingList.length, 'ingredients');
-    console.log('[ShoppingListSummary] Shopping list:', shoppingList);
+    console.log('[ShoppingListSummary] Calculating estimate for', filteredShoppingList.length, 'ingredients');
+    console.log('[ShoppingListSummary] Shopping list:', filteredShoppingList);
     
     try {
-      const result = calculateMealsFromGroceryList(shoppingList);
+      const result = calculateMealsFromGroceryList(
+        filteredShoppingList,
+        undefined,
+        species,
+        true,
+        recipeServings
+      );
       console.log('[ShoppingListSummary] Estimate calculated:', result);
       console.log('[ShoppingListSummary] UI totalCost prop (not used):', totalCost);
       return result;
@@ -45,7 +60,7 @@ export function ShoppingListSummary({ shoppingList, className = '' }: ShoppingLi
       console.error('[ShoppingListSummary] Error calculating meals:', error);
       return null;
     }
-  }, [shoppingList, totalCost]);
+  }, [filteredShoppingList, totalCost, species, recipeServings]);
   
   // Don't show if no estimate or invalid
   if (!estimate || estimate.estimatedMeals === 0) {

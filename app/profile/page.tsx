@@ -26,6 +26,7 @@ import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import PetBadges from '@/components/PetBadges';
 import BadgeToggle from '@/components/BadgeToggle';
 import Tooltip from '@/components/Tooltip';
+import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -1237,7 +1238,7 @@ const buildWeeklyPlan = useCallback(
                                   height={168}
                                   className="object-cover"
                                   unoptimized
-                                  style={activePet.type === 'cats' || activePet.type === 'cat' ? { transform: 'scale(1.5)', transformOrigin: 'center', objectPosition: 'center' } : undefined}
+                                  style={normalizePetCategory(activePet.type, 'profile.page.avatar') === 'cats' ? { transform: 'scale(1.5)', transformOrigin: 'center', objectPosition: 'center' } : undefined}
                                 />
                               )}
                             </label>
@@ -1440,7 +1441,7 @@ const buildWeeklyPlan = useCallback(
                                         const enhancedPet: EnhancedPet = {
                                           id: activePet.id,
                                           name: getPrimaryName(activePet.names || []) || 'Pet',
-                                          type: activePet.type === 'dogs' ? 'dog' : activePet.type === 'cats' ? 'cat' : activePet.type === 'birds' ? 'bird' : activePet.type === 'reptiles' ? 'reptile' : 'pocket-pet',
+                                          type: normalizePetType(activePet.type, 'profile.page.saved.compat'),
                                           breed: activePet.breed || '',
                                           age: activePet.age === 'baby' ? 0.5 : activePet.age === 'young' ? 2 : activePet.age === 'adult' ? 5 : 10,
                                           weight: activePet.weightKg || 10,

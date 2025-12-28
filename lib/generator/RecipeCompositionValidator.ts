@@ -137,7 +137,11 @@ export function validateRecipeComposition(
   const issues: string[] = [];
   const warnings: string[] = [];
 
-  const ingredientNames = selectedIngredients.map(ing => ing.name.toLowerCase());
+  const coreIngredients = selectedIngredients.filter(
+    (ing) => ing.category !== 'supplement'
+  );
+
+  const ingredientNames = coreIngredients.map(ing => ing.name.toLowerCase());
 
   // ========================================================================
   // CHECK 1: Required structure
@@ -166,18 +170,6 @@ export function validateRecipeComposition(
       if (!hasCategory) {
         warnings.push(`Recommended ingredient type missing: ${category}`);
       }
-    }
-
-    // Check ingredient count
-    if (selectedIngredients.length < structure.minIngredients) {
-      issues.push(
-        `Too few ingredients (${selectedIngredients.length}, need ${structure.minIngredients}+)`
-      );
-    }
-    if (selectedIngredients.length > structure.maxIngredients) {
-      warnings.push(
-        `Too many ingredients (${selectedIngredients.length}, recommended max ${structure.maxIngredients})`
-      );
     }
   }
 

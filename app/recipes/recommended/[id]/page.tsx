@@ -9,10 +9,10 @@ import { recipes } from '@/lib/data/recipes-complete';
 import RecipeCard from '@/components/RecipeCard';
 import {
   calculateEnhancedCompatibility,
-  calibrateScoresForPet,
   type Pet as EnhancedPet,
 } from '@/lib/utils/enhancedCompatibilityScoring';
 import type { Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+import { normalizePetType } from '@/lib/utils/petType';
 
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
@@ -56,16 +56,6 @@ export default function RecommendedRecipesPage() {
   const ratingPet: RatingPet | null = useMemo(() => {
     if (!pet) return null;
 
-    const normalizePetType = (value: string): RatingPet['type'] => {
-      const v = String(value || '').toLowerCase();
-      if (v === 'dogs' || v === 'dog') return 'dog';
-      if (v === 'cats' || v === 'cat') return 'cat';
-      if (v === 'birds' || v === 'bird') return 'bird';
-      if (v === 'reptiles' || v === 'reptile') return 'reptile';
-      if (v === 'pocket-pets' || v === 'pocket-pet') return 'pocket-pet';
-      return 'dog';
-    };
-
     const ageYears = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
     const weightNum =
       typeof pet.weightKg === 'number'
@@ -79,7 +69,7 @@ export default function RecommendedRecipesPage() {
     return {
       id: pet.id,
       name: pet.name,
-      type: normalizePetType(pet.type),
+      type: normalizePetType(pet.type, 'recipes/recommended/[id]') as RatingPet['type'],
       breed: pet.breed,
       age: ageYears,
       weight: Number.isFinite(weightNum) ? weightNum : 25,
@@ -146,27 +136,6 @@ export default function RecommendedRecipesPage() {
         return { recipe, score: null };
       }
     });
-
-    // Apply per-pet calibration to normalize scores
-    // This ensures 100% is rare and meaningful, and scores are spread across the range
-    const validScored = scored.filter((s) => s.score !== null && enhancedPet);
-    if (validScored.length > 0 && enhancedPet) {
-      const recipesToCalibrate = validScored.map((s) => s.recipe);
-      const calibratedScores = calibrateScoresForPet(recipesToCalibrate, enhancedPet);
-
-      // Update scores with calibrated values
-      validScored.forEach((item) => {
-        const calibratedScore = calibratedScores.get(item.recipe.id);
-        if (calibratedScore !== undefined && item.score) {
-          item.score.compatibilityScore = calibratedScore;
-          item.score.stars = Math.round(calibratedScore / 20);
-          // Update enhanced score if it exists
-          if (item.score.enhancedScore) {
-            item.score.enhancedScore.overallScore = calibratedScore;
-          }
-        }
-      });
-    }
 
     // Sort by compatibility score (highest first)
     const sorted = scored.sort((a, b) => {

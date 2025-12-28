@@ -15,6 +15,7 @@ import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
 import ScoringProgress from '@/components/ScoringProgress';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
+import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
@@ -30,11 +31,13 @@ interface Pet {
   dietaryRestrictions?: string[];
   savedRecipes?: string[];
   allergies?: string[];
+  allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
   bannedIngredients?: string[];
   weightKg?: number;
   weight?: string;
   dislikes?: string[];
   activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
+  notes?: string;
 }
 
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
@@ -42,18 +45,6 @@ const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 const getCurrentUserId = () => {
   if (typeof window === 'undefined') return SIMULATED_USER_ID;
   return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
-};
-
-const getCombinedRecipes = (): Recipe[] => {
-  if (typeof window !== 'undefined') {
-    try {
-      const customRecipes = JSON.parse(localStorage.getItem('custom_recipes') || '[]');
-      return customRecipes;
-    } catch (error) {
-      console.error('Error loading custom recipes:', error);
-    }
-  }
-  return [];
 };
 
 export default function RecommendedRecipesPage() {
@@ -73,7 +64,7 @@ export default function RecommendedRecipesPage() {
 
   const mealsCacheKey = useMemo(() => {
     const userId = getCurrentUserId();
-    return `generated_meals_v1:${userId}:${petId}`;
+    return `generated_meals_v2:${userId}:${petId}`;
   }, [petId]);
 
   const forceRegenerate = searchParams.get('regenerate') === '1';
@@ -90,13 +81,14 @@ export default function RecommendedRecipesPage() {
   const enhancedPet: EnhancedPet | null = useMemo(() => {
     if (!pet) return null;
     const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
+    const petType = normalizePetType(pet.type, 'profile/pet/[id].enhancedPet');
     return {
       id: pet.id,
       name: petDisplayName,
-      type: (pet.type === 'dogs' ? 'dog' : pet.type === 'cats' ? 'cat' : pet.type === 'birds' ? 'bird' : pet.type === 'reptiles' ? 'reptile' : 'pocket-pet') as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+      type: petType,
       breed: pet.breed,
       age: petAge,
-      weight: pet.weightKg || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
+      weight: pet.weightKg || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
       activityLevel: 'moderate' as const,
       healthConcerns: pet.healthConcerns || [],
       dietaryRestrictions: pet.dietaryRestrictions || [],
@@ -203,10 +195,16 @@ export default function RecommendedRecipesPage() {
             count: 9,
             petProfile: {
               name: petDisplayName,
+              breed: pet.breed || undefined,
               weight: pet.weight,
               weightKg: pet.weightKg,
               age: pet.age,
+              activityLevel: pet.activityLevel,
               allergies: pet.allergies || [],
+              dietaryRestrictions: pet.dietaryRestrictions || [],
+              dislikes: pet.dislikes || [],
+              notes: pet.notes || undefined,
+              allergiesSeverity: pet.allergiesSeverity,
               healthConcerns: pet.healthConcerns || [],
               bannedIngredients: pet.bannedIngredients || [],
             },
@@ -266,7 +264,7 @@ export default function RecommendedRecipesPage() {
           console.error('Recipe generation error:', error);
         }
         if (isAbortError) {
-          setEngineError('Meal generation timed out—showing standard matches.');
+          setEngineError('Meal generation timed out.');
           setEngineMeals(null);
         }
         const rawMessage = error instanceof Error ? error.message : String(error);
@@ -276,65 +274,16 @@ export default function RecommendedRecipesPage() {
           rawMessage.includes('Quota exceeded') ||
           rawMessage.includes('limit: 0');
 
+        if (!isQuotaClosed && !isAbortError) {
+          setEngineError(rawMessage || 'Meal generation failed.');
+          setEngineMeals(null);
+        }
+
         if (isQuotaClosed) {
           setEngineError(
             'The Kitchen is currently closed (Google API Quota). Please check back in a few hours!'
           );
           setShowQuotaPopup(true);
-        }
-
-        try {
-          const concerns = (pet.healthConcerns || []).filter((concern) => concern !== 'none');
-          const allergies = pet.allergies?.filter((allergy) => allergy !== 'none') || [];
-
-          const fallbackController = new AbortController();
-          const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 30000);
-
-          const response = await fetch('/api/recommendations', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: fallbackController.signal,
-            body: JSON.stringify({
-              profile: {
-                species: pet.type,
-                ageGroup: pet.age,
-                breed: pet.breed,
-                weightKg: pet.weightKg || 10,
-                healthConcerns: concerns,
-                allergies,
-                petName: petDisplayName,
-              },
-              limit: 50,
-            }),
-          });
-
-          clearTimeout(fallbackTimeoutId);
-
-          if (!response.ok) {
-            throw new Error(`Recommendations failed (${response.status})`);
-          }
-
-          const data = await response.json();
-          if (!isMounted) return;
-
-          setEngineMeals((data?.results as ModifiedRecipeResult[]) || []);
-        } catch (fallbackError) {
-          if (!isMounted) return;
-          const isAbortError =
-            (fallbackError as any)?.name === 'AbortError' ||
-            (typeof DOMException !== 'undefined' &&
-              fallbackError instanceof DOMException &&
-              fallbackError.name === 'AbortError');
-          if (isAbortError) {
-            setEngineMeals(null);
-            setEngineError('Meal recommendations timed out—showing standard matches.');
-            return;
-          }
-          if (!isAbortError) {
-            console.error('Recommendations error:', fallbackError);
-          }
-          setEngineMeals(null);
-          setEngineError('Unable to load meals—showing standard matches.');
         }
       } finally {
         clearTimeout(timeoutId);
@@ -368,80 +317,10 @@ export default function RecommendedRecipesPage() {
 
   const closeQuotaPopup = () => setShowQuotaPopup(false);
 
-  useEffect(() => {
-    if (pet) {
-      const { getRecommendedRecipes } = require('@/lib/utils/recipeRecommendations');
-      const tieredRecommendations = getRecommendedRecipes(pet, 20, true);
-      const fallbackCount = tieredRecommendations.length;
-    }
-  }, [engineMeals, pet]);
-
-  const { normalizeToSubtype } = require('@/lib/utils/ingredientWhitelists');
-
-  const matchesSpecies = (recipe: Recipe, currentPet: Pet): boolean => {
-    if (recipe.category === currentPet.type) return true;
-
-    const subtype = normalizeToSubtype(currentPet.type as any, currentPet.breed);
-
-    if (currentPet.type === 'birds') {
-      if (recipe.category === 'birds' || recipe.category === 'bird') return true;
-      if (recipe.category === subtype) return true;
-    }
-
-    if (currentPet.type === 'reptiles') {
-      if (recipe.category === 'reptiles' || recipe.category === 'reptile') return true;
-      if (recipe.category === subtype) return true;
-    }
-
-    if (currentPet.type === 'pocket-pets') {
-      if (recipe.category === 'pocket-pets' || recipe.category === 'pocket-pet') return true;
-      if (recipe.category === subtype) return true;
-    }
-
-    return false;
-  };
-
-  const tieredHealthConcernsKey = pet ? JSON.stringify(pet.healthConcerns || []) : '';
-  const tieredAllergiesKey = pet ? JSON.stringify(pet.allergies || []) : '';
-
-  const tieredRecommendations = useMemo(() => {
-    if (!pet) return [];
-    const { getRecommendedRecipes } = require('@/lib/utils/recipeRecommendations');
-    const combinedRecipes = getCombinedRecipes();
-    return getRecommendedRecipes(pet, 9, true, combinedRecipes);
-  }, [pet?.id, pet?.type, pet?.breed, pet?.age, tieredHealthConcernsKey, pet?.weightKg, tieredAllergiesKey]);
-
-  const buildFallbackExplanation = (recipe: Recipe, currentPet: Pet, tierLabel?: string, warning?: string) => {
-    if (warning) {
-      return warning;
-    }
-    if (tierLabel && tierLabel !== 'Best Match') {
-      return `${recipe.name} - ${tierLabel}`;
-    }
-    const concern = (currentPet.healthConcerns || [])[0]?.replace(/-/g, ' ') || 'overall wellness';
-    const highlight = recipe.tags?.[0] || (recipe.description || '').split('. ')[0] || recipe.name;
-    return `${recipe.name} keeps ${currentPet.name || 'pet'}'s ${concern} on track with ${highlight?.toLowerCase()}.`;
-  };
-
-  const fallbackHealthConcernsKey = pet ? JSON.stringify(pet.healthConcerns || []) : '';
-  const fallbackPetName = pet?.name || '';
-
-  const fallbackMeals = useMemo(() => {
-    if (!pet) return [];
-    return tieredRecommendations.map((rec: any) => ({
-      recipe: rec.recipe,
-      explanation: buildFallbackExplanation(rec.recipe, pet, rec.tierLabel, rec.warning),
-      _tierLabel: rec.tierLabel,
-      _warning: rec.warning,
-      _healthMatch: rec.healthConcernMatch,
-      _tier: rec.tier
-    }));
-  }, [pet?.id, pet?.type, pet?.breed, pet?.age, fallbackHealthConcernsKey, fallbackPetName, tieredRecommendations]);
-
   const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
     const hasAnyFromAPI = engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0;
-    return hasAnyFromAPI ? engineMeals : fallbackMeals;
-  }, [engineMeals, fallbackMeals]);
+    return hasAnyFromAPI ? engineMeals : [];
+  }, [engineMeals]);
 
   const { scoredMeals, isLoading: isScoring, progress, totalMeals: totalMealsToScore, scoredCount } = useChunkedRecipeScoring(
     mealsToRender,

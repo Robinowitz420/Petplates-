@@ -36,6 +36,7 @@ import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
+import { normalizePetType } from '@/lib/utils/petType';
 
 // =================================================================
 // 1. CONSTANTS
@@ -458,13 +459,14 @@ export default function RecipeDetailPage() {
     // Use enhanced scoring
     try {
       const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
+      const petType = normalizePetType(pet.type, 'recipe/[id].scoreForQueryPet');
       const enhancedPet: EnhancedPet = {
         id: pet.id,
         name: getRandomName(pet.names),
-        type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+        type: petType,
         breed: pet.breed,
         age: petAge,
-        weight: parseFloat(pet.weight) || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
+        weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
         activityLevel: 'moderate' as const,
         healthConcerns: pet.healthConcerns || [],
         dietaryRestrictions: pet.allergies || [],
@@ -483,7 +485,7 @@ export default function RecipeDetailPage() {
       // Get recommendations for nutritional gaps
       const supplementRecommendations = getRecommendationsForRecipe(
         enhanced.detailedBreakdown.nutritionalGaps,
-        pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+        petType,
         pet.healthConcerns || []
       );
 
@@ -653,23 +655,6 @@ export default function RecipeDetailPage() {
     }
   }, [id, queryPetId, userId]); // Reload when ID, petId, or userId changes
 
-  // Update recommendations when score changes
-  useEffect(() => {
-    if (scoreForQueryPet && 'supplementRecommendations' in scoreForQueryPet) {
-      const recs = (scoreForQueryPet as any).supplementRecommendations || [];
-      setRecommendedSupplements(recs);
-    } else {
-      setRecommendedSupplements([]);
-    }
-  }, [scoreForQueryPet]);
-
-  // Initialize modified recipe
-  useEffect(() => {
-    if (recipe && !modifiedRecipe) {
-      setModifiedRecipe(JSON.parse(JSON.stringify(recipe)));
-    }
-  }, [recipe, modifiedRecipe]);
-
   // Load pets & saved state
   useEffect(() => {
     if (!userId || !id) return;
@@ -771,13 +756,14 @@ export default function RecipeDetailPage() {
       const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
       if (pet) {
         const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
+        const petType = normalizePetType(pet.type, 'recipe/[id].recalcScore');
         const enhancedPet: EnhancedPet = {
           id: pet.id,
           name: getRandomName(pet.names),
-          type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+          type: petType,
           breed: pet.breed,
           age: petAge,
-          weight: parseFloat(pet.weight) || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
+          weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
           activityLevel: 'moderate' as const,
           healthConcerns: pet.healthConcerns || [],
           dietaryRestrictions: pet.allergies || [],
@@ -1001,7 +987,7 @@ export default function RecipeDetailPage() {
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
-      amazonSearchUrl: ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(ing.name))
+      amazonSearchUrl: ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(ing.name)),
     }));
 
     const supplementItems = supplementsEnrichedWithLinks.map((supplement: any) => ({
@@ -1009,33 +995,55 @@ export default function RecipeDetailPage() {
       name: supplement.name,
       amount: supplement.amount || supplement.defaultAmount || '',
       asinLink: supplement.asinLink || supplement.amazonLink ? ensureSellerId(supplement.asinLink || supplement.amazonLink) : undefined,
-      amazonSearchUrl: supplement.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(supplement.name))
+      amazonSearchUrl: supplement.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(supplement.name)),
     }));
 
     const shoppingItems = [...ingredientItems, ...supplementItems];
 
-    const totalCost = shoppingItems.reduce((sum: number, item: any) => {
+    const totalCost = ingredientItems.reduce((sum: number, item: any) => {
       const price = getProductPrice(item.name);
       if (typeof price === 'number') return sum + price;
       return sum;
     }, 0);
 
     let estimate = null;
-    if (shoppingItems.length > 0) {
+    if (ingredientItems.length > 0) {
       try {
-        const shoppingListItems = shoppingItems.map((item: any) => {
+        const shoppingListItems = ingredientItems.map((item: any) => {
           const genericName = getGenericIngredientName(item.name) || item.name.toLowerCase();
           const vettedProduct = getVettedProduct(genericName, (baseRecipe as any)?.category);
           return {
             id: item.id,
             name: item.name,
             amount: item.amount,
-            category: vettedProduct?.category || 'other'
+            category: vettedProduct?.category || 'other',
           };
         });
 
-        estimate = calculateMealsFromGroceryList(shoppingListItems, undefined, (baseRecipe as any)?.category);
-      } catch (error) {
+        const servings = typeof (baseRecipe as any)?.servings === 'number' && (baseRecipe as any).servings > 0
+          ? (baseRecipe as any).servings
+          : 1;
+
+        const rawEstimate = calculateMealsFromGroceryList(
+          shoppingListItems,
+          undefined,
+          (baseRecipe as any)?.category,
+          true,
+          servings
+        );
+
+        const roundedTotalCost = Math.round(totalCost * 100) / 100;
+        const meals = rawEstimate?.estimatedMeals || 0;
+        const costPerMeal = meals > 0 ? Math.round((roundedTotalCost / meals) * 100) / 100 : 0;
+
+        estimate = rawEstimate
+          ? {
+              ...rawEstimate,
+              totalCost: roundedTotalCost,
+              costPerMeal,
+            }
+          : null;
+      } catch {
         estimate = null;
       }
     }
@@ -1688,13 +1696,14 @@ export default function RecipeDetailPage() {
           pet={(() => {
             const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
             if (!pet) return null;
+            const petType = normalizePetType(pet.type, 'recipe/[id].RecipeScoreModal');
             return {
               id: pet.id,
               name: getRandomName(pet.names),
-              type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+              type: petType,
               breed: pet.breed,
               age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10,
-              weight: parseFloat(pet.weight) || (pet.type === 'dogs' ? 25 : pet.type === 'cats' ? 10 : 5),
+              weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
               activityLevel: 'moderate' as const,
               healthConcerns: pet.healthConcerns || [],
               dietaryRestrictions: pet.allergies || []

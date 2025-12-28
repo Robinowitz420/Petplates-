@@ -11,6 +11,7 @@ import type { Recipe } from '@/lib/types';
 import healthConcerns from '@/lib/data/healthConcerns';
 import { actionNeededBeep } from '@/lib/utils/beep';
 import { ensureSellerId, isValidAmazonUrl } from '@/lib/utils/affiliateLinks';
+import { normalizePetType } from '@/lib/utils/petType';
 
 interface Props {
   recipe: Recipe;
@@ -34,7 +35,7 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
       const enhancedPet: EnhancedPet = {
         id: pet.id,
         name: pet.name,
-        type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+        type: normalizePetType(pet.type, 'RecipeScoreModal'),
         breed: pet.breed,
         age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
         weight: pet.weight || 10,

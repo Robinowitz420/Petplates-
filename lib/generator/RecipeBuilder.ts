@@ -640,8 +640,12 @@ export class RecipeBuilder {
    * 🔥 FIX: Species-aware ingredient selection
    */
   private selectIngredients(scored: ScoredIngredient[]): Ingredient[] {
-    const selected: Ingredient[] = [];
+    const species = this.constraints.species;
     const categories = this.getRequiredCategoriesForSpecies();
+
+    const selected: Ingredient[] = [];
+
+    const isSupplement = (ing: Ingredient) => canonicalCategory(ing.category) === 'supplement';
 
     // 🔥 PRECONDITION CHECK: For cats, ensure we have all required categories
     if (this.constraints.species === 'cats') {
@@ -758,8 +762,12 @@ export class RecipeBuilder {
             break;
         }
 
-        const randomIndex = this.weightedRandomSelection(inCategory.slice(0, poolSize));
-        const selectedIng = inCategory[randomIndex].ingredient;
+        const eligiblePool = inCategory.filter(s => !isSupplement(s.ingredient));
+        if (eligiblePool.length === 0) break;
+
+        const poolSlice = eligiblePool.slice(0, poolSize);
+        const randomIndex = this.weightedRandomSelection(poolSlice);
+        const selectedIng = poolSlice[randomIndex].ingredient;
         selected.push(selectedIng);
 
         // 🔥 DEBUG: Log what was selected
@@ -768,7 +776,8 @@ export class RecipeBuilder {
         }
 
         // Remove selected to avoid duplicates
-        inCategory.splice(randomIndex, 1);
+        const originalIndex = inCategory.findIndex(s => s.ingredient.id === selectedIng.id);
+        if (originalIndex >= 0) inCategory.splice(originalIndex, 1);
       }
     }
 
@@ -781,12 +790,13 @@ export class RecipeBuilder {
     // CRITICAL: Enforce minimum 3 ingredients for proper meal prep
     // 2-ingredient meals are just "putting ingredients in a bowl", not meal prep
     const MIN_INGREDIENTS = 3;
-    if (selected.length < MIN_INGREDIENTS) {
-      console.warn(`Only ${selected.length} ingredients selected, need at least ${MIN_INGREDIENTS}`);
+    const coreSelected = selected.filter(ing => !isSupplement(ing));
+    if (coreSelected.length < MIN_INGREDIENTS) {
+      console.warn(`Only ${coreSelected.length} core ingredients selected, need at least ${MIN_INGREDIENTS}`);
 
       // 🔥 NEVER pad with proteins when vegetables/fats are missing
       // Check what categories we're missing
-      const selectedCategories = new Set(selected.map(ing => ing.category));
+      const selectedCategories = new Set(coreSelected.map(ing => ing.category));
       const missingCategories = categories.filter(cat => !selectedCategories.has(cat));
 
       if (missingCategories.length > 0) {
@@ -799,7 +809,7 @@ export class RecipeBuilder {
       }
 
       // Only pad if we have all required categories but just need more variety
-      const remainingNeeded = MIN_INGREDIENTS - selected.length;
+      const remainingNeeded = MIN_INGREDIENTS - coreSelected.length;
       const alreadySelectedIds = new Set(selected.map(ing => ing.id));
 
       // Get top-scoring ingredients from EXISTING categories only (no proteins if we already have one)
@@ -807,6 +817,9 @@ export class RecipeBuilder {
         .filter(s => {
           // Don't add if already selected
           if (alreadySelectedIds.has(s.ingredient.id)) return false;
+
+          // Never add supplements as core padding
+          if (isSupplement(s.ingredient)) return false;
 
           // For cats: don't add more proteins (we already have 1)
           if (this.constraints.species === 'cats' && canonicalCategory(s.ingredient.category) === 'protein') {

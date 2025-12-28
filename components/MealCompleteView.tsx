@@ -22,6 +22,7 @@ import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
+import { normalizePetType } from '@/lib/utils/petType';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -163,7 +164,7 @@ export default function MealCompleteView({
       const enhancedPet: EnhancedPet = {
         id: pet?.id || petId,
         name: petName,
-        type: (petType || pet?.type || 'dog') as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+        type: normalizePetType(petType || pet?.type || 'dog', 'MealCompleteView'),
         breed: petBreed || pet?.breed || '',
         age: petAge === 'baby' ? 0.5 : petAge === 'young' ? 2 : petAge === 'senior' ? 10 : 5,
         weight: parseFloat(petWeight) || pet?.weightKg || 10,

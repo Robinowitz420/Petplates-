@@ -8,26 +8,27 @@ import type {
 export function getArchetypes(): Archetype[] {
   return [
     {
-      name: 'High-Protein Meat + Taurine-rich Organ + Fat',
+      name: 'High-Protein Meat + Fat (low carb)',
       description:
-        'Cat-appropriate, protein-forward meal with taurine-aware choices (e.g., heart) and adequate fat. Minimal carbs.',
+        'Cat-appropriate, protein-forward meal with adequate fat. Minimal carbs.',
     },
     {
-      name: 'Fish + Poultry Blend + Omega-3',
+      name: 'Fish + Poultry Blend (low carb)',
       description:
-        'Fish-forward cat meal blended with poultry for amino acid profile; includes omega-3 source. Avoid carb-heavy bases.',
+        'Fish-forward cat meal blended with poultry for amino acid profile. Avoid carb-heavy bases.',
     },
     {
-      name: 'Simple Poultry + Organ + Small Fiber',
+      name: 'Simple Poultry + Small Fiber',
       description:
-        'Very low-carb poultry base with an organ component and a small fiber/veg addition for GI tolerance.',
+        'Very low-carb poultry base with a small fiber/veg addition for GI tolerance.',
     },
   ];
 }
 
 export function getCompletenessMechanismRules(): string[] {
   return [
-    'Recipe MUST include a cat completeness mechanism: either (A) a feline vitamin/mineral balancer/premix ingredient OR (B) ALL of: a taurine-aware choice (heart/taurine source) + a calcium source + an omega-3 source.',
+    'Do NOT include vitamin/mineral blends, supplements, powders, capsules, or "vitamin" ingredients. This app handles supplement recommendations separately.',
+    'Avoid organ meats (liver/heart/kidney/etc) unless medically indicated by the pet profile health concerns.',
     'Keep carbs minimal. Avoid grain-heavy or starchy, high-carb bases unless medically indicated.',
   ];
 }
@@ -48,12 +49,12 @@ function baseHeader(ctx: SpeciesEngineContext): string {
 function constraintsBlock(ctx: SpeciesEngineContext): string {
   return [
     'HARD CONSTRAINTS:',
-    `- Output must include exactly ${ctx.requestedCount} recipes in the recipes array.`,
+    `- Output must include up to ${ctx.requestedCount} recipes in the recipes array.`,
     '- Each recipe MUST be a plausible single meal for a cat (not a snack).',
     '- Amounts must be in grams (e.g., "80g").',
     '- Total meal mass MUST be >= 60g (sum of ingredient grams).',
     '- Macro style: high protein, higher fat, low carbs.',
-    '- Taurine-aware: include a taurine-rich ingredient choice (e.g., heart) OR an explicit taurine/balancer ingredient name if available in the allowed vocabulary.',
+    '- Whole-food meals only: do NOT include supplements, vitamins/minerals, powders, capsules, or oils-as-supplements. Any supplement suggestions will be returned separately by the app.',
     ...(ctx.healthConcerns.length
       ? [`- Health concerns to consider (avoid contraindications): ${ctx.healthConcerns.join(', ')}`]
       : ['- No health concerns.']),

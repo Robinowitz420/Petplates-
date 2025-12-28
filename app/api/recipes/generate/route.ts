@@ -14,6 +14,7 @@ import {
 } from '@/lib/utils/enhancedCompatibilityScoring';
 import { normalizeSpecies as normalizeSpeciesKey } from '@/lib/utils/ingredientCompatibility';
 import { getTargetScoreThresholdForSpecies } from '@/lib/services/speciesMealGeneration';
+import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendations';
 
 export const runtime = 'nodejs';
 
@@ -22,11 +23,17 @@ interface RecipeRequest {
   count?: number;
   petProfile?: {
     name?: string;
+    breed?: string;
     weight?: string;
     weightKg?: number;
     age?: string;
+    activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active' | string;
     allergies?: string[];
+    allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
     healthConcerns?: string[];
+    dietaryRestrictions?: string[];
+    dislikes?: string[];
+    notes?: string;
     bannedIngredients?: string[];
   };
 }
@@ -69,18 +76,29 @@ function buildCompatibilityPet(species: string, petProfile?: RecipeRequest['petP
     : [];
   const dietaryRestrictions = [...dietaryRestrictionsFromProfile, ...banned, ...allergies];
 
+  const breed = typeof petProfile?.breed === 'string' && petProfile.breed.trim() ? petProfile.breed.trim() : type;
+  const activityLevelRaw = typeof (petProfile as any)?.activityLevel === 'string' ? String((petProfile as any).activityLevel) : undefined;
+  const activityLevel =
+    activityLevelRaw === 'sedentary' ||
+    activityLevelRaw === 'moderate' ||
+    activityLevelRaw === 'active' ||
+    activityLevelRaw === 'very-active'
+      ? (activityLevelRaw as CompatibilityPet['activityLevel'])
+      : 'moderate';
+  const dislikes = Array.isArray((petProfile as any)?.dislikes) ? ((petProfile as any).dislikes as string[]).filter(Boolean) : [];
+
   return {
     id: `pet-profile-${type}`,
     name,
     type,
-    breed: type,
+    breed,
     age,
     weight,
-    activityLevel: 'moderate',
+    activityLevel,
     healthConcerns,
     dietaryRestrictions,
     allergies,
-    dislikes: [],
+    dislikes,
     savedRecipes: [],
     names: name ? [name] : [],
     weightKg: weight,
@@ -121,6 +139,19 @@ const normalizeTerm = (value: string): string =>
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 
+const normalizeIngredientNameForVocab = (value: string): string => {
+  let s = String(value || '').trim();
+  if (!s) return '';
+  // Strip parentheticals like "(cooked)" / "(raw)" / "(boneless)" etc.
+  s = s.replace(/\([^)]*\)/g, ' ');
+  // Strip common preparation descriptors that models like to append.
+  s = s
+    .replace(/\b(cooked|raw|boneless|skinless|chopped|diced|minced|ground|sliced|steamed|baked|boiled|roasted)\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return normalizeTerm(s);
+};
+
 const includesAnyTerm = (haystack: string, terms: string[]): boolean => {
   if (!terms.length) return false;
   const h = normalizeTerm(haystack);
@@ -137,6 +168,46 @@ const normalizeSplitKey = (value: any) =>
     .trim()
     .replace(/_/g, ' ')
     .replace(/\s+/g, ' ');
+
+ const ORGAN_KEYWORDS = [
+   'liver',
+   'heart',
+   'kidney',
+   'giblet',
+   'gizzard',
+   'tripe',
+   'offal',
+   'organ',
+   'spleen',
+   'pancreas',
+   'lung',
+   'brain',
+ ];
+
+ const BANNED_MEAT_KEYWORDS = ['duck', 'rabbit'];
+
+ function isOrganIngredient(i: any): boolean {
+   const id = String(i?.id || '').toLowerCase();
+   const name = String(i?.name || '').toLowerCase();
+   const haystack = `${id} ${name}`.trim();
+   if (!haystack) return false;
+   return ORGAN_KEYWORDS.some((kw) => haystack.includes(kw));
+ }
+
+ function isBannedMeatIngredient(i: any): boolean {
+   const category = String(i?.category || '').toLowerCase();
+   if (category !== 'protein') return false;
+
+   const id = String(i?.id || '').toLowerCase();
+   const name = String(i?.name || '').toLowerCase();
+   const haystack = `${id} ${name}`.trim();
+   if (!haystack) return false;
+
+   // Keep eggs (duck egg / duck eggs) if present
+   if (haystack.includes('egg')) return false;
+
+   return BANNED_MEAT_KEYWORDS.some((kw) => haystack.includes(kw));
+ }
 
 const SUPPLEMENT_KEYWORDS = [
   'vitamin',
@@ -250,7 +321,18 @@ function validateAndNormalizeRecipes(params: {
     return HEALTH_CONTRAINDICATIONS[key] || HEALTH_CONTRAINDICATIONS[c] || [];
   });
 
-  const allowed = new Set(getIngredientsForSpecies(species as any).map((i) => normalizeTerm(i.name)));
+  const allowedIngredientObjs = getIngredientsForSpecies(species as any);
+  const allowedById = new Map<string, string>();
+  const allowedByNormalizedName = new Map<string, string>();
+  for (const ing of allowedIngredientObjs) {
+    const id = String((ing as any)?.id || '').trim();
+    const displayName = String((ing as any)?.name || '').trim();
+    if (id) allowedById.set(id.toLowerCase(), displayName || id);
+    if (displayName) {
+      const key = normalizeTerm(displayName);
+      if (key && !allowedByNormalizedName.has(key)) allowedByNormalizedName.set(key, displayName);
+    }
+  }
   const now = Date.now();
 
   const results: Array<Recipe & { estimatedCostPerMeal?: number }> = [];
@@ -262,8 +344,9 @@ function validateAndNormalizeRecipes(params: {
     }
 
     // Enforce vocabulary + hard blockers
-    const ingredientNames = r.ingredients.map((i) => String(i?.name || '')).filter(Boolean);
-    const combined = ingredientNames.join(' | ');
+    const rawIngredientNames = r.ingredients.map((i) => String(i?.name || ''));
+    const ingredientNamesForChecks = rawIngredientNames.filter(Boolean);
+    const combined = ingredientNamesForChecks.join(' | ');
 
     const hasBlocked =
       includesAnyTerm(combined, allergies) ||
@@ -271,7 +354,35 @@ function validateAndNormalizeRecipes(params: {
       includesAnyTerm(combined, contraindications);
     if (hasBlocked) continue;
 
-    const vocabOk = ingredientNames.every((n) => allowed.has(normalizeTerm(n)));
+    // Canonicalize ingredient identifiers from Gemini.
+    // Primary contract: ingredient.name is a snake_case ingredient id.
+    // Fallback: if Gemini returns display names, attempt normalization to map to the canonical display name.
+    const canonicalizedNames: string[] = [];
+    let vocabOk = true;
+    for (const rawName of rawIngredientNames) {
+      if (!String(rawName || '').trim()) {
+        vocabOk = false;
+        break;
+      }
+      const asId = String(rawName || '').trim().toLowerCase();
+      const directIdMatch = allowedById.get(asId);
+      if (directIdMatch) {
+        canonicalizedNames.push(directIdMatch);
+        continue;
+      }
+      const directNameMatch = allowedByNormalizedName.get(normalizeTerm(rawName));
+      if (directNameMatch) {
+        canonicalizedNames.push(directNameMatch);
+        continue;
+      }
+      const relaxedNameMatch = allowedByNormalizedName.get(normalizeIngredientNameForVocab(rawName));
+      if (relaxedNameMatch) {
+        canonicalizedNames.push(relaxedNameMatch);
+        continue;
+      }
+      vocabOk = false;
+      break;
+    }
     if (!vocabOk) continue;
 
     const recipe: Recipe & { estimatedCostPerMeal?: number } = {
@@ -284,7 +395,7 @@ function validateAndNormalizeRecipes(params: {
       servings: typeof r.servings === 'number' && r.servings > 0 ? r.servings : 1,
       ingredients: r.ingredients.map((ing, j) => ({
         id: `gemini-${species}-${now}-${idx}-ing-${j}`,
-        name: String(ing?.name || ''),
+        name: canonicalizedNames[j] || String(ing?.name || ''),
         amount: String(ing?.amount || ''),
       })),
       instructions: Array.isArray(r.instructions) && r.instructions.length > 0 ? r.instructions : ['Mix and serve.'],
@@ -404,7 +515,13 @@ export async function POST(request: NextRequest) {
 
     const debug = request.nextUrl.searchParams.get('debug') === '1';
 
-    const requestedCount = 10;
+    const requestedByClient =
+      typeof body.count === 'number' && Number.isFinite(body.count) && body.count > 0
+        ? Math.floor(body.count)
+        : 9;
+    const targetCount = Math.max(9, requestedByClient);
+    const requestedCount = Math.max(12, targetCount * 2);
+    const maxAttempts = 6;
 
     console.log('[API] Generating Gemini recipes for pet:', {
       name: petProfile?.name,
@@ -415,18 +532,19 @@ export async function POST(request: NextRequest) {
       bannedIngredients: petProfile?.bannedIngredients || [],
     });
 
-    let allowedIngredientNames = getIngredientsForSpecies(species as any)
-      .map((i) => i.name)
+    const allowedIngredientIds = getIngredientsForSpecies(species as any)
+      .filter((i: any) => {
+        const category = String(i?.category || '').toLowerCase();
+        // Supplements are handled separately by the app; Gemini should output whole-food meals only.
+        if (category === 'supplement') return false;
+        // Hard block organ meats entirely.
+        if (isOrganIngredient(i)) return false;
+        // Hard block duck and rabbit meats.
+        if (isBannedMeatIngredient(i)) return false;
+        return true;
+      })
+      .map((i) => String((i as any)?.id || ''))
       .filter(Boolean);
-
-    if (species === 'dogs' || species === 'cats') {
-      // We inject calcium carbonate ourselves in post-processing.
-      // Keep Gemini from choosing these (or eggshell variants).
-      allowedIngredientNames = allowedIngredientNames.filter((name) => {
-        const lower = String(name || '').toLowerCase();
-        return !(lower.includes('calcium carbonate') || lower.includes('eggshell') || lower.includes('egg shell'));
-      });
-    }
 
     const healthConcerns = (petProfile?.healthConcerns || []).filter(Boolean);
     const allergies = (petProfile?.allergies || []).filter(Boolean);
@@ -457,7 +575,21 @@ export async function POST(request: NextRequest) {
     let bestAttemptAcceptedCount = 0;
     let attemptsUsed = 0;
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    const collected: Recipe[] = [];
+    const seenRecipeKeys = new Set<string>();
+    const hasMinIngredients = (recipe: Recipe): boolean => {
+      const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+      return ingredients.length >= 3;
+    };
+
+    const pushUnique = (recipe: Recipe) => {
+      const key = `${String(recipe.name || '').toLowerCase()}|${String(recipe.category || '').toLowerCase()}`;
+      if (!key || seenRecipeKeys.has(key)) return;
+      seenRecipeKeys.add(key);
+      collected.push(recipe);
+    };
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       attemptsUsed = attempt;
       const generationResult =
         attempt === 1
@@ -465,13 +597,13 @@ export async function POST(request: NextRequest) {
               species,
               count: requestedCount,
               petProfile,
-              allowedIngredientNames,
+              allowedIngredientIds,
             })
           : await generateRecipesJsonWithFallbackAndPrompt({
               species,
               count: requestedCount,
               petProfile,
-              allowedIngredientNames,
+              allowedIngredientIds,
               promptText: buildRevisionPromptText({
                 species,
                 petProfile,
@@ -505,9 +637,7 @@ export async function POST(request: NextRequest) {
         payload,
       }).slice(0, requestedCount);
 
-      const generatedRecipes = generatedRecipesRaw.map((r) =>
-        splitSupplementsFromIngredients(normalizeCalciumSupplement(r, species, petProfile))
-      );
+      const generatedRecipes = generatedRecipesRaw.map((r) => splitSupplementsFromIngredients(r));
 
       if (generatedRecipes.length === 0) {
         bestAttemptRecipes = [];
@@ -519,6 +649,14 @@ export async function POST(request: NextRequest) {
           try {
             const score = calculateEnhancedCompatibility(recipe, compatibilityPet);
             const topIssues = extractTopIssues(score);
+            const supplementRecommendations = getRecommendationsForRecipe(
+              (score as any)?.detailedBreakdown?.nutritionalGaps || [],
+              compatibilityPet.type,
+              healthConcerns
+            );
+
+            (recipe as any).supplementRecommendations = supplementRecommendations;
+
             const nutrition = debug ? calculateRecipeNutrition(recipe, { includeBreakdown: true }) : null;
             const ca = nutrition?.calcium ?? null;
             const p = nutrition?.phosphorus ?? null;
@@ -527,6 +665,7 @@ export async function POST(request: NextRequest) {
               recipe,
               score: score.overallScore,
               topIssues,
+              supplementRecommendations,
               ...(debug
                 ? {
                     debugNutrition: {
@@ -558,15 +697,54 @@ export async function POST(request: NextRequest) {
         bestAttemptRecipes = scored.map((s) => s.recipe);
       }
 
+      const acceptedThisAttempt = scored
+        .filter((s) => s.score >= threshold)
+        .map((s) => s.recipe)
+        .filter(hasMinIngredients);
+
+      for (const r of acceptedThisAttempt) {
+        pushUnique(r);
+        if (collected.length >= targetCount) break;
+      }
+
+      if (collected.length >= targetCount) {
+        break;
+      }
+
       if (attemptBest >= threshold) {
         bestScore = attemptBest;
         bestAttemptRecipes = scored.map((s) => s.recipe);
         bestAttemptAcceptedCount = scored.filter((s) => s.score >= threshold).length;
-        break;
       }
     }
 
-    if (!bestAttemptRecipes || bestAttemptRecipes.length === 0) {
+    if (collected.length < targetCount && bestAttemptRecipes.length > 0) {
+      const fallback = bestAttemptRecipes.filter(hasMinIngredients);
+      for (const r of fallback) {
+        pushUnique(r);
+        if (collected.length >= targetCount) break;
+      }
+    }
+
+    const outputRecipes = collected.slice(0, targetCount);
+
+    const supplementRecommendations = (() => {
+      const all = outputRecipes
+        .flatMap((r: any) => (Array.isArray(r?.supplementRecommendations) ? r.supplementRecommendations : []))
+        .filter(Boolean);
+
+      const seen = new Set<string>();
+      const unique = [] as any[];
+      for (const rec of all) {
+        const key = String(rec?.name || '').trim().toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        unique.push(rec);
+      }
+      return unique;
+    })();
+
+    if (!outputRecipes || outputRecipes.length === 0) {
       return NextResponse.json(
         {
           error: 'Gemini returned no valid recipes after validation',
@@ -574,6 +752,7 @@ export async function POST(request: NextRequest) {
           attemptedCount: requestedCount,
           diagnostics: {
             requestedCount,
+            targetCount,
             rawRecipeCount: Array.isArray(lastPayload?.recipes) ? lastPayload?.recipes.length : 0,
             validRecipeCount: 0,
           },
@@ -610,15 +789,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      recipes: bestAttemptRecipes,
+      recipes: outputRecipes,
+      supplementRecommendations,
       diagnostics: {
         threshold,
         bestScore,
         noneMetThreshold: bestScore < threshold,
         acceptedCount: bestAttemptAcceptedCount,
+        requestedCount,
+        targetCount,
+        returnedCount: outputRecipes.length,
       },
       stats: {
-        total: bestAttemptRecipes.length,
+        total: outputRecipes.length,
         attemptCount: attemptsUsed,
         modelUsed: lastModelUsed,
         threshold,

@@ -4,7 +4,7 @@
 
 import type { Recipe } from '@/lib/types';
 import { getIngredientComposition, INGREDIENT_COMPOSITIONS } from '@/lib/data/ingredientCompositions';
-import { getSpeciesCompatibility, shouldAvoid, shouldLimit, normalizeSpecies } from './ingredientCompatibility';
+import { getSpeciesCompatibility, getMaxInclusionPercent, shouldAvoid, shouldLimit, normalizeSpecies } from './ingredientCompatibility';
 import { AAFCO_NUTRIENT_PROFILES, validateCriticalNutrients } from '@/lib/data/aafco-standards';
 import { getAvianStandards, AVIAN_NUTRITION_STANDARDS } from '@/lib/data/avian-nutrition-standards';
 import { getReptileStandards, validateReptileNutrition } from '@/lib/data/reptile-nutrition';
@@ -126,10 +126,11 @@ function applyIngredientAliases(s: string): string {
 
 // IMPORTANT: use the same normalization everywhere we look up compatibility/composition.
 // This fixes "egg (hard-boiled)" / "Bell Peppers (high vitamin C)" missing their data.
-function normalizeIngredientKey(name: string): string {
+export function normalizeIngredientKey(name: string): string {
   let s = (name || '').toLowerCase().trim();
   if (!s) return '';
 
+  // Remove parentheticals and extra descriptors
   s = s.replace(/[()]/g, ' ');
   s = s.replace(/[\/.,]/g, ' ');
   s = s.replace(/[^a-z0-9\s-]+/g, ' ');
@@ -417,6 +418,23 @@ function calculateIngredientSafety(
   let avoidCount = 0;
   const issues: string[] = [];
   const strengths: string[] = [];
+  let maxInclusionPenaltyTotal = 0;
+
+  const parseIngredientGrams = (ing: any): number => {
+    if (!ing || typeof ing === 'string') return 0;
+    const raw = (ing as any).amount;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const match = raw.match(/[\d.]+/);
+      if (match) {
+        const parsed = parseFloat(match[0]);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+    }
+    return 0;
+  };
+
+  const totalGrams = ingredients.reduce((sum: number, ing: any) => sum + parseIngredientGrams(ing), 0);
 
   // Check for banned ingredients
   const bannedIngredients = (pet as any).bannedIngredients || [];
@@ -426,6 +444,7 @@ function calculateIngredientSafety(
     const ingName = typeof ing === 'string' ? ing : ing.name;
     const ingKey = normalizeIngredientKey(ingName);
     const ingNameLower = ingName.toLowerCase();
+    const ingGrams = parseIngredientGrams(ing);
     
     // Check if ingredient is banned by user
     const isBanned = bannedLower.some((banned: string) => 
@@ -453,6 +472,29 @@ function calculateIngredientSafety(
       // Unknown ingredient - assume safe but note
       safeCount++;
     }
+
+    const maxInclusion = getMaxInclusionPercent(ingKey, normalizedSpecies);
+    if (
+      typeof maxInclusion === 'number' &&
+      Number.isFinite(maxInclusion) &&
+      maxInclusion > 0 &&
+      totalGrams > 0 &&
+      ingGrams > 0
+    ) {
+      const inclusion = ingGrams / totalGrams;
+      if (inclusion > maxInclusion) {
+        const over = inclusion - maxInclusion;
+        const overPct = over * 100;
+        const maxPct = maxInclusion * 100;
+        issues.push(`${ingName} exceeds max inclusion (${maxPct.toFixed(0)}%) for ${pet.type}s (~${overPct.toFixed(0)}% over)`);
+
+        // Apply a graduated penalty. This is intentionally strong for "supplement" ingredients like liver.
+        // Example: 10% over -> -20 points, capped at -40.
+        const penalty = Math.min(40, over * 200);
+        cautionCount += Math.min(2, Math.ceil(over * 10));
+        maxInclusionPenaltyTotal += penalty;
+      }
+    }
   }
 
   // Calculate score with gradual, proportional penalties for better granularity
@@ -469,6 +511,10 @@ function calculateIngredientSafety(
   const cautionRatio = cautionCount / totalIngredients;
   const cautionPenalty = cautionCount * 5 * (1 + cautionRatio); // More gradual
   score -= Math.min(cautionPenalty, 30); // Max -30 for cautions (reduced from -40)
+
+  if (Number.isFinite(maxInclusionPenaltyTotal) && maxInclusionPenaltyTotal > 0) {
+    score -= Math.min(40, maxInclusionPenaltyTotal);
+  }
   
   score = Math.max(0, score);
 
@@ -1441,14 +1487,126 @@ export function calculateRecipeNutrition(
   // Check if recipe has pre-calculated nutritional data (from custom meal analysis)
   const nutritionalCalc = (recipe as any).nutritionalCalculation;
   if (nutritionalCalc) {
+    const clamp01 = (n: number): number => Math.max(0, Math.min(1, n));
+
+    const parseIngredientAmountG = (ing: any): number => {
+      if (!ing) return 0;
+      if (typeof ing === 'string') return 0;
+      const raw = (ing as any).amount;
+      if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+      if (typeof raw === 'string') {
+        const parsed = parseFloat(raw.replace(/[^0-9.]/g, ''));
+        if (Number.isFinite(parsed)) return parsed;
+      }
+      return 0;
+    };
+
+    const inferMoistureFraction = (ingKey: string, displayName: string, compositionMoistureGPer100?: number): number => {
+      if (typeof compositionMoistureGPer100 === 'number' && Number.isFinite(compositionMoistureGPer100)) {
+        return clamp01(compositionMoistureGPer100 / 100);
+      }
+
+      const key = (ingKey || '').toLowerCase();
+      const name = (displayName || '').toLowerCase();
+
+      // Oils and fats
+      if (key.includes('oil') || name.includes(' oil')) return 0;
+      if (key.includes('calcium_carbonate') || name.includes('calcium carbonate')) return 0;
+
+      // Dry staples
+      if (key.includes('pellet') || name.includes('pellet') || name.includes('kibble')) return 0.10;
+      if (key.includes('hay') || name.includes('hay') || name.includes('timothy') || name.includes('orchard grass')) return 0.12;
+      if (name.includes('powder') || name.includes('flour') || name.includes('dry')) return 0.10;
+
+      // Cooked grains / legumes
+      if (
+        name.includes('cooked') &&
+        (name.includes('rice') || name.includes('quinoa') || name.includes('barley') || name.includes('oat') || name.includes('lentil') || name.includes('bean'))
+      ) {
+        return 0.70;
+      }
+
+      // Fruits / vegetables (high moisture)
+      if (
+        key.includes('watermelon') ||
+        name.includes('watermelon') ||
+        name.includes('cucumber') ||
+        name.includes('zucchini')
+      ) {
+        return 0.92;
+      }
+      if (
+        name.includes('lettuce') ||
+        name.includes('spinach') ||
+        name.includes('kale') ||
+        name.includes('greens') ||
+        name.includes('broccoli') ||
+        name.includes('carrot') ||
+        name.includes('pepper') ||
+        name.includes('pumpkin') ||
+        name.includes('sweet potato') ||
+        name.includes('peas') ||
+        name.includes('green bean')
+      ) {
+        return 0.90;
+      }
+      if (
+        name.includes('apple') ||
+        name.includes('berry') ||
+        name.includes('mango') ||
+        name.includes('papaya') ||
+        name.includes('banana')
+      ) {
+        return 0.88;
+      }
+
+      // Meats / eggs / fish (moderate-high moisture)
+      if (
+        name.includes('chicken') ||
+        name.includes('turkey') ||
+        name.includes('beef') ||
+        name.includes('pork') ||
+        name.includes('lamb') ||
+        name.includes('venison') ||
+        name.includes('rabbit') ||
+        name.includes('duck') ||
+        name.includes('salmon') ||
+        name.includes('tuna') ||
+        name.includes('sardine') ||
+        name.includes('fish')
+      ) {
+        return 0.70;
+      }
+      if (name.includes('egg')) return 0.75;
+
+      // Conservative default: treat as wet food
+      return 0.75;
+    };
+
     const totalGrams = nutritionalCalc.totalGrams || 100;
-    // Convert from grams to percentages
+    const ingredients = recipe.ingredients || [];
+    const computedDryMatterGrams = ingredients.reduce((sum: number, ing: any) => {
+      const name = typeof ing === 'string' ? ing : ing.name;
+      const amountG = typeof ing === 'string' ? 0 : parseIngredientAmountG(ing);
+      if (!name || !amountG) return sum;
+      const ingKey = normalizeIngredientKey(name);
+      const comp = getIngredientComposition(ingKey);
+      const moistureFrac = inferMoistureFraction(ingKey, name, (comp as any)?.moisture);
+      return sum + (amountG * (1 - moistureFrac));
+    }, 0);
+
+    const dryMatterGrams =
+      typeof (nutritionalCalc as any).dryMatterGrams === 'number' && Number.isFinite((nutritionalCalc as any).dryMatterGrams)
+        ? (nutritionalCalc as any).dryMatterGrams
+        : (computedDryMatterGrams > 0 ? computedDryMatterGrams : totalGrams * 0.25);
+
+    // Convert from grams to % DM
     return {
-      protein: totalGrams > 0 ? ((nutritionalCalc.protein_g || 0) / totalGrams) * 100 : 0,
-      fat: totalGrams > 0 ? ((nutritionalCalc.fat_g || 0) / totalGrams) * 100 : 0,
-      fiber: totalGrams > 0 ? ((nutritionalCalc.fiber_g || 0) / totalGrams) * 100 : 0,
-      calcium: totalGrams > 0 ? (((nutritionalCalc.ca_mg || 0) / 1000) / totalGrams) * 100 : 0,
-      phosphorus: totalGrams > 0 ? (((nutritionalCalc.p_mg || 0) / 1000) / totalGrams) * 100 : 0,
+      protein: dryMatterGrams > 0 ? ((nutritionalCalc.protein_g || 0) / dryMatterGrams) * 100 : 0,
+      fat: dryMatterGrams > 0 ? ((nutritionalCalc.fat_g || 0) / dryMatterGrams) * 100 : 0,
+      fiber: dryMatterGrams > 0 ? ((nutritionalCalc.fiber_g || 0) / dryMatterGrams) * 100 : 0,
+      calcium: dryMatterGrams > 0 ? (((nutritionalCalc.ca_mg || 0) / 1000) / dryMatterGrams) * 100 : 0,
+      phosphorus: dryMatterGrams > 0 ? (((nutritionalCalc.p_mg || 0) / 1000) / dryMatterGrams) * 100 : 0,
       calories: totalGrams > 0 ? ((nutritionalCalc.calories_kcal || nutritionalCalc.kcal || 0) / totalGrams) * 100 : 0,
       source: 'real',
     };
@@ -1464,6 +1622,7 @@ export function calculateRecipeNutrition(
   let totalPhosphorus = 0;
   let totalCalories = 0;
   let totalWeight = 0;
+  let totalDryMatter = 0;
   let realDataCount = 0;
   const fallbackIngredients: string[] = [];
   const breakdown: Array<{
@@ -1486,6 +1645,86 @@ export function calculateRecipeNutrition(
     // Note: psyllium, probiotics, vitamins don't have composition data yet
     // They can still be added but won't contribute to macro calculations
     return null;
+  };
+
+  const clamp01 = (n: number): number => Math.max(0, Math.min(1, n));
+
+  const inferMoistureFraction = (
+    ingKey: string,
+    displayName: string,
+    compositionMoistureGPer100?: number,
+    fallbackMoistureGPer100?: number
+  ): number => {
+    if (typeof compositionMoistureGPer100 === 'number' && Number.isFinite(compositionMoistureGPer100)) {
+      return clamp01(compositionMoistureGPer100 / 100);
+    }
+    if (typeof fallbackMoistureGPer100 === 'number' && Number.isFinite(fallbackMoistureGPer100)) {
+      return clamp01(fallbackMoistureGPer100 / 100);
+    }
+
+    const key = (ingKey || '').toLowerCase();
+    const name = (displayName || '').toLowerCase();
+
+    if (key.includes('oil') || name.includes(' oil')) return 0;
+    if (key.includes('calcium_carbonate') || name.includes('calcium carbonate')) return 0;
+
+    if (key.includes('pellet') || name.includes('pellet') || name.includes('kibble')) return 0.10;
+    if (key.includes('hay') || name.includes('hay') || name.includes('timothy') || name.includes('orchard grass')) return 0.12;
+    if (name.includes('powder') || name.includes('flour') || name.includes('dry')) return 0.10;
+
+    if (
+      name.includes('cooked') &&
+      (name.includes('rice') || name.includes('quinoa') || name.includes('barley') || name.includes('oat') || name.includes('lentil') || name.includes('bean'))
+    ) {
+      return 0.70;
+    }
+
+    if (key.includes('watermelon') || name.includes('watermelon') || name.includes('cucumber') || name.includes('zucchini')) return 0.92;
+
+    if (
+      name.includes('lettuce') ||
+      name.includes('spinach') ||
+      name.includes('kale') ||
+      name.includes('greens') ||
+      name.includes('broccoli') ||
+      name.includes('carrot') ||
+      name.includes('pepper') ||
+      name.includes('pumpkin') ||
+      name.includes('sweet potato') ||
+      name.includes('peas') ||
+      name.includes('green bean')
+    ) {
+      return 0.90;
+    }
+    if (
+      name.includes('apple') ||
+      name.includes('berry') ||
+      name.includes('mango') ||
+      name.includes('papaya') ||
+      name.includes('banana')
+    ) {
+      return 0.88;
+    }
+
+    if (
+      name.includes('chicken') ||
+      name.includes('turkey') ||
+      name.includes('beef') ||
+      name.includes('pork') ||
+      name.includes('lamb') ||
+      name.includes('venison') ||
+      name.includes('rabbit') ||
+      name.includes('duck') ||
+      name.includes('salmon') ||
+      name.includes('tuna') ||
+      name.includes('sardine') ||
+      name.includes('fish')
+    ) {
+      return 0.70;
+    }
+    if (name.includes('egg')) return 0.75;
+
+    return 0.75;
   };
 
   // Process ingredients
@@ -1512,6 +1751,7 @@ export function calculateRecipeNutrition(
       totalPhosphorus += (composition.phosphorus || 0) * (amount / 100);
       totalCalories += (composition.kcal || 0) * (amount / 100);
       totalWeight += amount;
+      totalDryMatter += amount * (1 - inferMoistureFraction(ingKey, name, (composition as any).moisture));
       realDataCount++;
 
       if (options?.includeBreakdown) {
@@ -1526,7 +1766,7 @@ export function calculateRecipeNutrition(
       }
     } else {
       if (ingKey === 'calcium_carbonate') {
-        const forced = { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0 };
+        const forced = { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0, moisture: 0 };
         fallbackIngredients.push(name);
         totalProtein += (forced.protein || 0) * (amount / 100);
         totalFat += (forced.fat || 0) * (amount / 100);
@@ -1535,6 +1775,7 @@ export function calculateRecipeNutrition(
         totalPhosphorus += (forced.phosphorus || 0) * (amount / 100);
         totalCalories += (forced.kcal || 0) * (amount / 100);
         totalWeight += amount;
+        totalDryMatter += amount * (1 - inferMoistureFraction(ingKey, name, undefined, forced.moisture));
         realDataCount++;
 
         if (options?.includeBreakdown) {
@@ -1556,18 +1797,18 @@ export function calculateRecipeNutrition(
 
       const explicitFallback =
         ingKey === 'calcium_carbonate'
-          ? { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0 }
+          ? { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0, moisture: 0 }
           : (ingKey === 'fish_oil' || ingKey === 'olive_oil')
-          ? { protein: 0, fat: 100, fiber: 0, calcium: 0, phosphorus: 0, kcal: 900 }
+          ? { protein: 0, fat: 100, fiber: 0, calcium: 0, phosphorus: 0, kcal: 900, moisture: 0 }
           : ingKey === 'pellets_fortified'
-          ? { protein: 18, fat: 6, fiber: 8, calcium: 1200, phosphorus: 600, kcal: 360 }
+          ? { protein: 18, fat: 6, fiber: 8, calcium: 1200, phosphorus: 600, kcal: 360, moisture: 10 }
           : null;
 
       const genericFallback =
         (nameLower.includes('pellet') || ingKey.includes('pellet'))
-          ? { protein: 14, fat: 5, fiber: 8, calcium: 800, phosphorus: 500, kcal: 350 }
+          ? { protein: 14, fat: 5, fiber: 8, calcium: 800, phosphorus: 500, kcal: 350, moisture: 10 }
           : (nameLower.includes('hay') || ingKey.includes('hay'))
-          ? { protein: 8, fat: 2, fiber: 30, calcium: 500, phosphorus: 250, kcal: 200 }
+          ? { protein: 8, fat: 2, fiber: 30, calcium: 500, phosphorus: 250, kcal: 200, moisture: 12 }
           : null;
 
       const chosenFallback = explicitFallback || fallback || genericFallback;
@@ -1580,6 +1821,7 @@ export function calculateRecipeNutrition(
         totalPhosphorus += (chosenFallback.phosphorus || 0) * (amount / 100);
         totalCalories += (chosenFallback.kcal || 0) * (amount / 100);
         totalWeight += amount;
+        totalDryMatter += amount * (1 - inferMoistureFraction(ingKey, name, undefined, (chosenFallback as any).moisture));
         realDataCount++;
 
         if (options?.includeBreakdown) {
@@ -1643,17 +1885,18 @@ export function calculateRecipeNutrition(
       totalCalories += (composition.kcal || 0) * (supplementAmount / 100);
       // Add supplement weight to total (small contribution)
       totalWeight += supplementAmount;
+      totalDryMatter += supplementAmount * (1 - inferMoistureFraction(compositionKey, name, (composition as any).moisture));
       realDataCount++;
     }
   }
 
-  if (realDataCount > 0 && totalWeight > 0) {
+  if (realDataCount > 0 && totalWeight > 0 && totalDryMatter > 0) {
     return {
-      protein: (totalProtein / totalWeight) * 100,
-      fat: (totalFat / totalWeight) * 100,
-      fiber: (totalFiber / totalWeight) * 100,
-      calcium: ((totalCalcium / totalWeight) * 100) / 1000,
-      phosphorus: ((totalPhosphorus / totalWeight) * 100) / 1000,
+      protein: (totalProtein / totalDryMatter) * 100,
+      fat: (totalFat / totalDryMatter) * 100,
+      fiber: (totalFiber / totalDryMatter) * 100,
+      calcium: ((totalCalcium / totalDryMatter) * 100) / 1000,
+      phosphorus: ((totalPhosphorus / totalDryMatter) * 100) / 1000,
       calories: (totalCalories / totalWeight) * 100,
       source: fallbackIngredients.length > 0 ? 'estimated' : 'real',
       usesFallbackNutrition: fallbackIngredients.length > 0,
