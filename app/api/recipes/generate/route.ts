@@ -12,6 +12,7 @@ import {
   calculateRecipeNutrition,
   type Pet as CompatibilityPet,
 } from '@/lib/utils/enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { normalizeSpecies as normalizeSpeciesKey } from '@/lib/utils/ingredientCompatibility';
 import { getTargetScoreThresholdForSpecies } from '@/lib/services/speciesMealGeneration';
 import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendations';
@@ -647,10 +648,11 @@ export async function POST(request: NextRequest) {
       const scored = generatedRecipes
         .map((recipe) => {
           try {
-            const score = calculateEnhancedCompatibility(recipe, compatibilityPet);
-            const topIssues = extractTopIssues(score);
+            const enhancedScore = calculateEnhancedCompatibility(recipe, compatibilityPet);
+            const speciesScore = scoreWithSpeciesEngine(recipe, compatibilityPet);
+            const topIssues = extractTopIssues(enhancedScore);
             const supplementRecommendations = getRecommendationsForRecipe(
-              (score as any)?.detailedBreakdown?.nutritionalGaps || [],
+              (enhancedScore as any)?.detailedBreakdown?.nutritionalGaps || [],
               compatibilityPet.type,
               healthConcerns
             );
@@ -663,7 +665,7 @@ export async function POST(request: NextRequest) {
             const caPRatio = ca !== null && p !== null && p > 0 ? ca / p : null;
             return {
               recipe,
-              score: score.overallScore,
+              score: speciesScore.overallScore,
               topIssues,
               supplementRecommendations,
               ...(debug
