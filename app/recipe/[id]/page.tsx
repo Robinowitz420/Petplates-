@@ -23,6 +23,7 @@ import { petSupplements } from '@/lib/data/supplements';
 import Tooltip from '@/components/Tooltip';
 import { RecipeRatingSection } from '@/components/RecipeRatingSection';
 import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import RecipeScoreModal from '@/components/RecipeScoreModal';
 import { getRandomName, type Pet } from '@/lib/utils/petUtils';
 import OneClickCheckoutModal from '@/components/OneClickCheckoutModal';
@@ -473,6 +474,7 @@ export default function RecipeDetailPage() {
         allergies: pet.allergies || [],
       };
       const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
+      const scored = scoreWithSpeciesEngine(recipe, enhancedPet);
       // Convert to compatible format
       // Generate reason text that includes issues for better keyword matching
       const getReasonWithIssues = (factor: typeof enhanced.factors.ingredientSafety) => {
@@ -490,7 +492,7 @@ export default function RecipeDetailPage() {
       );
 
       // Check badges if score is 100% (Nutrient Navigator)
-      if (enhanced.overallScore === 100 && queryPetId && userId) {
+      if (scored.overallScore === 100 && queryPetId && userId) {
         checkAllBadges(userId, queryPetId, {
           action: 'recipe_saved',
           savedRecipesCount: 0, // Will be updated from profile page
@@ -509,10 +511,10 @@ export default function RecipeDetailPage() {
         : 'Recipe evaluated for compatibility with your pet.';
 
       return {
-        overallScore: enhanced.overallScore,
-        compatibility: enhanced.grade === 'A+' || enhanced.grade === 'A' ? 'excellent' :
-                       enhanced.grade === 'B+' || enhanced.grade === 'B' ? 'good' :
-                       enhanced.grade === 'C+' || enhanced.grade === 'C' ? 'fair' : 'poor',
+        overallScore: scored.overallScore,
+        compatibility: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
+                       scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
+                       scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
         summaryReasoning: summaryReasoning,
         explainRecommendations: enhanced.detailedBreakdown.recommendations || [],
         nutritionalGaps: enhanced.detailedBreakdown.nutritionalGaps,
@@ -771,16 +773,17 @@ export default function RecipeDetailPage() {
         };
 
         try {
-          const newScore = calculateEnhancedCompatibility(newRecipe, enhancedPet);
+          const newEnhanced = calculateEnhancedCompatibility(newRecipe, enhancedPet);
+          const newScored = scoreWithSpeciesEngine(newRecipe, enhancedPet);
           const oldScore = scoreForQueryPet.overallScore;
-          const scoreDiff = newScore.overallScore - oldScore;
+          const scoreDiff = newScored.overallScore - oldScore;
 
           if (scoreDiff > 0) {
             // Animate score change
-            animateScoreChange(oldScore, newScore.overallScore);
+            animateScoreChange(oldScore, newScored.overallScore);
           }
 
-          setModifiedScore(newScore.overallScore);
+          setModifiedScore(newScored.overallScore);
           setMessage(`${supplement.name} added! Score improved by ${scoreDiff > 0 ? '+' : ''}${scoreDiff.toFixed(0)} points.`);
           setTimeout(() => setMessage(null), 5000);
         } catch (error) {
