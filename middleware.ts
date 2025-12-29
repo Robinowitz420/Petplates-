@@ -12,6 +12,8 @@ export default clerkMiddleware((auth, req) => {
 export const config = {
   // Optimize matcher to exclude static files and only match necessary routes
   matcher: [
+    '/api/pets(.*)',
+    '/api/custom-meals(.*)',
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)

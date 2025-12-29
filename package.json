@@ -4,9 +4,13 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "clean:next": "node -e \"require('node:fs').rmSync('.next',{recursive:true,force:true})\"",
+    "predev": "npm run clean:next",
     "dev": "next dev",
+    "prebuild": "npm run clean:next",
     "build": "npm run validate:recipes && next build",
     "export": "next export",
+    "prestart": "npm run clean:next",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest -c config/vitest.config.ts",

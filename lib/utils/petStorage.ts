@@ -3,8 +3,15 @@
 // Note: All operations are now ASYNCHRONOUS
 
 import { Pet } from '@/lib/types'; // Updated import to use shared type
-import * as firestoreService from '@/lib/services/firestoreService';
-import { ensureFirebaseAuth, isFirebaseAvailable } from '@/lib/utils/firebaseConfig';
+
+async function fetchJsonOrThrow<T>(res: Response): Promise<T> {
+  const text = await res.text();
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('Please sign in');
+    throw new Error(text || `Request failed (${res.status})`);
+  }
+  return text ? (JSON.parse(text) as T) : ({} as T);
+}
 
 /**
  * Retrieves all pets for a given user.
@@ -15,25 +22,13 @@ import { ensureFirebaseAuth, isFirebaseAvailable } from '@/lib/utils/firebaseCon
 export async function getPets(userId: string): Promise<Pet[]> {
   if (!userId) return [];
 
-  // Use localStorage only when Firebase is not configured/available.
-  if (!isFirebaseAvailable()) {
-    console.log('Firebase not configured - using localStorage only');
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(`pets_${userId}`);
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {
-          return [];
-        }
-      }
-    }
-    return [];
-  }
-  
-  // Firestore is authoritative when configured. Use the authenticated uid.
-  const uid = await ensureFirebaseAuth();
-  return firestoreService.getPets(uid);
+  const res = await fetch('/api/pets', {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  const data = await fetchJsonOrThrow<{ pets?: Pet[] }>(res);
+  return Array.isArray(data.pets) ? data.pets : [];
 }
 
 /**
@@ -46,54 +41,17 @@ export async function getPets(userId: string): Promise<Pet[]> {
 export async function savePet(userId: string, pet: Pet): Promise<void> {
   if (!userId) return;
 
-  // Use localStorage only when Firebase is not configured/available.
-  if (!isFirebaseAvailable()) {
-    console.log('Firebase not configured - saving to localStorage only');
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(`pets_${userId}`);
-      let localPets: Pet[] = [];
-      try {
-        localPets = stored ? JSON.parse(stored) : [];
-      } catch {
-        localPets = [];
-      }
-      const index = localPets.findIndex((p) => p.id === pet.id);
-      if (index >= 0) {
-        localPets[index] = pet;
-      } else {
-        localPets.push(pet);
-      }
-      localStorage.setItem(`pets_${userId}`, JSON.stringify(localPets));
-      window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: pet.id } }));
-    }
-    return;
-  }
+  const res = await fetch('/api/pets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ pet }),
+  });
 
-  const uid = await ensureFirebaseAuth();
-  // Firestore is authoritative when configured. If this throws, the UI should surface it.
-  await firestoreService.savePet(uid, pet);
+  await fetchJsonOrThrow<{ pet?: Pet }>(res);
 
-  // Optional: mirror to localStorage for same-tab UX (not a fallback source of truth)
   if (typeof window !== 'undefined') {
-    try {
-      const stored = localStorage.getItem(`pets_${uid}`);
-      let localPets: Pet[] = [];
-      try {
-        localPets = stored ? JSON.parse(stored) : [];
-      } catch {
-        localPets = [];
-      }
-      const index = localPets.findIndex((p) => p.id === pet.id);
-      if (index >= 0) {
-        localPets[index] = pet;
-      } else {
-        localPets.push(pet);
-      }
-      localStorage.setItem(`pets_${uid}`, JSON.stringify(localPets));
-    } catch {
-      // ignore local mirror errors
-    }
-    window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId: uid, petId: pet.id } }));
+    window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: pet.id } }));
   }
 }
 
@@ -107,41 +65,14 @@ export async function savePet(userId: string, pet: Pet): Promise<void> {
 export async function deletePet(userId: string, petId: string): Promise<void> {
   if (!userId) return;
 
-  // Use localStorage only when Firebase is not configured/available.
-  if (!isFirebaseAvailable()) {
-    console.log('Firebase not configured - deleting from localStorage only');
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(`pets_${userId}`);
-      if (stored) {
-        try {
-          const pets: Pet[] = JSON.parse(stored);
-          const filtered = pets.filter((p) => p.id !== petId);
-          localStorage.setItem(`pets_${userId}`, JSON.stringify(filtered));
-          window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId } }));
-        } catch (e) {
-          console.error('Error deleting pet from localStorage:', e);
-        }
-      }
-    }
-    return;
-  }
+  const res = await fetch(`/api/pets/${encodeURIComponent(petId)}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  await fetchJsonOrThrow<{ ok?: boolean }>(res);
 
-  const uid = await ensureFirebaseAuth();
-  await firestoreService.deletePet(uid, petId);
-
-  // Optional: mirror delete to localStorage
   if (typeof window !== 'undefined') {
-    try {
-      const stored = localStorage.getItem(`pets_${uid}`);
-      if (stored) {
-        const pets: Pet[] = JSON.parse(stored);
-        const filtered = pets.filter((p) => p.id !== petId);
-        localStorage.setItem(`pets_${uid}`, JSON.stringify(filtered));
-      }
-    } catch {
-      // ignore local mirror errors
-    }
-    window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId: uid, petId } }));
+    window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId } }));
   }
 }
 

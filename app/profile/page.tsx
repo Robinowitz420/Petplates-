@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, startTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import { Plus, Edit, Trash2, ShoppingCart } from 'lucide-react';
 import { getPrimaryName } from '@/lib/utils/petUtils';
 import type { Pet } from '@/lib/types';
@@ -28,7 +29,6 @@ import PetBadges from '@/components/PetBadges';
 import BadgeToggle from '@/components/BadgeToggle';
 import Tooltip from '@/components/Tooltip';
 import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
-import { ensureFirebaseAuth, isFirebaseAvailable } from '@/lib/utils/firebaseConfig';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -91,9 +91,6 @@ type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
 
 type ProfilePet = Pet;
-
-// Simulated user id (replace with Clerk user.id in real auth)
-const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
 // =================================================================
 // 2. DATA CONSTANTS
@@ -518,7 +515,8 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
 // =================================================================
 
 export default function MyPetsPage() {
-  const [userId, setFirebaseUserId] = useState<string>('');
+  const { user, isLoaded } = useUser();
+  const [userId, setUserId] = useState<string>('');
   const { setUserId: setVillageUserId } = useVillageStore();
   const router = useRouter();
 
@@ -599,36 +597,12 @@ const buildWeeklyPlan = useCallback(
     return rotation;
   };
 
-  // Initialize Firebase auth (when configured) and use auth.uid as the canonical userId.
   useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        if (!isFirebaseAvailable()) {
-          // Keep existing local/dev behavior.
-          if (cancelled) return;
-          setFirebaseUserId(SIMULATED_USER_ID);
-          setVillageUserId(SIMULATED_USER_ID);
-          return;
-        }
-
-        const uid = await ensureFirebaseAuth();
-        if (cancelled) return;
-        setFirebaseUserId(uid);
-        setVillageUserId(uid);
-      } catch (e) {
-        console.error('Failed to initialize Firebase Auth', e);
-        if (cancelled) return;
-        // No silent localStorage fallback for prod; keep page usable in dev.
-        setFirebaseUserId('');
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [setVillageUserId]);
+    if (!isLoaded) return;
+    const uid = user?.id || '';
+    setUserId(uid);
+    setVillageUserId(uid);
+  }, [isLoaded, user?.id, setVillageUserId]);
 
   useEffect(() => {
     setIsClient(true);
