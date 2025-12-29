@@ -54,10 +54,6 @@ next-env.d.ts
 # clerk configuration (can include secrets)
 /.clerk/
 
-# generated images
-images/
-.vercel
-
 # Auto-generated validation artifacts
 .validation-output.log
 .pre-commit-validation.log
@@ -65,3 +61,6 @@ images/
 # Keep manual review CSVs (tracked for audit trail)
 # PHASE_*_MANUAL_REVIEW.csv - NOT ignored, these are tracked
 # AUTO_CLASSIFICATION_REPORT.md - NOT ignored, these are tracked
+
+# Vercel local metadata
+.vercel

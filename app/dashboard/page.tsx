@@ -5,10 +5,7 @@ import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { Settings, Plus, Utensils, Heart, ArrowRight } from 'lucide-react';
 
-// Firebase Imports
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, getDoc, collection, getDocs, query, onSnapshot, where } from 'firebase/firestore';
+import { getPets } from '@/lib/utils/petStorage';
 
 // --- Data Structures (Based on your other files) ---
 interface SavedRecipe {
@@ -33,103 +30,44 @@ interface Pet {
     dislikes?: string[];
 }
 
-// Firestore Globals (MUST be used)
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-// Utility to safely retrieve Firebase services
-let app: any;
-let db: any;
-let auth: any;
-
-if (firebaseConfig) {
-  try {
-    app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-    auth = getAuth(app);
-    // setLogLevel('debug'); // Uncomment for debugging
-  } catch (error) {
-    console.error("Firebase initialization failed:", error);
-  }
-}
-
 // --- Pet Dashboard Component ---
 export default function DashboardPage() {
     const { user, isLoaded: isClerkLoaded } = useUser();
     const [pets, setPets] = useState<Pet[]>([]);
-    const [userId, setUserId] = useState<string | null>(null);
-    const [isAuthReady, setIsAuthReady] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // 1. Firebase Auth and Initialization
     useEffect(() => {
-        if (!auth) return;
+        if (!isClerkLoaded) return;
+        const uid = user?.id;
+        if (!uid) {
+            setPets([]);
+            setIsLoading(false);
+            return;
+        }
 
-        const setupAuth = async () => {
+        (async () => {
             try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Firebase Auth failed:", error);
-            }
-        };
-
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-            if (firebaseUser) {
-                setUserId(firebaseUser.uid);
-            } else {
-                setUserId(crypto.randomUUID()); // Anonymous fallback
-            }
-            setIsAuthReady(true);
-        });
-
-        setupAuth();
-        return () => unsubscribe();
-    }, []);
-
-    // 2. Real-time Pet Data Fetch (Using onSnapshot)
-    useEffect(() => {
-        if (!isAuthReady || !userId || !db) return;
-
-        // Reference the 'pets' subcollection under the user's private path
-        const petCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/pets`);
-        
-        // Use onSnapshot to listen for real-time changes
-        const unsubscribe = onSnapshot(
-            petCollectionRef,
-            (snapshot) => {
-                const fetchedPets: Pet[] = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    // Ensure savedRecipes is treated as an array, even if empty/missing
-                    const savedRecipes = Array.isArray(data.savedRecipes) ? data.savedRecipes : [];
-
-                    fetchedPets.push({
-                        petId: doc.id, // Firestore document ID (e.g., pet_176...)
-                        name: data.name || 'Unnamed Pet',
-                        type: data.type || 'Unknown',
-                        breed: data.breed || 'Mixed',
-                        age: data.age || 'Adult',
-                        healthConcerns: data.healthConcerns || [],
-                        savedRecipes: savedRecipes as SavedRecipe[], 
-                    });
-                });
-                setPets(fetchedPets);
-                setIsLoading(false);
-            },
-            (error) => {
-                console.error("Error fetching real-time pet data:", error);
+                const loaded = await getPets(uid);
+                const mapped: Pet[] = loaded.map((p: any) => ({
+                    petId: p.id,
+                    name: (p.names?.[0] || p.name || 'Unnamed Pet') as string,
+                    type: (p.type || 'Unknown') as string,
+                    breed: (p.breed || 'Mixed') as string,
+                    age: (p.age || 'Adult') as string,
+                    healthConcerns: Array.isArray(p.healthConcerns) ? p.healthConcerns : [],
+                    savedRecipes: Array.isArray(p.savedRecipes)
+                        ? (p.savedRecipes as string[]).map((id) => ({ id, name: id, dateAdded: '' }))
+                        : [],
+                }));
+                setPets(mapped);
+            } catch (e) {
+                console.error('Error loading pets:', e);
+                setPets([]);
+            } finally {
                 setIsLoading(false);
             }
-        );
-
-        return () => unsubscribe();
-    }, [isAuthReady, userId]);
-
+        })();
+    }, [isClerkLoaded, user?.id]);
 
     if (!isClerkLoaded || isLoading) {
         return <div className="min-h-screen flex items-center justify-center text-xl text-primary-600">Loading Dashboard...</div>;
@@ -221,7 +159,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <p className="text-center text-sm text-gray-400 mt-10">
-                    User ID: {userId}
+                    User ID: {user?.id}
                 </p>
 
             </div>
