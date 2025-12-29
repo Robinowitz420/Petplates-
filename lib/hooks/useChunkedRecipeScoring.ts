@@ -3,8 +3,20 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Recipe, ModifiedRecipeResult } from '@/lib/types';
-import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+
+type ScoringPet = {
+  id: string;
+  name: string;
+  type: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
+  breed: string;
+  age: number;
+  weight: number;
+  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
+  healthConcerns: string[];
+  dietaryRestrictions: string[];
+  allergies?: string[];
+};
 
 interface ScoredMeal {
   meal: ModifiedRecipeResult | { recipe: Recipe; explanation: string };
@@ -90,7 +102,7 @@ function simpleHash(str: string): string {
  */
 function generatePetProfileHash(
   pet: null, // Deprecated - using enhancedPet only
-  enhancedPet: EnhancedPet | null
+  enhancedPet: ScoringPet | null
 ): string {
   if (!enhancedPet) return 'no-pet';
   
@@ -105,7 +117,7 @@ function generatePetProfileHash(
     petData.type || '',
     petData.breed || '',
     typeof petData.age === 'string' ? parseFloat(petData.age) || 0 : petData.age || 0,
-    petData.weight || petData.weightKg || 0,
+    petData.weight || 0,
     petData.activityLevel || 'moderate',
     healthConcerns,
     allergies,
@@ -376,7 +388,7 @@ function cacheScores(
 function computeMealScore(
   meal: ModifiedRecipeResult | { recipe: Recipe; explanation: string },
   ratingPet: null, // Deprecated - kept for type compatibility but always null
-  enhancedPet: EnhancedPet | null,
+  enhancedPet: ScoringPet | null,
   petProfileHash: string
 ): number {
   // If meal already has a score, use it
@@ -423,7 +435,7 @@ function computeMealScore(
 export function useChunkedRecipeScoring(
   meals: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[],
   ratingPet: null, // Deprecated - using enhancedPet only
-  enhancedPet: EnhancedPet | null
+  enhancedPet: ScoringPet | null
 ) {
   const [scoredMeals, setScoredMeals] = useState<ScoredMeal[]>([]);
   const [isLoading, setIsLoading] = useState(true);

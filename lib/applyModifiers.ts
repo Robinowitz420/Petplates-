@@ -8,6 +8,7 @@ import { recipes } from './data/recipes-complete';
 import { getVettedProduct, getAllAffiliateLinks, getGenericIngredientName } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
 import { matchesSpecies } from './utils/recipeRecommendations';
 import { normalizePetCategory } from './utils/petType';
+import { calculateRecipeNutrition } from './utils/recipeNutrition';
 
 interface ApplyModifiersResult {
   modifiedRecipe: Recipe;
@@ -76,8 +77,17 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
     return mapping[normalized] || normalized.replace(/[^a-z0-9]+/g, '-');
   };
 
+  const recipeConcernsNormalized = (recipe.healthConcerns || []).map((c: any) => normalizeConcern(String(c || '')));
+
   for (const concern of pet.healthConcerns || []) {
     const normalizedConcern = normalizeConcern(concern);
+
+    // Only recommend modifier additions when the recipe explicitly supports the concern.
+    // This avoids silently injecting unrelated additions.
+    if (!recipeConcernsNormalized.includes(normalizedConcern)) {
+      continue;
+    }
+
     const modKey = concernToModifierKey[normalizedConcern] || concernToModifierKey[concern.toLowerCase()];
     if (modKey && (modifiers as any)[modKey]) {
       const modifier = (modifiers as any)[modKey];
@@ -155,6 +165,48 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
         asinLink: undefined,
       };
     });
+  }
+
+  if (petCategory === 'cats') {
+    const allText = (
+      (modifiedRecipe.ingredients || []).map((i: any) => String(i?.name || '')).join(' ') +
+      ' ' +
+      (((modifiedRecipe as any).supplements || []) as any[]).map((s: any) => String(s?.name || s?.productName || '')).join(' ')
+    ).toLowerCase();
+
+    const hasCalciumSource =
+      allText.includes('eggshell') ||
+      allText.includes('egg shell') ||
+      allText.includes('calcium carbonate') ||
+      allText.includes('bone meal') ||
+      allText.includes('cuttlebone') ||
+      allText.includes('neck') ||
+      allText.includes('bone');
+
+    if (!hasCalciumSource) {
+      const nutrition = calculateRecipeNutrition(modifiedRecipe);
+      const ca = nutrition.calcium;
+      const p = nutrition.phosphorus;
+      const ratio = ca > 0 && p > 0 ? ca / p : 0;
+
+      const needsCalcium = ca <= 0 || p <= 0 || (ratio > 0 && (ratio < 1.0 || ratio > 2.0));
+      if (needsCalcium) {
+        const suppArr = (((modifiedRecipe as any).supplements || []) as any[]);
+        (modifiedRecipe as any).supplements = suppArr;
+        suppArr.push({
+          name: 'Eggshell Powder',
+          amount: '1/4 tsp',
+          notes: 'Added automatically to support calcium balance (Ca:P) for cats.',
+          category: 'supplement',
+        });
+        addedIngredients.push({
+          name: 'Eggshell Powder',
+          benefit: 'Supports calcium balance (Ca:P) for cats',
+          amazon: '',
+          forConcern: 'nutrition_balance',
+        });
+      }
+    }
   }
 
   return {

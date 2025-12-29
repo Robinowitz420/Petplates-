@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+
 import {
   Clock,
   User,
@@ -15,29 +16,36 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
-import { loadRecipeById, loadAllRecipes } from '@/lib/data/recipes-index';
 import type { Recipe, ModifiedRecipeResult } from '@/lib/types';
 import { applyModifiers } from '@/lib/applyModifiers';
-import { getVettedProduct, getVettedProductByAnyIdentifier, VETTED_PRODUCTS, getGenericIngredientName } from '@/lib/data/vetted-products';
-import { petSupplements } from '@/lib/data/supplements';
+import {
+  getVettedProduct,
+  getVettedProductByAnyIdentifier,
+  VETTED_PRODUCTS,
+  getGenericIngredientName,
+} from '@/lib/data/vetted-products';
+
 import Tooltip from '@/components/Tooltip';
-import { RecipeRatingSection } from '@/components/RecipeRatingSection';
-import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import RecipeScoreModal from '@/components/RecipeScoreModal';
 import { getRandomName, type Pet } from '@/lib/utils/petUtils';
 import OneClickCheckoutModal from '@/components/OneClickCheckoutModal';
+
 import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import { getCustomMeal } from '@/lib/utils/customMealStorage';
 import { convertCustomMealToRecipe } from '@/lib/utils/convertCustomMealToRecipe';
-import { getRecommendationsForRecipe, type RecommendedSupplement } from '@/lib/utils/nutritionalRecommendations';
+import {
+  getRecommendationsForRecipe,
+  type RecommendedSupplement,
+} from '@/lib/utils/nutritionalRecommendations';
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import { normalizePetType } from '@/lib/utils/petType';
+import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
 
 // =================================================================
 // 1. CONSTANTS
@@ -164,7 +172,7 @@ const setRecipeSavedState = (
   });
 
   savePetsToLocalStorage(userId, updatedPets);
-  
+
   // Check badges after saving/removing recipe
   if (isSaving) {
     updatedPets.forEach(async (pet) => {
@@ -173,19 +181,19 @@ const setRecipeSavedState = (
         // Note: We'll need to check this from the profile page context
         // For now, just check saved recipes count
         const savedRecipesCount = pet.savedRecipes.length;
-        
+
         checkAllBadges(userId, pet.id, {
           action: 'recipe_saved',
           savedRecipesCount,
           mealPlanCount: 0, // Will be updated from profile page
           weeklyPlanCompleted: false,
-        }).catch(err => {
+        }).catch((err) => {
           console.error('Failed to check badges:', err);
         });
       }
     });
   }
-  
+
   return updatedPets;
 };
 
@@ -195,18 +203,17 @@ const getCurrentUserId = () => {
   return localStorage.getItem('last_user_id') || '';
 };
 
-
 // Helper function to extract ASIN from Amazon URL
 const extractASIN = (url: string): string | undefined => {
   if (!url) return undefined;
   // Try /dp/ASIN pattern
   const dpMatch = url.match(/\/dp\/([A-Z0-9]{10})/);
   if (dpMatch) return dpMatch[1];
-  
+
   // Try /gp/product/ASIN pattern
   const gpMatch = url.match(/\/gp\/product\/([A-Z0-9]{10})/);
   if (gpMatch) return gpMatch[1];
-  
+
   // Try ASIN parameter
   try {
     const urlObj = new URL(url);
@@ -215,7 +222,7 @@ const extractASIN = (url: string): string | undefined => {
   } catch (e) {
     // Invalid URL, try regex
   }
-  
+
   return undefined;
 };
 
@@ -230,10 +237,10 @@ const getSpeciesFromRecipeCategory = (category?: string): string | undefined => 
 // Helper function to vet recipe ingredients even without a pet selected
 const vetRecipeIngredients = (recipe: Recipe): Recipe => {
   if (!recipe) return recipe;
-  
+
   // Derive species from recipe category
   const species = getSpeciesFromRecipeCategory(recipe.category);
-  
+
   return {
     ...recipe,
     ingredients: recipe.ingredients.map((ing) => {
@@ -241,30 +248,30 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
       const { amazonLink, ...ingWithoutOldLink } = ing as any;
 
       const existingLink = ing.asinLink || amazonLink;
-      
+
       const genericKey = getGenericIngredientName((ing as any).productName || ing.name);
       const displayName = genericKey ? formatIngredientNameForDisplay(genericKey) : ing.name;
-      
+
       // Try to find vetted product using the ingredient name
       // If the name is a product name (from applyModifiers), try to reverse-lookup
       // by checking if there's an id that might be the original name
       const lookupName = genericKey || ing.name;
-      
+
       // Pass species for species-aware product matching
       let vettedProduct = getVettedProduct(lookupName, species);
-      
+
       // If lookup by name/id failed and we have a productName, the ingredient was already vetted
       // Try to find the original generic name by searching VETTED_PRODUCTS for matching productName
       if (!vettedProduct && (ing as any).productName) {
         // Search VETTED_PRODUCTS for an entry with matching productName
-        const matchingKey = Object.keys(VETTED_PRODUCTS).find(key => 
+        const matchingKey = Object.keys(VETTED_PRODUCTS).find((key) =>
           VETTED_PRODUCTS[key].productName === (ing as any).productName
         );
         if (matchingKey) {
           vettedProduct = VETTED_PRODUCTS[matchingKey];
         }
       }
-      
+
       if (vettedProduct) {
         const vettedLink = (vettedProduct.asinLink || vettedProduct.purchaseLink);
         return {
@@ -283,140 +290,8 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
         amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
       };
     }),
-    // Also vet supplements if they exist
-    supplements: (recipe as any).supplements?.map((supplement: any) => {
-      // Remove old amazonLink property
-      const { amazonLink, ...supplementWithoutOldLink } = supplement;
-
-      const existingLink = supplement.asinLink || amazonLink;
-
-      const genericKey = getGenericIngredientName(supplement.productName || supplement.name);
-      const displayName = genericKey ? formatIngredientNameForDisplay(genericKey) : supplement.name;
-      
-      // Derive species from recipe category (re-derive here since we're in map scope)
-      const species = getSpeciesFromRecipeCategory(recipe.category);
-      // Pass species for species-aware product matching
-      const lookupName = genericKey || supplement.name;
-      const vettedProduct = getVettedProduct(lookupName, species);
-      if (vettedProduct) {
-        const vettedLink = (vettedProduct.asinLink || vettedProduct.purchaseLink);
-        return {
-          ...supplementWithoutOldLink,
-          productName: vettedProduct.productName,
-          name: displayName,
-          asinLink: ensureSellerId(vettedLink), // Prefer vetted product link over existing link
-          amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
-        };
-      }
-      // Keep supplement but no ASIN link if no vetted product found
-      return {
-        ...supplementWithoutOldLink,
-        name: displayName,
-        asinLink: existingLink ? ensureSellerId(existingLink) : undefined,
-        amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
-      };
-    }),
   };
 };
-
-// Supplement splitting helpers
-const SUPPLEMENT_KEYWORDS = [
-  'vitamin',
-  'mineral',
-  'supplement',
-  'probiotic',
-  'enzyme',
-  'omega',
-  'fish oil',
-  'salmon oil',
-  'anchovy oil',
-  'sardine oil',
-  'mackerel oil',
-  'krill oil',
-  'algae oil',
-  'herring oil',
-  'oil',
-  'calcium',
-  'carbonate',
-  'eggshell',
-  'glucosamine',
-  'chondroitin',
-  'sam-e',
-  's-adenosyl',
-  'quercetin',
-  'curcumin',
-  'l-carnitine',
-  'psyllium',
-  'd-mannose',
-  'fructooligosaccharides',
-  'fos',
-  'inulin',
-  'mannanoligosaccharides',
-  'mos',
-  'beta-glucan',
-  'hyaluronic',
-  'b complex',
-];
-
-const normalizeSplitKey = (value: any) =>
-  String(value || '')
-    .toLowerCase()
-    .trim()
-    .replace(/_/g, ' ')
-    .replace(/\s+/g, ' ');
-
-const SUPPLEMENT_NAME_SET: Set<string> = (() => {
-  const set = new Set<string>();
-  try {
-    Object.values(petSupplements || {}).forEach((byConcern: any) => {
-      Object.values(byConcern || {}).forEach((list: any) => {
-        (list || []).forEach((s: any) => {
-          if (s?.name) set.add(normalizeSplitKey(s.name));
-        });
-      });
-    });
-  } catch {
-    // ignore
-  }
-  return set;
-})();
-
-function isSupplementLikeName(name: any) {
-  const n = normalizeSplitKey(name);
-  if (!n) return false;
-  if (SUPPLEMENT_NAME_SET.has(n)) return true;
-  for (const kw of SUPPLEMENT_KEYWORDS) {
-    if (n.includes(kw)) return true;
-  }
-  return false;
-}
-
-function splitIngredientsAndSupplements(base: any) {
-  const ingredients = Array.isArray(base?.ingredients) ? base.ingredients : [];
-  const supplements = Array.isArray(base?.supplements) ? base.supplements : [];
-
-  const supplementKeySet = new Set<string>(supplements.map((s: any) => normalizeSplitKey(s?.name)));
-  const movedSupplements: any[] = [];
-  const keptIngredients: any[] = [];
-
-  for (const ing of ingredients) {
-    const name = ing?.name || ing?.productName;
-    if (isSupplementLikeName(name)) {
-      const key = normalizeSplitKey(name);
-      if (!supplementKeySet.has(key)) {
-        movedSupplements.push({ ...ing, name: String(name) });
-        supplementKeySet.add(key);
-      }
-    } else {
-      keptIngredients.push(ing);
-    }
-  }
-
-  return {
-    ingredients: keptIngredients,
-    supplements: [...supplements, ...movedSupplements],
-  };
-}
 
 // =================================================================
 // 3. MAIN COMPONENT
@@ -425,6 +300,8 @@ function splitIngredientsAndSupplements(base: any) {
 export default function RecipeDetailPage() {
   const params = useParams();
   const id = params?.id as string | undefined;
+
+  const ingredientsTopRef = useRef<HTMLDivElement | null>(null);
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [pets, setPets] = useState<RecipeDetailPet[]>([]);
@@ -444,6 +321,7 @@ export default function RecipeDetailPage() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [modifiedRecipe, setModifiedRecipe] = useState<Recipe | null>(null);
   const [recommendedSupplements, setRecommendedSupplements] = useState<RecommendedSupplement[]>([]);
+  const [hopAddedLabel, setHopAddedLabel] = useState<string | null>(null);
   const [modifiedScore, setModifiedScore] = useState<number | null>(null);
   const [animatedScore, setAnimatedScore] = useState<number | null>(null);
 
@@ -457,11 +335,10 @@ export default function RecipeDetailPage() {
     const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
     if (!pet) return null;
 
-    // Use enhanced scoring
     try {
       const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
       const petType = normalizePetType(pet.type, 'recipe/[id].scoreForQueryPet');
-      const enhancedPet: EnhancedPet = {
+      const scoringPet = {
         id: pet.id,
         name: getRandomName(pet.names),
         type: petType,
@@ -472,24 +349,9 @@ export default function RecipeDetailPage() {
         healthConcerns: pet.healthConcerns || [],
         dietaryRestrictions: pet.allergies || [],
         allergies: pet.allergies || [],
-      };
-      const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
-      const scored = scoreWithSpeciesEngine(recipe, enhancedPet);
-      // Convert to compatible format
-      // Generate reason text that includes issues for better keyword matching
-      const getReasonWithIssues = (factor: typeof enhanced.factors.ingredientSafety) => {
-        if (factor.issues.length > 0) {
-          return factor.issues.join('; ') + (factor.reasoning ? ` (${factor.reasoning})` : '');
-        }
-        return factor.reasoning || '';
-      };
+      } as any;
 
-      // Get recommendations for nutritional gaps
-      const supplementRecommendations = getRecommendationsForRecipe(
-        enhanced.detailedBreakdown.nutritionalGaps,
-        petType,
-        pet.healthConcerns || []
-      );
+      const scored = scoreWithSpeciesEngine(recipe, scoringPet);
 
       // Check badges if score is 100% (Nutrient Navigator)
       if (scored.overallScore === 100 && queryPetId && userId) {
@@ -498,17 +360,31 @@ export default function RecipeDetailPage() {
           savedRecipesCount: 0, // Will be updated from profile page
           mealPlanCount: 0, // Will be updated from profile page
           weeklyPlanCompleted: false,
-        }).catch(err => {
+        }).catch((err) => {
           console.error('Failed to check badges:', err);
         });
       }
 
-      // Generate summary reasoning from enhanced breakdown
-      const summaryReasoning = enhanced.detailedBreakdown.recommendations.length > 0
-        ? enhanced.detailedBreakdown.recommendations.join('. ')
-        : enhanced.detailedBreakdown.healthBenefits.length > 0
-        ? enhanced.detailedBreakdown.healthBenefits.join('. ')
+      const summaryReasoning = scored.warnings.length > 0
+        ? scored.warnings.slice(0, 3).join('. ')
+        : scored.strengths.length > 0
+        ? scored.strengths.slice(0, 3).join('. ')
         : 'Recipe evaluated for compatibility with your pet.';
+
+      const breakdown = Object.entries(scored.raw.factors).reduce(
+        (acc, [key, factor]) => {
+          const f = factor as { score: number; weight: number; reasoning: string; issues: string[]; strengths: string[] };
+          acc[key] = {
+            score: f.score,
+            weightedContribution: Math.round(f.score * (f.weight || 0)),
+            weight: f.weight,
+            reason: f.reasoning || (f.issues.length > 0 ? f.issues.join('; ') : f.strengths.join('; ')),
+            recommendations: key === 'nutrition' ? scored.raw.detailedBreakdown.recommendations : undefined,
+          };
+          return acc;
+        },
+        {} as Record<string, { score: number; weightedContribution?: number; weight: number; reason?: string; recommendations?: any[] }>
+      );
 
       return {
         overallScore: scored.overallScore,
@@ -516,63 +392,39 @@ export default function RecipeDetailPage() {
                        scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
                        scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
         summaryReasoning: summaryReasoning,
-        explainRecommendations: enhanced.detailedBreakdown.recommendations || [],
-        nutritionalGaps: enhanced.detailedBreakdown.nutritionalGaps,
-        supplementRecommendations: supplementRecommendations,
-        breakdown: {
-          petTypeMatch: { 
-            score: enhanced.factors.ingredientSafety.score,
-            weightedContribution: Math.round(enhanced.factors.ingredientSafety.score * enhanced.factors.ingredientSafety.weight),
-            weight: enhanced.factors.ingredientSafety.weight,
-            reason: getReasonWithIssues(enhanced.factors.ingredientSafety)
-          },
-          ageAppropriate: { 
-            score: enhanced.factors.lifeStageFit.score,
-            weightedContribution: Math.round(enhanced.factors.lifeStageFit.score * enhanced.factors.lifeStageFit.weight),
-            weight: enhanced.factors.lifeStageFit.weight,
-            reason: getReasonWithIssues(enhanced.factors.lifeStageFit)
-          },
-          nutritionalFit: { 
-            score: enhanced.factors.nutritionalAdequacy.score,
-            weightedContribution: Math.round(enhanced.factors.nutritionalAdequacy.score * enhanced.factors.nutritionalAdequacy.weight),
-            weight: enhanced.factors.nutritionalAdequacy.weight,
-            reason: getReasonWithIssues(enhanced.factors.nutritionalAdequacy),
-            recommendations: supplementRecommendations // Add recommendations to nutritional fit
-          } as any, // Type assertion needed because recommendations is added dynamically
-          healthCompatibility: { 
-            score: enhanced.factors.healthAlignment.score,
-            weightedContribution: Math.round(enhanced.factors.healthAlignment.score * enhanced.factors.healthAlignment.weight),
-            weight: enhanced.factors.healthAlignment.weight,
-            reason: getReasonWithIssues(enhanced.factors.healthAlignment)
-          },
-          activityFit: {
-            score: enhanced.factors.activityFit.score,
-            weightedContribution: Math.round(enhanced.factors.activityFit.score * enhanced.factors.activityFit.weight),
-            weight: enhanced.factors.activityFit.weight,
-            reason: getReasonWithIssues(enhanced.factors.activityFit)
-          },
-          allergenSafety: { 
-            score: enhanced.factors.allergenSafety.score,
-            weightedContribution: Math.round(enhanced.factors.allergenSafety.score * enhanced.factors.allergenSafety.weight),
-            weight: enhanced.factors.allergenSafety.weight,
-            reason: getReasonWithIssues(enhanced.factors.allergenSafety)
-          },
-        },
-        warnings: enhanced.detailedBreakdown.warnings,
-        strengths: enhanced.detailedBreakdown.healthBenefits,
-        recommendations: enhanced.detailedBreakdown.recommendations,
+        explainRecommendations: [],
+        nutritionalGaps: scored.raw.detailedBreakdown?.nutritionalGaps || [],
+        supplementRecommendations: scored.raw.detailedBreakdown?.recommendations || [],
+        breakdown,
+        warnings: scored.warnings,
+        strengths: scored.strengths,
+        recommendations: [],
+        usesFallbackNutrition: scored.raw.detailedBreakdown?.nutritionalGaps?.includes('fallback-nutrition') || false,
       };
     } catch (error) {
       // Fallback to original scoring
-    console.error('Error calculating compatibility:', error);
-    return null;
+      console.error('Error calculating compatibility:', error);
+      return null;
     }
   }, [recipe, queryPetId, userId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!id) return;
+    if (!modifiedRecipe) return;
+
+    try {
+      sessionStorage.setItem(`recipe_${id}`, JSON.stringify(modifiedRecipe));
+    } catch {
+      // ignore
+    }
+  }, [id, modifiedRecipe]);
 
   const modifierResultForQueryPet = (() => {
     if (!recipe || !queryPetId) return null;
     const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
     if (!pet) return null;
+
     return applyModifiers(recipe, pet as any);
   })();
 
@@ -584,10 +436,10 @@ export default function RecipeDetailPage() {
     }
 
     setIsLoading(true);
-    
+
     // Check if this is a custom meal (starts with "custom_")
     const isCustomMeal = id.startsWith('custom_');
-    
+
     if (isCustomMeal && queryPetId) {
       // Load custom meal
       getCustomMeal(userId, queryPetId, id)
@@ -631,24 +483,26 @@ export default function RecipeDetailPage() {
         setVettedRecipe(vetted);
         setIsLoading(false);
       } else {
-        // Try to load from static recipes (fallback)
-        loadRecipeById(id)
+        // Load persisted generated recipe from Firestore (via API)
+        fetch(`/api/recipes/generated/${encodeURIComponent(id)}`)
+          .then(async (res) => {
+            if (!res.ok) return null;
+            const data = await res.json();
+            return data?.recipe || null;
+          })
           .then((foundRecipe) => {
             if (foundRecipe) {
-              // Always vet the recipe ingredients to ensure all have purchase links
               const vetted = vetRecipeIngredients(foundRecipe);
               setRecipe(vetted);
-              // Always set vettedRecipe so ShoppingList can use vetted products
               setVettedRecipe(vetted);
             } else {
-              // Recipe not found
               setRecipe(null);
               setVettedRecipe(null);
             }
             setIsLoading(false);
           })
           .catch((error) => {
-            console.error('Error loading recipe:', error);
+            console.error('Error loading generated recipe:', error);
             setRecipe(null);
             setVettedRecipe(null);
             setIsLoading(false);
@@ -720,38 +574,33 @@ export default function RecipeDetailPage() {
 
   // Function to add supplement to recipe
   const handleAddSupplement = useCallback((supplement: RecommendedSupplement) => {
-    if (!modifiedRecipe) return;
 
-    const newRecipe = JSON.parse(JSON.stringify(modifiedRecipe));
-    
-    // Initialize supplements array if it doesn't exist
-    if (!newRecipe.supplements) {
-      newRecipe.supplements = [];
-    }
+    const baseRecipe: any = modifiedRecipe || vettedRecipe || recipe;
+    if (!baseRecipe) return;
 
-    // Check if supplement already exists
-    const exists = newRecipe.supplements.some((s: any) => 
-      s.name === supplement.name || s.productName === supplement.productName
-    );
+    const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
 
-    if (exists) {
-      setMessage('This supplement is already in the recipe');
-      setTimeout(() => setMessage(null), 3000);
-      return;
-    }
-
-    // Add supplement
-    const supplementToAdd: any = {
+    const ingredientToAdd: any = {
       id: `supplement-${Date.now()}`,
       name: supplement.name,
       productName: supplement.productName || supplement.name,
       amount: supplement.defaultAmount,
       notes: supplement.benefits,
       asinLink: supplement.asinLink || supplement.amazonLink,
+      amazonLink: supplement.asinLink || supplement.amazonLink,
     };
 
-    newRecipe.supplements.push(supplementToAdd);
-    setModifiedRecipe(newRecipe);
+    newRecipe.ingredients.unshift(ingredientToAdd);
+    const vettedAdded = vetRecipeIngredients(newRecipe);
+    setModifiedRecipe(vettedAdded);
+    setActiveTab('ingredients');
+    setHopAddedLabel(ingredientToAdd.name);
+    setTimeout(() => setHopAddedLabel(null), 700);
+    try {
+      ingredientsTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch {
+      // ignore
+    }
 
     // Recalculate score
     if (queryPetId && scoreForQueryPet) {
@@ -759,7 +608,7 @@ export default function RecipeDetailPage() {
       if (pet) {
         const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
         const petType = normalizePetType(pet.type, 'recipe/[id].recalcScore');
-        const enhancedPet: EnhancedPet = {
+        const scoringPet = {
           id: pet.id,
           name: getRandomName(pet.names),
           type: petType,
@@ -770,11 +619,10 @@ export default function RecipeDetailPage() {
           healthConcerns: pet.healthConcerns || [],
           dietaryRestrictions: pet.allergies || [],
           allergies: pet.allergies || [],
-        };
+        } as any;
 
         try {
-          const newEnhanced = calculateEnhancedCompatibility(newRecipe, enhancedPet);
-          const newScored = scoreWithSpeciesEngine(newRecipe, enhancedPet);
+          const newScored = scoreWithSpeciesEngine(newRecipe, scoringPet);
           const oldScore = scoreForQueryPet.overallScore;
           const scoreDiff = newScored.overallScore - oldScore;
 
@@ -793,7 +641,7 @@ export default function RecipeDetailPage() {
         }
       }
     }
-  }, [modifiedRecipe, queryPetId, scoreForQueryPet, userId]);
+  }, [modifiedRecipe, vettedRecipe, recipe, queryPetId, scoreForQueryPet, userId]);
 
   // Score animation function
   const animateScoreChange = useCallback((from: number, to: number) => {
@@ -866,14 +714,10 @@ export default function RecipeDetailPage() {
     setIsAddingMeal(false);
   }, [recipe, selectedPetId, queryPetId, pets, userId]);
 
-  const selectedPet = selectedPetId
-    ? pets.find((pet) => pet.id === selectedPetId)
-    : null;
-
   const handlePersonalizeRecipe = async () => {
     if (!recipe) return;
 
-    const currentPet = selectedPet || (queryPetId ? pets.find(p => p.id === queryPetId) : null);
+    const currentPet = selectedPetId ? pets.find(p => p.id === selectedPetId) : (queryPetId ? pets.find(p => p.id === queryPetId) : null);
     if (!currentPet) {
       setModifierError('Select a pet profile first.');
       return;
@@ -937,13 +781,11 @@ export default function RecipeDetailPage() {
   // Calculate all shopping items and meal estimate for sidebar (MUST be before early returns)
   const { ingredientShoppingItems, supplementShoppingItems, allShoppingItems, mealEstimate } = useMemo(() => {
     const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
-    const sourceRecipe = baseRecipe ? splitIngredientsAndSupplements(baseRecipe) : null;
-    if (!sourceRecipe) {
+    if (!baseRecipe) {
       return { ingredientShoppingItems: [], supplementShoppingItems: [], allShoppingItems: [], mealEstimate: null };
     }
 
-    const allIngredients = sourceRecipe.ingredients || [];
-    const allSupplements = sourceRecipe.supplements || [];
+    const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
 
     const ingredientsEnrichedWithLinks = allIngredients.map((ing: any) => {
       const existingLink = ing?.asinLink || ing?.amazonLink;
@@ -965,26 +807,6 @@ export default function RecipeDetailPage() {
       };
     });
 
-    const supplementsEnrichedWithLinks = allSupplements.map((supplement: any) => {
-      const existingLink = supplement?.asinLink || supplement?.amazonLink;
-
-      const lookupName = getGenericIngredientName(supplement?.productName || supplement?.name) || supplement?.name;
-      if (!lookupName) return supplement;
-
-      const product = getVettedProduct(lookupName, (baseRecipe as any)?.category);
-      const productLink = product?.asinLink || product?.purchaseLink;
-      const displayName = String(supplement?.name || lookupName);
-      const amazonSearchUrl = ensureSellerId(buildAmazonSearchUrl(displayName));
-      const enrichedLink = productLink ? ensureSellerId(productLink) : (existingLink ? ensureSellerId(existingLink) : undefined);
-
-      return {
-        ...supplement,
-        ...(product?.productName ? { productName: supplement?.productName || product.productName } : {}),
-        ...(enrichedLink ? { amazonLink: enrichedLink, asinLink: enrichedLink } : {}),
-        amazonSearchUrl,
-      };
-    });
-
     const ingredientItems = ingredientsEnrichedWithLinks.map((ing: any) => ({
       id: ing.id,
       name: ing.name,
@@ -993,15 +815,9 @@ export default function RecipeDetailPage() {
       amazonSearchUrl: ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(ing.name)),
     }));
 
-    const supplementItems = supplementsEnrichedWithLinks.map((supplement: any) => ({
-      id: supplement.id || supplement.name,
-      name: supplement.name,
-      amount: supplement.amount || supplement.defaultAmount || '',
-      asinLink: supplement.asinLink || supplement.amazonLink ? ensureSellerId(supplement.asinLink || supplement.amazonLink) : undefined,
-      amazonSearchUrl: supplement.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(supplement.name)),
-    }));
+    const supplementItems: any[] = [];
 
-    const shoppingItems = [...ingredientItems, ...supplementItems];
+    const shoppingItems = [...ingredientItems];
 
     const totalCost = ingredientItems.reduce((sum: number, item: any) => {
       const price = getProductPrice(item.name);
@@ -1105,166 +921,95 @@ export default function RecipeDetailPage() {
           Back to My Pets
         </Link>
 
-        {/* Top-of-page Compatibility Score Banner for selected pet */}
-        {queryPetId && scoreForQueryPet && (
-          <div className="mb-8 rounded-xl border-2 p-6 shadow-md bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 border-emerald-500/80 text-emerald-50">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-              <div className="flex items-center gap-3">
-                {scoreForQueryPet.overallScore >= 80 ? (
-                  <CheckCircle size={28} className="text-emerald-300" />
-                ) : scoreForQueryPet.overallScore >= 60 ? (
-                  <AlertTriangle size={28} className="text-yellow-300" />
-                ) : (
-                  <X size={28} className="text-red-300" />
-                )}
-                <div>
-                  <h3 className="font-semibold text-xl leading-tight">Compatibility Score</h3>
-                  <p className="text-xs md:text-sm opacity-80 mt-0.5">
-                    Overall fit for this recipe and your selected pet profile.
-                  </p>
+        {/* Full-width title card with radial compatibility score */}
+        <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
+          <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+            <div className="min-w-0">
+              <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span>{recipe.name}</span>
+                  {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
+                      Experimental / Topper Only
+                    </span>
+                  )}
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-4xl font-extrabold leading-none">{scoreForQueryPet.overallScore}%</div>
-                <div className="mt-1 text-xs uppercase tracking-wide opacity-75">
-                  {scoreForQueryPet.compatibility}
-                </div>
+              </h1>
+
+              <div className="flex flex-wrap gap-2">
+
+                {recipe.tags?.filter((tag) => tag !== 'Generated').map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-surface-highlight text-gray-300 px-3 py-1 rounded-full text-sm font-medium border border-surface-highlight"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="w-full bg-black/40 rounded-full h-[3px] mb-3 overflow-hidden">
-              <div
-                className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-                  scoreForQueryPet.overallScore >= 80
-                    ? 'bg-emerald-400'
-                    : scoreForQueryPet.overallScore >= 60
-                    ? 'bg-amber-300'
-                    : 'bg-red-400'
-                }`}
-                style={{ width: `${scoreForQueryPet.overallScore}%` }}
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm opacity-90 mt-1">
-              <span>
-                {scoreForQueryPet.overallScore >= 80
-                  ? '✓ Excellent match for your pet'
-                  : scoreForQueryPet.overallScore >= 60
-                  ? '⚠ Good, but could be improved'
-                  : '✗ Needs adjustments for safety'}
-              </span>
+            {queryPetId && scoreForQueryPet && (
               <button
                 type="button"
                 onClick={() => setIsScoreModalOpen(true)}
-                className="text-xs md:text-sm font-medium underline underline-offset-4 hover:opacity-80"
+                className="lg:shrink-0 self-start rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
               >
-                View detailed breakdown
+                {(() => {
+                  const score = Math.max(0, Math.min(100, Number(scoreForQueryPet.overallScore) || 0));
+                  const size = 118;
+                  const stroke = 10;
+                  const r = (size - stroke) / 2;
+                  const c = 2 * Math.PI * r;
+                  const dash = (score / 100) * c;
+                  const color = score >= 80 ? '#34d399' : score >= 60 ? '#fbbf24' : '#f87171';
+                  return (
+                    <div className="flex items-center gap-5">
+                      <div className="relative" style={{ width: size, height: size }}>
+                        <svg width={size} height={size} className="block" style={{ transform: 'rotate(-90deg)' }}>
+                          <circle
+                            cx={size / 2}
+                            cy={size / 2}
+                            r={r}
+                            stroke="rgba(255,255,255,0.10)"
+                            strokeWidth={stroke}
+                            fill="transparent"
+                          />
+                          <circle
+                            cx={size / 2}
+                            cy={size / 2}
+                            r={r}
+                            stroke={color}
+                            strokeWidth={stroke}
+                            fill="transparent"
+                            strokeLinecap="round"
+                            strokeDasharray={`${dash} ${c - dash}`}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <div className="text-3xl font-extrabold text-foreground leading-none">{Math.round(score)}%</div>
+                          <div className="text-xs text-gray-400 mt-1">compatibility</div>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="text-sm font-semibold text-gray-200">Compatibility</div>
+                        <div className="text-xs text-gray-400 mt-1">Tap for details</div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </button>
-            </div>
+            )}
           </div>
-        )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">
-            {/* Recipe Info Card */}
-            <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
-              <div className="p-8">
-                <h1 className="text-4xl font-extrabold text-foreground mb-2 tracking-tight">
-                  <div className="flex items-center gap-3">
-                    <span>{recipe.name}</span>
-                    {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
-                        ⚠️ Experimental / Topper Only
-                      </span>
-                    )}
-                  </div>
-                </h1>
-                {/* Pet Compatibility Rating - Using NEW system */}
-                
-                {queryPetId && scoreForQueryPet && (
-                  <div className="mb-4 flex items-center gap-3">
-                    <button
-                      onClick={() => setIsScoreModalOpen(true)}
-                      className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
-                    >
-                      <div className="flex items-center">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-5 h-5 ${i < Math.round(scoreForQueryPet.overallScore / 20) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-600'}`}
-                          />
-                        ))}
-                      </div>
-                      <div className="text-sm text-gray-300 ml-2">
-                        Compatibility Score: <strong>{scoreForQueryPet.overallScore}%</strong>
-                        <span className="text-xs text-gray-400 ml-2">(weighted average)</span>
-                      </div>
-                    </button>
-                    <Tooltip
-                      content={`Compatibility: ${scoreForQueryPet.compatibility}\n\n${scoreForQueryPet.strengths.length > 0 ? 'Strengths:\n• ' + scoreForQueryPet.strengths.join('\n• ') + '\n' : ''}${scoreForQueryPet.warnings.length > 0 ? '\nWarnings:\n• ' + scoreForQueryPet.warnings.join('\n• ') : ''}`}
-                    >
-                      <div className="text-xs text-gray-500 cursor-help hover:text-gray-300">
-                        Why
-                      </div>
-                    </Tooltip>
-                  </div>
-                )}
-
-                {scoreForQueryPet && 'explainRecommendations' in scoreForQueryPet && (scoreForQueryPet as any).explainRecommendations && (scoreForQueryPet as any).explainRecommendations.length > 0 && (
-                  <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-4">
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg">💡</span>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-amber-900 mb-2">Suggestions:</h4>
-                        <ul className="text-sm text-amber-800 space-y-1">
-                          {(scoreForQueryPet as any).explainRecommendations.map((rec: string, i: number) => (
-                            <li key={i}>• {rec}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Pet Reviews - Positioned directly under meal title */}
-                <div className="mb-6">
-                  <RecipeRatingSection
-                    recipeId={id || ''}
-                    recipeName={recipe.name}
-                    userId={userId}
-                  />
-                </div>
-
-                <div className="mb-8">
-                  <p className="text-gray-300 leading-relaxed text-lg">
-                    {recipe.description}
-                  </p>
-                  {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
-                    <div className="mt-3 p-3 bg-amber-900/20 border border-amber-700/50 rounded-lg">
-                      <p className="text-sm text-amber-200">
-                        <strong>⚠️ Note:</strong> This recipe uses estimated nutrition data. Consult your veterinarian before feeding as a complete meal.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {recipe.tags?.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-surface-highlight text-gray-300 px-3 py-1 rounded-full text-sm font-medium border border-surface-highlight"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-              </div>
-            </div>
-
             {/* Ingredients & Supplements Tabs */}
             <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
+                Shopping List
+              </h3>
               {/* Tab Navigation */}
               <div className="flex border-b border-surface-highlight mb-6">
                 <button
@@ -1291,266 +1036,79 @@ export default function RecipeDetailPage() {
 
               {/* Tab Content */}
               {activeTab === 'ingredients' && (
-                <div className="relative">
-                  {(() => {
-                    const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
-                    const split = baseRecipe ? splitIngredientsAndSupplements(baseRecipe) : { ingredients: [], supplements: [] };
-                    const allIngredients = split.ingredients || [];
-                    
-                    const ingredientsWithASINs = allIngredients.filter((ing: any) => ing.asinLink);
-                    // Filter out ingredients with old amazonLink - only show truly missing ASINs
-                    const ingredientsWithoutASINs = allIngredients.filter((ing: any) => !ing.asinLink && !ing.amazonLink);
-                    
-                    // Get recommended ingredients (from recommendations where isIngredient === true)
-                    const recommendedIngredients = recommendedSupplements.filter((rec: any) => rec.isIngredient === true);
-                    
-                    return (
-                      <div className="space-y-6">
-                        {/* Recommended Ingredients Section */}
-                        {recommendedIngredients.length > 0 && (
-                          <div className="bg-orange-900/20 border border-orange-700/50 rounded-lg p-6">
-                            <h3 className="text-lg font-semibold text-orange-200 mb-4 flex items-center gap-2">
-                              <span>✨</span>
-                              Recommended Ingredients
-                            </h3>
-                            <p className="text-sm text-gray-400 mb-4">
-                              These ingredients can help address nutritional deficiencies in this recipe:
-                            </p>
-                            <div className="space-y-3">
-                              {recommendedIngredients.map((ingredient: any, index: number) => (
-                                <div key={index} className="bg-surface rounded-lg p-4 border border-orange-700/30">
-                                  <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                      <h5 className="font-semibold text-gray-200">{ingredient.name}</h5>
-                                      <p className="text-sm text-gray-400 mt-1">{ingredient.description}</p>
-                                      <p className="text-xs text-orange-300 mt-2">
-                                        Addresses: {ingredient.addressesDeficiency}
-                                      </p>
-                                      <p className="text-sm text-gray-300 mt-2">
-                                        <strong>Benefits:</strong> {ingredient.benefits}
-                                      </p>
-                                      <p className="text-sm text-gray-400 mt-1">
-                                        <strong>Suggested Amount:</strong> {ingredient.defaultAmount}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Ingredients with ASIN links - show buy buttons */}
-                        {ingredientShoppingItems.length > 0 && (
-                          <div className="space-y-6">
-                            <h3 className="text-lg font-semibold text-foreground mb-4">
-                              Recipe Ingredients
-                            </h3>
-                            <ShoppingList
-                              ingredients={ingredientShoppingItems}
-                              recipeName={recipe.name}
-                              userId={userId}
-                            />
-                          </div>
-                        )}
-                        
-                        {/* Ingredients without ASIN links - just display them */}
-                        {ingredientsWithoutASINs.length > 0 && (
-                          <div className="bg-surface-lighter rounded-lg border border-surface-highlight p-6">
-                            <h3 className="text-lg font-semibold text-foreground mb-4">
-                              Additional Ingredients
-                            </h3>
-                            <div className="space-y-2">
-                              {ingredientsWithoutASINs.map((ing: any, index: number) => (
-                                <div
-                                  key={ing.id || index}
-                                  className="flex items-center justify-between p-3 bg-surface rounded-lg border border-surface-highlight"
-                                >
-                                  <div className="flex-1">
-                                    <div className="font-medium text-gray-200">{ing.name}</div>
-                                    {ing.amount && (
-                                      <div className="text-sm text-gray-400">{ing.amount}</div>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-
-              {activeTab === 'supplements' && (
                 <div className="relative space-y-6">
-                  {/* Recommended Supplements Section */}
-                  {(() => {
-                    const baseRecipe = modifiedRecipe || recipe;
-                    const split = baseRecipe ? splitIngredientsAndSupplements(baseRecipe) : { ingredients: [], supplements: [] };
-
-                    // Filter out ingredients - only show supplements
-                    const recommendedSupplementsOnly = recommendedSupplements.filter((rec: any) => !rec.isIngredient);
-                    
-                    if (recommendedSupplementsOnly.length === 0) return null;
-                    
-                    return (
-                      <div className="bg-orange-900/20 border border-orange-700/50 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-orange-200 mb-4 flex items-center gap-2">
-                          <span>💊</span>
-                          Recommended Supplements
-                        </h3>
-                        <p className="text-sm text-gray-400 mb-4">
-                          These supplements can help address nutritional deficiencies in this recipe:
-                        </p>
-                        <div className="space-y-3">
-                          {recommendedSupplementsOnly.map((supplement, index) => {
-                            const isAlreadyAdded = (split.supplements || []).some((s: any) => 
-                              s.name === supplement.name || s.productName === supplement.productName
-                            ) || false;
-                            
-                            return (
-                              <div key={index} className="bg-surface rounded-lg p-4 border border-orange-700/30">
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="flex-1">
-                                    <h5 className="font-semibold text-gray-200">{supplement.name}</h5>
-                                    <p className="text-sm text-gray-400 mt-1">{supplement.description}</p>
-                                    <p className="text-xs text-orange-300 mt-2">
-                                      Addresses: {supplement.addressesDeficiency}
-                                    </p>
-                                    <p className="text-sm text-gray-300 mt-2">
-                                      <strong>Benefits:</strong> {supplement.benefits}
-                                    </p>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                      <strong>Amount:</strong> {supplement.defaultAmount}
-                                    </p>
-                                  </div>
-                                  <button
-                                    onClick={() => handleAddSupplement(supplement)}
-                                    disabled={isAlreadyAdded}
-                                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors whitespace-nowrap ${
-                                      isAlreadyAdded
-                                        ? 'bg-green-600 text-white cursor-not-allowed opacity-50'
-                                        : 'bg-orange-600 text-white hover:bg-orange-700'
-                                    }`}
-                                  >
-                                    {isAlreadyAdded ? '✓ Added' : '+ Add to Recipe'}
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                  <div ref={ingredientsTopRef} />
+                  {hopAddedLabel && (
+                    <div className="pointer-events-none relative">
+                      <div className="hop-toast">
+                        <span className="hop-pill">+ {hopAddedLabel} added</span>
                       </div>
-                    );
-                  })()}
+                      <style jsx>{`
+                        @keyframes hopIn {
+                          0% { transform: translateY(16px) scale(0.96); opacity: 0; }
+                          35% { transform: translateY(-10px) scale(1.02); opacity: 1; }
+                          65% { transform: translateY(2px) scale(1); opacity: 1; }
+                          100% { transform: translateY(0) scale(1); opacity: 0; }
+                        }
+                        .hop-toast {
+                          position: sticky;
+                          top: 0;
+                          z-index: 10;
+                          display: flex;
+                          justify-content: flex-start;
+                        }
+                        .hop-pill {
+                          animation: hopIn 700ms ease-out forwards;
+                          display: inline-flex;
+                          align-items: center;
+                          gap: 8px;
+                          padding: 8px 12px;
+                          border-radius: 9999px;
+                          border: 1px solid rgba(249, 115, 22, 0.35);
+                          background: rgba(249, 115, 22, 0.14);
+                          color: rgb(253, 186, 116);
+                          font-weight: 700;
+                          font-size: 12px;
+                          box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+                        }
+                      `}</style>
+                    </div>
+                  )}
 
-                  {/* Existing Recipe Supplements */}
-                  {(() => {
-                    if (supplementShoppingItems.length > 0) {
-                      return (
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-200 mb-4">
-                            Recipe Supplements
-                          </h3>
-                          <ShoppingList
-                            ingredients={supplementShoppingItems}
-                            recipeName={`${recipe.name} supplements`}
-                            userId={userId}
-                          />
-                        </div>
-                      );
-                    } else {
-                      const recipeSupplements = (modifiedRecipe || recipe)?.supplements || [];
-                      if (recipeSupplements.length === 0 && recommendedSupplements.length === 0) {
-                        return (
-                          <div>
-                            <h3 className="text-2xl font-bold text-foreground mb-6">
-                              Recipe Supplements
-                            </h3>
-                            <div className="text-center py-8 text-gray-500">
-                              <p>This recipe doesn't include specific supplements.</p>
-                              <p className="text-sm mt-2">Check the ingredients tab for all components.</p>
-                            </div>
-                          </div>
-                        );
-                      } else if (recipeSupplements.length > 0) {
-                        return (
-                          <div>
-                            <h3 className="text-2xl font-bold text-foreground mb-6">
-                              Recipe Supplements
-                            </h3>
-                            <div className="space-y-4">
-                              {recipeSupplements.map((supplement: any, index: number) => (
-                                <div key={index} className="bg-surface-lighter rounded-lg p-4 border border-surface-highlight">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <h5 className="font-semibold text-gray-200">{supplement.name}</h5>
-                                      {supplement.productName && supplement.productName !== supplement.name && (
-                                        <div className="text-sm text-gray-400 mt-1">
-                                          (Generic: {supplement.name})
-                                        </div>
-                                      )}
-                                      <p className="text-sm text-gray-400 mt-1">{supplement.notes || 'Health supplement for optimal nutrition'}</p>
-                                    </div>
-                                    <div className="flex items-center gap-4 ml-4">
-                                      {supplement.amount && (
-                                        <span className="text-orange-400 font-bold">
-                                          {supplement.amount}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                    }
-                  })()}
+                  {ingredientShoppingItems.length > 0 ? (
+                    <ShoppingList
+                      ingredients={ingredientShoppingItems}
+                      recipeName={recipe.name}
+                      userId={userId}
+                      showHeader={false}
+                    />
+                  ) : (
+                    <div className="text-center py-12 text-gray-400 border border-dashed border-surface-highlight rounded-xl">
+                      No ingredients available for this recipe.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-            {modifierResultForQueryPet && modifierResultForQueryPet.addedIngredients.length > 0 && (
-              <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
-                <h3 className="text-2xl font-bold text-foreground mb-6 border-b border-surface-highlight pb-4">
-                  Recommended Additions
-                </h3>
-                <ul className="space-y-4">
-                  {modifierResultForQueryPet.addedIngredients.map((add) => (
-                    <li
-                      key={add.name}
-                      className="flex justify-between items-center p-3 bg-green-900/20 rounded-lg transition-colors border border-green-800/30"
-                    >
-                      <div>
-                        <span className="text-gray-200 font-medium text-lg">
-                          {add.name}
-                        </span>
-                        <p className="text-sm text-gray-400">{add.benefit}</p>
-                        <p className="text-xs text-green-400">Added for {add.forConcern}</p>
-                      </div>
-                      <a
-                        href={ensureSellerId(add.amazon)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF9900] hover:bg-[#E07704] text-black rounded-lg transition-all duration-200 text-sm font-semibold whitespace-nowrap hover:shadow-md"
-                      >
-                        <ShoppingCart size={16} />
-                        Buy
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
+            {/* Cost Comparison */}
+            {allShoppingItems.length > 0 &&
+              mealEstimate &&
+              mealEstimate.estimatedMeals > 0 &&
+              mealEstimate.costPerMeal > 0 && (
+                <div className="bg-surface rounded-2xl shadow-lg p-6 mb-8 border border-surface-highlight">
+                  <CostComparison
+                    costPerMeal={mealEstimate.costPerMeal}
+                    totalCost={mealEstimate.totalCost}
+                    estimatedMeals={mealEstimate.estimatedMeals}
+                    exceedsBudget={mealEstimate.exceedsBudget || false}
+                  />
+                </div>
+              )}
           </main>
 
           <aside className="lg:col-span-2 space-y-8">
-            {/* Health Breakdown Panel - Moved to top */}
+            {/* Health Breakdown Panel */}
             {scoreForQueryPet && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
                 <h4 className="text-lg font-bold mb-4 flex items-center justify-center text-gray-200">
@@ -1571,105 +1129,98 @@ export default function RecipeDetailPage() {
                   Proffessor Purfessor has found these individual factors that contribute to the overall compatibility score
                 </p>
                 <div className="space-y-3">
-                  {Object.entries(scoreForQueryPet.breakdown).map(([key, factor]) => {
-                    const f = factor as { score: number; weightedContribution?: number; weight: number; reason?: string };
-                    const score = f.score || 0;
-                    const weightedContribution = f.weightedContribution ?? Math.round(score * (f.weight || 0));
-                    const weight = f.weight || 0;
+                  {Object.entries(scoreForQueryPet.breakdown)
+                    .filter(([key]) => {
+                      const k = String(key || '').toLowerCase();
+                      if (k.includes('life') && k.includes('stage') && k.includes('fit')) return false;
+                      if (k.includes('activity') && k.includes('fit')) return false;
+                      return true;
+                    })
+                    .map(([key, factor]) => {
+                      const f = factor as {
+                        score: number;
+                        weightedContribution?: number;
+                        weight: number;
+                        reason?: string;
+                        recommendations?: any[];
+                      };
 
-                    // Always show all health factors with appropriate colors
-                    let bgColor = 'bg-green-900/20 border-green-700/50';
-                    let icon = '✅';
-                    let textColor = 'text-green-200';
+                      const rawScore = typeof f.score === 'number' && Number.isFinite(f.score) ? f.score : 0;
+                      const score = Math.round(rawScore);
+                      const weightedContribution =
+                        f.weightedContribution ?? Math.round(rawScore * (f.weight || 0));
+                      const weight = f.weight || 0;
 
-                    if (score < 70) {
-                      bgColor = 'bg-yellow-900/20 border-yellow-700/50';
-                      icon = '⚠️';
-                      textColor = 'text-yellow-200';
-                    }
-                    if (score < 40) {
-                      bgColor = 'bg-red-900/20 border-red-700/50';
-                      icon = '❌';
-                      textColor = 'text-red-200';
-                    }
+                      let bgColor = 'bg-green-900/20 border-green-700/50';
+                      let icon = '✅';
+                      let textColor = 'text-green-200';
 
-                    // Format factor name
-                    const factorName = key.replace(/([A-Z])/g, ' $1').toLowerCase();
-                    // Format tooltip content with better structure and spacing
-                    const formattedFactorName = factorName.charAt(0).toUpperCase() + factorName.slice(1);
-                    
-                    // Get recommendations for this factor
-                    let recommendationText = '';
-                    const factorWithRecommendations = f as typeof f & { recommendations?: any[] };
-                    if (key === 'nutritionalFit' && factorWithRecommendations.recommendations && factorWithRecommendations.recommendations.length > 0) {
-                      recommendationText += '\n\n─────────────────────\n\n💊 Recommendations:\n';
-                      const supplements = factorWithRecommendations.recommendations.filter((r: any) => !r.isIngredient);
-                      const ingredients = factorWithRecommendations.recommendations.filter((r: any) => r.isIngredient);
-                      
-                      if (supplements.length > 0) {
-                        recommendationText += `\nCheck Supplements tab for: ${supplements.map((r: any) => r.productName || r.name).join(', ')}`;
+                      if (score < 70) {
+                        bgColor = 'bg-yellow-900/20 border-yellow-700/50';
+                        icon = '⚠️';
+                        textColor = 'text-yellow-200';
                       }
-                      if (ingredients.length > 0) {
-                        recommendationText += `\nCheck Ingredients tab for: ${ingredients.map((r: any) => r.name).join(', ')}`;
+                      if (score < 40) {
+                        bgColor = 'bg-red-900/20 border-red-700/50';
+                        icon = '❌';
+                        textColor = 'text-red-200';
                       }
-                    }
-                    
-                    const tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${score}%\nWeight: ${(weight * 100).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${f.reason ? `💡 ${f.reason}` : 'No additional details available'}${recommendationText}`;
 
-                    return (
-                      <Tooltip key={key} content={tooltipContent} wide={key === 'nutritionalFit'}>
-                        <div className={`flex items-center justify-between p-3 ${bgColor} rounded-lg border cursor-help hover:opacity-80 transition-colors`}>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">{icon}</span>
-                            <span className={`text-sm font-medium capitalize ${textColor}`}>
-                              {factorName}
-                            </span>
+                      const factorNameMap: Record<string, string> = {
+                        safety: 'ingredient safety',
+                        nutrition: 'nutritional adequacy',
+                        health: 'health alignment',
+                        quality: 'ingredient quality',
+                      };
+                      const factorName =
+                        factorNameMap[key] || key.replace(/([A-Z])/g, ' $1').toLowerCase();
+                      const formattedFactorName =
+                        factorName.charAt(0).toUpperCase() + factorName.slice(1);
+
+                      let recommendationText = '';
+                      if (key === 'nutrition' && f.recommendations && f.recommendations.length > 0) {
+                        recommendationText += '\n\n─────────────────────\n\n💊 Recommendations:\n';
+                        const supplements = f.recommendations.filter((r: any) => !r.isIngredient);
+                        const ingredients = f.recommendations.filter((r: any) => r.isIngredient);
+
+                        if (supplements.length > 0) {
+                          recommendationText += `\nCheck Supplements tab for: ${supplements
+                            .map((r: any) => r.productName || r.name)
+                            .join(', ')}`;
+                        }
+                        if (ingredients.length > 0) {
+                          recommendationText += `\nCheck Ingredients tab for: ${ingredients
+                            .map((r: any) => r.name)
+                            .join(', ')}`;
+                        }
+                      }
+
+                      const tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${score}%\nWeight: ${(
+                        weight * 100
+                      ).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${
+                        f.reason ? `💡 ${f.reason}` : 'No additional details available'
+                      }${recommendationText}`;
+
+                      return (
+                        <Tooltip key={key} content={tooltipContent} wide={key === 'nutrition'}>
+                          <div
+                            className={`flex items-center justify-between p-3 ${bgColor} rounded-lg border cursor-help hover:opacity-80 transition-colors`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{icon}</span>
+                              <span className={`text-sm font-medium capitalize ${textColor}`}>{factorName}</span>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className={`text-sm font-bold ${textColor}`}>{score}%</span>
+                              <span className="text-xs text-gray-400">+{weightedContribution} pts</span>
+                            </div>
                           </div>
-                          <div className="flex flex-col items-end">
-                            <span className={`text-sm font-bold ${textColor}`}>
-                              {score}%
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              +{weightedContribution} pts
-                            </span>
-                          </div>
-                        </div>
-                      </Tooltip>
-                    );
-                  })}
+                        </Tooltip>
+                      );
+                    })}
                 </div>
               </div>
             )}
-
-            {/* Cost Comparison */}
-            {allShoppingItems.length > 0 && mealEstimate && mealEstimate.estimatedMeals > 0 && mealEstimate.costPerMeal > 0 && (
-              <CostComparison 
-                costPerMeal={mealEstimate.costPerMeal}
-                totalCost={mealEstimate.totalCost}
-                estimatedMeals={mealEstimate.estimatedMeals}
-                exceedsBudget={mealEstimate.exceedsBudget || false}
-              />
-            )}
-
-
-
-            {/* Action Buttons */}
-            {!isMealAdded && (
-              <div className="bg-surface rounded-2xl shadow-lg p-6 space-y-4 border border-surface-highlight">
-                <button
-                  onClick={handleAddToMealPlan}
-                  disabled={isAddingMeal}
-                  className={`btn btn-success btn-lg btn-full ${
-                    isAddingMeal 
-                      ? 'btn-loading' 
-                      : 'btn-ripple'
-                  }`}
-                >
-                  {isAddingMeal ? 'Adding...' : '+Add Meal'}
-                </button>
-              </div>
-            )}
-
             {/* Preparation Instructions */}
             <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
               <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
@@ -1681,9 +1232,7 @@ export default function RecipeDetailPage() {
                     <span className="flex-shrink-0 w-6 h-6 bg-secondary-900/50 border border-secondary-700 text-secondary-200 rounded-full flex items-center justify-center font-bold mr-3 mt-1 text-sm">
                       {index + 1}
                     </span>
-                    <span className="text-gray-300 text-base leading-relaxed">
-                      {step}
-                    </span>
+                    <span className="text-gray-300 text-base leading-relaxed">{step}</span>
                   </li>
                 ))}
               </ol>

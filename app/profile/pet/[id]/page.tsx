@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
-import { calculateEnhancedCompatibility, type Pet as EnhancedPet, getGrade } from '@/lib/utils/enhancedCompatibilityScoring';
 import { CompatibilityBadge } from '@/components/CompatibilityBadge';
 import { getRandomName } from '@/lib/utils/petUtils';
 import EmojiIcon from '@/components/EmojiIcon';
@@ -15,7 +14,17 @@ import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
 import ScoringProgress from '@/components/ScoringProgress';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
-import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
+import { normalizePetType } from '@/lib/utils/petType';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+import { getProductPrice } from '@/lib/data/product-prices';
+import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
+import { getGenericIngredientName, getVettedProduct } from '@/lib/data/vetted-products';
+
+type RecipeCardEstimate = {
+  costPerMeal: number;
+  estimatedMeals: number;
+  totalCost: number;
+};
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
@@ -78,7 +87,7 @@ export default function RecommendedRecipesPage() {
   const allergiesKey = pet ? JSON.stringify(pet.allergies || []) : '';
   const dislikesKey = pet ? JSON.stringify(pet.dislikes || []) : '';
 
-  const enhancedPet: EnhancedPet | null = useMemo(() => {
+  const scoringPet = useMemo(() => {
     if (!pet) return null;
     const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
     const petType = normalizePetType(pet.type, 'profile/pet/[id].enhancedPet');
@@ -93,7 +102,7 @@ export default function RecommendedRecipesPage() {
       healthConcerns: pet.healthConcerns || [],
       dietaryRestrictions: pet.dietaryRestrictions || [],
       allergies: pet.allergies || [],
-    };
+    } as any;
   }, [pet?.id, pet?.type, pet?.breed, pet?.age, pet?.weightKg, healthConcernsKey, allergiesKey, petDisplayName, pet?.dietaryRestrictions]);
 
   useEffect(() => {
@@ -186,11 +195,13 @@ export default function RecommendedRecipesPage() {
 
     (async () => {
       try {
+        const userId = getCurrentUserId();
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
           body: JSON.stringify({
+            userId,
             species: pet.type,
             count: 9,
             petProfile: {
@@ -302,30 +313,82 @@ export default function RecommendedRecipesPage() {
     };
   }, [pet, regenerateNonce, forceRegenerate, mealsCacheKey, petId]);
 
+  const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
+    const hasAnyFromAPI = engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0;
+    return hasAnyFromAPI ? engineMeals : [];
+  }, [engineMeals]);
+
+  const pricingByRecipeId = useMemo(() => {
+    const next: Record<string, RecipeCardEstimate> = {};
+
+    for (const m of mealsToRender as any[]) {
+      const recipe = m?.recipe as any;
+      const recipeId = recipe?.id;
+      if (!recipeId) continue;
+
+      const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+      const ingredientItems = ingredients.map((ing: any) => ({
+        id: ing.id,
+        name: ing.name,
+        amount: ing.amount || '',
+      }));
+
+      const totalCost = ingredientItems.reduce((sum: number, item: any) => {
+        const price = getProductPrice(item.name);
+        if (typeof price === 'number') return sum + price;
+        return sum;
+      }, 0);
+
+      const roundedTotalCost = Math.round(totalCost * 100) / 100;
+
+      let estimatedMeals = 0;
+      try {
+        const shoppingListItems = ingredientItems.map((item: any) => {
+          const genericName = getGenericIngredientName(item.name) || item.name.toLowerCase();
+          const vettedProduct = getVettedProduct(genericName, recipe?.category);
+          return {
+            id: item.id,
+            name: item.name,
+            amount: item.amount,
+            category: vettedProduct?.category || 'other',
+          };
+        });
+
+        const servings = typeof recipe?.servings === 'number' && recipe.servings > 0 ? recipe.servings : 1;
+        const rawEstimate = calculateMealsFromGroceryList(shoppingListItems, undefined, recipe?.category, true, servings);
+        estimatedMeals = rawEstimate?.estimatedMeals || 0;
+      } catch {
+        estimatedMeals = 0;
+      }
+
+      const costPerMeal = estimatedMeals > 0 ? Math.round((roundedTotalCost / estimatedMeals) * 100) / 100 : 0;
+      if (costPerMeal > 0 && estimatedMeals > 0) {
+        next[recipeId] = { costPerMeal, estimatedMeals, totalCost: roundedTotalCost };
+      }
+    }
+
+    return next;
+  }, [mealsToRender]);
+
   const handleRegenerate = () => {
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(mealsCacheKey);
       } catch {
       }
+      lastGeneratedPetIdRef.current = null;
+      setEngineMeals(null);
     }
-    lastGeneratedPetIdRef.current = null;
-    setEngineMeals(null);
     setEngineError(null);
     setRegenerateNonce(Date.now());
   };
 
   const closeQuotaPopup = () => setShowQuotaPopup(false);
 
-  const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
-    const hasAnyFromAPI = engineMeals && Array.isArray(engineMeals) && engineMeals.length > 0;
-    return hasAnyFromAPI ? engineMeals : [];
-  }, [engineMeals]);
-
   const { scoredMeals, isLoading: isScoring, progress, totalMeals: totalMealsToScore, scoredCount } = useChunkedRecipeScoring(
     mealsToRender,
     null,
-    enhancedPet
+    scoringPet
   );
 
   const sortedMealsToRender = useMemo(() => {
@@ -443,113 +506,131 @@ export default function RecommendedRecipesPage() {
           Back to Profile
         </Link>
 
-        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex flex-col gap-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3">
-              Sherlock Shells is detecting meals for
-              <span className="inline-flex items-center gap-3">
-                <span className="w-14 h-14 rounded-full bg-surface-highlight border border-surface-highlight overflow-hidden inline-flex items-center justify-center align-middle">
-                  <Image
-                    src={getProfilePictureForPetType(pet.type)}
-                    alt={`${petDisplayName} profile`}
-                    width={56}
-                    height={56}
-                    className="w-14 h-14 object-cover"
-                    unoptimized
-                  />
+        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex gap-6">
+          <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1">
+            <span className="relative block w-40 md:w-48 lg:w-56 h-full overflow-hidden rounded-md">
+              <Image
+                src="/images/emojis/Mascots/Sherlock%20Shells/Shell4.jpg"
+                alt="Sherlock Shells"
+                fill
+                sizes="(min-width: 1024px) 224px, (min-width: 768px) 192px, 160px"
+                className="object-cover"
+                unoptimized
+              />
+            </span>
+          </span>
+
+          <div className="flex-1 flex flex-col gap-6 min-w-0">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0">
+                Sherlock Shells is detecting meals for
+                <span className="inline-flex items-center gap-3">
+                  <span className="font-semibold text-2xl">{petDisplayName}</span>
+                  <span className="w-16 h-16 rounded-full bg-surface-highlight border border-surface-highlight overflow-hidden inline-flex items-center justify-center align-middle">
+                    <Image
+                      src={getProfilePictureForPetType(pet.type)}
+                      alt={`${petDisplayName} profile`}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16 object-cover"
+                      unoptimized
+                    />
+                  </span>
                 </span>
-                <span className="font-semibold text-2xl">{petDisplayName}</span>
-              </span>
-            </div>
-            <button
-              onClick={handleRegenerate}
-              disabled={loadingMeals}
-              className="px-6 py-2 rounded-full text-sm font-semibold transition-colors bg-green-800 text-white hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-            >
-              {loadingMeals ? 'Regenerating Meals…' : 'Regenerate Meals'}
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-            <div className="flex-shrink-0 min-w-[220px]">
-              <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
-              <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
-                {pet.breed && (
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-orange-400 mt-0.5">•</span>
-                    <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
-                  </div>
-                )}
-                {pet.age && (
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-orange-400 mt-0.5">•</span>
-                    <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
-                  </div>
-                )}
-                {(pet.weightKg || pet.weight) && (
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-orange-400 mt-0.5">•</span>
-                    <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
-                  </div>
-                )}
-                {pet.activityLevel && (
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-orange-400 mt-0.5">•</span>
-                    <span><strong className="text-gray-200">Activity Level:</strong> {pet.activityLevel}</span>
-                  </div>
-                )}
-                {(pet.dietaryRestrictions || []).length > 0 && (
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-orange-400 mt-0.5">•</span>
-                    <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}</span>
-                  </div>
-                )}
-                {(pet.dislikes || []).length > 0 && (
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-orange-400 mt-0.5">•</span>
-                    <span><strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}</span>
-                  </div>
-                )}
               </div>
             </div>
 
-            <div className="flex-shrink-0 min-w-[180px]">
-              <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Health Concerns</h3>
-              <div className="flex flex-col gap-1.5">
-                {(pet.healthConcerns || []).length > 0 ? (
-                  (pet.healthConcerns || []).map((concern) => (
-                    <div
-                      key={concern}
-                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                    >
-                      {concern.replace(/-/g, ' ')}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-2 py-1 text-gray-500 text-xs italic">
-                    None
-                  </div>
-                )}
-              </div>
-            </div>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+              <button
+                onClick={handleRegenerate}
+                disabled={loadingMeals}
+                className="px-6 py-2 rounded-full text-sm font-semibold transition-colors bg-green-800 text-white hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap"
+              >
+                {loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
+              </button>
 
-            <div className="flex-shrink-0 min-w-[180px]">
-              <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Allergies</h3>
-              <div className="flex flex-col gap-1.5">
-                {(pet.allergies || []).length > 0 ? (
-                  (pet.allergies || []).map((allergy) => (
-                    <div
-                      key={allergy}
-                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                    >
-                      {allergy.replace(/-/g, ' ')}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-2 py-1 text-gray-500 text-xs italic">
-                    None
+              <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1">
+                <div className="flex-shrink-0 min-w-[200px]">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
+                  <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
+                    {pet.breed && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
+                      </div>
+                    )}
+                    {pet.age && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
+                      </div>
+                    )}
+                    {(pet.weightKg || pet.weight) && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
+                      </div>
+                    )}
+                    {pet.activityLevel && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Activity Level:</strong> {pet.activityLevel}</span>
+                      </div>
+                    )}
+                    {(pet.dietaryRestrictions || []).length > 0 && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}</span>
+                      </div>
+                    )}
+                    {(pet.dislikes || []).length > 0 && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span><strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div className="flex-shrink-0 min-w-[160px]">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Health Concerns</h3>
+                  <div className="flex flex-col gap-1.5">
+                    {(pet.healthConcerns || []).length > 0 ? (
+                      (pet.healthConcerns || []).map((concern) => (
+                        <div
+                          key={concern}
+                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                        >
+                          {concern.replace(/-/g, ' ')}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1 text-gray-500 text-xs italic">
+                        None
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex-shrink-0 min-w-[160px]">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Allergies</h3>
+                  <div className="flex flex-col gap-1.5">
+                    {(pet.allergies || []).length > 0 ? (
+                      (pet.allergies || []).map((allergy) => (
+                        <div
+                          key={allergy}
+                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                        >
+                          {allergy.replace(/-/g, ' ')}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1 text-gray-500 text-xs italic">
+                        None
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -564,9 +645,20 @@ export default function RecommendedRecipesPage() {
             })
             .slice(0, 9)
             .map((meal) => {
-              const recipe = meal.recipe;
-              const explanation = meal.explanation;
-              const recipeId = recipe.id;
+              const recipe = (meal as any).recipe;
+              const recipeId = recipe?.id;
+              if (!recipeId) return null;
+
+              const pricing = pricingByRecipeId[recipeId];
+              const costText =
+                typeof pricing?.costPerMeal === 'number' && Number.isFinite(pricing.costPerMeal)
+                  ? `$${pricing.costPerMeal.toFixed(2)}`
+                  : null;
+              const mealsText =
+                typeof pricing?.estimatedMeals === 'number' && Number.isFinite(pricing.estimatedMeals) && pricing.estimatedMeals > 0
+                  ? `${Math.round(pricing.estimatedMeals)}`
+                  : null;
+
               return (
                 <Link
                   key={recipeId}
@@ -578,27 +670,33 @@ export default function RecommendedRecipesPage() {
                   }}
                 >
                   <div className="relative group">
-                    <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/30 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200
-ease-out h-full flex flex-col">
+                    <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/30 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
                       <div className="p-6 flex-1 flex flex-col">
                         <div className="mb-3">
-                          <h3 className="text-xl font-bold text-foreground text-center">
-                            {recipe.name}
-                          </h3>
-                          {enhancedPet && (
+                          <h3 className="text-xl font-bold text-foreground text-center">{recipe.name}</h3>
+                          <div className="mt-2 text-xs text-gray-400 text-center">
+                            {costText ? (
+                              <span>
+                                Est. cost: {costText}/meal
+                                {mealsText ? ` • Est. meals: ${mealsText}` : ''}
+                              </span>
+                            ) : (
+                              <span>Pricing unavailable</span>
+                            )}
+                          </div>
+
+                          {scoringPet && (
                             <div className="mt-4 flex flex-col items-center gap-2">
                               {(() => {
                                 const score =
-                                  'score' in meal && typeof meal.score === 'number'
-                                    ? (meal.score as number)
-                                    : calculateEnhancedCompatibility(recipe, enhancedPet).overallScore;
+                                  'score' in (meal as any) && typeof (meal as any).score === 'number'
+                                    ? ((meal as any).score as number)
+                                    : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
                                 return (
                                   <div>
                                     <CompatibilityRadial score={score} size={140} />
                                     <div className="text-xs text-emerald-100/70 text-center">
-                                      {score >= 60
-                                        ? 'Balanced for your pet'
-                                        : 'Needs adjustments for safety'}
+                                      {score >= 60 ? 'Balanced for your pet' : 'Needs adjustments for safety'}
                                     </div>
                                   </div>
                                 );

@@ -282,7 +282,8 @@ const Step1 = memo(({
   mascotPaths,
   petTypeHandlers,
   onNameChange,
-  onPrevious
+  onPrevious,
+  onNext
 }: {
   formData: FormData;
   error: string | null;
@@ -291,6 +292,7 @@ const Step1 = memo(({
   petTypeHandlers: Record<PetCategory, () => void>;
   onNameChange: (value: string) => void;
   onPrevious?: () => void;
+  onNext?: () => void;
 }) => (
   <div className="space-y-6">
     <h3 className="text-xl font-semibold text-foreground">1. Basic Info</h3>
@@ -331,20 +333,32 @@ const Step1 = memo(({
 
     {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
 
-    {onPrevious && (
-      <div className="flex justify-start pt-6 border-t border-surface-highlight">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onPrevious();
-          }}
-          className="flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors duration-150"
-        >
-          <ChevronLeft className="w-5 h-5 mr-2" />
-          Previous
-        </button>
+    {(onPrevious || onNext) && (
+      <div className="flex justify-between pt-6 border-t border-surface-highlight">
+        {onPrevious && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onPrevious();
+            }}
+            className="flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors duration-150"
+          >
+            <ChevronLeft className="w-5 h-5 mr-2" />
+            Previous
+          </button>
+        )}
+        {onNext && (
+          <button
+            type="button"
+            onClick={onNext}
+            className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 ml-auto"
+          >
+            Next
+            <ChevronRight className="w-5 h-5 ml-2" />
+          </button>
+        )}
       </div>
     )}
   </div>
@@ -356,13 +370,15 @@ const Step2 = memo(({
   error,
   sortedBreeds,
   onBreedSelect,
-  onPrevious
+  onPrevious,
+  onNext
 }: {
   formData: FormData;
   error: string | null;
   sortedBreeds: string[];
   onBreedSelect: (breed: string) => void;
   onPrevious?: () => void;
+  onNext?: () => void;
 }) => (
   <div className="space-y-6">
     <h3 className="text-xl font-semibold text-foreground">2. Choose Breed</h3>
@@ -381,16 +397,28 @@ const Step2 = memo(({
 
     {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
 
-    {onPrevious && (
-      <div className="flex justify-start pt-6 border-t border-surface-highlight">
-        <button
-          type="button"
-          onClick={onPrevious}
-          className="flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors duration-150"
-        >
-          <ChevronLeft className="w-5 h-5 mr-2" />
-          Previous
-        </button>
+    {(onPrevious || onNext) && (
+      <div className="flex justify-between pt-6 border-t border-surface-highlight">
+        {onPrevious && (
+          <button
+            type="button"
+            onClick={onPrevious}
+            className="flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors duration-150"
+          >
+            <ChevronLeft className="w-5 h-5 mr-2" />
+            Previous
+          </button>
+        )}
+        {onNext && (
+          <button
+            type="button"
+            onClick={onNext}
+            className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 ml-auto"
+          >
+            Next
+            <ChevronRight className="w-5 h-5 ml-2" />
+          </button>
+        )}
       </div>
     )}
   </div>
@@ -401,12 +429,14 @@ const Step3 = memo(({
   formData,
   onWeightChange,
   onActivitySelect,
-  onPrevious
+  onPrevious,
+  onNext
 }: {
   formData: FormData;
   onWeightChange: (value: string) => void;
   onActivitySelect: (level: ActivityLevel) => void;
   onPrevious?: () => void;
+  onNext?: () => void;
 }) => (
   <div className="space-y-6">
     <h3 className="text-xl font-semibold text-foreground">3. Weight & Activity</h3>
@@ -440,16 +470,28 @@ const Step3 = memo(({
       </div>
     </div>
 
-    {onPrevious && (
-      <div className="flex justify-start pt-6 border-t border-surface-highlight">
-        <button
-          type="button"
-          onClick={onPrevious}
-          className="flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors duration-150"
-        >
-          <ChevronLeft className="w-5 h-5 mr-2" />
-          Previous
-        </button>
+    {(onPrevious || onNext) && (
+      <div className="flex justify-between pt-6 border-t border-surface-highlight">
+        {onPrevious && (
+          <button
+            type="button"
+            onClick={onPrevious}
+            className="flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors duration-150"
+          >
+            <ChevronLeft className="w-5 h-5 mr-2" />
+            Previous
+          </button>
+        )}
+        {onNext && (
+          <button
+            type="button"
+            onClick={onNext}
+            className="flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors duration-150 ml-auto"
+          >
+            Next
+            <ChevronRight className="w-5 h-5 ml-2" />
+          </button>
+        )}
       </div>
     )}
   </div>
@@ -779,6 +821,30 @@ const AddPetModal = memo(function AddPetModal({ isOpen, onClose, onSubmit, editi
     setStep(prev => Math.max(1, prev - 1));
   }, []);
 
+  const handleNext = useCallback(() => {
+    setError(null);
+    setStep((prev) => {
+      if (prev === 1) {
+        if (!formData.name.trim() || !formData.type) {
+          setError('Please enter a name and select a pet type to continue.');
+          return prev;
+        }
+        return 2;
+      }
+      if (prev === 2) {
+        if (!formData.breed) {
+          setError('Please choose a breed to continue.');
+          return prev;
+        }
+        return 3;
+      }
+      if (prev === 3) {
+        return 4;
+      }
+      return prev;
+    });
+  }, [formData.name, formData.type, formData.breed]);
+
   const handleSubmitInternal = useCallback(() => {
     setError(null);
 
@@ -847,35 +913,7 @@ const AddPetModal = memo(function AddPetModal({ isOpen, onClose, onSubmit, editi
   // Combined auto-advance logic - single effect instead of multiple
   useEffect(() => {
     if (!isOpen) return;
-    
-    let timer: NodeJS.Timeout;
-    
-    if (step === 1 && formData.name.trim() && formData.type) {
-      timer = setTimeout(() => {
-        setStep(2);
-        setError(null);
-      }, 300);
-    } else if (step === 2 && formData.breed) {
-      timer = setTimeout(() => {
-        setStep(3);
-        setError(null);
-      }, 300);
-    } else if (step === 3 && formData.activityLevel) {
-      timer = setTimeout(() => {
-        setStep(4);
-        setError(null);
-      }, 500);
-    } else if (step === 4 && formData.healthConcerns && formData.healthConcerns.length > 0 && false) {
-      // Auto-advance disabled - users can select multiple health concerns before proceeding
-      timer = setTimeout(() => {
-        setStep(5);
-        setError(null);
-      }, 500);
-    }
-    
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
+    return;
   }, [step, formData.name, formData.type, formData.breed, formData.activityLevel, formData.healthConcerns, isOpen]);
 
   if (!isOpen) return null;
@@ -917,6 +955,7 @@ const AddPetModal = memo(function AddPetModal({ isOpen, onClose, onSubmit, editi
                 petTypeHandlers={petTypeHandlers}
                 onNameChange={handleNameChange}
                 onPrevious={step > 1 ? handlePrevious : undefined}
+                onNext={handleNext}
               />
             )}
             {step === 2 && (
@@ -926,6 +965,7 @@ const AddPetModal = memo(function AddPetModal({ isOpen, onClose, onSubmit, editi
                 sortedBreeds={sortedBreeds}
                 onBreedSelect={handleBreedSelect}
                 onPrevious={handlePrevious}
+                onNext={handleNext}
               />
             )}
             {step === 3 && (
@@ -934,6 +974,7 @@ const AddPetModal = memo(function AddPetModal({ isOpen, onClose, onSubmit, editi
                 onWeightChange={handleWeightChange}
                 onActivitySelect={handleActivitySelect}
                 onPrevious={handlePrevious}
+                onNext={handleNext}
               />
             )}
             {step === 4 && (

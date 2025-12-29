@@ -7,12 +7,7 @@ import {
   type RecipeCandidate,
 } from '@/lib/services/speciesMealGeneration';
 
-export const MODEL_FALLBACK_LIST = [
-  'gemini-3-flash-preview',
-  'gemini-1.5-flash-lite',
-  'gemini-1.5-flash',
-  'gemini-2.0-flash',
-] as const;
+export const MODEL_FALLBACK_LIST = ['gemini-2.0-flash', 'gemini-1.5-pro'] as const;
 
 type GeminiRecipePayload = {
   recipes: Array<{
@@ -215,8 +210,8 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('Missing GEMINI_API_KEY');
 
-  const preferred = (process.env.GEMINI_API_MODEL || '').trim();
-  const models = [preferred, ...MODEL_FALLBACK_LIST].filter(Boolean);
+  // Enforce model order: prefer gemini-2.0-flash first, fall back to gemini-1.5-pro only.
+  const models = [...MODEL_FALLBACK_LIST];
 
   const { species, petProfile, allowedIngredientIds, promptText } = params;
   const requestedCount = 10; // Super-request engine is always exactly 10
@@ -436,8 +431,7 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
 }
 
 export function getModelFallbackListForDebug(): string[] {
-  const preferred = (process.env.GEMINI_API_MODEL || '').trim();
-  const models = [preferred, ...MODEL_FALLBACK_LIST].filter(Boolean);
+  const models = [...MODEL_FALLBACK_LIST];
   // De-dupe (preserve order)
   const seen = new Set<string>();
   return models.filter((m) => {

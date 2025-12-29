@@ -1,13 +1,8 @@
 import type { Recipe } from '@/lib/types';
 
 import { normalizePetType, type PetType } from './petType';
-import {
-  calculateEnhancedCompatibility,
-  type EnhancedCompatibilityScore,
-  type Pet as EnhancedPet,
-  getGrade,
-  calculateRecipeNutrition,
-} from './enhancedCompatibilityScoring';
+import { calculateRecipeNutrition } from './recipeNutrition';
+import { AAFCO_STANDARDS } from '@/lib/data/aafco-standards';
 
 import { getBirdStandards } from '@/lib/data/birdNutritionRules';
 import { getPocketPetRequirements } from '@/lib/data/pocketPetRequirements';
@@ -30,19 +25,43 @@ export type SpeciesFactorScores = {
 export type SpeciesScoreResult = {
   species: PetType;
   overallScore: number;
-  grade: EnhancedCompatibilityScore['grade'];
+  grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
   factors: SpeciesFactorScores;
   criticalViolations: string[];
   warnings: string[];
   strengths: string[];
-  raw: EnhancedCompatibilityScore;
+  raw: {
+    overallScore: number;
+    grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
+    factors: Record<string, { score: number; weight: number; reasoning: string; issues: string[]; strengths: string[] }>;
+    detailedBreakdown: {
+      warnings: string[];
+      healthBenefits: string[];
+      nutritionalStrengths: string[];
+      nutritionalGaps: string[];
+      recommendations: string[];
+    };
+  };
 };
 
 export interface SpeciesScoringEngine {
   readonly species: PetType;
   getWeights(): SpeciesScoringWeights;
-  score(recipe: Recipe, pet: EnhancedPet): SpeciesScoreResult;
+  score(recipe: Recipe, pet: SpeciesScoringPet): SpeciesScoreResult;
 }
+
+export type SpeciesScoringPet = {
+  id?: string;
+  name?: string;
+  type: string;
+  breed?: string;
+  age?: number | string;
+  weight?: number | string;
+  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active' | string;
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+};
 
 function clamp01(n: number): number {
   return Math.max(0, Math.min(1, n));
@@ -50,6 +69,18 @@ function clamp01(n: number): number {
 
 function clampScore(n: number): number {
   return Math.max(0, Math.min(100, n));
+}
+
+function getGrade(overallScore: number): SpeciesScoreResult['grade'] {
+  const s = clampScore(overallScore);
+  if (s >= 97) return 'A+';
+  if (s >= 93) return 'A';
+  if (s >= 89) return 'B+';
+  if (s >= 83) return 'B';
+  if (s >= 77) return 'C+';
+  if (s >= 70) return 'C';
+  if (s >= 60) return 'D';
+  return 'F';
 }
 
 function smoothPenalty(
@@ -70,43 +101,124 @@ function penaltyFromMin(value: number, min: number, maxPenalty: number, k = 4): 
   return smoothPenalty(deficit01, maxPenalty, k);
 }
 
-function extractCriticalViolations(enhanced: EnhancedCompatibilityScore): string[] {
-  const warnings = enhanced.detailedBreakdown?.warnings || [];
-  return warnings.filter((w) =>
-    w.toLowerCase().includes('critical nutritional gap:') ||
-    w.toLowerCase().includes(' - avoid') ||
-    w.toLowerCase().includes('outside safe range')
-  );
+function normalizeAgeYears(age: SpeciesScoringPet['age']): number {
+  if (typeof age === 'number' && Number.isFinite(age)) return age;
+  if (typeof age === 'string') {
+    const n = parseFloat(age);
+    if (Number.isFinite(n)) return n;
+    const s = age.toLowerCase();
+    if (s === 'baby' || s === 'puppy' || s === 'kitten') return 0.5;
+    if (s === 'young') return 2;
+    if (s === 'adult') return 5;
+    if (s === 'senior') return 10;
+  }
+  return 5;
 }
 
-function extractWarnings(enhanced: EnhancedCompatibilityScore): string[] {
-  return enhanced.detailedBreakdown?.warnings || [];
+function toTextList(recipe: Recipe): string {
+  const ingredients = (recipe.ingredients || []).map((i: any) => (typeof i === 'string' ? i : i?.name || '')).filter(Boolean);
+  const supplements = ((recipe as any).supplements || []).map((s: any) => String(s?.name || s?.productName || '')).filter(Boolean);
+  return (ingredients.join(' ') + ' ' + supplements.join(' ')).toLowerCase();
 }
 
-function extractStrengths(enhanced: EnhancedCompatibilityScore): string[] {
+function computeBaselineFactors(params: { recipe: Recipe; pet: SpeciesScoringPet; species: PetType }): {
+  factors: SpeciesFactorScores;
+  warnings: string[];
+  strengths: string[];
+  criticalViolations: string[];
+  nutritionalGaps: string[];
+  nutritionalStrengths: string[];
+} {
+  const { recipe, pet, species } = params;
+  const warnings: string[] = [];
   const strengths: string[] = [];
-  const s1 = enhanced.detailedBreakdown?.nutritionalStrengths || [];
-  const s2 = enhanced.detailedBreakdown?.healthBenefits || [];
-  strengths.push(...s1, ...s2);
-  return strengths;
-}
+  const criticalViolations: string[] = [];
+  const nutritionalGaps: string[] = [];
+  const nutritionalStrengths: string[] = [];
 
-function mapFactors(enhanced: EnhancedCompatibilityScore): SpeciesFactorScores {
-  const ingredientSafety = enhanced.factors.ingredientSafety?.score ?? 0;
-  const allergenSafety = enhanced.factors.allergenSafety?.score ?? 0;
-  const nutritionalAdequacy = enhanced.factors.nutritionalAdequacy?.score ?? 0;
-  const healthAlignment = enhanced.factors.healthAlignment?.score ?? 0;
-  const ingredientQuality = enhanced.factors.ingredientQuality?.score ?? 0;
+  const nutrition = calculateRecipeNutrition(recipe);
+  const joined = toTextList(recipe);
+  const ageYears = normalizeAgeYears(pet.age);
+
+  // Safety: basic allergy/restriction string matching.
+  let safety = 100;
+  const avoidList = [...(pet.allergies || []), ...(pet.dietaryRestrictions || [])].map((s) => String(s || '').toLowerCase()).filter(Boolean);
+  for (const avoid of avoidList) {
+    if (avoid && joined.includes(avoid)) {
+      safety = clampScore(safety - 40);
+      warnings.push(`Contains restricted ingredient: ${avoid}`);
+      criticalViolations.push(`Restricted ingredient present: ${avoid}`);
+      break;
+    }
+  }
+
+  // Nutrition: simple heuristics based on existing app assumptions.
+  let nutritionScore = 100;
+
+  const proteinMin = species === 'cat' ? 26 : species === 'dog' ? 18 : 0;
+  if (proteinMin > 0 && nutrition.protein < proteinMin) {
+    const deficit01 = (proteinMin - nutrition.protein) / proteinMin;
+    const penalty = smoothPenalty(deficit01, 30, 2.5);
+    nutritionScore = clampScore(nutritionScore - penalty);
+    warnings.push(`Protein below target (${nutrition.protein.toFixed(1)}% vs min ${proteinMin}%)`);
+    nutritionalGaps.push('protein');
+    if (deficit01 > 0.5) criticalViolations.push('Low protein');
+  } else if (proteinMin > 0) {
+    nutritionalStrengths.push('Protein meets target');
+  }
+
+  const fiberMin = species === 'dog' || species === 'cat' ? 2 : 0;
+  if (fiberMin > 0 && nutrition.fiber < fiberMin) {
+    const deficit01 = (fiberMin - nutrition.fiber) / fiberMin;
+    const penalty = smoothPenalty(deficit01, 12, 2.5);
+    nutritionScore = clampScore(nutritionScore - penalty);
+    warnings.push(`Fiber below target (${nutrition.fiber.toFixed(1)}% vs min ${fiberMin}%)`);
+    nutritionalGaps.push('fiber');
+  }
+
+  if (nutrition.calcium > 0 && nutrition.phosphorus > 0) {
+    const ratio = nutrition.calcium / nutrition.phosphorus;
+    const min = species === 'reptile' || species === 'pocket-pet' ? 1.5 : 1.0;
+    const max = species === 'reptile' || species === 'pocket-pet' ? 2.5 : 2.0;
+    if (ratio < min || ratio > max) {
+      const deficit01 = ratio < min ? (min - ratio) / min : (ratio - max) / max;
+      const penalty = smoothPenalty(deficit01, 30, 4);
+      nutritionScore = clampScore(nutritionScore - penalty);
+      warnings.push(`Calcium:Phosphorus ratio out of range (${ratio.toFixed(2)} vs ${min}-${max})`);
+      nutritionalGaps.push('ca:p');
+    } else {
+      nutritionalStrengths.push('Calcium:Phosphorus ratio in range');
+    }
+  } else {
+    if (nutrition.calcium <= 0) nutritionalGaps.push('calcium');
+    if (nutrition.phosphorus <= 0) nutritionalGaps.push('phosphorus');
+    warnings.push('Calcium/Phosphorus data missing or zero');
+  }
+
+  // Health factor: light penalty for relevant missing supports.
+  let health = 100;
+  const concerns = (pet.healthConcerns || []).map((c) => String(c || '').toLowerCase());
+  if (concerns.length === 0) strengths.push('No health concerns specified');
+
+  // Quality: baseline, can evolve later.
+  let quality = 90;
+  if (ageYears >= 8 && species === 'dog') {
+    // Use existing senior AAFCO as an indicator (no hard penalties here, just a nudge)
+    void AAFCO_STANDARDS;
+    quality = 88;
+  }
 
   return {
-    safety: Math.round((ingredientSafety * 0.7 + allergenSafety * 0.3) * 1000) / 1000,
-    nutrition: nutritionalAdequacy,
-    health: healthAlignment,
-    quality: ingredientQuality,
+    factors: { safety, nutrition: nutritionScore, health, quality },
+    warnings,
+    strengths,
+    criticalViolations,
+    nutritionalGaps: Array.from(new Set(nutritionalGaps)),
+    nutritionalStrengths: Array.from(new Set(nutritionalStrengths)),
   };
 }
 
-abstract class EnhancedCompatibilityBackedEngine implements SpeciesScoringEngine {
+abstract class NativeSpeciesEngine implements SpeciesScoringEngine {
   public abstract readonly species: PetType;
 
   public getWeights(): SpeciesScoringWeights {
@@ -118,15 +230,16 @@ abstract class EnhancedCompatibilityBackedEngine implements SpeciesScoringEngine
     };
   }
 
-  public score(recipe: Recipe, pet: EnhancedPet): SpeciesScoreResult {
-    const enhanced = calculateEnhancedCompatibility(recipe, pet);
-    const factors = mapFactors(enhanced);
+  public score(recipe: Recipe, pet: SpeciesScoringPet): SpeciesScoreResult {
+    const baseline = computeBaselineFactors({ recipe, pet, species: this.species });
+    const factors = baseline.factors;
+    const warnings = baseline.warnings;
+    const strengths = baseline.strengths;
+    const criticalViolations = baseline.criticalViolations;
+    const nutritionalGaps = baseline.nutritionalGaps;
+    const nutritionalStrengths = baseline.nutritionalStrengths;
 
-    const warnings = extractWarnings(enhanced);
-    const strengths = extractStrengths(enhanced);
-    const criticalViolations = extractCriticalViolations(enhanced);
-
-    this.applySpeciesAdjustments(recipe, pet, enhanced, factors, warnings, strengths, criticalViolations);
+    this.applySpeciesAdjustments(recipe, pet, factors, warnings, strengths, criticalViolations, nutritionalGaps, nutritionalStrengths);
 
     const weights = this.getWeights();
     const totalWeight = weights.safety + weights.nutrition + weights.health + weights.quality;
@@ -154,29 +267,48 @@ abstract class EnhancedCompatibilityBackedEngine implements SpeciesScoringEngine
       criticalViolations: [...new Set(criticalViolations)],
       warnings: [...new Set(warnings)],
       strengths: [...new Set(strengths)],
-      raw: enhanced,
+      raw: {
+        overallScore,
+        grade: getGrade(overallScore),
+        factors: {
+          ingredientSafety: { score: clampScore(factors.safety), weight: 0.3, reasoning: '', issues: [], strengths: [] },
+          nutritionalAdequacy: { score: clampScore(factors.nutrition), weight: 0.4, reasoning: '', issues: [], strengths: [] },
+          healthAlignment: { score: clampScore(factors.health), weight: 0.2, reasoning: '', issues: [], strengths: [] },
+          ingredientQuality: { score: clampScore(factors.quality), weight: 0.1, reasoning: '', issues: [], strengths: [] },
+          lifeStageFit: { score: 0, weight: 0, reasoning: '', issues: [], strengths: [] },
+          activityFit: { score: 0, weight: 0, reasoning: '', issues: [], strengths: [] },
+          allergenSafety: { score: clampScore(factors.safety), weight: 0, reasoning: '', issues: [], strengths: [] },
+        },
+        detailedBreakdown: {
+          warnings: [...new Set(warnings)],
+          healthBenefits: [...new Set(strengths)],
+          nutritionalStrengths: [...new Set(nutritionalStrengths)],
+          nutritionalGaps: [...new Set(nutritionalGaps)],
+          recommendations: [],
+        },
+      },
     };
   }
 
   protected applySpeciesAdjustments(
     recipe: Recipe,
-    pet: EnhancedPet,
-    enhanced: EnhancedCompatibilityScore,
+    pet: SpeciesScoringPet,
     factors: SpeciesFactorScores,
     warnings: string[],
     _strengths: string[],
-    criticalViolations: string[]
+    criticalViolations: string[],
+    _nutritionalGaps: string[],
+    _nutritionalStrengths: string[]
   ): void {
     void recipe;
     void pet;
-    void enhanced;
     void factors;
     void warnings;
     void criticalViolations;
   }
 }
 
-class DogScoringEngine extends EnhancedCompatibilityBackedEngine {
+class DogScoringEngine extends NativeSpeciesEngine {
   public readonly species: PetType = 'dog';
 
   public getWeights(): SpeciesScoringWeights {
@@ -189,7 +321,7 @@ class DogScoringEngine extends EnhancedCompatibilityBackedEngine {
   }
 }
 
-class CatScoringEngine extends EnhancedCompatibilityBackedEngine {
+class CatScoringEngine extends NativeSpeciesEngine {
   public readonly species: PetType = 'cat';
 
   public getWeights(): SpeciesScoringWeights {
@@ -203,17 +335,44 @@ class CatScoringEngine extends EnhancedCompatibilityBackedEngine {
 
   protected applySpeciesAdjustments(
     recipe: Recipe,
-    pet: EnhancedPet,
-    _enhanced: EnhancedCompatibilityScore,
+    pet: SpeciesScoringPet,
     factors: SpeciesFactorScores,
     warnings: string[],
     _strengths: string[],
-    criticalViolations: string[]
+    criticalViolations: string[],
+    _nutritionalGaps: string[],
+    _nutritionalStrengths: string[]
   ): void {
     const ingredients = (recipe.ingredients || []).map((i: any) => (typeof i === 'string' ? i : i?.name || '')).filter(Boolean);
     const supplements = ((recipe as any).supplements || []).map((s: any) => String(s?.name || s?.productName || '')).filter(Boolean);
     const joined = (ingredients.join(' ') + ' ' + supplements.join(' ')).toLowerCase();
-    const hasTaurine = joined.includes('taurine') || joined.includes('heart') || joined.includes('organ') || joined.includes('taurine_powder');
+
+    const taurineSupportKeywords = [
+      'taurine',
+      'taurine_powder',
+      'heart',
+      'organ',
+      'liver',
+      'kidney',
+      'chicken',
+      'turkey',
+      'beef',
+      'pork',
+      'lamb',
+      'venison',
+      'rabbit',
+      'duck',
+      'meat',
+      'sardine',
+      'anchovy',
+      'mackerel',
+      'herring',
+      'tuna',
+      'salmon',
+      'trout',
+      'fish',
+    ];
+    const hasTaurine = taurineSupportKeywords.some((k) => joined.includes(k));
 
     if (!hasTaurine) {
       const penalty = smoothPenalty(1, 40, 4);
@@ -224,7 +383,7 @@ class CatScoringEngine extends EnhancedCompatibilityBackedEngine {
   }
 }
 
-class BirdScoringEngine extends EnhancedCompatibilityBackedEngine {
+class BirdScoringEngine extends NativeSpeciesEngine {
   public readonly species: PetType = 'bird';
 
   public getWeights(): SpeciesScoringWeights {
@@ -238,12 +397,13 @@ class BirdScoringEngine extends EnhancedCompatibilityBackedEngine {
 
   protected applySpeciesAdjustments(
     recipe: Recipe,
-    pet: EnhancedPet,
-    _enhanced: EnhancedCompatibilityScore,
+    pet: SpeciesScoringPet,
     factors: SpeciesFactorScores,
     warnings: string[],
     _strengths: string[],
-    criticalViolations: string[]
+    criticalViolations: string[],
+    _nutritionalGaps: string[],
+    _nutritionalStrengths: string[]
   ): void {
     const toxic = findBirdToxicIngredients(recipe);
     if (toxic.length > 0) {
@@ -277,7 +437,7 @@ class BirdScoringEngine extends EnhancedCompatibilityBackedEngine {
   }
 }
 
-class ReptileScoringEngine extends EnhancedCompatibilityBackedEngine {
+class ReptileScoringEngine extends NativeSpeciesEngine {
   public readonly species: PetType = 'reptile';
 
   public getWeights(): SpeciesScoringWeights {
@@ -291,12 +451,13 @@ class ReptileScoringEngine extends EnhancedCompatibilityBackedEngine {
 
   protected applySpeciesAdjustments(
     recipe: Recipe,
-    pet: EnhancedPet,
-    _enhanced: EnhancedCompatibilityScore,
+    pet: SpeciesScoringPet,
     factors: SpeciesFactorScores,
     warnings: string[],
     _strengths: string[],
-    criticalViolations: string[]
+    criticalViolations: string[],
+    _nutritionalGaps: string[],
+    _nutritionalStrengths: string[]
   ): void {
     const ingredients = (recipe.ingredients || []).map((i: any) => (typeof i === 'string' ? i : i?.name || '')).filter(Boolean);
     const supplements = ((recipe as any).supplements || []).map((s: any) => String(s?.name || s?.productName || '')).filter(Boolean);
@@ -312,7 +473,7 @@ class ReptileScoringEngine extends EnhancedCompatibilityBackedEngine {
   }
 }
 
-class PocketPetScoringEngine extends EnhancedCompatibilityBackedEngine {
+class PocketPetScoringEngine extends NativeSpeciesEngine {
   public readonly species: PetType = 'pocket-pet';
 
   public getWeights(): SpeciesScoringWeights {
@@ -326,12 +487,13 @@ class PocketPetScoringEngine extends EnhancedCompatibilityBackedEngine {
 
   protected applySpeciesAdjustments(
     recipe: Recipe,
-    pet: EnhancedPet,
-    _enhanced: EnhancedCompatibilityScore,
+    pet: SpeciesScoringPet,
     factors: SpeciesFactorScores,
     warnings: string[],
     _strengths: string[],
-    criticalViolations: string[]
+    criticalViolations: string[],
+    _nutritionalGaps: string[],
+    _nutritionalStrengths: string[]
   ): void {
     const req = getPocketPetRequirements(pet.breed || '');
 
@@ -357,7 +519,7 @@ class PocketPetScoringEngine extends EnhancedCompatibilityBackedEngine {
   }
 }
 
-export function getSpeciesScoringEngine(pet: EnhancedPet): SpeciesScoringEngine {
+export function getSpeciesScoringEngine(pet: SpeciesScoringPet): SpeciesScoringEngine {
   const species = normalizePetType(pet.type, 'getSpeciesScoringEngine');
   switch (species) {
     case 'dog':
@@ -375,6 +537,6 @@ export function getSpeciesScoringEngine(pet: EnhancedPet): SpeciesScoringEngine 
   }
 }
 
-export function scoreWithSpeciesEngine(recipe: Recipe, pet: EnhancedPet): SpeciesScoreResult {
+export function scoreWithSpeciesEngine(recipe: Recipe, pet: SpeciesScoringPet): SpeciesScoreResult {
   return getSpeciesScoringEngine(pet).score(recipe, pet);
 }

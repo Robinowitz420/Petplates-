@@ -4444,6 +4444,7 @@ function normalizeIngredientName(name: string): string {
     'black beans': 'black beans',
     'green peas': 'green peas',
     'carrots': 'carrots',
+    'carrot': 'carrots',
     'spinach': 'spinach',
     'broccoli': 'broccoli',
     'zucchini': 'zucchini',

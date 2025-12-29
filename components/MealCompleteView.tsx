@@ -6,7 +6,6 @@ import { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
 import MealCompositionList from '@/components/MealCompositionList';
 import { generateMealName } from '@/lib/utils/mealNameGenerator';
 import { saveCustomMeal } from '@/lib/utils/customMealStorage';
-import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
 import type { Recipe } from '@/lib/types';
 import Image from 'next/image';
 import Tooltip from '@/components/Tooltip';
@@ -23,6 +22,8 @@ import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -159,9 +160,7 @@ export default function MealCompleteView({
         } : undefined,
       } as any;
 
-      // Convert pet to EnhancedPet format
-      // Use pet object if available, otherwise use props directly
-      const enhancedPet: EnhancedPet = {
+      const scoringPet = {
         id: pet?.id || petId,
         name: petName,
         type: normalizePetType(petType || pet?.type || 'dog', 'MealCompleteView'),
@@ -172,74 +171,80 @@ export default function MealCompleteView({
         healthConcerns: pet?.healthConcerns || [],
         dietaryRestrictions: pet?.allergies || [],
         allergies: pet?.allergies || [],
-      };
+      } as any;
 
-      const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
-      
-      // Get nutritional recommendations
-      const nutritionalGaps = enhanced.detailedBreakdown.nutritionalGaps || [];
+      const scored = scoreWithSpeciesEngine(recipe, scoringPet);
+
+      const nutrition = calculateRecipeNutrition(recipe);
+      const nutritionalGaps: string[] = [];
+      if ((scoringPet as any).type === 'cat') {
+        const joined = (recipe.ingredients || []).map((i: any) => String(i?.name || '')).join(' ').toLowerCase();
+        if (!joined.includes('taurine') && !joined.includes('heart')) nutritionalGaps.push('taurine');
+      }
+      if (nutrition.protein < 18) nutritionalGaps.push('protein');
+      if (nutrition.fiber < 2) nutritionalGaps.push('fiber');
+      if (nutrition.calcium > 0 && nutrition.phosphorus > 0) {
+        const ratio = nutrition.calcium / nutrition.phosphorus;
+        if (ratio < 1.0 || ratio > 2.0) nutritionalGaps.push('ca:p');
+      } else {
+        if (nutrition.calcium <= 0) nutritionalGaps.push('calcium');
+        if (nutrition.phosphorus <= 0) nutritionalGaps.push('phosphorus');
+      }
+
       const recommendations = getRecommendationsForRecipe(
         nutritionalGaps,
-        enhancedPet.type,
-        enhancedPet.healthConcerns || []
+        (scoringPet as any).type,
+        (scoringPet as any).healthConcerns || []
       );
-      
-      // Format breakdown similar to recipe detail page
-      const getReasonWithIssues = (factor: typeof enhanced.factors.ingredientSafety) => {
-        if (factor.issues.length > 0) {
-          return factor.issues.join('; ') + (factor.reasoning ? ` (${factor.reasoning})` : '');
-        }
-        return factor.reasoning || '';
-      };
 
       setHealthAnalysis({
-        overallScore: enhanced.overallScore,
-        compatibility: enhanced.grade === 'A+' || enhanced.grade === 'A' ? 'excellent' :
-                       enhanced.grade === 'B+' || enhanced.grade === 'B' ? 'good' :
-                       enhanced.grade === 'C+' || enhanced.grade === 'C' ? 'fair' : 'poor',
+        overallScore: scored.overallScore,
+        compatibility: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
+                       scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
+                       scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
         breakdown: {
-          petTypeMatch: { 
-            score: enhanced.factors.ingredientSafety.score,
-            weightedContribution: Math.round(enhanced.factors.ingredientSafety.score * enhanced.factors.ingredientSafety.weight),
-            weight: enhanced.factors.ingredientSafety.weight,
-            reason: getReasonWithIssues(enhanced.factors.ingredientSafety)
+          petTypeMatch: {
+            score: scored.factors.safety,
+            weightedContribution: Math.round(scored.factors.safety * 0.3),
+            weight: 0.3,
+            reason: '',
           },
-          ageAppropriate: { 
-            score: enhanced.factors.lifeStageFit.score,
-            weightedContribution: Math.round(enhanced.factors.lifeStageFit.score * enhanced.factors.lifeStageFit.weight),
-            weight: enhanced.factors.lifeStageFit.weight,
-            reason: getReasonWithIssues(enhanced.factors.lifeStageFit)
+          ageAppropriate: {
+            score: 0,
+            weightedContribution: 0,
+            weight: 0,
+            reason: '',
           },
-          healthCompatibility: { 
-            score: enhanced.factors.healthAlignment.score,
-            weightedContribution: Math.round(enhanced.factors.healthAlignment.score * enhanced.factors.healthAlignment.weight),
-            weight: enhanced.factors.healthAlignment.weight,
-            reason: getReasonWithIssues(enhanced.factors.healthAlignment)
+          healthCompatibility: {
+            score: scored.factors.health,
+            weightedContribution: Math.round(scored.factors.health * 0.2),
+            weight: 0.2,
+            reason: '',
           },
           activityFit: {
-            score: enhanced.factors.activityFit.score,
-            weightedContribution: Math.round(enhanced.factors.activityFit.score * enhanced.factors.activityFit.weight),
-            weight: enhanced.factors.activityFit.weight,
-            reason: getReasonWithIssues(enhanced.factors.activityFit)
+            score: 0,
+            weightedContribution: 0,
+            weight: 0,
+            reason: '',
           },
-          allergenSafety: { 
-            score: enhanced.factors.allergenSafety.score,
-            weightedContribution: Math.round(enhanced.factors.allergenSafety.score * enhanced.factors.allergenSafety.weight),
-            weight: enhanced.factors.allergenSafety.weight,
-            reason: getReasonWithIssues(enhanced.factors.allergenSafety)
+          allergenSafety: {
+            score: 0,
+            weightedContribution: 0,
+            weight: 0,
+            reason: '',
           },
         },
-        warnings: enhanced.detailedBreakdown.warnings,
-        strengths: enhanced.detailedBreakdown.healthBenefits,
+        warnings: scored.warnings,
+        strengths: scored.strengths,
         nutritionalGaps: nutritionalGaps,
         recommendations: recommendations,
       });
 
       // Check badges if score is 100% (Nutrient Navigator)
-      if (enhanced.overallScore === 100 && userId && petId) {
+      if (scored.overallScore === 100 && userId && petId) {
         checkAllBadges(userId, petId, {
           action: 'meal_created',
-          compatibilityScore: enhanced.overallScore,
+          compatibilityScore: scored.overallScore,
         }).catch(err => {
           logger.error('Failed to check badges', err);
         });
@@ -558,100 +563,56 @@ export default function MealCompleteView({
           Back to Pet Profile
         </Link>
 
-        {/* Top-of-page Compatibility Score Banner */}
-        {analysis && (
-          <div
-            className="mb-8 rounded-xl border-2 p-6 shadow-md bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 border-emerald-500/70 text-emerald-50"
-          >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-              <div className="flex items-center gap-3">
-                {displayScore >= 80 ? (
-                  <CheckCircle size={28} strokeWidth={2.5} className="text-emerald-300" />
-                ) : displayScore >= 60 ? (
-                  <AlertTriangle size={28} strokeWidth={2.5} className="text-yellow-300" />
-                ) : (
-                  <XCircle size={28} strokeWidth={2.5} className="text-red-300" />
-                )}
-                <div>
-                  <h3 className="font-semibold text-xl leading-tight">Compatibility Score</h3>
-                  <p className="text-xs md:text-sm opacity-80 mt-0.5">
-                    Overall nutritional and safety fit for {petName || 'your pet'} based on this meal.
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-4xl font-extrabold leading-none">{displayScore}/100</div>
-                <div className="mt-1 text-xs uppercase tracking-wide opacity-75">
-                  {compatibility === 'excellent'
-                    ? 'Excellent match'
-                    : compatibility === 'good'
-                    ? 'Good match'
-                    : compatibility === 'fair'
-                    ? 'Fair match'
-                    : 'Needs adjustments'}
-                </div>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="w-full bg-black/40 rounded-full h-[3px] mb-3 overflow-hidden">
-              <div
-                className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-                  displayScore >= 80
-                    ? 'bg-emerald-400'
-                    : displayScore >= 60
-                    ? 'bg-amber-300'
-                    : 'bg-red-400'
-                }`}
-                style={{ width: `${displayScore}%` }}
-              />
-            </div>
-
-            <div className="text-xs md:text-sm opacity-90 flex flex-wrap items-center gap-2 mt-1">
-              {isCalculatingHealthAnalysis && !healthAnalysis && (
-                <span>Calculating enhanced score...</span>
-              )}
-              {!isCalculatingHealthAnalysis && (
-                <span>
-                  {displayScore >= 80
-                    ? '✓ Excellent match for your pet'
-                    : displayScore >= 60
-                    ? '⚠ Good, but could be improved'
-                    : '✗ Needs adjustments for safety'}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">
             {/* Meal Title Card */}
-          <div className="bg-surface rounded-xl shadow-md overflow-hidden mb-8 border border-surface-highlight">
-            <div className="p-8">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                <input
-                  type="text"
-                  value={mealName}
-                  onChange={(e) => setMealName(e.target.value)}
-                  className="flex-1 px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="Enter meal name..."
-                />
-                <div className="flex flex-col items-center gap-3">
+            <div className="bg-surface rounded-xl shadow-md overflow-hidden mb-8 border border-surface-highlight">
+              <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={mealName}
+                    onChange={(e) => setMealName(e.target.value)}
+                    className="w-full px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="Enter meal name..."
+                  />
+                  <div className="mt-4 flex flex-col gap-3 text-sm text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <span>Compatibility score:</span>
+                      <span
+                        className={`font-semibold ${
+                          compatibility === 'excellent'
+                            ? 'text-green-300'
+                            : compatibility === 'good'
+                            ? 'text-yellow-300'
+                            : 'text-red-300'
+                        }`}
+                      >
+                        {displayScore}% – {compatibility}
+                      </span>
+                    </div>
+                    {isCalculatingHealthAnalysis && !healthAnalysis && (
+                      <span className="text-xs text-gray-500">Calculating enhanced score…</span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-4 lg:min-w-[180px]">
                   <CompatibilityRadial score={displayScore} size={150} />
                   {mealEstimateForCost?.costPerMeal ? (
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-sm font-semibold text-orange-200">
-                      <span>Estimated Cost:</span>
+                      <span>Cost per meal:</span>
                       <span className="text-white">${mealEstimateForCost.costPerMeal.toFixed(2)}</span>
                     </div>
                   ) : null}
                 </div>
               </div>
             </div>
-          </div>
 
             {/* Ingredients & Supplements Tabs */}
             <div className="bg-surface rounded-xl shadow-md p-8 mb-8 border border-surface-highlight">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
+                Shopping List
+              </h3>
               {/* Tab Navigation */}
               <div className="flex border-b border-surface-highlight mb-6">
                 <button
@@ -689,6 +650,7 @@ export default function MealCompleteView({
                         selectedIngredients={selectedIngredients}
                         totalGrams={totalGrams}
                         recommendedServingGrams={analysis?.recommendedServingGrams}
+                        showHeader={false}
                       />
                     )}
                     
@@ -751,6 +713,7 @@ export default function MealCompleteView({
                         selectedIngredients={selectedIngredients}
                         totalGrams={totalGrams}
                         recommendedServingGrams={analysis?.recommendedServingGrams}
+                        showHeader={false}
                       />
                     </div>
                   )}

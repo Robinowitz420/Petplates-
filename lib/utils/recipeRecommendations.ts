@@ -18,10 +18,7 @@ interface Pet {
 
 import { normalizeToSubtype, type Subtype } from './ingredientWhitelists';
 import { getHealthTemplatesForSpecies, applyHealthTemplate, type HealthConcernTemplate } from '@/lib/data/healthConcernTemplates';
-import {
-  calculateEnhancedCompatibility,
-  type Pet as EnhancedPet,
-} from './enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine, type SpeciesScoringPet } from './speciesScoringEngines';
 import { normalizePetCategory, normalizePetType } from './petType';
 
 /**
@@ -361,7 +358,7 @@ export const getRecommendedRecipes = (
       try {
         // Convert pet format for improved scoring
         const numericAge = typeof pet.age === 'number' ? pet.age : (parseFloat(pet.age) || 1);
-        const enhancedPet: EnhancedPet = {
+        const enhancedPet: SpeciesScoringPet = {
           id: pet.id,
           name: pet.name,
           type: normalizePetType(pet.type, 'getRecommendedRecipes'),
@@ -374,7 +371,7 @@ export const getRecommendedRecipes = (
           allergies: pet.allergies || [],
         };
         
-        const enhanced = calculateEnhancedCompatibility(result.recipe, enhancedPet);
+        const enhanced = scoreWithSpeciesEngine(result.recipe, enhancedPet);
         result.enhancedScore = enhanced;
         result.score = enhanced.overallScore;
       } catch (error) {

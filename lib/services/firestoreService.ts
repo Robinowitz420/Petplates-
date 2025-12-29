@@ -15,6 +15,27 @@ import { Pet, CustomMeal } from '@/lib/types';
 import { DatabaseError, ValidationError } from '@/lib/utils/errorHandler';
 import { validatePet, validateCustomMeal } from '@/lib/validation/petSchema';
 
+function safeStringify(value: unknown): string {
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function describeFirestoreError(err: unknown) {
+  const anyErr = err as any;
+  const code = anyErr?.code ? String(anyErr.code) : 'unknown';
+  const message =
+    anyErr?.message
+      ? String(anyErr.message)
+      : err instanceof Error
+        ? err.message
+        : safeStringify(err);
+  return { code, message };
+}
+
 // Helper to get collection ref
 const getCollection = (userId: string, collectionName: string) => {
   const services = getFirebaseServices();
@@ -50,11 +71,16 @@ export async function getPets(userId: string): Promise<Pet[]> {
         return null;
       }
     }).filter(Boolean) as Pet[];
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof DatabaseError) {
-      throw error;
+  } catch (err) {
+    if (err instanceof ValidationError || err instanceof DatabaseError) {
+      throw err;
     }
-    throw new DatabaseError('Failed to fetch pets', error as Error);
+    console.error('[Firestore] getPets failed:', err);
+    const { code, message } = describeFirestoreError(err);
+    throw new DatabaseError(
+      `Failed to fetch pets (${code}): ${message}`,
+      err instanceof Error ? err : undefined
+    );
   }
 }
 
@@ -77,11 +103,16 @@ export async function savePet(userId: string, pet: Pet): Promise<void> {
       ...safePet,
       updatedAt: Timestamp.now(),
     }, { merge: true });
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof DatabaseError) {
-      throw error;
+  } catch (err) {
+    if (err instanceof ValidationError || err instanceof DatabaseError) {
+      throw err;
     }
-    throw new DatabaseError('Failed to save pet', error as Error);
+    console.error('[Firestore] savePet failed:', err);
+    const { code, message } = describeFirestoreError(err);
+    throw new DatabaseError(
+      `Failed to save pet (${code}): ${message}`,
+      err instanceof Error ? err : undefined
+    );
   }
 }
 
@@ -124,11 +155,16 @@ export async function getCustomMeals(userId: string, petId: string): Promise<Cus
         return null;
       }
     }).filter(Boolean) as CustomMeal[];
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof DatabaseError) {
-      throw error;
+  } catch (err) {
+    if (err instanceof ValidationError || err instanceof DatabaseError) {
+      throw err;
     }
-    throw new DatabaseError('Failed to fetch custom meals', error as Error);
+    console.error('[Firestore] getCustomMeals failed:', err);
+    const { code, message } = describeFirestoreError(err);
+    throw new DatabaseError(
+      `Failed to fetch custom meals (${code}): ${message}`,
+      err instanceof Error ? err : undefined
+    );
   }
 }
 
@@ -151,11 +187,16 @@ export async function saveCustomMeal(userId: string, meal: CustomMeal): Promise<
       ...safeMeal,
       updatedAt: Timestamp.now(),
     }, { merge: true });
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof DatabaseError) {
-      throw error;
+  } catch (err) {
+    if (err instanceof ValidationError || err instanceof DatabaseError) {
+      throw err;
     }
-    throw new DatabaseError('Failed to save custom meal', error as Error);
+    console.error('[Firestore] saveCustomMeal failed:', err);
+    const { code, message } = describeFirestoreError(err);
+    throw new DatabaseError(
+      `Failed to save custom meal (${code}): ${message}`,
+      err instanceof Error ? err : undefined
+    );
   }
 }
 

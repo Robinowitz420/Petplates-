@@ -4,7 +4,7 @@
 // Also includes research-based standards for birds, reptiles, and pocket-pets
 
 export interface NutritionalStandard {
-  protein: { min: number; max: number }; // % on dry matter basis
+  protein: { min: number; max?: number }; // % on dry matter basis
   fat: { min: number; max: number }; // % on dry matter basis
   calcium: { min: number; max: number }; // mg per 1000 kcal
   phosphorus: { min: number; max: number }; // mg per 1000 kcal
@@ -42,7 +42,7 @@ export const AAFCO_STANDARDS: {
     
     // Adult Maintenance
     adult: {
-      protein: { min: 18, max: 32 },
+      protein: { min: 18 },
       fat: { min: 5.5, max: 18 },
       calcium: { min: 500, max: 2500 }, // mg per 1000 kcal (0.5% - 2.5% DM)
       phosphorus: { min: 400, max: 1600 }, // mg per 1000 kcal (0.4% - 1.6% DM)

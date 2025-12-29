@@ -7,11 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import type { Recipe } from '@/lib/types';
 import { recipes } from '@/lib/data/recipes-complete';
 import RecipeCard from '@/components/RecipeCard';
-import {
-  calculateEnhancedCompatibility,
-  type Pet as EnhancedPet,
-} from '@/lib/utils/enhancedCompatibilityScoring';
-import type { Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { normalizePetType } from '@/lib/utils/petType';
 
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
@@ -53,7 +49,7 @@ export default function RecommendedRecipesPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const ratingPet: RatingPet | null = useMemo(() => {
+  const scoringPet = useMemo(() => {
     if (!pet) return null;
 
     const ageYears = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
@@ -69,7 +65,7 @@ export default function RecommendedRecipesPage() {
     return {
       id: pet.id,
       name: pet.name,
-      type: normalizePetType(pet.type, 'recipes/recommended/[id]') as RatingPet['type'],
+      type: normalizePetType(pet.type, 'recipes/recommended/[id]'),
       breed: pet.breed,
       age: ageYears,
       weight: Number.isFinite(weightNum) ? weightNum : 25,
@@ -77,28 +73,8 @@ export default function RecommendedRecipesPage() {
       healthConcerns: pet.healthConcerns || [],
       dietaryRestrictions: pet.dietaryRestrictions || [],
       allergies: pet.allergies || [],
-      dislikes: pet.dislikes || [],
-      savedRecipes: pet.savedRecipes || [],
-      names: pet.names,
-      weightKg: pet.weightKg,
-    };
+    } as any;
   }, [pet]);
-
-  // Convert pet data to enhanced compatibility format
-  const enhancedPet: EnhancedPet | null = ratingPet
-    ? {
-        id: ratingPet.id,
-        name: ratingPet.name,
-        type: ratingPet.type,
-        breed: ratingPet.breed,
-        age: ratingPet.age,
-        weight: ratingPet.weight || ratingPet.weightKg || 25,
-        activityLevel: (ratingPet.activityLevel || 'moderate') as EnhancedPet['activityLevel'],
-        healthConcerns: ratingPet.healthConcerns || [],
-        dietaryRestrictions: ratingPet.dietaryRestrictions || [],
-        allergies: ratingPet.allergies || [],
-      }
-    : null;
 
   useEffect(() => {
     if (petId) {
@@ -113,22 +89,15 @@ export default function RecommendedRecipesPage() {
   const scoredRecipes = useMemo(() => {
     if (!pet) return [];
 
-    // Calculate compatibility scores for all recipes against this pet using enhanced scoring
     const scored = recipes.map((recipe) => {
-      if (!enhancedPet) return { recipe, score: null };
+      if (!scoringPet) return { recipe, score: null };
 
       try {
-        const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
+        const speciesScore = scoreWithSpeciesEngine(recipe, scoringPet);
         return {
           recipe,
           score: {
-            compatibilityScore: enhanced.overallScore,
-            stars: Math.round(enhanced.overallScore / 20),
-            reasoning: {
-              goodMatches: enhanced.detailedBreakdown.healthBenefits,
-              conflicts: enhanced.detailedBreakdown.warnings,
-            },
-            enhancedScore: enhanced, // keep for detail view
+            compatibilityScore: speciesScore.overallScore,
           },
         };
       } catch (error) {
@@ -144,7 +113,7 @@ export default function RecommendedRecipesPage() {
     });
 
     return sorted;
-  }, [pet]);
+  }, [pet, scoringPet]);
 
   if (loading) {
     return (
@@ -212,7 +181,7 @@ export default function RecommendedRecipesPage() {
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              pet={ratingPet}
+              pet={pet as any}
             />
           ))}
         </div>

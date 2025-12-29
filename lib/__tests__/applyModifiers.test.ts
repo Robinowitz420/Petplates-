@@ -47,7 +47,7 @@ describe('applyModifiers', () => {
     const result = applyModifiers(mockRecipe as any, mockPetAllergies as any);
     expect(result.addedIngredients.length).toBeGreaterThan(0);
     expect(result.addedIngredients.some((add) => add.forConcern === 'allergies')).toBe(true);
-    expect(result.modifiedRecipe.ingredients.length).toBe(mockRecipe.ingredients.length + result.addedIngredients.length);
+    expect(result.modifiedRecipe.ingredients.length).toBe(mockRecipe.ingredients.length);
   });
 
   it('should add joint-related ingredients for pet with joint issues', () => {

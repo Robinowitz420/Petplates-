@@ -1,6 +1,15 @@
 import React from 'react';
 
-import { getScoreTier, type ScoreTier } from '@/lib/utils/enhancedCompatibilityScoring';
+type ScoreTier = 'perfect' | 'excellent' | 'great' | 'good' | 'fair' | 'poor';
+
+function getScoreTier(score: number): ScoreTier {
+  if (score >= 95) return 'perfect';
+  if (score >= 90) return 'excellent';
+  if (score >= 85) return 'great';
+  if (score >= 80) return 'good';
+  if (score >= 70) return 'fair';
+  return 'poor';
+}
 
 interface CompatibilityBadgeProps {
   compatibility?: 'excellent' | 'good' | 'fair' | 'poor';

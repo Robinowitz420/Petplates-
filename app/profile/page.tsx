@@ -20,13 +20,15 @@ import EmojiIcon from '@/components/EmojiIcon';
 import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
-import { calculateEnhancedCompatibility, calculateRecipeNutrition, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
+import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import type { Recipe } from '@/lib/types';
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import PetBadges from '@/components/PetBadges';
 import BadgeToggle from '@/components/BadgeToggle';
 import Tooltip from '@/components/Tooltip';
 import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
+import { ensureFirebaseAuth, isFirebaseAvailable } from '@/lib/utils/firebaseConfig';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -516,8 +518,8 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
 // =================================================================
 
 export default function MyPetsPage() {
-  const userId = SIMULATED_USER_ID;
-  const { setUserId } = useVillageStore();
+  const [userId, setFirebaseUserId] = useState<string>('');
+  const { setUserId: setVillageUserId } = useVillageStore();
   const router = useRouter();
 
   const [pets, setPets] = useState<ProfilePet[]>([]);
@@ -597,12 +599,44 @@ const buildWeeklyPlan = useCallback(
     return rotation;
   };
 
+  // Initialize Firebase auth (when configured) and use auth.uid as the canonical userId.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        if (!isFirebaseAvailable()) {
+          // Keep existing local/dev behavior.
+          if (cancelled) return;
+          setFirebaseUserId(SIMULATED_USER_ID);
+          setVillageUserId(SIMULATED_USER_ID);
+          return;
+        }
+
+        const uid = await ensureFirebaseAuth();
+        if (cancelled) return;
+        setFirebaseUserId(uid);
+        setVillageUserId(uid);
+      } catch (e) {
+        console.error('Failed to initialize Firebase Auth', e);
+        if (cancelled) return;
+        // No silent localStorage fallback for prod; keep page usable in dev.
+        setFirebaseUserId('');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setVillageUserId]);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   // Load pets function - reusable
   const loadPets = useCallback(async () => {
+    if (!userId) return;
     const loadedPets = await getPets(userId);
     // Normalize names: convert name field to names array if needed
     const normalizedPets = loadedPets.map((p: Pet) => ({
@@ -637,6 +671,7 @@ const buildWeeklyPlan = useCallback(
   // Load saved active pet ID from localStorage on mount (before pets load)
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if (!userId) return;
       localStorage.setItem('last_user_id', userId);
       
       // Load saved active pet ID - this will be validated once pets are loaded
@@ -656,6 +691,7 @@ const buildWeeklyPlan = useCallback(
 
   // Load pets and expose user id for other pages (recipe detail, etc.)
   useEffect(() => {
+    if (!userId) return;
     if (typeof window !== 'undefined') {
       localStorage.setItem('last_user_id', userId);
     }
@@ -664,8 +700,8 @@ const buildWeeklyPlan = useCallback(
     loadPets();
 
     // Initialize village store with userId
-    setUserId(userId);
-  }, [userId, setUserId, loadPets]);
+    setVillageUserId(userId);
+  }, [userId, setVillageUserId, loadPets]);
 
   // Refresh pets when page becomes visible (user returns to tab)
   useEffect(() => {
@@ -1438,7 +1474,7 @@ const buildWeeklyPlan = useCallback(
                                     let compatibilityScore: number | null = null;
                                     if (activePet && recipeForScoring) {
                                       try {
-                                        const enhancedPet: EnhancedPet = {
+                                        const scoringPet = {
                                           id: activePet.id,
                                           name: getPrimaryName(activePet.names || []) || 'Pet',
                                           type: normalizePetType(activePet.type, 'profile.page.saved.compat'),
@@ -1449,8 +1485,8 @@ const buildWeeklyPlan = useCallback(
                                           healthConcerns: activePet.healthConcerns || [],
                                           dietaryRestrictions: activePet.allergies || [],
                                           allergies: activePet.allergies || [],
-                                        };
-                                        const result = calculateEnhancedCompatibility(recipeForScoring, enhancedPet);
+                                        } as any;
+                                        const result = scoreWithSpeciesEngine(recipeForScoring, scoringPet);
                                         compatibilityScore = result.overallScore;
                                       } catch (error) {
                                         console.error('Error calculating compatibility:', error);

@@ -125,6 +125,7 @@ function safeGetIngredient(key: string) {
   // Return a minimal placeholder instead of throwing - allows scoring to continue
   // Ingredient not found in composition DB - using placeholder
   return {
+    __notFound: true,
     protein: 0,
     fat: 0,
     calcium: 0,
@@ -147,8 +148,8 @@ function sumRecipeTotals(selections: IngredientSelection[]) {
     
     const ing = safeGetIngredient(sel.key);
     
-    // Track if ingredient was found in DB (placeholder has name === 'Unknown')
-    if (ing.name === 'Unknown' || !ing.name) {
+    // Track if ingredient was found in DB
+    if ((ing as any).__notFound) {
       ingredientsNotFound.push(sel.key);
     }
     
@@ -706,7 +707,68 @@ function computeRecommendedServingGrams(nutrients: Record<string, number>, total
 export function generateCustomMealAnalysis(petProfile: PetProfile, selections: IngredientSelection[]): MealAnalysis {
   // Defensive: ensure selections are valid
   const safeSelections = (selections || []).filter(s => s && s.key && s.grams && s.grams > 0);
+  if (safeSelections.length === 0) {
+    return {
+      nutrients: {},
+      totalRecipeGrams: 0,
+      energyDensityKcalPerGram: 0,
+      recommendedServingGrams: 0,
+      score: 0,
+      breakdown: {
+        nutrientCoverageScore: 0,
+        toxicityPenalty: 0,
+        balanceVarietyScore: 0,
+      },
+      toxicityWarnings: [],
+      allergyWarnings: [],
+      nutrientWarnings: [],
+      suggestions: [],
+      dmNutrients: {},
+      dryMatterPercent: 0,
+      totalWeight_g: 0,
+      caToPratio: undefined,
+      deficiencies: ['No ingredients selected'],
+      excesses: [],
+      adequacies: [],
+      scoreBreakdown: {
+        baseScore: 0,
+        nutritionPenalty: 0,
+        balancePenalty: 0,
+      },
+    };
+  }
   const { totals, totalGrams, ingredientsNotFound } = sumRecipeTotals(safeSelections);
+
+  if (ingredientsNotFound.length > 0) {
+    return {
+      nutrients: totals,
+      totalRecipeGrams: totalGrams,
+      energyDensityKcalPerGram: 0,
+      recommendedServingGrams: 0,
+      score: 0,
+      breakdown: {
+        nutrientCoverageScore: 0,
+        toxicityPenalty: 0,
+        balanceVarietyScore: 0,
+      },
+      toxicityWarnings: [],
+      allergyWarnings: [],
+      nutrientWarnings: [],
+      suggestions: [],
+      dmNutrients: {},
+      dryMatterPercent: 0,
+      totalWeight_g: totalGrams,
+      caToPratio: undefined,
+      deficiencies: [`Error: Ingredient not found: ${ingredientsNotFound[0]}`],
+      excesses: [],
+      adequacies: [],
+      scoreBreakdown: {
+        baseScore: 0,
+        nutritionPenalty: 0,
+        balancePenalty: 0,
+      },
+    };
+  }
   
   // Log ingredients not found in DB
   if (ingredientsNotFound && ingredientsNotFound.length > 0) {
@@ -734,6 +796,9 @@ export function generateCustomMealAnalysis(petProfile: PetProfile, selections: I
 
   // Suggestions
   const suggestions = generatePetSpecificSuggestions(petProfile, totals, totalGrams, toxicityWarnings, allergyWarnings);
+  if (suggestions.length === 0) {
+    suggestions.push({ message: 'Consider adding more ingredient variety for a more balanced meal.', confidence: 'low' });
+  }
 
   // Calculate Ca:P ratio for legacy compatibility
   const ca = totals['ca_mg'] ?? 0;

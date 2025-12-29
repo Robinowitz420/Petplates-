@@ -61,6 +61,6 @@ describe('scoreRecipe', () => {
   it('should handle missing nutrition info', () => {
     const noNutritionRecipe = { ...mockRecipe, nutritionalInfo: undefined };
     const result = scoreRecipe(noNutritionRecipe as any, mockPet as any);
-    expect(result.matchScore).toBeLessThan(100);
+    expect(result.matchScore).toBeLessThanOrEqual(90);
   });
 });

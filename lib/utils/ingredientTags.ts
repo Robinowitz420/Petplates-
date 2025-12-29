@@ -1,8 +1,16 @@
-import { normalizeIngredientKey } from '@/lib/utils/enhancedCompatibilityScoring';
 import { checkBirdToxicIngredients, calculatePelletPercentage } from '@/lib/data/birdNutritionRules';
 import { calculateHayPercentage, checkVitaminCSources } from '@/lib/data/pocketPetRequirements';
 
 export type IngredientLike = string | { name?: string; amount?: string | number };
+
+function normalizeIngredientKey(value: unknown): string {
+  return String(value ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/_/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '_');
+}
 
 function parseAmountToGrams(amount: unknown, fallback = 100): number {
   if (typeof amount === 'number' && Number.isFinite(amount)) return amount;

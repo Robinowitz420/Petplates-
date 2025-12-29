@@ -1,11 +1,12 @@
 // scripts/diagnose-scoring.ts
 // Diagnostic script to identify exact scoring bottlenecks for perfect pets
 
-import { calculateEnhancedCompatibility, type Pet } from '@/lib/utils/enhancedCompatibilityScoring';
-import { recipes } from '@/lib/data/recipes-complete';
+import type { Recipe } from '../lib/types';
+import { scoreWithSpeciesEngine, type SpeciesScoringPet } from '../lib/utils/speciesScoringEngines';
+import { recipes } from '../lib/data/recipes-complete';
 
 async function diagnoseScoring() {
-  const perfectDog: Pet = {
+  const perfectDog: SpeciesScoringPet = {
     id: 'test-perfect-dog',
     name: 'Test Dog',
     type: 'dog',
@@ -21,32 +22,33 @@ async function diagnoseScoring() {
   console.log('=== SCORING DIAGNOSIS ===\n');
   
   const scores = recipes
-    .filter(r => r.category === 'dogs')
-    .map(recipe => {
+    .filter((r: Recipe) => r.category === 'dogs')
+    .map((recipe: Recipe) => {
       try {
-        const result = calculateEnhancedCompatibility(recipe, perfectDog);
+        const result = scoreWithSpeciesEngine(recipe, perfectDog);
         return { recipe, result };
       } catch (error) {
         console.error(`Error scoring recipe ${recipe.name}:`, error);
         return null;
       }
     })
-    .filter((item): item is { recipe: typeof recipes[0]; result: ReturnType<typeof calculateEnhancedCompatibility> } => item !== null)
+    .filter((item): item is { recipe: Recipe; result: ReturnType<typeof scoreWithSpeciesEngine> } => item !== null)
     .sort((a, b) => b.result.overallScore - a.result.overallScore);
   
   // Top 10 scores
   console.log('Top 10 Scores:');
-  scores.slice(0, 10).forEach(({ recipe, result }, i) => {
+  scores.slice(0, 10).forEach(({ recipe, result }, i: number) => {
     console.log(`\n${i + 1}. ${recipe.name}: ${result.overallScore}%`);
     console.log('   Factors:');
-    Object.entries(result.factors).forEach(([key, factor]) => {
-      const contribution = factor.score * (factor.weight || 0);
-      const status = factor.score < 100 ? '⚠️' : '✅';
-      console.log(`     ${status} ${key}: ${factor.score}% (weight: ${((factor.weight || 0) * 100).toFixed(1)}%, contributes: ${contribution.toFixed(1)}%)`);
-      if (factor.score < 100 && factor.issues.length > 0) {
-        console.log(`        Issues: ${factor.issues.slice(0, 2).join(', ')}`);
-      }
+    Object.entries(result.factors).forEach(([key, score]) => {
+      const s = typeof score === 'number' ? score : 0;
+      const status = s < 100 ? '⚠️' : '✅';
+      console.log(`     ${status} ${key}: ${s}%`);
     });
+
+    if (result.warnings.length > 0) {
+      console.log(`   Warnings: ${result.warnings.slice(0, 3).join(' | ')}`);
+    }
   });
   
   const maxScore = scores.length > 0 ? scores[0].result.overallScore : 0;
@@ -57,11 +59,16 @@ async function diagnoseScoring() {
     console.log('\nBottlenecks preventing 100%:');
     if (scores.length > 0) {
       const topRecipe = scores[0];
-      Object.entries(topRecipe.result.factors).forEach(([key, factor]) => {
-        if (factor.score < 100) {
-          console.log(`  - ${key}: ${factor.score}% (${factor.reasoning})`);
+      Object.entries(topRecipe.result.factors).forEach(([key, score]) => {
+        const s = typeof score === 'number' ? score : 0;
+        if (s < 100) {
+          console.log(`  - ${key}: ${s}%`);
         }
       });
+
+      if (topRecipe.result.warnings.length > 0) {
+        console.log(`\nWarnings: ${topRecipe.result.warnings.join(' | ')}`);
+      }
     }
   } else {
     console.log('\n✅ SUCCESS: Found recipes scoring 95%+ for perfect pet');

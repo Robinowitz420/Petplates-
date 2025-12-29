@@ -80,7 +80,7 @@ describe('getFallbackAmazonSearchLink', () => {
   test('creates search link with affiliate tag', () => {
     const link = getFallbackAmazonSearchLink('chicken breast organic');
     expect(link).toContain('amazon.com/s');
-    expect(link).toContain('k=chicken%20breast%20organic');
+    expect(link).toMatch(/k=chicken(%20|\+)breast(%20|\+)organic/);
     expect(link).toContain('tag=robinfrench-20');
   });
 

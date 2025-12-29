@@ -29,6 +29,20 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.*
+.env.local*
+.env*.backup
+.env*.bak
+.env.local.backup
+!.env.example
+!.env.sample
+
+# Firebase service account keys (never commit)
+*firebase-adminsdk*.json
+*-firebase-adminsdk-*.json
+
+# Local credential files
+**/GOOGLE_APPLICATION_CREDENTIALS
 
 # vercel
 .vercel/

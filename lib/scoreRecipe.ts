@@ -3,11 +3,7 @@ import { dogModifiers } from './data/nutrition-dog-modifiers';
 import { catModifiers } from './data/nutrition-cat-modifiers';
 import { matchesSpecies } from './utils/recipeRecommendations';
 import { normalizePetCategory, normalizePetType } from './utils/petType';
-import {
-  calculateEnhancedCompatibility,
-  type Pet as EnhancedPet,
-} from './utils/enhancedCompatibilityScoring';
-import { scoreWithSpeciesEngine } from './utils/speciesScoringEngines';
+import { scoreWithSpeciesEngine, type SpeciesScoringPet } from './utils/speciesScoringEngines';
 
 export interface ScoreReasoning {
   goodMatches: string[];
@@ -43,10 +39,16 @@ function toLower(s?: string) {
 }
 
 function containsAllergen(recipe: Recipe, allergies: string[] = []) {
+  const normalizedAllergies = Array.isArray(allergies)
+    ? allergies.map((a) => toLower(a)).filter(Boolean)
+    : [];
+  // If the pet has no allergies listed, do not apply a generic common-allergen blocker.
+  // Common-allergen matching is only a fallback *when allergies are present but imprecise*.
+  if (normalizedAllergies.length === 0) return null;
+
   const ingredientText = (recipe.ingredients || []).map((i) => toLower(i.name)).join(' ');
   // if user specified allergies explicitly, check those first
-  for (const a of allergies) {
-    const aLow = toLower(a);
+  for (const aLow of normalizedAllergies) {
     if (!aLow) continue;
     if (ingredientText.includes(aLow)) return aLow;
     // check substring matches for common names
@@ -345,9 +347,10 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
 
   // Map into 0..100 proportionally
   const compatibilityScore = Math.round((score / possible) * 100);
+  const cappedCompatibilityScore = !hasNutrition ? Math.min(compatibilityScore, 90) : compatibilityScore;
   const stars = mapScoreToStars(compatibilityScore);
 
-  return { compatibilityScore, matchScore: compatibilityScore, stars, reasoning, conflictCount, hasHydrationSupport };
+  return { compatibilityScore: cappedCompatibilityScore, matchScore: cappedCompatibilityScore, stars, reasoning, conflictCount, hasHydrationSupport };
 }
 
 /**
@@ -355,7 +358,7 @@ export function scoreRecipe(recipe: Recipe, pet: any): ScoreResult {
  * Keeps the original ScoreResult shape for drop-in use.
  */
 export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
-  const enhancedPet: EnhancedPet = {
+  const enhancedPet: SpeciesScoringPet = {
     id: pet.id,
     name: pet.name,
     type: normalizePetType(pet.type, 'scoreRecipeImproved'),
@@ -369,20 +372,19 @@ export function scoreRecipeImproved(recipe: Recipe, pet: any): ScoreResult {
   };
 
   const scored = scoreWithSpeciesEngine(recipe, enhancedPet);
-  const result = scored.raw;
   const stars = Math.round(scored.overallScore / 20);
   return {
     compatibilityScore: scored.overallScore,
     matchScore: scored.overallScore, // Keep for backward compatibility
     stars: stars,
     reasoning: {
-      goodMatches: result.detailedBreakdown.healthBenefits,
-      conflicts: result.detailedBreakdown.warnings,
+      goodMatches: scored.strengths,
+      conflicts: scored.warnings,
     },
-    conflictCount: result.detailedBreakdown.warnings.length,
+    conflictCount: scored.warnings.length,
     hasHydrationSupport: false,
     summaryReasoning: `Compatibility score: ${scored.overallScore}% (${scored.grade})`,
-    recommendations: result.detailedBreakdown.recommendations,
+    recommendations: [],
   };
 }
 
