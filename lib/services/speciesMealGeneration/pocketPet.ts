@@ -86,7 +86,7 @@ function constraintsBlock(ctx: SpeciesEngineContext, subtype: PocketSubtype): st
 
   return [
     'HARD CONSTRAINTS:',
-    `- Output must include exactly ${ctx.requestedCount} recipes in the recipes array.`,
+    `- Output must include up to ${ctx.requestedCount} recipes in the recipes array.`,
     '- Each recipe MUST be a plausible single portion for a pocket-pet (not a snack).',
     '- Amounts must be in grams (e.g., "15g").',
     `- Total meal mass MUST be >= ${minMass}g (sum of ingredient grams).`,

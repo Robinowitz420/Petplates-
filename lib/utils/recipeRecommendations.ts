@@ -18,10 +18,8 @@ interface Pet {
 
 import { normalizeToSubtype, type Subtype } from './ingredientWhitelists';
 import { getHealthTemplatesForSpecies, applyHealthTemplate, type HealthConcernTemplate } from '@/lib/data/healthConcernTemplates';
-import {
-  calculateEnhancedCompatibility,
-  type Pet as EnhancedPet,
-} from './enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine, type SpeciesScoringPet } from './speciesScoringEngines';
+import { normalizePetCategory, normalizePetType } from './petType';
 
 /**
  * Check if recipe matches species/subtype
@@ -29,12 +27,14 @@ import {
  */
 export function matchesSpecies(recipe: Recipe, pet: Pet): boolean {
   // Exact match
-  if (recipe.category === pet.type) return true;
+  const petCategory = normalizePetCategory(pet.type, 'matchesSpecies');
+  const petType = normalizePetType(pet.type, 'matchesSpecies');
+  if (recipe.category === petCategory || recipe.category === petType) return true;
   
   // Subtype matching for exotics (Beta feature)
-  const subtype = normalizeToSubtype(pet.type as any, pet.breed);
+  const subtype = normalizeToSubtype(petType as any, pet.breed);
   
-  if (pet.type === 'bird') {
+  if (petType === 'bird') {
     const largeBirds = ['parrot', 'cockatoo', 'african grey', 'macaw', 'conure', 'quaker'];
     const isLargeBird = largeBirds.some(lb => (pet.breed || '').toLowerCase().includes(lb));
     
@@ -46,7 +46,7 @@ export function matchesSpecies(recipe: Recipe, pet: Pet): boolean {
     if (recipe.category === 'bird_small' && !isLargeBird) return true;
   }
   
-  if (pet.type === 'reptile') {
+  if (petType === 'reptile') {
     // Allow generic reptile recipes
     if (recipe.category === 'reptiles' || recipe.category === 'reptile') return true;
     
@@ -61,7 +61,7 @@ export function matchesSpecies(recipe: Recipe, pet: Pet): boolean {
     }
   }
   
-  if (pet.type === 'pocket-pet') {
+  if (petType === 'pocket-pet') {
     // Allow generic pocket-pet recipes
     if (recipe.category === 'pocket-pets' || recipe.category === 'pocket-pet') return true;
     
@@ -167,6 +167,7 @@ export const getRecommendedRecipes = (
   customRecipes?: Recipe[]
 ): RecipeRecommendation[] => {
   const { type, age, healthConcerns } = pet;
+  const petType = normalizePetType(type, 'getRecommendedRecipes');
   // Normalize health concerns to match recipe database format
   const normalizedConcerns = (healthConcerns || []).map(normalizeHealthConcern);
   const results: RecipeRecommendation[] = [];
@@ -200,11 +201,11 @@ export const getRecommendedRecipes = (
   
   // Tier 2: Subtype + health concern template match - ALWAYS run when concerns exist
   if (normalizedConcerns.length > 0) {
-    const subtype = normalizeToSubtype(type as any, pet.breed);
+    const subtype = normalizeToSubtype(petType as any, pet.breed);
     
     // Process each health concern (use normalized version)
     normalizedConcerns.forEach(concern => {
-      const templates = getHealthTemplatesForSpecies(type, pet.breed, concern);
+      const templates = getHealthTemplatesForSpecies(petType, pet.breed, concern);
       
       templates.forEach(template => {
         // Find recipes that match subtype and age (can be adapted)
@@ -292,8 +293,8 @@ export const getRecommendedRecipes = (
   results.push(...tier4);
   
   // Tier 5: Subtype match (generic) - Fill up to minCount for exotics
-  if (results.length < minCount && ['bird', 'reptile', 'pocket-pet', 'birds', 'reptiles', 'pocket-pets'].includes(type)) {
-    const subtype = normalizeToSubtype(type as any, pet.breed);
+  if (results.length < minCount && ['bird', 'reptile', 'pocket-pet', 'birds', 'reptiles', 'pocket-pets'].includes(petType)) {
+    const subtype = normalizeToSubtype(petType as any, pet.breed);
     const tier5 = allRecipes.filter(r => {
       const matchesSubtype = r.category === subtype || 
         (r.category && r.category.includes(subtype.split('_')[0])) ||
@@ -313,15 +314,15 @@ export const getRecommendedRecipes = (
   
   // Tier 6: Health template-based suggestions (always ensure something shows)
   // Also run if we're below minCount for exotics
-  if ((results.length === 0 || (results.length < minCount && ['bird', 'reptile', 'pocket-pet', 'birds', 'reptiles', 'pocket-pets'].includes(type))) && normalizedConcerns.length > 0) {
-    const templates = getHealthTemplatesForSpecies(type, pet.breed, normalizedConcerns[0]);
+  if ((results.length === 0 || (results.length < minCount && ['bird', 'reptile', 'pocket-pet', 'birds', 'reptiles', 'pocket-pets'].includes(petType))) && normalizedConcerns.length > 0) {
+    const templates = getHealthTemplatesForSpecies(petType, pet.breed, normalizedConcerns[0]);
     if (templates.length > 0) {
       // Create a placeholder recipe from template
       const template = templates[0];
       const placeholderRecipe: Recipe = {
         id: `template-${template.id}`,
         name: template.name,
-        category: type,
+        category: petType,
         ageGroup: [petAgeGroup],
         healthConcerns: [normalizedConcerns[0]],
         description: template.description,
@@ -357,10 +358,10 @@ export const getRecommendedRecipes = (
       try {
         // Convert pet format for improved scoring
         const numericAge = typeof pet.age === 'number' ? pet.age : (parseFloat(pet.age) || 1);
-        const enhancedPet: EnhancedPet = {
+        const enhancedPet: SpeciesScoringPet = {
           id: pet.id,
           name: pet.name,
-          type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+          type: normalizePetType(pet.type, 'getRecommendedRecipes'),
           breed: pet.breed,
           age: numericAge,
           weight: pet.weight || 10,
@@ -370,7 +371,7 @@ export const getRecommendedRecipes = (
           allergies: pet.allergies || [],
         };
         
-        const enhanced = calculateEnhancedCompatibility(result.recipe, enhancedPet);
+        const enhanced = scoreWithSpeciesEngine(result.recipe, enhancedPet);
         result.enhancedScore = enhanced;
         result.score = enhanced.overallScore;
       } catch (error) {

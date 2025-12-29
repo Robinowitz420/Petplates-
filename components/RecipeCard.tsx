@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
 
-import { calculateEnhancedCompatibility, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
-import type { Pet } from '@/lib/utils/petRatingSystem';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+import type { Pet } from '@/lib/types';
 import RecipeScoreModal from './RecipeScoreModal';
-
+import { normalizePetType } from '@/lib/utils/petType';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -27,30 +27,30 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Calculate compatibility rating if pet is provided
-  const enhancedScore = pet ? (() => {
-    const enhancedPet: EnhancedPet = {
-      id: pet.id,
-      name: pet.name,
-      type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
-      breed: pet.breed,
-      age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
-      weight: pet.weight || pet.weightKg || 10,
-      activityLevel: pet.activityLevel,
-      healthConcerns: pet.healthConcerns || [],
-      dietaryRestrictions: pet.dietaryRestrictions || [],
-      allergies: pet.allergies || [],
-    };
-    return calculateEnhancedCompatibility(recipe, enhancedPet);
-  })() : null;
+  const speciesScore = pet
+    ? (() => {
+        const ageYears = typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : 1;
+        const weightNum =
+          typeof pet.weightKg === 'number'
+            ? pet.weightKg
+            : typeof pet.weight === 'string'
+              ? parseFloat(pet.weight) || 10
+              : 10;
 
-  const compatibilityRating = enhancedScore ? {
-    overallScore: enhancedScore.overallScore,
-    compatibility: gradeToCompatibility(enhancedScore.grade),
-    breakdown: enhancedScore.factors,
-    warnings: enhancedScore.detailedBreakdown.warnings,
-    strengths: enhancedScore.detailedBreakdown.healthBenefits,
-    recommendations: enhancedScore.detailedBreakdown.recommendations,
-  } : null;
+        return scoreWithSpeciesEngine(recipe, {
+          id: pet.id,
+          name: pet.name || (pet.names?.[0] ?? 'Pet'),
+          type: normalizePetType(pet.type, 'RecipeCard'),
+          breed: pet.breed || '',
+          age: ageYears,
+          weight: Number.isFinite(weightNum) ? weightNum : 10,
+          activityLevel: pet.activityLevel || 'moderate',
+          healthConcerns: pet.healthConcerns || [],
+          dietaryRestrictions: pet.dietaryRestrictions || [],
+          allergies: pet.allergies || [],
+        } as any);
+      })()
+    : null;
 
   return (
     <>
@@ -82,7 +82,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
           </p>
 
           {/* Compact compatibility score bar (unified with recipe detail view) */}
-          {enhancedScore && (
+          {speciesScore && (
             <div className="mb-4 rounded-lg border border-emerald-500/60 bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 p-3 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex flex-col">
@@ -95,10 +95,10 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                 </div>
                 <div className="text-right">
                   <div className="text-lg font-bold leading-none text-emerald-50">
-                    {enhancedScore.overallScore}%
+                    {speciesScore.overallScore}%
                   </div>
                   <div className="mt-0.5 text-[10px] uppercase tracking-wide text-emerald-100/80">
-                    {gradeToCompatibility(enhancedScore.grade)} match
+                    {gradeToCompatibility(speciesScore.grade)} match
                   </div>
                 </div>
               </div>
@@ -106,21 +106,21 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
               <div className="w-full bg-black/40 rounded-full h-[3px] mb-2 overflow-hidden">
                 <div
                   className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-                    enhancedScore.overallScore >= 80
+                    speciesScore.overallScore >= 80
                       ? 'bg-emerald-400'
-                      : enhancedScore.overallScore >= 60
+                      : speciesScore.overallScore >= 60
                       ? 'bg-amber-300'
                       : 'bg-red-400'
                   }`}
-                  style={{ width: `${enhancedScore.overallScore}%` }}
+                  style={{ width: `${speciesScore.overallScore}%` }}
                 />
               </div>
 
               <div className="flex items-center justify-between text-[11px] text-emerald-100/80">
                 <span>
-                  {enhancedScore.overallScore >= 80
+                  {speciesScore.overallScore >= 80
                     ? '✓ Excellent match for your pet'
-                    : enhancedScore.overallScore >= 60
+                    : speciesScore.overallScore >= 60
                     ? '⚠ Good, but could be improved'
                     : '✗ Needs adjustments for safety'}
                 </span>

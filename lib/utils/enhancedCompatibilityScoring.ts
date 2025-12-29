@@ -4,12 +4,13 @@
 
 import type { Recipe } from '@/lib/types';
 import { getIngredientComposition, INGREDIENT_COMPOSITIONS } from '@/lib/data/ingredientCompositions';
-import { getSpeciesCompatibility, shouldAvoid, shouldLimit, normalizeSpecies } from './ingredientCompatibility';
+import { getSpeciesCompatibility, getMaxInclusionPercent, shouldAvoid, shouldLimit, normalizeSpecies } from './ingredientCompatibility';
 import { AAFCO_NUTRIENT_PROFILES, validateCriticalNutrients } from '@/lib/data/aafco-standards';
 import { getAvianStandards, AVIAN_NUTRITION_STANDARDS } from '@/lib/data/avian-nutrition-standards';
 import { getReptileStandards, validateReptileNutrition } from '@/lib/data/reptile-nutrition';
 import { getFallbackNutrition } from './nutritionFallbacks';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
+import { calculateRecipeNutrition, normalizeIngredientKey } from './recipeNutrition';
 import {
   getHealthConcernBenefits,
   normalizeHealthConcern,
@@ -124,27 +125,7 @@ function applyIngredientAliases(s: string): string {
   return v;
 }
 
-// IMPORTANT: use the same normalization everywhere we look up compatibility/composition.
-// This fixes "egg (hard-boiled)" / "Bell Peppers (high vitamin C)" missing their data.
-function normalizeIngredientKey(name: string): string {
-  let s = (name || '').toLowerCase().trim();
-  if (!s) return '';
-
-  s = s.replace(/[()]/g, ' ');
-  s = s.replace(/[\/.,]/g, ' ');
-  s = s.replace(/[^a-z0-9\s-]+/g, ' ');
-  s = s.replace(/\s+/g, ' ').trim();
-
-  const words = s
-    .split(' ')
-    .filter(Boolean)
-    .map((w) => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w));
-
-  s = words.join(' ');
-  s = applyIngredientAliases(s);
-
-  return s.replace(/\s+/g, '_');
-}
+export { normalizeIngredientKey };
 
 function inferReptileDiet(breedRaw: string): 'herbivore' | 'carnivore' | 'omnivore' {
   const breed = (breedRaw || '').toLowerCase();
@@ -417,6 +398,23 @@ function calculateIngredientSafety(
   let avoidCount = 0;
   const issues: string[] = [];
   const strengths: string[] = [];
+  let maxInclusionPenaltyTotal = 0;
+
+  const parseIngredientGrams = (ing: any): number => {
+    if (!ing || typeof ing === 'string') return 0;
+    const raw = (ing as any).amount;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const match = raw.match(/[\d.]+/);
+      if (match) {
+        const parsed = parseFloat(match[0]);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+    }
+    return 0;
+  };
+
+  const totalGrams = ingredients.reduce((sum: number, ing: any) => sum + parseIngredientGrams(ing), 0);
 
   // Check for banned ingredients
   const bannedIngredients = (pet as any).bannedIngredients || [];
@@ -426,6 +424,7 @@ function calculateIngredientSafety(
     const ingName = typeof ing === 'string' ? ing : ing.name;
     const ingKey = normalizeIngredientKey(ingName);
     const ingNameLower = ingName.toLowerCase();
+    const ingGrams = parseIngredientGrams(ing);
     
     // Check if ingredient is banned by user
     const isBanned = bannedLower.some((banned: string) => 
@@ -453,6 +452,29 @@ function calculateIngredientSafety(
       // Unknown ingredient - assume safe but note
       safeCount++;
     }
+
+    const maxInclusion = getMaxInclusionPercent(ingKey, normalizedSpecies);
+    if (
+      typeof maxInclusion === 'number' &&
+      Number.isFinite(maxInclusion) &&
+      maxInclusion > 0 &&
+      totalGrams > 0 &&
+      ingGrams > 0
+    ) {
+      const inclusion = ingGrams / totalGrams;
+      if (inclusion > maxInclusion) {
+        const over = inclusion - maxInclusion;
+        const overPct = over * 100;
+        const maxPct = maxInclusion * 100;
+        issues.push(`${ingName} exceeds max inclusion (${maxPct.toFixed(0)}%) for ${pet.type}s (~${overPct.toFixed(0)}% over)`);
+
+        // Apply a graduated penalty. This is intentionally strong for "supplement" ingredients like liver.
+        // Example: 10% over -> -20 points, capped at -40.
+        const penalty = Math.min(40, over * 200);
+        cautionCount += Math.min(2, Math.ceil(over * 10));
+        maxInclusionPenaltyTotal += penalty;
+      }
+    }
   }
 
   // Calculate score with gradual, proportional penalties for better granularity
@@ -469,6 +491,10 @@ function calculateIngredientSafety(
   const cautionRatio = cautionCount / totalIngredients;
   const cautionPenalty = cautionCount * 5 * (1 + cautionRatio); // More gradual
   score -= Math.min(cautionPenalty, 30); // Max -30 for cautions (reduced from -40)
+
+  if (Number.isFinite(maxInclusionPenaltyTotal) && maxInclusionPenaltyTotal > 0) {
+    score -= Math.min(40, maxInclusionPenaltyTotal);
+  }
   
   score = Math.max(0, score);
 
@@ -1412,267 +1438,7 @@ function analyzeNutrition(
   return { gaps, strengths };
 }
 
-/**
- * Calculate recipe nutrition from ingredients
- * Returns nutrition values as percentages (dry matter basis)
- */
-export function calculateRecipeNutrition(
-  recipe: Recipe,
-  options?: { includeBreakdown?: boolean }
-): {
-  protein: number;
-  fat: number;
-  fiber: number;
-  calcium: number;
-  phosphorus: number;
-  calories: number;
-  source: 'real' | 'estimated';
-  usesFallbackNutrition?: boolean;
-  fallbackIngredients?: string[];
-  breakdown?: Array<{
-    name: string;
-    amountG: number;
-    ingKey: string;
-    used: 'composition' | 'fallback' | 'forced_calcium';
-    calciumMg: number;
-    phosphorusMg: number;
-  }>;
-} {
-  // Check if recipe has pre-calculated nutritional data (from custom meal analysis)
-  const nutritionalCalc = (recipe as any).nutritionalCalculation;
-  if (nutritionalCalc) {
-    const totalGrams = nutritionalCalc.totalGrams || 100;
-    // Convert from grams to percentages
-    return {
-      protein: totalGrams > 0 ? ((nutritionalCalc.protein_g || 0) / totalGrams) * 100 : 0,
-      fat: totalGrams > 0 ? ((nutritionalCalc.fat_g || 0) / totalGrams) * 100 : 0,
-      fiber: totalGrams > 0 ? ((nutritionalCalc.fiber_g || 0) / totalGrams) * 100 : 0,
-      calcium: totalGrams > 0 ? (((nutritionalCalc.ca_mg || 0) / 1000) / totalGrams) * 100 : 0,
-      phosphorus: totalGrams > 0 ? (((nutritionalCalc.p_mg || 0) / 1000) / totalGrams) * 100 : 0,
-      calories: totalGrams > 0 ? ((nutritionalCalc.calories_kcal || nutritionalCalc.kcal || 0) / totalGrams) * 100 : 0,
-      source: 'real',
-    };
-  }
-
-  const ingredients = recipe.ingredients || [];
-  const supplements = (recipe as any).supplements || [];
-  
-  let totalProtein = 0;
-  let totalFat = 0;
-  let totalFiber = 0;
-  let totalCalcium = 0;
-  let totalPhosphorus = 0;
-  let totalCalories = 0;
-  let totalWeight = 0;
-  let realDataCount = 0;
-  const fallbackIngredients: string[] = [];
-  const breakdown: Array<{
-    name: string;
-    amountG: number;
-    ingKey: string;
-    used: 'composition' | 'fallback' | 'forced_calcium';
-    calciumMg: number;
-    phosphorusMg: number;
-  }> = [];
-
-  // Helper function to map supplement names to ingredient composition keys
-  const mapSupplementToCompositionKey = (supplementName: string): string | null => {
-    const lower = supplementName.toLowerCase();
-    // Map common supplement names to ingredient composition keys
-    if (lower.includes('taurine')) return 'taurine_powder';
-    if (lower.includes('eggshell') || lower.includes('egg shell') || lower.includes('egg shells')) return 'calcium_carbonate';
-    if (lower.includes('calcium') && (lower.includes('carbonate') || lower.includes('supplement'))) return 'calcium_carbonate';
-    if (lower.includes('omega') || lower.includes('fish oil') || lower.includes('krill') || lower.includes('salmon oil')) return 'fish_oil';
-    // Note: psyllium, probiotics, vitamins don't have composition data yet
-    // They can still be added but won't contribute to macro calculations
-    return null;
-  };
-
-  // Process ingredients
-  for (const ingredient of ingredients) {
-    const name = typeof ingredient === 'string' ? ingredient : ingredient.name;
-    const amount = typeof ingredient === 'string' ? 100 : (ingredient.amount ? parseFloat(String(ingredient.amount).replace(/[^0-9.]/g, '')) : 100);
-
-    const ingKey = normalizeIngredientKey(name);
-    const composition = getIngredientComposition(ingKey);
-    
-    if (composition && composition.protein !== undefined) {
-      // Check if composition uses fallback (has needsReview and source is estimated_fallback)
-      const usesFallback = (composition as any).needsReview === true && 
-                          (composition.source === 'estimated_fallback' || composition.source?.includes('fallback'));
-      
-      if (usesFallback) {
-        fallbackIngredients.push(name);
-      }
-      
-      totalProtein += (composition.protein || 0) * (amount / 100);
-      totalFat += (composition.fat || 0) * (amount / 100);
-      totalFiber += (composition.fiber || 0) * (amount / 100);
-      totalCalcium += (composition.calcium || 0) * (amount / 100);
-      totalPhosphorus += (composition.phosphorus || 0) * (amount / 100);
-      totalCalories += (composition.kcal || 0) * (amount / 100);
-      totalWeight += amount;
-      realDataCount++;
-
-      if (options?.includeBreakdown) {
-        breakdown.push({
-          name,
-          amountG: amount,
-          ingKey,
-          used: 'composition',
-          calciumMg: (composition.calcium || 0) * (amount / 100),
-          phosphorusMg: (composition.phosphorus || 0) * (amount / 100),
-        });
-      }
-    } else {
-      if (ingKey === 'calcium_carbonate') {
-        const forced = { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0 };
-        fallbackIngredients.push(name);
-        totalProtein += (forced.protein || 0) * (amount / 100);
-        totalFat += (forced.fat || 0) * (amount / 100);
-        totalFiber += (forced.fiber || 0) * (amount / 100);
-        totalCalcium += (forced.calcium || 0) * (amount / 100);
-        totalPhosphorus += (forced.phosphorus || 0) * (amount / 100);
-        totalCalories += (forced.kcal || 0) * (amount / 100);
-        totalWeight += amount;
-        realDataCount++;
-
-        if (options?.includeBreakdown) {
-          breakdown.push({
-            name,
-            amountG: amount,
-            ingKey,
-            used: 'forced_calcium',
-            calciumMg: (forced.calcium || 0) * (amount / 100),
-            phosphorusMg: (forced.phosphorus || 0) * (amount / 100),
-          });
-        }
-        continue;
-      }
-
-      // Try fallback nutrition
-      const fallback = getFallbackNutrition(name);
-      const nameLower = name.toLowerCase();
-
-      const explicitFallback =
-        ingKey === 'calcium_carbonate'
-          ? { protein: 0, fat: 0, fiber: 0, calcium: 40000, phosphorus: 0, kcal: 0 }
-          : (ingKey === 'fish_oil' || ingKey === 'olive_oil')
-          ? { protein: 0, fat: 100, fiber: 0, calcium: 0, phosphorus: 0, kcal: 900 }
-          : ingKey === 'pellets_fortified'
-          ? { protein: 18, fat: 6, fiber: 8, calcium: 1200, phosphorus: 600, kcal: 360 }
-          : null;
-
-      const genericFallback =
-        (nameLower.includes('pellet') || ingKey.includes('pellet'))
-          ? { protein: 14, fat: 5, fiber: 8, calcium: 800, phosphorus: 500, kcal: 350 }
-          : (nameLower.includes('hay') || ingKey.includes('hay'))
-          ? { protein: 8, fat: 2, fiber: 30, calcium: 500, phosphorus: 250, kcal: 200 }
-          : null;
-
-      const chosenFallback = explicitFallback || fallback || genericFallback;
-      if (chosenFallback) {
-        fallbackIngredients.push(name);
-        totalProtein += (chosenFallback.protein || 0) * (amount / 100);
-        totalFat += (chosenFallback.fat || 0) * (amount / 100);
-        totalFiber += (chosenFallback.fiber || 0) * (amount / 100);
-        totalCalcium += (chosenFallback.calcium || 0) * (amount / 100);
-        totalPhosphorus += (chosenFallback.phosphorus || 0) * (amount / 100);
-        totalCalories += (chosenFallback.kcal || 0) * (amount / 100);
-        totalWeight += amount;
-        realDataCount++;
-
-        if (options?.includeBreakdown) {
-          breakdown.push({
-            name,
-            amountG: amount,
-            ingKey,
-            used: 'fallback',
-            calciumMg: (chosenFallback.calcium || 0) * (amount / 100),
-            phosphorusMg: (chosenFallback.phosphorus || 0) * (amount / 100),
-          });
-        }
-      }
-    }
-  }
-
-  // Process supplements - add their nutritional contributions
-  for (const supplement of supplements) {
-    const name = supplement.name || supplement.productName || '';
-    if (!name) continue;
-    
-    // Map supplement name to ingredient composition key
-    const compositionKey = mapSupplementToCompositionKey(name);
-    if (!compositionKey) continue;
-    
-    // Get composition data
-    const composition = getIngredientComposition(compositionKey);
-    if (!composition) continue;
-    
-    // Supplements are typically added in small amounts (mg or grams)
-    // Parse amount from supplement.amount (e.g., "250mg", "1g", "As directed")
-    let supplementAmount = 0;
-    const amountStr = supplement.amount || supplement.defaultAmount || '';
-    if (amountStr) {
-      // Extract numeric value
-      const numericMatch = amountStr.match(/([\d.]+)/);
-      if (numericMatch) {
-        supplementAmount = parseFloat(numericMatch[1]);
-        // Convert mg to grams if needed
-        if (amountStr.toLowerCase().includes('mg')) {
-          supplementAmount = supplementAmount / 1000;
-        }
-      } else {
-        // Default supplement amount (typically 1-5g for powders)
-        supplementAmount = 2; // 2g default
-      }
-    } else {
-      supplementAmount = 2; // 2g default
-    }
-    
-    // Add supplement nutrition to totals
-    // Supplements contribute nutrients but typically don't add significant weight to the meal
-    // We'll add them proportionally to the existing meal weight
-    if (totalWeight > 0) {
-      // Add supplement nutrients as if they were part of the meal
-      totalCalcium += (composition.calcium || 0) * (supplementAmount / 100);
-      totalPhosphorus += (composition.phosphorus || 0) * (supplementAmount / 100);
-      totalProtein += (composition.protein || 0) * (supplementAmount / 100);
-      totalFat += (composition.fat || 0) * (supplementAmount / 100);
-      totalFiber += (composition.fiber || 0) * (supplementAmount / 100);
-      totalCalories += (composition.kcal || 0) * (supplementAmount / 100);
-      // Add supplement weight to total (small contribution)
-      totalWeight += supplementAmount;
-      realDataCount++;
-    }
-  }
-
-  if (realDataCount > 0 && totalWeight > 0) {
-    return {
-      protein: (totalProtein / totalWeight) * 100,
-      fat: (totalFat / totalWeight) * 100,
-      fiber: (totalFiber / totalWeight) * 100,
-      calcium: ((totalCalcium / totalWeight) * 100) / 1000,
-      phosphorus: ((totalPhosphorus / totalWeight) * 100) / 1000,
-      calories: (totalCalories / totalWeight) * 100,
-      source: fallbackIngredients.length > 0 ? 'estimated' : 'real',
-      usesFallbackNutrition: fallbackIngredients.length > 0,
-      fallbackIngredients: fallbackIngredients.length > 0 ? fallbackIngredients : undefined,
-      breakdown: options?.includeBreakdown ? breakdown : undefined,
-    };
-  }
-
-  // Fallback estimates
-  return {
-    protein: 25,
-    fat: 15,
-    fiber: 3,
-    calcium: 0.8,
-    phosphorus: 0.6,
-    calories: 150,
-    source: 'estimated',
-  };
-}
+export { calculateRecipeNutrition };
 
 /**
  * Perfect path short-circuit: Check if recipe is a perfect match for a perfect pet

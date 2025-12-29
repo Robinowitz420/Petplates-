@@ -25,6 +25,7 @@ interface ShoppingListProps {
   selectedIngredients?: Array<{ key: string; grams: number }>;
   totalGrams?: number;
   recommendedServingGrams?: number;
+  showHeader?: boolean;
 }
 
 // Helper to get generic ingredient name
@@ -42,8 +43,8 @@ function getGenericIngredientName(name: string): string {
 
 export function ShoppingList({ 
   ingredients, 
-  recipeName = 'this recipe', 
-  userId
+  userId,
+  showHeader = true
 }: ShoppingListProps) {
   const [isOpening, setIsOpening] = useState(false);
   const [openedCount, setOpenedCount] = useState(0);
@@ -172,30 +173,16 @@ export function ShoppingList({
 
   return (
     <div className="bg-surface rounded-lg border border-surface-highlight p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <ShoppingCart size={24} />
-            Shopping List
-          </h3>
-          <p className="text-sm text-gray-400 mt-1">
-            {purchasableItems.length > 0 ? (
-              <>
-                {purchasableItems.length} ingredient{purchasableItems.length !== 1 ? 's' : ''} with purchase links
-                {unlinkedIngredients.length > 0 && (
-                  <>, {unlinkedIngredients.length} without links</>
-                )}
-              </>
-            ) : (
-              <>
-                {unlinkedIngredients.length} ingredient{unlinkedIngredients.length !== 1 ? 's' : ''} (no purchase links available)
-              </>
-            )}{' '}
-            for {recipeName}
-          </p>
+      {showHeader && (
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+              <ShoppingCart size={24} />
+              Shopping List
+            </h3>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Individual Ingredient List */}
       <div className="space-y-2 mb-6 max-h-96 overflow-y-auto pr-2">
@@ -209,11 +196,6 @@ export function ShoppingList({
               <div className="text-sm text-gray-400">
                 Recipe needs: {item.recipeAmount}
               </div>
-              {item.packageQuantity && (
-                <div className="text-xs text-gray-500">
-                  Package size: {item.packageQuantity}
-                </div>
-              )}
             </div>
             
             {/* Price Display */}

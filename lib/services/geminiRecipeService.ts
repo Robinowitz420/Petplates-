@@ -7,12 +7,7 @@ import {
   type RecipeCandidate,
 } from '@/lib/services/speciesMealGeneration';
 
-export const MODEL_FALLBACK_LIST = [
-  'gemini-3-flash-preview',
-  'gemini-1.5-flash-lite',
-  'gemini-1.5-flash',
-  'gemini-2.0-flash',
-] as const;
+export const MODEL_FALLBACK_LIST = ['gemini-2.0-flash', 'gemini-1.5-pro'] as const;
 
 type GeminiRecipePayload = {
   recipes: Array<{
@@ -58,13 +53,19 @@ export async function generateRecipesJsonWithFallback(params: {
   count: number;
   petProfile?: {
     name?: string;
+    breed?: string;
     weightKg?: number;
     age?: string;
+    activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active' | string;
     allergies?: string[];
+    allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
     healthConcerns?: string[];
+    dietaryRestrictions?: string[];
+    dislikes?: string[];
+    notes?: string;
     bannedIngredients?: string[];
   };
-  allowedIngredientNames: string[];
+  allowedIngredientIds: string[];
 }): Promise<{ payload: GeminiRecipePayload; modelUsed: string }> {
   return generateRecipesJsonWithFallbackAndPrompt({
     ...params,
@@ -77,13 +78,19 @@ function buildInitialPromptText(params: {
   count: number;
   petProfile?: {
     name?: string;
+    breed?: string;
     weightKg?: number;
     age?: string;
+    activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active' | string;
     allergies?: string[];
+    allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
     healthConcerns?: string[];
+    dietaryRestrictions?: string[];
+    dislikes?: string[];
+    notes?: string;
     bannedIngredients?: string[];
   };
-  allowedIngredientNames: string[];
+  allowedIngredientIds: string[];
 }): string {
   const { species, petProfile } = params;
   const requestedCount = 10;
@@ -127,10 +134,16 @@ export function buildRevisionPromptText(params: {
   species: string;
   petProfile?: {
     name?: string;
+    breed?: string;
     weightKg?: number;
     age?: string;
+    activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active' | string;
     allergies?: string[];
+    allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
     healthConcerns?: string[];
+    dietaryRestrictions?: string[];
+    dislikes?: string[];
+    notes?: string;
     bannedIngredients?: string[];
   };
   failingCandidates: RecipeCandidate[];
@@ -179,31 +192,44 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
   count: number;
   petProfile?: {
     name?: string;
+    breed?: string;
     weightKg?: number;
     age?: string;
+    activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active' | string;
     allergies?: string[];
+    allergiesSeverity?: Record<string, 'low' | 'medium' | 'high'>;
     healthConcerns?: string[];
+    dietaryRestrictions?: string[];
+    dislikes?: string[];
+    notes?: string;
     bannedIngredients?: string[];
   };
-  allowedIngredientNames: string[];
+  allowedIngredientIds: string[];
   promptText: string;
 }): Promise<{ payload: GeminiRecipePayload; modelUsed: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('Missing GEMINI_API_KEY');
 
-  const preferred = (process.env.GEMINI_API_MODEL || '').trim();
-  const models = [preferred, ...MODEL_FALLBACK_LIST].filter(Boolean);
+  // Enforce model order: prefer gemini-2.0-flash first, fall back to gemini-1.5-pro only.
+  const models = [...MODEL_FALLBACK_LIST];
 
-  const { species, petProfile, allowedIngredientNames, promptText } = params;
+  const { species, petProfile, allowedIngredientIds, promptText } = params;
   const requestedCount = 10; // Super-request engine is always exactly 10
 
   const age = petProfile?.age || 'adult';
   const weightKg = petProfile?.weightKg;
   const allergies = (petProfile?.allergies || []).filter(Boolean);
+  const allergiesSeverity = (petProfile as any)?.allergiesSeverity;
   const bannedIngredients = (petProfile?.bannedIngredients || []).filter(Boolean);
   const healthConcerns = (petProfile?.healthConcerns || []).filter(Boolean);
+  const dietaryRestrictions = Array.isArray((petProfile as any)?.dietaryRestrictions)
+    ? ((petProfile as any).dietaryRestrictions as string[]).filter(Boolean)
+    : [];
+  const dislikes = Array.isArray((petProfile as any)?.dislikes) ? ((petProfile as any).dislikes as string[]).filter(Boolean) : [];
+  const notes = typeof (petProfile as any)?.notes === 'string' ? String((petProfile as any).notes) : undefined;
+  const activityLevel = typeof (petProfile as any)?.activityLevel === 'string' ? String((petProfile as any).activityLevel) : undefined;
 
-  const allowedIngredientList = allowedIngredientNames.filter(Boolean).slice(0, 350);
+  const allowedIngredientIdList = allowedIngredientIds.filter(Boolean);
 
   const contraindications = healthConcerns.flatMap((c) => {
     const key = normalizeConcernKey(c);
@@ -239,8 +265,14 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
         name: petProfile?.name || 'Pet',
         age,
         weightKg: typeof weightKg === 'number' ? weightKg : undefined,
+        breed: typeof (petProfile as any)?.breed === 'string' ? String((petProfile as any).breed) : undefined,
+        activityLevel,
         healthConcerns,
         allergies,
+        allergiesSeverity,
+        dietaryRestrictions,
+        dislikes,
+        notes,
         bannedIngredients,
       },
       zero_tolerance: {
@@ -249,9 +281,14 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
         contraindications,
       },
       ingredient_vocabulary: {
-        rule: 'Every ingredient.name MUST be chosen from allowed_names EXACTLY (case-insensitive match ok).',
-        allowed_names: allowedIngredientList,
+        rule:
+          'CLOSED VOCABULARY: Every ingredient.name MUST be EXACTLY one of allowed_ids (snake_case ingredient id). ' +
+          'Do NOT invent new ids. Do NOT add preparation descriptors. Use only ids from allowed_ids.',
+        allowed_ids: allowedIngredientIdList,
       },
+      food_only_rule:
+        'WHOLE-FOOD ONLY: Do NOT include supplements, vitamins, minerals, powders, capsules, drops, or oils as standalone additives. ' +
+        'If a supplement could help, omit it from the recipe; the app will recommend supplements separately.',
       safety: {
         forbid: ['onion', 'garlic', 'grape', 'raisins', 'xylitol', 'chocolate', 'macadamia', 'alcohol', 'caffeine'],
       },
@@ -265,7 +302,8 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
 
   const finalPromptText =
     `${systemPrefix}\n\n` +
-    `CRITICAL: Output MUST include exactly ${requestedCount} recipes in the recipes array.\n\n` +
+    `CRITICAL: Output MUST include up to ${requestedCount} recipes in the recipes array.\n\n` +
+    `CRITICAL: ingredient.name MUST be an allowed snake_case ingredient id from hard_constraints.ingredient_vocabulary.allowed_ids.\n\n` +
     `OUTPUT JSON SCHEMA (must match exactly, with no extra keys at top-level):\n` +
     `${JSON.stringify(schemaRequirement, null, 2)}\n\n` +
     `REQUEST:\n${JSON.stringify(userPromptObject)}`;
@@ -376,11 +414,13 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
       continue;
     }
 
-    if (parsed.recipes.length !== requestedCount) {
-      lastErr = new Error(
-        `Gemini returned ${parsed.recipes.length} recipes; expected exactly ${requestedCount} [model=${model}]`
-      );
+    if (parsed.recipes.length === 0) {
+      lastErr = new Error(`Gemini returned 0 recipes; expected 1..${requestedCount} [model=${model}]`);
       continue;
+    }
+
+    if (parsed.recipes.length > requestedCount) {
+      parsed.recipes = parsed.recipes.slice(0, requestedCount);
     }
 
     console.info(`[Gemini] ✅ Generation successful with model: ${model}`);
@@ -391,8 +431,7 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
 }
 
 export function getModelFallbackListForDebug(): string[] {
-  const preferred = (process.env.GEMINI_API_MODEL || '').trim();
-  const models = [preferred, ...MODEL_FALLBACK_LIST].filter(Boolean);
+  const models = [...MODEL_FALLBACK_LIST];
   // De-dupe (preserve order)
   const seen = new Set<string>();
   return models.filter((m) => {

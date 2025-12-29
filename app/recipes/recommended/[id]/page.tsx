@@ -7,12 +7,8 @@ import { ArrowLeft } from 'lucide-react';
 import type { Recipe } from '@/lib/types';
 import { recipes } from '@/lib/data/recipes-complete';
 import RecipeCard from '@/components/RecipeCard';
-import {
-  calculateEnhancedCompatibility,
-  calibrateScoresForPet,
-  type Pet as EnhancedPet,
-} from '@/lib/utils/enhancedCompatibilityScoring';
-import type { Pet as RatingPet } from '@/lib/utils/petRatingSystem';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+import { normalizePetType } from '@/lib/utils/petType';
 
 const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
@@ -53,18 +49,8 @@ export default function RecommendedRecipesPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const ratingPet: RatingPet | null = useMemo(() => {
+  const scoringPet = useMemo(() => {
     if (!pet) return null;
-
-    const normalizePetType = (value: string): RatingPet['type'] => {
-      const v = String(value || '').toLowerCase();
-      if (v === 'dogs' || v === 'dog') return 'dog';
-      if (v === 'cats' || v === 'cat') return 'cat';
-      if (v === 'birds' || v === 'bird') return 'bird';
-      if (v === 'reptiles' || v === 'reptile') return 'reptile';
-      if (v === 'pocket-pets' || v === 'pocket-pet') return 'pocket-pet';
-      return 'dog';
-    };
 
     const ageYears = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
     const weightNum =
@@ -79,7 +65,7 @@ export default function RecommendedRecipesPage() {
     return {
       id: pet.id,
       name: pet.name,
-      type: normalizePetType(pet.type),
+      type: normalizePetType(pet.type, 'recipes/recommended/[id]'),
       breed: pet.breed,
       age: ageYears,
       weight: Number.isFinite(weightNum) ? weightNum : 25,
@@ -87,28 +73,8 @@ export default function RecommendedRecipesPage() {
       healthConcerns: pet.healthConcerns || [],
       dietaryRestrictions: pet.dietaryRestrictions || [],
       allergies: pet.allergies || [],
-      dislikes: pet.dislikes || [],
-      savedRecipes: pet.savedRecipes || [],
-      names: pet.names,
-      weightKg: pet.weightKg,
-    };
+    } as any;
   }, [pet]);
-
-  // Convert pet data to enhanced compatibility format
-  const enhancedPet: EnhancedPet | null = ratingPet
-    ? {
-        id: ratingPet.id,
-        name: ratingPet.name,
-        type: ratingPet.type,
-        breed: ratingPet.breed,
-        age: ratingPet.age,
-        weight: ratingPet.weight || ratingPet.weightKg || 25,
-        activityLevel: (ratingPet.activityLevel || 'moderate') as EnhancedPet['activityLevel'],
-        healthConcerns: ratingPet.healthConcerns || [],
-        dietaryRestrictions: ratingPet.dietaryRestrictions || [],
-        allergies: ratingPet.allergies || [],
-      }
-    : null;
 
   useEffect(() => {
     if (petId) {
@@ -123,22 +89,15 @@ export default function RecommendedRecipesPage() {
   const scoredRecipes = useMemo(() => {
     if (!pet) return [];
 
-    // Calculate compatibility scores for all recipes against this pet using enhanced scoring
     const scored = recipes.map((recipe) => {
-      if (!enhancedPet) return { recipe, score: null };
+      if (!scoringPet) return { recipe, score: null };
 
       try {
-        const enhanced = calculateEnhancedCompatibility(recipe, enhancedPet);
+        const speciesScore = scoreWithSpeciesEngine(recipe, scoringPet);
         return {
           recipe,
           score: {
-            compatibilityScore: enhanced.overallScore,
-            stars: Math.round(enhanced.overallScore / 20),
-            reasoning: {
-              goodMatches: enhanced.detailedBreakdown.healthBenefits,
-              conflicts: enhanced.detailedBreakdown.warnings,
-            },
-            enhancedScore: enhanced, // keep for detail view
+            compatibilityScore: speciesScore.overallScore,
           },
         };
       } catch (error) {
@@ -147,27 +106,6 @@ export default function RecommendedRecipesPage() {
       }
     });
 
-    // Apply per-pet calibration to normalize scores
-    // This ensures 100% is rare and meaningful, and scores are spread across the range
-    const validScored = scored.filter((s) => s.score !== null && enhancedPet);
-    if (validScored.length > 0 && enhancedPet) {
-      const recipesToCalibrate = validScored.map((s) => s.recipe);
-      const calibratedScores = calibrateScoresForPet(recipesToCalibrate, enhancedPet);
-
-      // Update scores with calibrated values
-      validScored.forEach((item) => {
-        const calibratedScore = calibratedScores.get(item.recipe.id);
-        if (calibratedScore !== undefined && item.score) {
-          item.score.compatibilityScore = calibratedScore;
-          item.score.stars = Math.round(calibratedScore / 20);
-          // Update enhanced score if it exists
-          if (item.score.enhancedScore) {
-            item.score.enhancedScore.overallScore = calibratedScore;
-          }
-        }
-      });
-    }
-
     // Sort by compatibility score (highest first)
     const sorted = scored.sort((a, b) => {
       if (!a.score || !b.score) return 0;
@@ -175,7 +113,7 @@ export default function RecommendedRecipesPage() {
     });
 
     return sorted;
-  }, [pet]);
+  }, [pet, scoringPet]);
 
   if (loading) {
     return (
@@ -243,7 +181,7 @@ export default function RecommendedRecipesPage() {
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              pet={ratingPet}
+              pet={pet as any}
             />
           ))}
         </div>

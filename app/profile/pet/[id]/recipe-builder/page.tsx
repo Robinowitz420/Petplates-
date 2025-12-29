@@ -144,6 +144,31 @@ const normalizeSpecies = (species: string): string => {
   return mapping[species.toLowerCase()] || species;
 };
 
+const shouldExcludeIngredientName = (value: string): boolean => {
+  const n = String(value || '').toLowerCase();
+  if (!n) return false;
+
+  if (n.includes('duck') && !n.includes('egg')) return true;
+  if (n.includes('rabbit') && !n.includes('pellet')) return true;
+
+  const organKeywords = [
+    'liver',
+    'heart',
+    'hearts',
+    'kidney',
+    'giblet',
+    'giblets',
+    'gizzard',
+    'tripe',
+    'offal',
+    'spleen',
+    'pancreas',
+    'lung',
+    'brain',
+  ];
+  return organKeywords.some((kw) => n.includes(kw));
+};
+
 // Get filtered ingredients based on pet species - ONLY show species-specific ingredients
 const getAvailableIngredients = (species: string, bannedIngredients?: string[]): string[] => {
   const normalizedSpecies = normalizeSpecies(species);
@@ -192,6 +217,8 @@ const getAvailableIngredients = (species: string, bannedIngredients?: string[]):
       return !bannedLower.some(banned => ingLower.includes(banned) || banned.includes(ingLower));
     });
   }
+
+  filtered = filtered.filter((ing) => !shouldExcludeIngredientName(ing));
 
   return Array.from(filtered).sort();
 };

@@ -3,7 +3,20 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Recipe, ModifiedRecipeResult } from '@/lib/types';
-import { calculateEnhancedCompatibility, calibrateScoresForPet, type Pet as EnhancedPet } from '@/lib/utils/enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+
+type ScoringPet = {
+  id: string;
+  name: string;
+  type: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
+  breed: string;
+  age: number;
+  weight: number;
+  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
+  healthConcerns: string[];
+  dietaryRestrictions: string[];
+  allergies?: string[];
+};
 
 interface ScoredMeal {
   meal: ModifiedRecipeResult | { recipe: Recipe; explanation: string };
@@ -27,19 +40,20 @@ interface IndividualCacheEntry {
   version?: string;
 }
 
-const SCORING_VERSION = 'v3';
+const SCORING_VERSION = 'v4';
 const CACHE_KEY_PREFIX = `recipe_scores_${SCORING_VERSION}_`;
 const INDIVIDUAL_CACHE_KEY_PREFIX = `recipe_score_${SCORING_VERSION}_`;
 const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 const CHUNK_SIZE = 20; // Recipes per frame
 const MAX_CACHE_SIZE_MB = 5; // Maximum cache size in MB
 const MAX_CACHE_ENTRIES = 50; // Maximum number of cache entries before LRU eviction
-const SCORE_JITTER_STEP = 1;
-const MAX_JITTER_TOTAL = 5;
+const SCORE_JITTER_STEP = 0;
+const MAX_JITTER_TOTAL = 0;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 function applyScoreJitter(items: ScoredMeal[]): ScoredMeal[] {
+  if (SCORE_JITTER_STEP <= 0 || MAX_JITTER_TOTAL <= 0) return items;
   const jittered = items.map((item) => ({ ...item }));
   let i = 0;
 
@@ -88,7 +102,7 @@ function simpleHash(str: string): string {
  */
 function generatePetProfileHash(
   pet: null, // Deprecated - using enhancedPet only
-  enhancedPet: EnhancedPet | null
+  enhancedPet: ScoringPet | null
 ): string {
   if (!enhancedPet) return 'no-pet';
   
@@ -103,7 +117,7 @@ function generatePetProfileHash(
     petData.type || '',
     petData.breed || '',
     typeof petData.age === 'string' ? parseFloat(petData.age) || 0 : petData.age || 0,
-    petData.weight || petData.weightKg || 0,
+    petData.weight || 0,
     petData.activityLevel || 'moderate',
     healthConcerns,
     allergies,
@@ -374,7 +388,7 @@ function cacheScores(
 function computeMealScore(
   meal: ModifiedRecipeResult | { recipe: Recipe; explanation: string },
   ratingPet: null, // Deprecated - kept for type compatibility but always null
-  enhancedPet: EnhancedPet | null,
+  enhancedPet: ScoringPet | null,
   petProfileHash: string
 ): number {
   // If meal already has a score, use it
@@ -397,9 +411,9 @@ function computeMealScore(
   let score = 0;
   
   try {
-    // Use enhanced compatibility scoring
-    const enhanced = calculateEnhancedCompatibility(meal.recipe, enhancedPet);
-    score = Number(enhanced.overallScore);
+    // Use enhanced compatibility scoring for breakdown, but species engine for final score
+    const scored = scoreWithSpeciesEngine(meal.recipe, enhancedPet);
+    score = Number(scored.overallScore);
   } catch (error) {
     console.warn('Error scoring meal:', error);
     score = 0;
@@ -421,10 +435,9 @@ function computeMealScore(
 export function useChunkedRecipeScoring(
   meals: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[],
   ratingPet: null, // Deprecated - using enhancedPet only
-  enhancedPet: EnhancedPet | null
+  enhancedPet: ScoringPet | null
 ) {
   const [scoredMeals, setScoredMeals] = useState<ScoredMeal[]>([]);
-  const [calibratedMeals, setCalibratedMeals] = useState<ScoredMeal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   
@@ -513,49 +526,16 @@ export function useChunkedRecipeScoring(
     };
   }, [meals, petProfileHash, enhancedPet]);
 
-  // Apply per-pet calibration when all scoring is complete
+  // Cache results when scoring completes
   useEffect(() => {
-    if (!isLoading && scoredMeals.length > 0 && scoredMeals.length === meals.length && enhancedPet) {
-      // Extract recipes from meals
-      const recipes = meals.map(meal => meal.recipe).filter((r): r is Recipe => r !== undefined);
-      
-      if (recipes.length > 0) {
-        // Apply calibration
-        const calibratedScores = calibrateScoresForPet(recipes, enhancedPet);
-        
-        // Update scores with calibrated values
-        const calibrated = scoredMeals.map(item => {
-          const recipeId = item.recipeId;
-          const calibratedScore = calibratedScores.get(recipeId);
-          if (calibratedScore !== undefined) {
-            return {
-              ...item,
-              score: calibratedScore,
-            };
-          }
-          return item;
-        });
-        
-        setCalibratedMeals(calibrated);
-      } else {
-        setCalibratedMeals(scoredMeals);
-      }
-    } else if (!isLoading && scoredMeals.length > 0 && scoredMeals.length === meals.length && !enhancedPet) {
-      // No enhanced pet, skip calibration
-      setCalibratedMeals(scoredMeals);
+    if (!isLoading && scoredMeals.length > 0 && scoredMeals.length === meals.length) {
+      cacheScores(scoredMeals, meals, petProfileHash);
     }
-  }, [isLoading, scoredMeals, meals, enhancedPet]);
-
-  // Cache results when scoring completes (use calibrated scores)
-  useEffect(() => {
-    if (!isLoading && calibratedMeals.length > 0 && calibratedMeals.length === meals.length) {
-      cacheScores(calibratedMeals, meals, petProfileHash);
-    }
-  }, [isLoading, calibratedMeals, meals, petProfileHash]);
+  }, [isLoading, scoredMeals, meals, petProfileHash]);
 
   // Sort final results by score (descending) and format for rendering
   const scoredMealsToRender = useMemo(() => {
-    const mealsToSort = calibratedMeals.length > 0 ? calibratedMeals : scoredMeals;
+    const mealsToSort = scoredMeals;
     const sorted = [...mealsToSort].sort((a, b) => {
       const scoreDiff = b.score - a.score;
       if (Math.abs(scoreDiff) > 0.001) {
@@ -573,7 +553,7 @@ export function useChunkedRecipeScoring(
       }
       return { ...item.meal, score: item.score };
     });
-  }, [scoredMeals, calibratedMeals]);
+  }, [scoredMeals]);
 
   return {
     scoredMeals: scoredMealsToRender,

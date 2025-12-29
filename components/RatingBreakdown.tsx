@@ -1,5 +1,13 @@
 import React from 'react';
-import { CompatibilityRating } from '@/lib/utils/petRatingSystem';
+
+type CompatibilityRating = {
+  overallScore: number;
+  compatibility: string;
+  breakdown: Record<string, { score: number; weight: number; reason: string }>;
+  warnings: string[];
+  strengths: string[];
+  recommendations: string[];
+};
 
 interface RatingBreakdownProps {
   rating: CompatibilityRating;

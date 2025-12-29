@@ -1,20 +1,31 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { X, AlertTriangle, CheckCircle, Info, Star } from 'lucide-react';
-import type { Pet } from '@/lib/utils/petRatingSystem';
-import {
-  calculateEnhancedCompatibility,
-  type Pet as EnhancedPet,
-} from '@/lib/utils/enhancedCompatibilityScoring';
+import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import type { Recipe } from '@/lib/types';
 import healthConcerns from '@/lib/data/healthConcerns';
 import { actionNeededBeep } from '@/lib/utils/beep';
 import { ensureSellerId, isValidAmazonUrl } from '@/lib/utils/affiliateLinks';
+import { normalizePetType } from '@/lib/utils/petType';
+
+type ModalPet = {
+  id: string;
+  name?: string;
+  type: unknown;
+  breed?: string;
+  age?: string | number;
+  weight?: string | number;
+  weightKg?: number;
+  activityLevel?: unknown;
+  healthConcerns?: string[];
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+};
 
 interface Props {
   recipe: Recipe;
-  pet?: Pet | null;
+  pet?: ModalPet | null;
   onClose?: () => void;
 }
 
@@ -29,45 +40,59 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
   // Use improved scoring if available, fallback to original
   let rating: any = null;
 
+  const pct = (v: unknown) => {
+    const n = typeof v === 'number' ? v : typeof v === 'string' ? parseFloat(v) : NaN;
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(n);
+  };
+
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiExplain, setAiExplain] = useState<{
+    summary: string;
+    healthConcerns: string;
+    weight: string;
+    age: string;
+    modelUsed?: string;
+  } | null>(null);
+
   if (pet) {
     try {
-      const enhancedPet: EnhancedPet = {
+      const scored = scoreWithSpeciesEngine(recipe, {
         id: pet.id,
-        name: pet.name,
-        type: pet.type as 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+        name: pet.name || 'Pet',
+        type: normalizePetType(pet.type, 'RecipeScoreModal'),
         breed: pet.breed,
-        age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : pet.age || 1,
-        weight: pet.weight || 10,
-        activityLevel: pet.activityLevel,
-        healthConcerns: pet.healthConcerns || [],
-        dietaryRestrictions: pet.dietaryRestrictions || [],
-        allergies: pet.allergies || [],
-      };
-      const enhancedScore = calculateEnhancedCompatibility(recipe, enhancedPet);
-      // Convert enhanced score to expected format
-      const stars = Math.round(enhancedScore.overallScore / 20);
+        age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : (pet.age || 1),
+        weight: (pet as any).weightKg || pet.weight || 10,
+        activityLevel: (pet as any).activityLevel,
+        healthConcerns: (pet as any).healthConcerns || [],
+        dietaryRestrictions: (pet as any).dietaryRestrictions || [],
+        allergies: (pet as any).allergies || [],
+      } as any);
+
+      const stars = Math.round(scored.overallScore / 20);
       rating = {
-        overallScore: enhancedScore.overallScore,
+        overallScore: scored.overallScore,
         stars: stars,
-        recommendation: enhancedScore.grade === 'A+' || enhancedScore.grade === 'A' ? 'excellent' :
-                       enhancedScore.grade === 'B+' || enhancedScore.grade === 'B' ? 'good' :
-                       enhancedScore.grade === 'C+' || enhancedScore.grade === 'C' ? 'fair' : 'poor',
-        summaryReasoning: `Compatibility score: ${enhancedScore.overallScore}% (${enhancedScore.grade})`,
-        compatibility: enhancedScore.grade === 'A+' || enhancedScore.grade === 'A' ? 'excellent' :
-                       enhancedScore.grade === 'B+' || enhancedScore.grade === 'B' ? 'good' :
-                       enhancedScore.grade === 'C+' || enhancedScore.grade === 'C' ? 'fair' : 'poor',
+        recommendation: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
+                       scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
+                       scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
+        summaryReasoning: `Compatibility score: ${pct(scored.overallScore)}% (${scored.grade})`,
+        compatibility: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
+                       scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
+                       scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
         breakdown: {
-          petTypeMatch: { score: enhancedScore.factors.ingredientSafety.score },
-          ageAppropriate: { score: enhancedScore.factors.lifeStageFit.score },
-          nutritionalFit: { score: enhancedScore.factors.nutritionalAdequacy.score },
-          healthCompatibility: { score: enhancedScore.factors.healthAlignment.score },
-          activityFit: { score: enhancedScore.factors.activityFit.score },
-          allergenSafety: { score: enhancedScore.factors.allergenSafety.score },
+          petTypeMatch: { score: (scored as any).raw?.factors?.ingredientSafety?.score ?? scored.factors.safety },
+          nutritionalFit: { score: (scored as any).raw?.factors?.nutritionalAdequacy?.score ?? scored.factors.nutrition },
+          healthCompatibility: { score: (scored as any).raw?.factors?.healthAlignment?.score ?? scored.factors.health },
+          allergenSafety: { score: (scored as any).raw?.factors?.allergenSafety?.score ?? 0 },
         },
-        warnings: enhancedScore.detailedBreakdown.warnings,
-        strengths: enhancedScore.detailedBreakdown.healthBenefits,
-        recommendations: enhancedScore.detailedBreakdown.recommendations,
+        warnings: scored.warnings,
+        strengths: scored.strengths,
+        recommendations: (scored as any).raw?.detailedBreakdown?.recommendations || [],
       };
+
     } catch (error) {
       console.error('Error calculating compatibility:', error);
       rating = null;
@@ -88,10 +113,75 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
     );
   }
 
+  const scorePayload = useMemo(() => {
+    return {
+      overallScore: rating?.overallScore,
+      warnings: Array.isArray(rating?.warnings) ? rating.warnings : [],
+      strengths: Array.isArray(rating?.strengths) ? rating.strengths : [],
+    };
+  }, [rating]);
+
   // Play a short cue when the modal opens to prompt user action.
   useEffect(() => {
     actionNeededBeep();
   }, []);
+
+  // Auto-generate Gemini explanations on open.
+  useEffect(() => {
+    if (!pet) return;
+    let cancelled = false;
+
+    setAiLoading(true);
+    setAiError(null);
+    setAiExplain(null);
+
+    (async () => {
+      try {
+        const resp = await fetch('/api/compatibility/explain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pet,
+            recipe: {
+              id: recipe.id,
+              name: recipe.name,
+              category: recipe.category,
+              description: recipe.description,
+              ingredients: Array.isArray(recipe.ingredients)
+                ? recipe.ingredients.map((i: any) => ({ name: i?.name, amount: i?.amount }))
+                : [],
+            },
+            score: scorePayload,
+          }),
+        });
+
+        if (!resp.ok) {
+          const text = await resp.text().catch(() => '');
+          throw new Error(text || `Request failed (${resp.status})`);
+        }
+
+        const data = (await resp.json()) as any;
+        if (cancelled) return;
+        setAiExplain({
+          summary: String(data?.summary || ''),
+          healthConcerns: String(data?.healthConcerns || ''),
+          weight: String(data?.weight || ''),
+          age: String(data?.age || ''),
+          modelUsed: typeof data?.modelUsed === 'string' ? data.modelUsed : undefined,
+        });
+      } catch (e) {
+        if (cancelled) return;
+        setAiError(e instanceof Error ? e.message : String(e));
+      } finally {
+        if (cancelled) return;
+        setAiLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pet, recipe.id, recipe.name, recipe.category, recipe.description, recipe.ingredients, scorePayload]);
 
   const { overallScore, compatibility, breakdown, warnings, strengths, recommendations, stars, summaryReasoning, recommendation } = rating;
 
@@ -147,23 +237,19 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center justify-between">
                 <div>Ingredient Safety</div>
-                <div className="font-mono text-gray-300">{breakdown.petTypeMatch.score}%</div>
+                <div className="font-mono text-gray-300">{pct(breakdown.petTypeMatch.score)}%</div>
               </div>
               <div className="flex items-center justify-between">
                 <div>Nutritional Adequacy</div>
-                <div className="font-mono text-gray-300">{breakdown.nutritionalFit.score}%</div>
+                <div className="font-mono text-gray-300">{pct(breakdown.nutritionalFit.score)}%</div>
               </div>
               <div className="flex items-center justify-between">
                 <div>Health Alignment</div>
-                <div className="font-mono text-gray-300">{breakdown.healthCompatibility.score}%</div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>Life Stage Fit</div>
-                <div className="font-mono text-gray-300">{breakdown.ageAppropriate.score}%</div>
+                <div className="font-mono text-gray-300">{pct(breakdown.healthCompatibility.score)}%</div>
               </div>
               <div className="flex items-center justify-between">
                 <div>Allergen Safety</div>
-                <div className="font-mono text-gray-300">{breakdown.allergenSafety.score}%</div>
+                <div className="font-mono text-gray-300">{pct(breakdown.allergenSafety.score)}%</div>
               </div>
             </div>
 
@@ -214,6 +300,39 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
                   Browse supplements
                 </button>
               </div>
+            </div>
+
+            <div className="mt-6">
+              <h5 className="text-sm font-semibold text-gray-200">Professor Purfessor explains</h5>
+              {aiLoading ? (
+                <div className="mt-2 text-sm text-gray-400">Generating explanation…</div>
+              ) : aiError ? (
+                <div className="mt-2 text-sm text-red-300/80">Unable to generate explanation right now.</div>
+              ) : aiExplain ? (
+                <div className="mt-2 space-y-3 text-sm text-gray-300">
+                  {aiExplain.summary && <div className="text-gray-200 font-semibold">{aiExplain.summary}</div>}
+                  {aiExplain.healthConcerns && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-400 mb-1">Health concerns</div>
+                      <div>{aiExplain.healthConcerns}</div>
+                    </div>
+                  )}
+                  {aiExplain.weight && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-400 mb-1">Weight</div>
+                      <div>{aiExplain.weight}</div>
+                    </div>
+                  )}
+                  {aiExplain.age && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-400 mb-1">Age / life stage</div>
+                      <div>{aiExplain.age}</div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-gray-500">No explanation available.</div>
+              )}
             </div>
           </div>
 

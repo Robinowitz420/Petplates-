@@ -708,7 +708,6 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
     },
     feedingRole: 'staple',
     maxInclusionPercentBySpecies: {
-      dog: 0.20,
       cat: 0.10,
       bird: 0.15,
       reptile: 0.25,
@@ -2025,6 +2024,35 @@ export const INGREDIENT_COMPOSITIONS: Record<string, IngredientComposition> = {
   "eggshell_powder": { protein: 0, fat: 0, calcium: 3800, phosphorus: 20, kcal: 0, source: "Natural supplement", speciesCompatibility: { dog: 'ok', cat: 'ok', bird: 'ok', reptile: 'ok', 'pocket-pet': 'ok' }, feedingRole: 'supplement', maxInclusionPercentBySpecies: { dog: 0.02, cat: 0.02, bird: 0.02, reptile: 0.02, 'pocket-pet': 0.02 }, confidenceBySpecies: { dog: 'high', cat: 'high', bird: 'high', reptile: 'high', 'pocket-pet': 'high' } },
   "bone_meal": { protein: 15, fat: 0, calcium: 3000, phosphorus: 1400, kcal: 60, source: "Natural supplement", speciesCompatibility: { dog: 'ok', cat: 'ok', bird: 'limit', reptile: 'ok', 'pocket-pet': 'limit' }, feedingRole: 'supplement', maxInclusionPercentBySpecies: { dog: 0.03, cat: 0.02, bird: 0.01, reptile: 0.02, 'pocket-pet': 0.01 }, confidenceBySpecies: { dog: 'high', cat: 'high', bird: 'medium', reptile: 'high', 'pocket-pet': 'medium' } },
 };
+
+const DEFAULT_CONFIDENCE: ConfidenceLevel = 'medium';
+
+for (const composition of Object.values(INGREDIENT_COMPOSITIONS)) {
+  composition.confidenceBySpecies ||= {};
+  composition.confidenceBySpecies.dog ||= DEFAULT_CONFIDENCE;
+  composition.confidenceBySpecies.cat ||= DEFAULT_CONFIDENCE;
+  composition.confidenceBySpecies.bird ||= DEFAULT_CONFIDENCE;
+  composition.confidenceBySpecies.reptile ||= DEFAULT_CONFIDENCE;
+  composition.confidenceBySpecies['pocket-pet'] ||= DEFAULT_CONFIDENCE;
+
+  composition.speciesCompatibility ||= {};
+  composition.speciesCompatibility.dog ||= 'ok';
+  composition.speciesCompatibility.cat ||= 'ok';
+  composition.speciesCompatibility.bird ||= 'ok';
+  composition.speciesCompatibility.reptile ||= 'ok';
+  composition.speciesCompatibility['pocket-pet'] ||= 'caution';
+
+  composition.maxInclusionPercentBySpecies ||= {};
+  if (composition.maxInclusionPercentBySpecies['pocket-pet'] === undefined) {
+    composition.maxInclusionPercentBySpecies['pocket-pet'] =
+      composition.speciesCompatibility['pocket-pet'] === 'avoid' ? 0 : 0.2;
+  }
+
+  composition.notesBySpecies ||= {};
+  if (composition.notesBySpecies['pocket-pet'] === undefined) {
+    composition.notesBySpecies['pocket-pet'] = '';
+  }
+}
 
 /**
  * Get nutritional composition for an ingredient
