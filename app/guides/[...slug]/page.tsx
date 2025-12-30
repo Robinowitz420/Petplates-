@@ -5,6 +5,16 @@ import type { Metadata } from 'next';
 import { guidesIndex } from '@/lib/guides/guidesIndex';
 import { guideCommon, guideTemplates, type GuideCategory } from '@/lib/guides/guidesTemplates';
 
+const BASE_URL = 'https://paws-and-plates.vercel.app';
+
+const categoryLabels: Record<GuideCategory, string> = {
+  dogs: 'Dogs',
+  cats: 'Cats',
+  birds: 'Birds',
+  reptiles: 'Reptiles',
+  'pocket-pets': 'Pocket Pets',
+};
+
 const fillEntity = (template: string, entityName: string): string => {
   return String(template || '').replaceAll('{entityName}', entityName);
 };
@@ -55,8 +65,66 @@ export default async function GuidePage(props: { params: Promise<{ slug: string[
   const guide = getGuideFromParams(params.slug);
   const template = guideTemplates[guide.category];
 
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Paws & Plates',
+    url: BASE_URL,
+    logo: `${BASE_URL}/images/emojis/Mascots/HeroPics/newLogo.png`,
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: `${BASE_URL}/`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: categoryLabels[guide.category],
+        item: `${BASE_URL}/category/${guide.category}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: fillEntity(template.h1, guide.entityName),
+        item: `${BASE_URL}${guide.slug}`,
+      },
+    ],
+  };
+
+  const faqPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: template.faq.map((item) => ({
+      '@type': 'Question',
+      name: fillEntity(item.q, guide.entityName),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: fillEntity(item.a, guide.entityName),
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-transparent text-foreground py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageJsonLd) }}
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="text-sm text-gray-300 mb-3">

@@ -64,9 +64,12 @@ export default function Navigation() {
 
           <div className="md:hidden">
             <button
+              type="button"
               onClick={() => setIsOpen(!isOpen)}
               className="btn btn-ghost btn-icon"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
             >
+              <span className="sr-only">{isOpen ? 'Close menu' : 'Open menu'}</span>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>

@@ -26,6 +26,64 @@ const nextConfig = {
       },
     ],
   },
+  async headers() {
+    const isPreview = process.env.VERCEL_ENV === 'preview';
+
+    const noindexHeaders = [
+      {
+        key: 'X-Robots-Tag',
+        value: 'noindex, nofollow',
+      },
+    ];
+
+    if (isPreview) {
+      return [
+        {
+          source: '/:path*',
+          headers: noindexHeaders,
+        },
+      ];
+    }
+
+    return [
+      {
+        source: '/profile/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/dashboard/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/pets/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/recipe/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/recipes/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/sign-in/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/sign-up/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/api/:path*',
+        headers: noindexHeaders,
+      },
+      {
+        source: '/diagnostics/:path*',
+        headers: noindexHeaders,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

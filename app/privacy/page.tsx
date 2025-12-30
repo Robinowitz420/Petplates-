@@ -2,6 +2,14 @@
 
 import Link from 'next/link';
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Paws & Plates',
+  url: 'https://paws-and-plates.vercel.app',
+  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+};
+
 const sections = [
   {
     title: 'What we collect',
@@ -47,6 +55,10 @@ const sections = [
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
           <Link href="/" className="text-orange-600 font-semibold hover:underline">

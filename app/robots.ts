@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app';
+  const baseUrl = 'https://paws-and-plates.vercel.app';
   
   return {
     rules: [

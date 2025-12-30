@@ -2,6 +2,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Bookmark } from 'lucide-react';
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Paws & Plates',
+  url: 'https://paws-and-plates.vercel.app',
+  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+};
+
 interface BlogPost {
   id: string;
   title: string;
@@ -15,6 +23,7 @@ interface BlogPost {
 }
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
+
   // Mock blog post data - in real app, this would come from a CMS or database
   const blogPost: BlogPost = {
     id: params.slug,
@@ -184,6 +193,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       {/* Navigation */}
       <div className="bg-surface border-b border-green-800/40">
         <div className="max-w-4xl mx-auto px-4 py-4">

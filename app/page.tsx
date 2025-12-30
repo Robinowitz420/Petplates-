@@ -1,4 +1,5 @@
 import { Check, Calendar, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 import HomePageClient from '@/components/HomePageClient';
 import SocialProof, { TestimonialSection } from '@/components/SocialProof';
 import TrustBadges from '@/components/TrustBadges';
@@ -6,6 +7,14 @@ import TrustBadges from '@/components/TrustBadges';
 export const dynamic = 'force-static';
 
 export const revalidate = 3600;
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Paws & Plates',
+  url: 'https://paws-and-plates.vercel.app',
+  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+};
 
 const whyCards = [
   {
@@ -60,20 +69,23 @@ const WhyUsSection = () => (
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       <header
         className="relative w-full border-b border-surface-highlight py-8 bg-[#043136]"
       >
         <div className="max-w-4xl mx-auto flex flex-col items-center gap-6 text-center">
           <div className="relative w-full max-w-3xl">
-            <img
+            <Image
               src="/images/emojis/Mascots/HeroPics/newLogo.png?v=2025-12-30"
               alt="Paws & Plates - Meal prep made easy, for ALL your pets!"
               width={720}
               height={405}
               className="w-full h-auto object-contain"
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
             />
           </div>
           <div className="space-y-3 px-4">
@@ -102,6 +114,7 @@ export default function HomePage() {
         </section>
 
         <section className="py-12 border-t border-surface-highlight">
+          <h2 className="sr-only">Why Paws & Plates</h2>
           <WhyUsSection />
         </section>
 

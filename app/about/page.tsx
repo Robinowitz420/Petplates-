@@ -11,9 +11,21 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Paws & Plates',
+  url: 'https://paws-and-plates.vercel.app',
+  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+};
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       {/* Header */}
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">

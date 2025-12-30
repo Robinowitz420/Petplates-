@@ -69,9 +69,9 @@ export default function HomePageClient() {
       <section className="text-center mb-12">
         {isLoaded && user ? (
           <>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
               Welcome Back, {user.firstName || 'Pet Owner'}!
-            </h1>
+            </h2>
             <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8">
               Fresh, vet-approved, and personalized nutrition for your beloved pets.
             </p>

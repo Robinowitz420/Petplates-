@@ -8,8 +8,10 @@ import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap', weight: ['400', '600', '700'] });
 
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app'),
+  metadataBase: new URL('https://paws-and-plates.vercel.app'),
   title: {
     default: "Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets",
     template: "%s | Paws & Plates"
@@ -50,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app',
+    url: 'https://paws-and-plates.vercel.app',
     siteName: 'Paws & Plates',
     title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering. AAFCO & WSAVA compliant nutrition.',
@@ -70,7 +72,7 @@ export const metadata: Metadata = {
     images: ['/images/emojis/Mascots/HeroPics/hero4.jpg'],
   },
   alternates: {
-    canonical: 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app',
+    canonical: 'https://paws-and-plates.vercel.app',
   },
   verification: {
     // Add these later when you have accounts:
@@ -95,35 +97,13 @@ export default function RootLayout({
           {/* Additional SEO tags */}
           <link rel="icon" href="/favicon.ico" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-          <link
-            rel="preload"
-            as="image"
-            href="/images/emojis/Mascots/HeroPics/newLogo.png?v=2025-12-30"
-            fetchPriority="high"
-          />
           <meta name="theme-color" content="#043136" />
           <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
+          {googleSiteVerification ? (
+            <meta name="google-site-verification" content={googleSiteVerification} />
+          ) : null}
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          
-          {/* Schema.org markup for Google */}
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                "name": "Paws & Plates",
-                "description": "Free vet-approved meal plans for dogs, cats, birds, reptiles, and pocket pets",
-                "url": "https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app",
-                "potentialAction": {
-                  "@type": "SearchAction",
-                  "target": "https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app/search?q={search_term_string}",
-                  "query-input": "required name=search_term_string"
-                }
-              })
-            }}
-          />
         </head>
         <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
           <ErrorBoundaryWrapper>

@@ -10,6 +10,8 @@ import RecipeCard from '@/components/RecipeCard';
 import { PetCategory, Breed, AgeGroup, HealthConcern } from '@/lib/types';
 import { exploreGuidesBlocks } from '@/lib/guides/guidesIndex';
 
+const BASE_URL = 'https://paws-and-plates.vercel.app';
+
 export default function CategoryPage() {
   const params = useParams();
   const category = params.category as PetCategory;
@@ -48,8 +50,43 @@ export default function CategoryPage() {
   const nutritionalInfo = getNutritionalInfo();
   const exploreBlock = exploreGuidesBlocks.find((b) => b.hubCategory === category);
 
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Paws & Plates',
+    url: BASE_URL,
+    logo: `${BASE_URL}/images/emojis/Mascots/HeroPics/newLogo.png`,
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: `${BASE_URL}/`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: categoryNames[category] || 'Category',
+        item: `${BASE_URL}/category/${category}`,
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12 px-4">
         <div className="max-w-7xl mx-auto">

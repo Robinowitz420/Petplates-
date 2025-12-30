@@ -2,6 +2,14 @@
 
 import Link from 'next/link';
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Paws & Plates',
+  url: 'https://paws-and-plates.vercel.app',
+  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+};
+
 const faqItems = [
   {
     question: 'What is Paws & Plates?',
@@ -38,9 +46,30 @@ const faqItems = [
   },
 ];
 
+const faqPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+
 export default function FAQPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageJsonLd) }}
+      />
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link href="/" className="text-orange-600 font-semibold hover:underline">

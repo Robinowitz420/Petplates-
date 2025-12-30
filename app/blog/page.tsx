@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Paws & Plates',
+  url: 'https://paws-and-plates.vercel.app',
+  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+};
+
 export default function BlogPage() {
   const blogPosts = [
     {
@@ -63,6 +71,10 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       {/* Header */}
       <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
