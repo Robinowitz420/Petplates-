@@ -8,6 +8,7 @@ import { breeds, ageGroups, healthConcerns } from '@/lib/data/pets';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
 import RecipeCard from '@/components/RecipeCard';
 import { PetCategory, Breed, AgeGroup, HealthConcern } from '@/lib/types';
+import { exploreGuidesBlocks } from '@/lib/guides/guidesIndex';
 
 export default function CategoryPage() {
   const params = useParams();
@@ -45,6 +46,7 @@ export default function CategoryPage() {
   };
 
   const nutritionalInfo = getNutritionalInfo();
+  const exploreBlock = exploreGuidesBlocks.find((b) => b.hubCategory === category);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -268,6 +270,22 @@ export default function CategoryPage() {
                 >
                   Go to My Pets
                 </Link>
+              </div>
+            )}
+
+            {exploreBlock && exploreBlock.links.length > 0 && (
+              <div className="mt-10 bg-surface rounded-2xl shadow-lg p-8 border border-green-800/50">
+                <h2 className="text-2xl font-bold text-orange-400 mb-4">{exploreBlock.heading}</h2>
+                <ul className="space-y-2">
+                  {exploreBlock.links.map((item) => (
+                    <li key={item.href} className="flex items-start gap-2">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <Link href={item.href} className="text-orange-300 hover:text-orange-200 font-medium">
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>

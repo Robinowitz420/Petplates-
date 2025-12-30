@@ -40,7 +40,7 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
   }
 
   return (
-    <div className={`flex flex-wrap justify-center gap-4 px-2 ${className}`}>
+    <div className={`flex flex-wrap justify-center gap-6 px-2 ${className}`}>
       {badges.badges.map((badge) => {
         const definition = getBadgeDefinition(badge.type);
         if (!definition) return null;
@@ -75,12 +75,12 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
         return (
           <Tooltip key={`${badge.type}-${badge.tier || 'single'}`} content={tooltipContent} wide={true}>
             <div className="relative group">
-              <div className="w-24 h-24 rounded-full bg-surface-highlight border border-white/10 flex items-center justify-center hover:scale-110 transition-transform cursor-help">
+              <div className="w-[141px] h-[141px] rounded-full bg-surface-highlight border border-white/10 flex items-center justify-center hover:scale-110 transition-transform cursor-help">
                 <Image
                   src={iconPath}
                   alt={displayName}
-                  width={72}
-                  height={72}
+                  width={117}
+                  height={117}
                   className="object-contain no-invert-badge"
                   unoptimized
                   onError={(e) => {

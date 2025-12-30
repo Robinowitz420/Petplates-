@@ -7,7 +7,18 @@ import {
   type RecipeCandidate,
 } from '@/lib/services/speciesMealGeneration';
 
-export const MODEL_FALLBACK_LIST = ['gemini-2.0-flash', 'gemini-1.5-pro'] as const;
+
+const getModelList = (): string[] => {
+  const override = process.env.GEMINI_MODEL_OVERRIDE;
+  if (override) {
+    return override.split(',').map(m => m.trim()).filter(Boolean);
+  }
+  // Default to flash models, removing the -pro model.
+  return ['gemini-2.0-flash', 'gemini-1.5-flash'];
+};
+
+export const MODEL_FALLBACK_LIST = getModelList();
+
 
 type GeminiRecipePayload = {
   recipes: Array<{
@@ -210,8 +221,7 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('Missing GEMINI_API_KEY');
 
-  // Enforce model order: prefer gemini-2.0-flash first, fall back to gemini-1.5-pro only.
-  const models = [...MODEL_FALLBACK_LIST];
+  const models = getModelList();
 
   const { species, petProfile, allowedIngredientIds, promptText } = params;
   const requestedCount = 10; // Super-request engine is always exactly 10

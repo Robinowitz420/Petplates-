@@ -925,19 +925,6 @@ export default function RecipeDetailPage() {
                   </span>
                 ))}
               </div>
-
-              <div className="-mt-2 pl-4 flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handleAddToMealPlan}
-                  disabled={!userId || !activePetId || isAddingMeal || isMealAdded}
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold transition-colors shadow-md border bg-green-800 text-white border-green-900 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}
-                </button>
-                {!userId && <span className="text-xs text-gray-400">Sign in to save</span>}
-                {userId && !activePetId && <span className="text-xs text-gray-400">Select a pet to add</span>}
-              </div>
             </div>
 
             {scoreForQueryPet && activePet && (
@@ -1241,56 +1228,64 @@ export default function RecipeDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
-                    <div className="text-gray-300">
-                      Serving varies by species, size, age, and activity—create a pet profile for exact portions.
-                    </div>
-                    <div className="mt-3">
-                      <Link
-                        href="/sign-up"
-                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-800 text-white font-semibold hover:bg-green-900 transition-colors"
-                      >
-                        Create Free Account
-                      </Link>
-                    </div>
-                  </div>
+                  null
                 )}
 
                 <div>
                   <div className="font-semibold text-gray-200">Storage</div>
-                  <div className="text-gray-300 mt-1">Fridge: Store in airtight container up to 3 days</div>
-                  <div className="text-gray-300">Freezer: Freeze portions up to 2 months</div>
-                  <div className="text-gray-300">Thawing: Thaw overnight in fridge</div>
+                  <ul className="mt-2 space-y-1">
+                    <li className="flex items-start gap-2 text-gray-300">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>Fridge: Store in airtight container up to 3 days</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-gray-300">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>Freezer: Freeze portions up to 2 months</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-gray-300">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>Thawing: Thaw overnight in fridge</span>
+                    </li>
+                  </ul>
                 </div>
 
                 <div>
                   <div className="font-semibold text-gray-200">Serving temperature</div>
-                  <div className="text-gray-300 mt-1">Serve at room temp or gently warmed</div>
-                  <div className="text-gray-300">Avoid overheating; stir well and test temperature before serving</div>
+                  <ul className="mt-2 space-y-1">
+                    <li className="flex items-start gap-2 text-gray-300">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>Serve at room temp or gently warmed</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-gray-300">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>Avoid overheating; stir well and test temperature before serving</span>
+                    </li>
+                  </ul>
                 </div>
 
                 <div>
                   <div className="font-semibold text-gray-200">Batch prep tip</div>
-                  <div className="text-gray-300 mt-1">Cool fully before portioning; portion into daily containers</div>
+                  <ul className="mt-2 space-y-1">
+                    <li className="flex items-start gap-2 text-gray-300">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>Cool fully before portioning; portion into daily containers</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
 
-            {/* Preparation Instructions */}
             <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
-                👨‍🍳 Preparation
-              </h3>
-              <ol className="space-y-4">
-                {recipe.instructions?.map((step, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="flex-shrink-0 w-6 h-6 bg-secondary-900/50 border border-secondary-700 text-secondary-200 rounded-full flex items-center justify-center font-bold mr-3 mt-1 text-sm">
-                      {index + 1}
-                    </span>
-                    <span className="text-gray-300 text-base leading-relaxed">{step}</span>
-                  </li>
-                ))}
-              </ol>
+              <button
+                type="button"
+                onClick={handleAddToMealPlan}
+                disabled={!userId || !activePetId || isAddingMeal || isMealAdded}
+                className="w-full inline-flex items-center justify-center px-10 py-4 rounded-full text-base font-semibold transition-colors shadow-md bg-green-800 text-white border-[3px] border-orange-500 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+              </button>
+              {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
+              {userId && !activePetId && <div className="mt-2 text-xs text-gray-400">Select a pet to add</div>}
             </div>
           </aside>
         </div>

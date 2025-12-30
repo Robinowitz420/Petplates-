@@ -208,17 +208,19 @@ export function getMascotFaceForPetType(petType: string): string {
 export function getProfilePictureForPetType(petType: string): string {
   const typeLower = (petType || '').toLowerCase();
   const typeToProfilePic: Record<string, string> = {
-    'dogs': '/images/emojis/Mascots/PrepPuppy/PrepPuppy.jpg', // Yellow dog chef with spoon and bowl
-    'cats': '/images/emojis/Mascots/Proffessor Purfessor/PUrfessorDesk.jpg', // Black cat with glasses and lab coat at desk
-    'birds': '/images/emojis/Mascots/RobinRed-Route.jpg', // Orange bird with goggles and satchel
-    'reptiles': '/images/emojis/Mascots/Sherlock Shells/SherlockShells.jpg', // Green turtle detective with monocle
-    'pocket-pets': '/images/emojis/Mascots/Harvest Hamster/HHCarrot.jpg', // Brown beaver/hamster with carrot
+    'dogs': '/images/emojis/Mascots/PrepPuppy/PrepPuppyProfilePic.png',
+    'cats': '/images/emojis/Mascots/Proffessor Purfessor/ProfessorPurrfesorProfilePic.jpg',
+    'birds': '/images/emojis/Mascots/Robin Red-Route/RobinRedRouteProfilePic.jpg',
+    'reptiles': '/images/emojis/Mascots/Sherlock Shells/SherlockShellsProfilePic.png',
+    'turtles': '/images/emojis/Mascots/Sherlock Shells/SherlockShellsProfilePic.png',
+    'pocket-pets': '/images/emojis/Mascots/Harvest Hamster/HarvestHamsterProfilePic.png',
     // Handle singular forms
-    'dog': '/images/emojis/Mascots/PrepPuppy/PrepPuppy.jpg',
-    'cat': '/images/emojis/Mascots/Proffessor Purfessor/PUrfessorDesk.jpg',
-    'bird': '/images/emojis/Mascots/RobinRed-Route.jpg',
-    'reptile': '/images/emojis/Mascots/Sherlock Shells/SherlockShells.jpg',
-    'pocket-pet': '/images/emojis/Mascots/Harvest Hamster/HHCarrot.jpg',
+    'dog': '/images/emojis/Mascots/PrepPuppy/PrepPuppyProfilePic.png',
+    'cat': '/images/emojis/Mascots/Proffessor Purfessor/ProfessorPurrfesorProfilePic.jpg',
+    'bird': '/images/emojis/Mascots/Robin Red-Route/RobinRedRouteProfilePic.jpg',
+    'reptile': '/images/emojis/Mascots/Sherlock Shells/SherlockShellsProfilePic.png',
+    'turtle': '/images/emojis/Mascots/Sherlock Shells/SherlockShellsProfilePic.png',
+    'pocket-pet': '/images/emojis/Mascots/Harvest Hamster/HarvestHamsterProfilePic.png',
   };
   return typeToProfilePic[typeLower] || '/images/emojis/Mascots/Mascot-Emoji-Faces.png';
 }

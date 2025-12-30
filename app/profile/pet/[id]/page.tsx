@@ -521,37 +521,42 @@ export default function RecommendedRecipesPage() {
               />
             </span>
           </span>
-
           <div className="flex-1 flex flex-col gap-6 min-w-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0">
-                Sherlock Shells is detecting meals for
+              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0" style={{ marginLeft: '150px' }}>
+                Sherlock Shells is detecting meals for:
                 <span className="inline-flex items-center gap-3">
                   <span className="font-semibold text-2xl">{petDisplayName}</span>
-                  <span className="w-16 h-16 rounded-full bg-surface-highlight border border-surface-highlight overflow-hidden inline-flex items-center justify-center align-middle">
-                    <Image
-                      src={getProfilePictureForPetType(pet.type)}
-                      alt={`${petDisplayName} profile`}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 object-cover"
-                      unoptimized
-                    />
-                  </span>
                 </span>
               </div>
             </div>
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-              <button
-                onClick={handleRegenerate}
-                disabled={loadingMeals}
-                className="px-6 py-2 rounded-full text-sm font-semibold transition-colors bg-green-800 text-white hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap"
-              >
-                {loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
-              </button>
+              <div className="flex flex-col items-center flex-shrink-0 gap-0">
+                <span className="w-16 h-16 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle relative top-[-10px]">
+                  <Image
+                    src={getProfilePictureForPetType(pet.type)}
+                    alt={`${petDisplayName} profile`}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 object-cover"
+                    unoptimized
+                  />
+                </span>
 
-              <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1">
+                <button
+                  onClick={handleRegenerate}
+                  disabled={loadingMeals}
+                  className="px-10 py-4 rounded-full text-base font-semibold transition-colors bg-green-800 text-white border-[3px] border-orange-500 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap"
+                >
+                  {loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
+                </button>
+              </div>
+
+              <div
+                className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1"
+                style={{ marginLeft: '-65px' }}
+              >
                 <div className="flex-shrink-0 min-w-[200px]">
                   <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
                   <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">

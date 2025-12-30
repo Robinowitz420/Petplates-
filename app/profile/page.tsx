@@ -1283,7 +1283,7 @@ const buildWeeklyPlan = useCallback(
                         border: activePetId === pet.id ? '3px solid #f97316' : '3px solid rgba(249, 115, 22, 0.5)'
                       }}
                     >
-                      <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-surface flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-800 bg-surface flex items-center justify-center flex-shrink-0">
                         <Image
                           src={getMascotFaceForPetType(pet.type as PetCategory)}
                           alt={`${name} mascot`}
@@ -1318,7 +1318,7 @@ const buildWeeklyPlan = useCallback(
                             >
                               {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
                             </h2>
-                            <label className="w-42 h-42 rounded-full overflow-hidden border border-white/10 bg-surface-highlight flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity group translate-y-10" style={{ width: '168px', height: '168px' }}>
+                            <label className="w-42 h-42 rounded-full overflow-hidden border-2 border-green-800 bg-surface-highlight flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity group translate-y-10" style={{ width: '168px', height: '168px' }}>
                               <input
                                 type="file"
                                 accept="image/*"
@@ -1369,7 +1369,16 @@ const buildWeeklyPlan = useCallback(
                         </div>
                         <div className="flex flex-col gap-3 mt-9">
                           {/* Badges Section - moved to far right, maintaining current height */}
-                          <div className="text-center text-sm font-semibold text-gray-300">Badges</div>
+                          <div className="flex justify-center">
+                            <Image
+                              src="/images/BadgesBanner.png"
+                              alt="Badges"
+                              width={220}
+                              height={44}
+                              className="h-auto"
+                              unoptimized
+                            />
+                          </div>
                           <div className="p-4 border border-surface-highlight rounded-lg bg-surface-highlight/30 min-h-[140px] w-[600px]">
                             <PetBadges key={badgeRefreshKey} petId={activePet.id} userId={userId} />
                           </div>
@@ -1406,7 +1415,7 @@ const buildWeeklyPlan = useCallback(
                         })}
                       </div>
 
-                      <div className="mt-3 min-h-[170px]">
+                      <div className="mt-3 min-h-[70px]">
                         {activeTab === 'bio' && (
                           <div className="flex gap-6">
                             {/* Bio Column */}

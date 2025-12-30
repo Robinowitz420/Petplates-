@@ -17,7 +17,7 @@ export default function Navigation() {
           <Link href="/" className="flex items-center space-x-2">
             <div className="h-10 w-10 relative">
               <Image
-                src="/images/emojis/Mascots/HeroPics/newLogo.png"
+                src="/images/emojis/GREENPAW.jpeg"
                 alt="Paws & Plates logo"
                 fill
                 className="object-contain rounded-md"

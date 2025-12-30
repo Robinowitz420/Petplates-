@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { guidesIndex } from '@/lib/guides/guidesIndex';
 
 // Dynamic sitemap generation for Next.js
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -47,6 +48,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...routes, ...categories, ...blogPosts];
+  const guides = guidesIndex.map((g) => ({
+    url: `${baseUrl}${g.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }));
+
+  return [...routes, ...categories, ...blogPosts, ...guides];
 }
 

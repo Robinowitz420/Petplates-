@@ -96,6 +96,7 @@ export default function RootLayout({
           <link rel="icon" href="/favicon.ico" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <meta name="theme-color" content="#043136" />
+          <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           
