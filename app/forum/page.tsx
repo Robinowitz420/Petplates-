@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { MessageSquare, Users, TrendingUp, Plus, Search, Filter, ThumbsUp, MessageCircle, Eye, ChefHat } from 'lucide-react';
+import Image from 'next/image';
+import CommunityBanner from '@/public/images/Site Banners/CommunityBanner.png';
 
 export default function ForumPage() {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -125,8 +127,16 @@ export default function ForumPage() {
     <div className="min-h-screen bg-background">
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
-        <div className="max-w-6xl mx-auto text-center">
+      <div className="relative text-white py-16 px-4 overflow-hidden">
+        <Image
+          src={CommunityBanner}
+          alt="Community banner"
+          fill
+          priority
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="relative max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Pet Nutrition Community
           </h1>

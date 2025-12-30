@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
+
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HeartOff, ArrowLeft, Utensils, Clock, Trash2 } from 'lucide-react';
@@ -8,6 +10,7 @@ import { useAuth } from '@clerk/nextjs';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
+import SavedMealsBanner from '@/public/images/Site Banners/SavedMeals.png';
 
 export default function SavedRecipesPage() {
   const { id: petId } = useParams();
@@ -218,6 +221,9 @@ export default function SavedRecipesPage() {
   return (
     <div className="min-h-screen bg-background py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-4 flex justify-center">
+          <Image src={SavedMealsBanner} alt="Saved Meals banner" className="h-auto w-full max-w-4xl" priority />
+        </div>
         <Link
           href="/profile"
           className="inline-flex items-center text-gray-500 hover:text-green-800 transition-colors mb-3 text-sm"

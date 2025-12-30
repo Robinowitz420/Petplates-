@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import type { Recipe, CustomMeal } from '@/lib/types';
+
 import { getProductPrice } from '@/lib/data/product-prices';
 import { VETTED_PRODUCTS, getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
+import MealPlanBanner from '@/public/images/Site Banners/MealPlan.png';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -279,6 +282,9 @@ export default function MealPlanPage() {
   return (
     <div className="min-h-screen bg-background py-10 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
+        <div className="flex justify-center">
+          <Image src={MealPlanBanner} alt="Meal Plan banner" className="h-auto w-full max-w-4xl" priority />
+        </div>
         <div className="bg-surface rounded-xl shadow p-6 flex flex-col gap-4 border border-surface-highlight">
           <div className="flex items-center gap-3 text-green-800">
             <button

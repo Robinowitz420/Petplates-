@@ -53,6 +53,7 @@ import { getPortionPlan } from '@/lib/portionCalc';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
 import CustomMadeForLine from '@/components/CustomMadeForLine';
+import ShoppingListBanner from '@/public/images/Site Banners/ShoppingList.png';
 
 // =================================================================
 // 1. CONSTANTS
@@ -1061,12 +1062,21 @@ export default function RecipeDetailPage() {
                   )}
 
                   {ingredientShoppingItems.length > 0 ? (
-                    <ShoppingList
-                      ingredients={ingredientShoppingItems}
-                      recipeName={recipe.name}
-                      userId={userId}
-                      showHeader={false}
-                    />
+                    <>
+                      <div className="mb-4 flex justify-center">
+                        <Image
+                          src={ShoppingListBanner}
+                          alt="Shopping List"
+                          className="h-auto w-full max-w-md"
+                        />
+                      </div>
+                      <ShoppingList
+                        ingredients={ingredientShoppingItems}
+                        recipeName={recipe.name}
+                        userId={userId}
+                        showHeader={false}
+                      />
+                    </>
                   ) : (
                     <div className="text-center py-12 text-gray-400 border border-dashed border-surface-highlight rounded-xl">
                       No ingredients available for this recipe.

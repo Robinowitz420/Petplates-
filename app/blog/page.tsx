@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
+import Image from 'next/image';
+import BlogBanner from '@/public/images/Site Banners/BlogBanner.png';
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
@@ -77,8 +79,16 @@ export default function BlogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <div className="relative text-white py-12 px-4 overflow-hidden">
+        <Image
+          src={BlogBanner}
+          alt="Blog banner"
+          fill
+          priority
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative max-w-4xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Pet Nutrition Blog
           </h1>

@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { SignOutButton, useUser } from '@clerk/nextjs';
 
 const QuickPreviewModal = dynamic(() => import('@/components/QuickPreviewModal'), {
   ssr: false,
@@ -20,7 +19,6 @@ const ABTestDashboard = dynamic(() => import('@/components/ABTestDashboard'), {
 });
 
 export default function HomePageClient() {
-  const { user, isLoaded } = useUser();
   const searchParams = useSearchParams();
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -55,9 +53,6 @@ export default function HomePageClient() {
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    if (!isLoaded) return;
-
-    if (user) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 10 && !hasShownExitIntentRef.current) {
@@ -70,50 +65,34 @@ export default function HomePageClient() {
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [user, isLoaded]);
+  }, []);
 
   return (
     <>
       <section className="text-center mb-12">
-        {isLoaded && user ? (
-          <>
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
-              Welcome Back, {user.firstName || 'Pet Owner'}!
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8">
-              Fresh, vet-approved, and personalized nutrition for your beloved pets.
-            </p>
-            <SignOutButton>
-              <button className="text-orange-400 hover:text-orange-300 font-medium">
-                Log Out
-              </button>
-            </SignOutButton>
-          </>
-        ) : (
-          <>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              {/* PRIMARY CTA - See Examples (Drives Affiliate Clicks!) */}
-              <button
-                onClick={() => setShowPreviewModal(true)}
-                className="btn btn-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-3 border-orange-400 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <Sparkles size={24} />
-                See Example Meals
-                <ArrowRight size={20} />
-              </button>
+        <>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* PRIMARY CTA - See Examples (Drives Affiliate Clicks!) */}
+            <button
+              onClick={() => setShowPreviewModal(true)}
+              className="btn btn-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-3 border-orange-400 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <Sparkles size={24} />
+              See Example Meals
+              <ArrowRight size={20} />
+            </button>
 
-              {/* Secondary CTA */}
-              <Link href="/sign-up" className="btn btn-lg btn-success">
-                Create Free Account
-              </Link>
-            </div>
+            {/* Secondary CTA */}
+            <Link href="/sign-up" className="btn btn-lg btn-success">
+              Create Free Account
+            </Link>
+          </div>
 
-            {/* Value Prop Subheading */}
-            <p className="text-gray-400 text-sm mt-4">
-              🎯 View meals instantly • No signup required • Start shopping now
-            </p>
-          </>
-        )}
+          {/* Value Prop Subheading */}
+          <p className="text-gray-400 text-sm mt-4">
+            🎯 View meals instantly • No signup required • Start shopping now
+          </p>
+        </>
       </section>
 
       <QuickPreviewModal

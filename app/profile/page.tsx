@@ -16,6 +16,7 @@ import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets, savePet, deletePet } from '@/lib/utils/petStorage'; // Import from storage util
 import type { CustomMeal } from '@/lib/types';
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
+import Image, { type StaticImageData } from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
 import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -28,7 +29,12 @@ import PetBadges from '@/components/PetBadges';
 import Tooltip from '@/components/Tooltip';
 import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
 import { formatPercent } from '@/lib/utils/formatPercent';
-import Image from 'next/image';
+import { getBreedNamesForSpecies } from '@/lib/data/speciesBreeds';
+import BioBanner from '@/public/images/Site Banners/BIO.png';
+import SavedMealsBanner from '@/public/images/Site Banners/SavedMeals.png';
+import MealPlanBanner from '@/public/images/Site Banners/MealPlan.png';
+import BadgesBanner from '@/public/images/Site Banners/Badges.png';
+import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -96,8 +102,6 @@ type ProfilePet = Pet;
 // 2. DATA CONSTANTS
 // =================================================================
 
-import { getBreedNamesForSpecies } from '@/lib/data/speciesBreeds';
-
 // Get breeds from centralized source
 const PET_BREEDS: Record<PetCategory, string[]> = {
   dogs: [...getBreedNamesForSpecies('dogs'), 'Other'],
@@ -107,10 +111,25 @@ const PET_BREEDS: Record<PetCategory, string[]> = {
   'pocket-pets': [...getBreedNamesForSpecies('pocket-pets'), 'Other'],
 };
 
-const PROFILE_TAB_BANNERS: Record<'bio' | 'saved' | 'plan', { src: string; alt: string }> = {
-  bio: { src: '/images/Site Banners/BIO.png', alt: 'Bio banner' },
-  saved: { src: '/images/Site Banners/SavedMeals.png', alt: 'Saved meals banner' },
-  plan: { src: '/images/Site Banners/MealPlan.png', alt: 'Meal plan banner' },
+const PROFILE_TAB_BANNERS: Record<'bio' | 'saved' | 'plan', { image: StaticImageData; alt: string }> = {
+  bio: { image: BioBanner, alt: 'Bio banner' },
+  saved: { image: SavedMealsBanner, alt: 'Saved meals banner' },
+  plan: { image: MealPlanBanner, alt: 'Meal plan banner' },
+};
+
+const renderTabBanner = (tab: 'bio' | 'saved' | 'plan') => {
+  const banner = PROFILE_TAB_BANNERS[tab];
+  if (!banner) return null;
+  return (
+    <div className="mb-4 flex justify-center">
+      <Image
+        src={banner.image}
+        alt={banner.alt}
+        className="h-auto w-full max-w-3xl"
+        priority={tab === 'bio'}
+      />
+    </div>
+  );
 };
 
 // Health concerns are now handled by HealthConcernsDropdown component
@@ -1377,12 +1396,10 @@ const buildWeeklyPlan = useCallback(
                           {/* Badges Section - moved to far right, maintaining current height */}
                           <div className="flex justify-center">
                             <Image
-                              src="/images/BadgesBanner.png"
+                              src={BadgesBanner}
                               alt="Badges"
-                              width={220}
-                              height={44}
-                              className="h-auto"
-                              unoptimized
+                              className="h-auto w-[220px]"
+                              priority
                             />
                           </div>
                           <div className="p-4 border border-surface-highlight rounded-lg bg-surface-highlight/30 min-h-[140px] w-[600px]">
@@ -1422,6 +1439,7 @@ const buildWeeklyPlan = useCallback(
                       </div>
 
                       <div className="mt-3 min-h-[70px]">
+                        {renderTabBanner(activeTab)}
                         {activeTab === 'bio' && (
                           <div className="flex gap-6">
                             {/* Bio Column */}
@@ -1462,7 +1480,13 @@ const buildWeeklyPlan = useCallback(
 
                             {/* Health Concerns Column - Always rendered for consistent layout */}
                             <div className="flex-shrink-0 min-w-[180px]">
-                              <h3 className="text-sm font-semibold text-gray-300 mb-2">Health Concerns</h3>
+                              <div className="flex justify-center mb-2">
+                                <Image
+                                  src={HealthAnalysisBanner}
+                                  alt="Health Analysis"
+                                  className="h-auto w-full max-w-[220px]"
+                                />
+                              </div>
                               <div className="flex flex-col gap-1.5">
                                 {(activePet.healthConcerns || []).length > 0 ? (
                                   (activePet.healthConcerns || []).map((concern) => (
