@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { guidesIndex } from '@/lib/guides/guidesIndex';
+import { getSiteUrl } from '@/lib/siteUrl';
 
-const BASE_URL = 'https://paws-and-plates.vercel.app';
+const BASE_URL = getSiteUrl();
 
 type SpeciesSlug = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 

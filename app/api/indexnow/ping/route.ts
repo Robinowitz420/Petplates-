@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
+import { getSiteUrl } from '@/lib/siteUrl';
 
 export const runtime = 'nodejs';
 
-const BASE_HOST = 'paws-and-plates.vercel.app';
+const BASE_HOST = new URL(getSiteUrl()).hostname;
 
 type RateState = { count: number; resetAt: number };
 const rateMap = new Map<string, RateState>();

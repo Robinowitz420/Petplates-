@@ -16,7 +16,6 @@ import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets, savePet, deletePet } from '@/lib/utils/petStorage'; // Import from storage util
 import type { CustomMeal } from '@/lib/types';
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
-import Image from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
 import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -29,6 +28,7 @@ import PetBadges from '@/components/PetBadges';
 import Tooltip from '@/components/Tooltip';
 import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
 import { formatPercent } from '@/lib/utils/formatPercent';
+import Image from 'next/image';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -105,6 +105,12 @@ const PET_BREEDS: Record<PetCategory, string[]> = {
   birds: [...getBreedNamesForSpecies('birds'), 'Other'],
   reptiles: [...getBreedNamesForSpecies('reptiles'), 'Other'],
   'pocket-pets': [...getBreedNamesForSpecies('pocket-pets'), 'Other'],
+};
+
+const PROFILE_TAB_BANNERS: Record<'bio' | 'saved' | 'plan', { src: string; alt: string }> = {
+  bio: { src: '/images/Site Banners/BIO.png', alt: 'Bio banner' },
+  saved: { src: '/images/Site Banners/SavedMeals.png', alt: 'Saved meals banner' },
+  plan: { src: '/images/Site Banners/MealPlan.png', alt: 'Meal plan banner' },
 };
 
 // Health concerns are now handled by HealthConcernsDropdown component

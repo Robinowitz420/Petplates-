@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Bookmark } from 'lucide-react';
+import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Paws & Plates',
-  url: 'https://paws-and-plates.vercel.app',
-  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+  url: getSiteUrl(),
+  logo: absoluteUrl('/images/emojis/Mascots/HeroPics/newLogo.png'),
 };
 
 interface BlogPost {

@@ -1,7 +1,8 @@
 // SEO Metadata Configurations for Key Pages
 import { Metadata } from 'next';
+import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
-const baseUrl = 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app';
+const baseUrl = getSiteUrl();
 
 // Helper to generate structured data for recipes
 export function generateRecipeStructuredData(recipe: any) {
@@ -10,7 +11,7 @@ export function generateRecipeStructuredData(recipe: any) {
     "@type": "Recipe",
     "name": recipe.name,
     "description": recipe.description,
-    "image": recipe.imageUrl ? `${baseUrl}${recipe.imageUrl}` : undefined,
+    "image": recipe.imageUrl ? absoluteUrl(recipe.imageUrl) : undefined,
     "prepTime": recipe.prepTime,
     "cookTime": recipe.cookTime,
     "recipeYield": `${recipe.servings} servings`,
@@ -135,7 +136,7 @@ export const organizationStructuredData = {
   "name": "Paws & Plates",
   "description": "Free vet-approved meal plans for dogs, cats, birds, reptiles, and pocket pets",
   "url": baseUrl,
-  "logo": `${baseUrl}/images/emojis/Mascots/HeroPics/HeroBanner-v3.png`,
+  "logo": absoluteUrl('/images/emojis/Mascots/HeroPics/HeroBanner-v3.png'),
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "Customer Support",
@@ -174,7 +175,7 @@ export function generateBreadcrumbStructuredData(items: { name: string; url: str
       "@type": "ListItem",
       "position": index + 1,
       "name": item.name,
-      "item": `${baseUrl}${item.url}`
+      "item": absoluteUrl(item.url)
     }))
   };
 }

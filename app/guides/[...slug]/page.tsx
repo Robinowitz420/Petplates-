@@ -4,8 +4,9 @@ import type { Metadata } from 'next';
 
 import { guidesIndex } from '@/lib/guides/guidesIndex';
 import { guideCommon, guideTemplates, type GuideCategory } from '@/lib/guides/guidesTemplates';
+import { getSiteUrl } from '@/lib/siteUrl';
 
-const BASE_URL = 'https://paws-and-plates.vercel.app';
+const BASE_URL = getSiteUrl();
 
 const categoryLabels: Record<GuideCategory, string> = {
   dogs: 'Dogs',

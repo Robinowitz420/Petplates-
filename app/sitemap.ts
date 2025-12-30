@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next';
 import { guidesIndex } from '@/lib/guides/guidesIndex';
+import { getSiteUrl } from '@/lib/siteUrl';
 
 // Dynamic sitemap generation for Next.js
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://paws-and-plates.vercel.app';
+  const baseUrl = getSiteUrl();
   
   // Static pages
   const routes = [

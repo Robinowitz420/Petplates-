@@ -3,17 +3,20 @@ import Image from 'next/image';
 import HomePageClient from '@/components/HomePageClient';
 import SocialProof, { TestimonialSection } from '@/components/SocialProof';
 import TrustBadges from '@/components/TrustBadges';
+import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 export const dynamic = 'force-static';
 
 export const revalidate = 3600;
 
+const siteUrl = getSiteUrl();
+
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Paws & Plates',
-  url: 'https://paws-and-plates.vercel.app',
-  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+  url: siteUrl,
+  logo: absoluteUrl('/images/emojis/Mascots/HeroPics/newLogo.png'),
 };
 
 const whyCards = [

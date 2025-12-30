@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Paws & Plates',
-  url: 'https://paws-and-plates.vercel.app',
-  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+  url: getSiteUrl(),
+  logo: absoluteUrl('/images/emojis/Mascots/HeroPics/newLogo.png'),
 };
 
 const faqItems = [

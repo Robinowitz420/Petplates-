@@ -2,6 +2,7 @@
 
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
+import { getSiteUrl } from '@/lib/siteUrl';
 
 interface SEOHeadProps {
   title?: string;
@@ -20,7 +21,7 @@ export default function SEOHead({
   noindex = false 
 }: SEOHeadProps) {
   const pathname = usePathname();
-  const baseUrl = 'https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app';
+  const baseUrl = getSiteUrl();
   const canonicalUrl = `${baseUrl}${pathname}`;
 
   const fullTitle = title 

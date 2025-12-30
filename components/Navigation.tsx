@@ -4,11 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { useUser, UserButton } from '@clerk/nextjs';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isSignedIn, isLoaded } = useUser();
 
   return (
     <nav className="bg-surface border-b border-surface-highlight sticky top-0 z-50">
@@ -40,26 +38,16 @@ export default function Navigation() {
             <Link href="/forum" className="text-gray-300 hover:text-orange-400 transition-colors">
               Community
             </Link>
-            
-            {isLoaded && (
-              <>
-                {!isSignedIn ? (
-                  <Link
-                    href="/sign-in"
-                    className="btn btn-primary btn-md btn-ripple"
-                  >
-                    Sign In
-                  </Link>
-                ) : (
-                  <>
-                    <Link href="/profile" className="text-gray-300 hover:text-orange-400 transition-colors">
-                      My Pets
-                    </Link>
-                    <UserButton afterSignOutUrl="/" />
-                  </>
-                )}
-              </>
-            )}
+
+            <Link href="/profile" className="text-gray-300 hover:text-orange-400 transition-colors">
+              My Pets
+            </Link>
+            <Link
+              href="/sign-in"
+              className="btn btn-primary btn-md btn-ripple"
+            >
+              Sign In
+            </Link>
           </div>
 
           <div className="md:hidden">
@@ -87,26 +75,16 @@ export default function Navigation() {
               <Link href="/forum" className="text-gray-300 hover:text-orange-400">
                 Community
               </Link>
-              
-              {isLoaded && (
-                <>
-                  {!isSignedIn ? (
-                    <Link
-                      href="/sign-in"
-                      className="btn btn-primary btn-md btn-ripple"
-                    >
-                      Sign In
-                    </Link>
-                  ) : (
-                    <>
-                      <Link href="/profile" className="text-gray-300 hover:text-orange-400">
-                        My Pets
-                      </Link>
-                      <UserButton afterSignOutUrl="/" />
-                    </>
-                  )}
-                </>
-              )}
+
+              <Link href="/profile" className="text-gray-300 hover:text-orange-400">
+                My Pets
+              </Link>
+              <Link
+                href="/sign-in"
+                className="btn btn-primary btn-md btn-ripple"
+              >
+                Sign In
+              </Link>
             </div>
           </div>
         )}

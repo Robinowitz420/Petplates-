@@ -1,5 +1,6 @@
 import { Award, Heart, Users, CheckCircle, ChefHat } from 'lucide-react';
 import { Metadata } from 'next';
+import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
   title: 'About Us - Vet-Approved Pet Meal Prep',
@@ -15,8 +16,8 @@ const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Paws & Plates',
-  url: 'https://paws-and-plates.vercel.app',
-  logo: 'https://paws-and-plates.vercel.app/images/emojis/Mascots/HeroPics/newLogo.png',
+  url: getSiteUrl(),
+  logo: absoluteUrl('/images/emojis/Mascots/HeroPics/newLogo.png'),
 };
 
 export default function AboutPage() {
