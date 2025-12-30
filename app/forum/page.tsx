@@ -9,13 +9,13 @@ export default function ForumPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const categories = [
-    { id: 'all', name: 'All Topics', count: 1247, color: 'bg-gray-100 text-gray-800' },
-    { id: 'recipes', name: 'Recipe Discussions', count: 456, color: 'bg-blue-100 text-blue-800' },
-    { id: 'nutrition', name: 'Nutrition Questions', count: 234, color: 'bg-green-100 text-green-800' },
-    { id: 'health', name: 'Health & Conditions', count: 189, color: 'bg-red-100 text-red-800' },
-    { id: 'training', name: 'Training & Behavior', count: 156, color: 'bg-purple-100 text-purple-800' },
-    { id: 'products', name: 'Product Reviews', count: 98, color: 'bg-orange-100 text-orange-800' },
-    { id: 'general', name: 'General Discussion', count: 114, color: 'bg-indigo-100 text-indigo-800' }
+    { id: 'all', name: 'All Topics', count: 1247, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
+    { id: 'recipes', name: 'Recipe Discussions', count: 456, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
+    { id: 'nutrition', name: 'Nutrition Questions', count: 234, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
+    { id: 'health', name: 'Health & Conditions', count: 189, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
+    { id: 'training', name: 'Training & Behavior', count: 156, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
+    { id: 'products', name: 'Product Reviews', count: 98, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
+    { id: 'general', name: 'General Discussion', count: 114, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' }
   ];
 
   const forumThreads = [
@@ -106,10 +106,10 @@ export default function ForumPage() {
   ];
 
   const stats = [
-    { label: 'Active Members', value: '12,847', icon: Users, color: 'text-blue-600' },
-    { label: 'Discussions', value: '3,421', icon: MessageSquare, color: 'text-green-600' },
-    { label: 'Recipes Shared', value: '1,892', icon: TrendingUp, color: 'text-purple-600' },
-    { label: 'Success Stories', value: '756', icon: ThumbsUp, color: 'text-orange-600' }
+    { label: 'Active Members', value: '12,847', icon: Users, color: 'text-orange-400' },
+    { label: 'Discussions', value: '3,421', icon: MessageSquare, color: 'text-orange-400' },
+    { label: 'Recipes Shared', value: '1,892', icon: TrendingUp, color: 'text-orange-400' },
+    { label: 'Success Stories', value: '756', icon: ThumbsUp, color: 'text-orange-400' }
   ];
 
   const filteredThreads = forumThreads.filter(thread => {
@@ -130,7 +130,7 @@ export default function ForumPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Pet Nutrition Community
           </h1>
-          <p className="text-xl text-primary-100 max-w-3xl mx-auto">
+          <p className="text-xl text-orange-200 max-w-3xl mx-auto">
             Connect with fellow pet parents, share recipes, get advice from experts,
             and learn from real experiences in our supportive community.
           </p>
@@ -144,8 +144,8 @@ export default function ForumPage() {
             <div key={index} className="bg-surface rounded-lg shadow-md p-6 text-center">
 
               <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color}`} />
-              <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
+              <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
+              <div className="text-sm text-white/70">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -153,36 +153,36 @@ export default function ForumPage() {
         {/* Quick Links */}
         <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
 
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Explore Community</h3>
+          <h3 className="text-lg font-semibold text-orange-400 mb-4">Explore Community</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/forum/gallery"
-              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 p-4 border border-green-800/40 rounded-lg hover:bg-surface-highlight transition-colors"
             >
-              <ChefHat className="w-8 h-8 text-primary-600" />
+              <ChefHat className="w-8 h-8 text-orange-400" />
               <div>
-                <div className="font-semibold text-gray-900">Recipe Gallery</div>
-                <div className="text-sm text-gray-600">Browse community modifications</div>
+                <div className="font-semibold text-white">Recipe Gallery</div>
+                <div className="text-sm text-white/70">Browse community modifications</div>
               </div>
             </Link>
             <Link
               href="/forum?category=recipes"
-              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 p-4 border border-green-800/40 rounded-lg hover:bg-surface-highlight transition-colors"
             >
-              <MessageSquare className="w-8 h-8 text-green-600" />
+              <MessageSquare className="w-8 h-8 text-orange-400" />
               <div>
-                <div className="font-semibold text-gray-900">Recipe Discussions</div>
-                <div className="text-sm text-gray-600">Ask questions, share tips</div>
+                <div className="font-semibold text-white">Recipe Discussions</div>
+                <div className="text-sm text-white/70">Ask questions, share tips</div>
               </div>
             </Link>
             <Link
               href="/forum?category=health"
-              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 p-4 border border-green-800/40 rounded-lg hover:bg-surface-highlight transition-colors"
             >
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-8 h-8 text-orange-400" />
               <div>
-                <div className="font-semibold text-gray-900">Health Support</div>
-                <div className="text-sm text-gray-600">Connect with other pet parents</div>
+                <div className="font-semibold text-white">Health Support</div>
+                <div className="text-sm text-white/70">Connect with other pet parents</div>
               </div>
             </Link>
           </div>
@@ -193,16 +193,16 @@ export default function ForumPage() {
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-300/70 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search discussions, recipes, or topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-surface border border-green-800/40 rounded-lg text-white placeholder:text-orange-300/60 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50"
               />
             </div>
-            <button className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2">
+            <button className="px-6 py-3 bg-green-800 text-white border-[3px] border-orange-500 rounded-lg hover:bg-green-900 transition-colors flex items-center gap-2">
               <Plus className="w-5 h-5" />
               Start Discussion
             </button>
@@ -216,8 +216,8 @@ export default function ForumPage() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeCategory === category.id
-                    ? 'bg-primary-600 text-white'
-                    : category.color + ' hover:opacity-80'
+                    ? 'bg-green-800 text-white border-[3px] border-orange-500'
+                    : category.color + ' hover:bg-surface-highlight hover:text-orange-200'
                 }`}
               >
                 {category.name} ({category.count})
@@ -234,8 +234,8 @@ export default function ForumPage() {
               <div className="p-6">
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-gray-600 font-semibold text-lg">
+                  <div className="w-12 h-12 bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0 border border-green-800/40">
+                    <span className="text-orange-300 font-semibold text-lg">
                       {thread.author.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -246,27 +246,22 @@ export default function ForumPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           {thread.isSticky && (
-                            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">
+                            <span className="bg-green-900/20 text-orange-300 border border-green-800/40 px-2 py-1 rounded text-xs font-medium">
                               STICKY
                             </span>
                           )}
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            thread.category === 'recipes' ? 'bg-blue-100 text-blue-800' :
-                            thread.category === 'health' ? 'bg-red-100 text-red-800' :
-                            thread.category === 'nutrition' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className="px-2 py-1 rounded text-xs font-medium bg-green-900/20 text-orange-300 border border-green-800/40">
                             {categories.find(c => c.id === thread.category)?.name}
                           </span>
                         </div>
 
                         <Link href="/forum">
-                          <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors mb-2">
+                          <h3 className="text-lg font-semibold text-white hover:text-orange-200 transition-colors mb-2">
                             {thread.title}
                           </h3>
                         </Link>
 
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        <p className="text-white/70 text-sm mb-3 line-clamp-2">
                           {thread.excerpt}
                         </p>
 
@@ -275,7 +270,7 @@ export default function ForumPage() {
                           {thread.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs"
+                              className="bg-green-900/20 text-orange-300/90 border border-green-800/40 px-2 py-1 rounded text-xs"
                             >
                               #{tag}
                             </span>
@@ -283,14 +278,14 @@ export default function ForumPage() {
                         </div>
 
                         {/* Thread Meta */}
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span>by <strong className="text-gray-700">{thread.author}</strong></span>
+                        <div className="flex items-center gap-4 text-sm text-white/70">
+                          <span>by <strong className="text-orange-300">{thread.author}</strong></span>
                           <span>Last reply {thread.lastReply} by {thread.lastReplyBy}</span>
                         </div>
                       </div>
 
                       {/* Thread Stats */}
-                      <div className="flex flex-col items-end gap-2 text-sm text-gray-500">
+                      <div className="flex flex-col items-end gap-2 text-sm text-white/70">
                         <div className="flex items-center gap-1">
                           <MessageCircle className="w-4 h-4" />
                           <span>{thread.replies} replies</span>
@@ -310,15 +305,15 @@ export default function ForumPage() {
 
         {/* Load More */}
         <div className="text-center mt-8">
-          <button className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+          <button className="px-6 py-3 bg-surface border border-orange-500/60 text-orange-300 rounded-lg hover:bg-surface-highlight hover:text-orange-200 transition-colors">
             Load More Discussions
           </button>
         </div>
 
         {/* Community Guidelines */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">Community Guidelines</h3>
-          <ul className="text-blue-800 text-sm space-y-2">
+        <div className="bg-surface border border-green-800/40 rounded-lg p-6 mt-8">
+          <h3 className="text-lg font-semibold text-orange-400 mb-3">Community Guidelines</h3>
+          <ul className="text-white/80 text-sm space-y-2">
             <li>• Be respectful and supportive of fellow pet parents</li>
             <li>• Always consult your veterinarian for health-related advice</li>
             <li>• Share your experiences and learn from others</li>

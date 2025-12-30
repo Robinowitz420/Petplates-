@@ -69,7 +69,7 @@ export default function BlogPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Pet Nutrition Blog
           </h1>
-          <p className="text-lg text-gray-200">
+          <p className="text-lg text-orange-200">
             Expert insights, research-backed advice, and the latest in pet nutrition science
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function BlogPage() {
           {categories.map((category) => (
             <button
               key={category}
-              className="px-4 py-2 bg-surface border border-gray-300 rounded-full text-sm font-medium hover:bg-surface-highlight hover:border-gray-400 transition-colors"
+              className="px-4 py-2 bg-surface border border-green-800/40 rounded-full text-sm font-medium text-orange-300 hover:bg-surface-highlight hover:border-orange-500/50 hover:text-orange-200 transition-colors"
             >
               {category}
             </button>
@@ -91,18 +91,21 @@ export default function BlogPage() {
         {/* Blog Posts List - Reddit Style */}
         <div className="space-y-4">
           {blogPosts.map((post) => (
-            <article key={post.id} className="bg-surface rounded border border-surface-highlight hover:border-gray-300 transition-colors">
+            <article
+              key={post.id}
+              className="bg-surface rounded border border-green-800/40 hover:border-green-800/60 transition-colors"
+            >
               <div className="p-4">
                 <div className="flex items-start gap-3">
                   {/* Left side - voting area (optional, can be removed) */}
                   <div className="flex flex-col items-center pt-1">
-                    <button className="text-gray-400 hover:text-green-600 transition-colors">
+                    <button className="text-orange-300/70 hover:text-orange-200 transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
                     </button>
-                    <span className="text-xs text-gray-500 mt-1">0</span>
-                    <button className="text-gray-400 hover:text-red-500 transition-colors">
+                    <span className="text-xs text-orange-300/70 mt-1">0</span>
+                    <button className="text-orange-300/70 hover:text-orange-200 transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
@@ -111,8 +114,8 @@ export default function BlogPage() {
 
                   {/* Right side - content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                      <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+                    <div className="flex items-center gap-2 text-xs text-white/70 mb-2">
+                      <span className="bg-green-900/20 text-orange-300 px-2 py-0.5 rounded border border-green-800/40">
                         {post.category}
                       </span>
                       <span>•</span>
@@ -126,24 +129,24 @@ export default function BlogPage() {
                       </span>
                     </div>
                     <Link href={`/blog/${post.id}`}>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-green-700 transition-colors">
+                      <h3 className="text-lg font-semibold text-white mb-2 hover:text-orange-200 transition-colors">
                         {post.title}
                       </h3>
                     </Link>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    <p className="text-sm text-white/70 mb-3 line-clamp-2">
                       {post.excerpt}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-white/70">
                       <Link
                         href={`/blog/${post.id}`}
-                        className="hover:text-green-700 font-medium transition-colors"
+                        className="hover:text-orange-200 font-medium transition-colors"
                       >
                         Read more
                       </Link>
                       <span>•</span>
-                      <button className="hover:text-green-700 transition-colors">Share</button>
+                      <button className="hover:text-orange-200 transition-colors">Share</button>
                       <span>•</span>
-                      <button className="hover:text-green-700 transition-colors">Save</button>
+                      <button className="hover:text-orange-200 transition-colors">Save</button>
                     </div>
                   </div>
                 </div>
