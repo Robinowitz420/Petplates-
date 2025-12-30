@@ -87,7 +87,7 @@ export default async function GuidePage(props: { params: Promise<{ slug: string[
         '@type': 'ListItem',
         position: 2,
         name: categoryLabels[guide.category],
-        item: `${BASE_URL}/category/${guide.category}`,
+        item: `${BASE_URL}/species/${guide.category}`,
       },
       {
         '@type': 'ListItem',
@@ -132,7 +132,7 @@ export default async function GuidePage(props: { params: Promise<{ slug: string[
               Home
             </Link>
             <span className="mx-2">/</span>
-            <Link href={`/category/${guide.category}`} className="text-orange-300 hover:text-orange-200">
+            <Link href={`/species/${guide.category}`} className="text-orange-300 hover:text-orange-200">
               {guide.category}
             </Link>
           </div>

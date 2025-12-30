@@ -19,9 +19,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route === '' ? 1.0 : 0.8,
   }));
 
-  // Pet category pages
-  const categories = ['dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'].map((category) => ({
-    url: `${baseUrl}/category/${category}`,
+  // Species hub pages
+  const speciesHubs = ['dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'].map((species) => ({
+    url: `${baseUrl}/species/${species}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.9,
@@ -34,6 +34,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...routes, ...categories, ...guides];
+  return [...routes, ...speciesHubs, ...guides];
 }
 

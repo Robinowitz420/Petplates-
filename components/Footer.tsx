@@ -52,27 +52,27 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/category/dogs" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/species/dogs" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
                   <MascotIcon mascot="puppy-prepper" size={14} /> Dogs
                 </Link>
               </li>
               <li>
-                <Link href="/category/cats" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/species/cats" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
                   <MascotIcon mascot="professor-purrfessor" size={14} /> Cats
                 </Link>
               </li>
               <li>
-                <Link href="/category/birds" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/species/birds" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
                   <MascotIcon mascot="robin-redroute" size={14} /> Birds
                 </Link>
               </li>
               <li>
-                <Link href="/category/reptiles" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/species/reptiles" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
                   <MascotIcon mascot="sherlock-shells" size={14} /> Reptiles
                 </Link>
               </li>
               <li>
-                <Link href="/category/pocket-pets" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/species/pocket-pets" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
                   <MascotIcon mascot="farmer-fluff" size={14} /> Pocket Pets
                 </Link>
               </li>

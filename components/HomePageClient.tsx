@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { SignOutButton, useUser } from '@clerk/nextjs';
 
@@ -20,6 +21,7 @@ const ABTestDashboard = dynamic(() => import('@/components/ABTestDashboard'), {
 
 export default function HomePageClient() {
   const { user, isLoaded } = useUser();
+  const searchParams = useSearchParams();
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showEmailCapture, setShowEmailCapture] = useState(false);
@@ -44,6 +46,12 @@ export default function HomePageClient() {
 
     return schedule(() => setMountABDashboard(true));
   }, []);
+
+  useEffect(() => {
+    if (!searchParams) return;
+    if (searchParams.get('demo') !== '1') return;
+    setShowPreviewModal(true);
+  }, [searchParams]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;

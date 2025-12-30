@@ -151,7 +151,7 @@ export default function ProfileSelector() {
                 {selectedPet === pet.id && (
                   <div className="mt-3 pt-3 border-t">
                     <a
-                      href={`/category/${pet.type}`}
+                      href={`/species/${pet.type}`}
                       className="text-sm text-orange-600 hover:text-orange-700 font-medium"
                     >
                       View {pet.name}'s Recipes →

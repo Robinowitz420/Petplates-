@@ -51,6 +51,10 @@ const nextConfig = {
         headers: noindexHeaders,
       },
       {
+        source: '/category/:path*',
+        headers: noindexHeaders,
+      },
+      {
         source: '/dashboard/:path*',
         headers: noindexHeaders,
       },
