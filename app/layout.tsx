@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { ClerkProvider } from '@clerk/nextjs';
 import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: 'swap', weight: ['400', '600', '700'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://petplatesmealplatform-ldvstwjsy-plateandpaw.vercel.app'),
@@ -95,6 +95,12 @@ export default function RootLayout({
           {/* Additional SEO tags */}
           <link rel="icon" href="/favicon.ico" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <link
+            rel="preload"
+            as="image"
+            href="/images/emojis/Mascots/HeroPics/newLogo.png?v=2025-12-30"
+            fetchPriority="high"
+          />
           <meta name="theme-color" content="#043136" />
           <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
           <meta name="apple-mobile-web-app-capable" content="yes" />

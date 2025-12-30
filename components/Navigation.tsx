@@ -22,7 +22,6 @@ export default function Navigation() {
                 fill
                 className="object-contain rounded-md"
                 sizes="40px"
-                priority
               />
             </div>
             <div className="flex flex-col">
