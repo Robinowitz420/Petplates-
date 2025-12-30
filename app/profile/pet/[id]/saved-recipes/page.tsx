@@ -4,30 +4,33 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HeartOff, ArrowLeft, Utensils, Clock, Trash2 } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
 
-// Same simulated user ID setup as profile/page.tsx
-const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
-
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return SIMULATED_USER_ID;
-  return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
-};
-
 export default function SavedRecipesPage() {
   const { id: petId } = useParams();
   const router = useRouter();
+  const { userId: clerkUserId, isLoaded } = useAuth();
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
+  const [savedGeneratedMeals, setSavedGeneratedMeals] = useState<Array<{ id: string; name: string; dateAdded?: number }>>([]);
 
   // Load pet and custom meals - async function
   const loadData = async () => {
-    const uid = getCurrentUserId();
+    if (!isLoaded) return;
+    const uid = clerkUserId || null;
     setUserId(uid);
+
+    if (!uid) {
+      setPet(null);
+      setCustomMeals([]);
+      setIsLoading(false);
+      return;
+    }
 
     if (!petId) {
       setIsLoading(false);
@@ -52,10 +55,9 @@ export default function SavedRecipesPage() {
     }
   };
 
-  // Load pet and custom meals from storage
   useEffect(() => {
     loadData();
-  }, [petId]);
+  }, [petId, isLoaded, clerkUserId]);
 
   // Listen for updates to pets and custom meals
   useEffect(() => {
@@ -63,27 +65,67 @@ export default function SavedRecipesPage() {
 
     const handlePetsUpdated = (e: CustomEvent) => {
       // Refresh if pets were updated
-      if (e.detail?.userId === getCurrentUserId()) {
-        loadData();
-      }
-    };
-
-    const handleStorageChange = (e: StorageEvent) => {
-      // Refresh if pets or custom meals storage was modified (cross-tab/window)
-      const uid = getCurrentUserId();
-      if (e.key === `pets_${uid}` || e.key?.startsWith(`custom_meals_${uid}_`)) {
+      if (e.detail?.userId === clerkUserId) {
         loadData();
       }
     };
 
     window.addEventListener('petsUpdated', handlePetsUpdated as EventListener);
-    window.addEventListener('storage', handleStorageChange);
 
     return () => {
       window.removeEventListener('petsUpdated', handlePetsUpdated as EventListener);
-      window.removeEventListener('storage', handleStorageChange);
     };
-  }, [petId]);
+  }, [petId, clerkUserId, isLoaded]);
+
+  useEffect(() => {
+    const run = async () => {
+      if (!pet) {
+        setSavedGeneratedMeals([]);
+        return;
+      }
+
+      const ids = Array.from(
+        new Set([
+          ...((pet.savedRecipes as any) || []),
+          ...((pet.mealPlan as any) || []),
+        ])
+      )
+        .map((x) => String(x || '').trim())
+        .filter(Boolean)
+        .filter((id) => !id.startsWith('custom_'));
+
+      if (ids.length === 0) {
+        setSavedGeneratedMeals([]);
+        return;
+      }
+
+      const results = await Promise.allSettled(
+        ids.map(async (id) => {
+          const res = await fetch(`/api/recipes/generated/${encodeURIComponent(id)}`);
+          if (!res.ok) throw new Error('not-found');
+          const data = await res.json();
+          const recipe = data?.recipe;
+          const name = String(recipe?.name || id);
+          const createdAt = typeof data?.createdAt === 'number' ? data.createdAt : undefined;
+          return {
+            id,
+            name,
+            ...(typeof createdAt === 'number' ? { dateAdded: createdAt } : {}),
+          } as { id: string; name: string; dateAdded?: number };
+        })
+      );
+
+      const loaded = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
+
+      const fallback = ids
+        .filter((id) => !loaded.some((m) => m.id === id))
+        .map((id) => ({ id, name: id }));
+
+      setSavedGeneratedMeals([...loaded, ...fallback]);
+    };
+
+    run();
+  }, [pet]);
 
   // Map saved recipe IDs and custom meals to display format
   const savedRecipeDetails = useMemo(() => {
@@ -94,6 +136,15 @@ export default function SavedRecipesPage() {
       isCustom?: boolean;
       compatibilityScore?: number;
     }[] = [];
+
+    savedGeneratedMeals.forEach((meal) => {
+      allMeals.push({
+        id: meal.id,
+        name: meal.name,
+        dateAdded: meal.dateAdded,
+        isCustom: false,
+      });
+    });
     
     // Add custom meals (with compatibility score)
     customMeals.forEach((meal) => {
@@ -107,7 +158,7 @@ export default function SavedRecipesPage() {
     });
     
     return allMeals;
-  }, [pet, customMeals]);
+  }, [customMeals, savedGeneratedMeals]);
 
   const handleRemoveRecipe = async (recipeIdToRemove: string, isCustom: boolean = false) => {
     if (!userId || !pet) return;
@@ -121,6 +172,7 @@ export default function SavedRecipesPage() {
       const updatedPet: Pet = {
         ...pet,
         savedRecipes: (pet.savedRecipes || []).filter(id => id !== recipeIdToRemove),
+        mealPlan: (pet.mealPlan || []).filter(id => id !== recipeIdToRemove),
       };
 
       await savePet(userId, updatedPet);

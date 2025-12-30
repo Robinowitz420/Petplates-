@@ -5,17 +5,14 @@
  * Badge types - one-time and progressive badges
  */
 export enum BadgeType {
-  // Category 1: The Quality Match (Single Tier)
-  NUTRIENT_NAVIGATOR = 'nutrient_navigator',
-  
-  // Category 2: Plan Variety & Engagement (Single Tier)
-  MASTER_MEAL_PLANNER = 'master_meal_planner',
-  
-  // Category 3: Planning Volume (Tiered)
-  PLANNING_VOLUME = 'planning_volume',
-  
-  // Category 4: Purchase Commitment (Tiered)
-  PURCHASE_COMMITMENT = 'purchase_commitment',
+  PERFECT_MATCH = 'perfect_match',
+  FEAST_ARCHITECT = 'feast_architect',
+  WEEK_WHISKER = 'week_whisker',
+  PURCHASE_CHAMPION = 'purchase_champion',
+  SEARCH_DISCOVERY = 'search_discovery',
+  DAILY_LOGIN = 'daily_login',
+  PROFILE_SETUP = 'profile_setup',
+  PREPARATION = 'preparation',
 }
 
 /**
@@ -52,12 +49,18 @@ export interface PetBadges {
  * Badge unlock context for checking eligibility
  */
 export interface BadgeCheckContext {
-  action: 'meal_created' | 'recipe_viewed' | 'meal_plan_created' | 'recipe_saved' | 'recipe_removed' | 'meal_plan_completed' | 'purchase_confirmed';
-  compatibilityScore?: number; // For Nutrient Navigator
-  mealPlanCount?: number; // Unique meals in plan
-  savedRecipesCount?: number; // Number of saved recipes
-  weeklyPlanCompleted?: boolean; // Whether weekly plan is completed
-  completionCount?: number; // Number of completed meal plans
-  purchaseCount?: number; // Number of purchases
+  action:
+    | 'meal_created'
+    | 'recipe_viewed'
+    | 'meal_plan_completed'
+    | 'purchase_confirmed'
+    | 'search_discovery'
+    | 'daily_login'
+    | 'profile_setup';
+  compatibilityScore?: number;
+  mealPlanCount?: number;
+  weeklyPlanCompleted?: boolean;
+  completionCount?: number;
+  purchaseCount?: number;
 }
 

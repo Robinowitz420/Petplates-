@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
+import { useAuth } from '@clerk/nextjs';
 
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import type { Pet } from '@/lib/types';
 import RecipeScoreModal from './RecipeScoreModal';
 import { normalizePetType } from '@/lib/utils/petType';
+import { formatPercent } from '@/lib/utils/formatPercent';
+import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -25,6 +28,18 @@ function gradeToCompatibility(grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' 
 
 export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddingMeal, setIsAddingMeal] = useState(false);
+  const [isMealAdded, setIsMealAdded] = useState(false);
+  const { userId } = useAuth();
+
+  useEffect(() => {
+    if (!pet) {
+      setIsMealAdded(false);
+      return;
+    }
+    const inSavedRecipes = Array.isArray(pet.savedRecipes) ? pet.savedRecipes.includes(recipe.id) : false;
+    setIsMealAdded(inSavedRecipes);
+  }, [pet, recipe.id]);
 
   // Calculate compatibility rating if pet is provided
   const speciesScore = pet
@@ -56,7 +71,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
     <>
       <Link
         href={`/recipe/${recipe.id}${pet ? `?petId=${pet.id}` : ''}`}
-        className="group bg-surface rounded-md shadow-sm border border-surface-highlight hover:border-orange-500/40 hover:shadow-md transition-shadow duration-200 overflow-hidden"
+        className="group bg-surface rounded-md shadow-sm border border-orange-500/30 hover:border-orange-500/50 hover:shadow-md transition-shadow duration-200 overflow-hidden"
       >
         <div className="bg-surface-highlight/90 px-4 py-3 border-b border-surface-highlight flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -89,13 +104,10 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                   <span className="text-[11px] font-semibold uppercase tracking-wide text-emerald-200/80">
                     Compatibility Score
                   </span>
-                  <span className="text-[11px] text-emerald-100/80">
-                    For this pet profile
-                  </span>
                 </div>
                 <div className="text-right">
                   <div className="text-lg font-bold leading-none text-emerald-50">
-                    {speciesScore.overallScore}%
+                    {formatPercent(speciesScore.overallScore)}
                   </div>
                   <div className="mt-0.5 text-[10px] uppercase tracking-wide text-emerald-100/80">
                     {gradeToCompatibility(speciesScore.grade)} match
@@ -117,13 +129,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
               </div>
 
               <div className="flex items-center justify-between text-[11px] text-emerald-100/80">
-                <span>
-                  {speciesScore.overallScore >= 80
-                    ? '✓ Excellent match for your pet'
-                    : speciesScore.overallScore >= 60
-                    ? '⚠ Good, but could be improved'
-                    : '✗ Needs adjustments for safety'}
-                </span>
+                <span />
                 <button
                   onClick={(e) => {
                     e.preventDefault();
@@ -134,6 +140,15 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                 >
                   View details
                 </button>
+              </div>
+            </div>
+          )}
+
+          {(recipe as any).meta?.estimatedCost && (
+            <div className="mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
+                <span>Cost per meal:</span>
+                <span className="text-white">{String((recipe as any).meta.estimatedCost)}</span>
               </div>
             </div>
           )}
@@ -174,6 +189,41 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
               <span>{recipe.servings} servings</span>
             </div>
           </div>
+
+          {pet ? (
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  if (!userId) return;
+                  if (isMealAdded || isAddingMeal) return;
+
+                  setIsAddingMeal(true);
+                  try {
+                    const nextSavedRecipes = Array.isArray(pet.savedRecipes) ? [...pet.savedRecipes] : [];
+                    if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
+                    await savePersistedPet(userId, { ...pet, savedRecipes: nextSavedRecipes } as any);
+                    setIsMealAdded(true);
+                  } catch {
+                    // ignore
+                  } finally {
+                    setIsAddingMeal(false);
+                  }
+                }}
+                disabled={!userId || isAddingMeal || isMealAdded}
+                className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-colors shadow-md border ${
+                  isMealAdded
+                    ? 'bg-green-900/40 text-green-200 border-green-700/50 cursor-default'
+                    : 'bg-green-800 text-white border-green-900 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+              </button>
+            </div>
+          ) : null}
         </div>
       </Link>
 

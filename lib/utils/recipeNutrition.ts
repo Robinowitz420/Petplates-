@@ -94,6 +94,12 @@ function parseAmountToGrams(value: unknown, opts?: AmountParseOpts): number {
   let str = value.toLowerCase().trim();
   if (!str) return 0;
 
+  // Many generated recipes use percentage-style amounts (e.g. "20%") rather than weights.
+  // Treat these as relative weights by stripping the % symbol so we can still compute ratios.
+  if (str.includes('%')) {
+    str = str.replace(/%/g, ' ');
+  }
+
   const vagueTerms = ['to taste', 'pinch', 'dash', 'some', 'handful', 'few', 'several', 'as needed'];
   if (vagueTerms.some((t) => str.includes(t))) return 0;
 

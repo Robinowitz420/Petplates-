@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   X
 } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import { generateCustomMealAnalysis } from '@/lib/analyzeCustomMeal';
 import { INGREDIENT_COMPOSITIONS } from '@/lib/data/ingredientCompositions';
 import { type IngredientSelection, type MealAnalysis } from '@/lib/analyzeCustomMeal';
@@ -396,6 +397,7 @@ export default function RecipeBuilderPage() {
   const params = useParams();
   const router = useRouter();
   const petId = params.id as string;
+  const { userId, isLoaded } = useAuth();
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [selectedIngredients, setSelectedIngredients] = useState<IngredientSelection[]>([]);
@@ -507,10 +509,10 @@ export default function RecipeBuilderPage() {
   // Load pet data and fetch recommended meals
   useEffect(() => {
     const loadPetData = async () => {
-      if (typeof window !== 'undefined') {
-        const userId = localStorage.getItem('last_user_id') || 'clerk_simulated_user_id_123';
-        
-        try {
+      if (!isLoaded) return;
+      if (!userId) return;
+
+      try {
           const pets = await getPets(userId);
           const foundPet = pets.find((p: any) => p.id === petId);
           
@@ -558,14 +560,13 @@ export default function RecipeBuilderPage() {
               // Failed to fetch recommended meals
             }
           }
-        } catch (error) {
-          console.error("Error loading pet:", error);
-        }
+      } catch (error) {
+        console.error("Error loading pet:", error);
       }
     };
 
     loadPetData();
-  }, [petId]);
+  }, [isLoaded, petId, userId]);
 
   // Handle wizard completion
   const handleWizardComplete = (selections: { [category: string]: string[] }) => {
@@ -813,7 +814,7 @@ export default function RecipeBuilderPage() {
           petAge={pet.age}
           petWeight={pet.weight}
           petId={petId}
-          userId={localStorage.getItem('last_user_id') || 'clerk_simulated_user_id_123'}
+          userId={userId || ''}
           selectedIngredients={selectedIngredients}
           analysis={analysis}
           isAnalyzing={isAnalyzing}

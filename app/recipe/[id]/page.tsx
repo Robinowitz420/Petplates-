@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuth } from '@clerk/nextjs';
 
 import {
   Clock,
@@ -36,22 +37,61 @@ import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import { getCustomMeal } from '@/lib/utils/customMealStorage';
 import { convertCustomMealToRecipe } from '@/lib/utils/convertCustomMealToRecipe';
+import { getPets as getPersistedPets, savePet as savePersistedPet } from '@/lib/utils/petStorage';
 import {
   getRecommendationsForRecipe,
   type RecommendedSupplement,
 } from '@/lib/utils/nutritionalRecommendations';
+
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import { normalizePetType } from '@/lib/utils/petType';
-import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
+import { formatPercent } from '@/lib/utils/formatPercent';
+import { getPortionPlan } from '@/lib/portionCalc';
+import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
+import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
+import CustomMadeForLine from '@/components/CustomMadeForLine';
 
 // =================================================================
 // 1. CONSTANTS
 // =================================================================
 
 type CategoryType = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
+
+function extractSafetyFlags(ingredients: Array<{ name?: string } | string>): string[] {
+  const items = Array.isArray(ingredients) ? ingredients : [];
+  const names = items
+    .map((i) => (typeof i === 'string' ? i : i?.name || ''))
+    .join(' | ')
+    .toLowerCase();
+
+  const flags: Array<{ key: string; text: string }> = [
+    { key: 'onion', text: 'Contains onion — may be unsafe for some pets.' },
+    { key: 'garlic', text: 'Contains garlic — may be unsafe for some pets.' },
+    { key: 'chive', text: 'Contains chives — may be unsafe for some pets.' },
+    { key: 'grape', text: 'Contains grapes — may be unsafe for some pets.' },
+    { key: 'raisin', text: 'Contains raisins — may be unsafe for some pets.' },
+    { key: 'chocolate', text: 'Contains chocolate/cocoa — may be unsafe for some pets.' },
+    { key: 'cocoa', text: 'Contains chocolate/cocoa — may be unsafe for some pets.' },
+    { key: 'xylitol', text: 'Contains xylitol — may be unsafe for some pets.' },
+    { key: 'macadamia', text: 'Contains macadamia — may be unsafe for some pets.' },
+    { key: 'alcohol', text: 'Contains alcohol — may be unsafe for some pets.' },
+    { key: 'caffeine', text: 'Contains caffeine/coffee/tea — may be unsafe for some pets.' },
+    { key: 'coffee', text: 'Contains caffeine/coffee/tea — may be unsafe for some pets.' },
+    { key: 'tea', text: 'Contains caffeine/coffee/tea — may be unsafe for some pets.' },
+  ];
+
+  const found = new Map<string, string>();
+  for (const f of flags) {
+    if (names.includes(f.key)) {
+      found.set(f.key, f.text);
+    }
+  }
+
+  return Array.from(found.values());
+}
 
 const NUTRITION_GUIDELINES: Record<
   CategoryType,
@@ -118,90 +158,7 @@ interface RecipeDetailPet {
   savedRecipes: string[];
 }
 
-const getPetsFromLocalStorage = (userId: string): RecipeDetailPet[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed)
-      ? parsed.map((p: any) => ({
-          ...p,
-          names: p.names || (p.name ? [p.name] : []),
-          savedRecipes: p.savedRecipes || [],
-          mealPlan: p.mealPlan || [],
-          healthConcerns: p.healthConcerns || [],
-        }))
-      : [];
-  } catch {
-    return [];
-  }
-};
-
-const savePetsToLocalStorage = (userId: string, pets: RecipeDetailPet[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(`pets_${userId}`, JSON.stringify(pets));
-  }
-};
-
-const getSavedRecipes = (userId: string): string[] => {
-  const pets = getPetsFromLocalStorage(userId);
-  return [...new Set(pets.flatMap((p) => p.savedRecipes || []))];
-};
-
-const getStarStates = (rating: number): boolean[] => {
-  const fullStars = Math.round(rating);
-  return Array.from({ length: 5 }, (_, i) => i < fullStars);
-};
-
-const setRecipeSavedState = (
-  userId: string,
-  recipeId: string,
-  isSaving: boolean
-): RecipeDetailPet[] => {
-  const pets = getPetsFromLocalStorage(userId);
-  const updatedPets = pets.map((pet) => {
-    if (!pet.savedRecipes) pet.savedRecipes = [];
-    if (isSaving && !pet.savedRecipes.includes(recipeId)) {
-      pet.savedRecipes.push(recipeId);
-    } else if (!isSaving && pet.savedRecipes.includes(recipeId)) {
-      pet.savedRecipes = pet.savedRecipes.filter((id) => id !== recipeId);
-    }
-    return pet;
-  });
-
-  savePetsToLocalStorage(userId, updatedPets);
-
-  // Check badges after saving/removing recipe
-  if (isSaving) {
-    updatedPets.forEach(async (pet) => {
-      if (pet.savedRecipes.includes(recipeId)) {
-        // Get meal plan count and weekly plan completion status
-        // Note: We'll need to check this from the profile page context
-        // For now, just check saved recipes count
-        const savedRecipesCount = pet.savedRecipes.length;
-
-        checkAllBadges(userId, pet.id, {
-          action: 'recipe_saved',
-          savedRecipesCount,
-          mealPlanCount: 0, // Will be updated from profile page
-          weeklyPlanCompleted: false,
-        }).catch((err) => {
-          console.error('Failed to check badges:', err);
-        });
-      }
-    });
-  }
-
-  return updatedPets;
-};
-
-// For now we use last_user_id the same way as profile page
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('last_user_id') || '';
-};
+// Removed getPetsFromLocalStorage and savePetsToLocalStorage
 
 // Helper function to extract ASIN from Amazon URL
 const extractASIN = (url: string): string | undefined => {
@@ -293,13 +250,14 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
   };
 };
 
-// =================================================================
 // 3. MAIN COMPONENT
 // =================================================================
 
 export default function RecipeDetailPage() {
   const params = useParams();
   const id = params?.id as string | undefined;
+
+  const { userId: clerkUserId, isLoaded } = useAuth();
 
   const ingredientsTopRef = useRef<HTMLDivElement | null>(null);
 
@@ -325,14 +283,47 @@ export default function RecipeDetailPage() {
   const [modifiedScore, setModifiedScore] = useState<number | null>(null);
   const [animatedScore, setAnimatedScore] = useState<number | null>(null);
 
-  const userId = getCurrentUserId();
+  const userId = clerkUserId || '';
 
   const searchParams = useSearchParams();
   const queryPetId = searchParams?.get('petId') || '';
 
+  const activePetId = selectedPetId || queryPetId;
+
+  const activePet = useMemo(() => {
+    if (!activePetId) return null;
+    return pets.find((p) => p.id === activePetId) || null;
+  }, [pets, activePetId]);
+
+  const portionPlan = useMemo(() => {
+    if (!recipe || !activePet) return null;
+
+    const petType = normalizePetType(activePet.type, 'recipe/[id].portionPlan');
+    if (petType !== 'dog' && petType !== 'cat') return null;
+
+    const weightKg = parseFloat(String(activePet.weight || '')) || 0;
+    if (!Number.isFinite(weightKg) || weightKg <= 0) return null;
+
+    const profile = {
+      species: petType === 'dog' ? 'dogs' : 'cats',
+      ageGroup: (activePet as any).age || 'adult',
+      weightKg,
+      breed: activePet.breed || null,
+      healthConcerns: (activePet.healthConcerns || []).map(normalizeConcern),
+      allergies: activePet.allergies || [],
+      petName: getRandomName(activePet.names),
+    };
+
+    try {
+      return getPortionPlan(recipe, profile as any);
+    } catch {
+      return null;
+    }
+  }, [recipe, activePet]);
+
   const scoreForQueryPet = useMemo(() => {
-    if (!recipe || !queryPetId) return null;
-    const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
+    if (!recipe || !activePetId) return null;
+    const pet = pets.find((p) => p.id === activePetId);
     if (!pet) return null;
 
     try {
@@ -347,19 +338,16 @@ export default function RecipeDetailPage() {
         weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
         activityLevel: 'moderate' as const,
         healthConcerns: pet.healthConcerns || [],
-        dietaryRestrictions: pet.allergies || [],
         allergies: pet.allergies || [],
       } as any;
 
       const scored = scoreWithSpeciesEngine(recipe, scoringPet);
 
-      // Check badges if score is 100% (Nutrient Navigator)
-      if (scored.overallScore === 100 && queryPetId && userId) {
-        checkAllBadges(userId, queryPetId, {
-          action: 'recipe_saved',
-          savedRecipesCount: 0, // Will be updated from profile page
-          mealPlanCount: 0, // Will be updated from profile page
-          weeklyPlanCompleted: false,
+      // Check badges if score is 100% (Perfect Match)
+      if (scored.overallScore === 100 && activePetId && userId) {
+        checkAllBadges(userId, activePetId, {
+          action: 'recipe_viewed',
+          compatibilityScore: scored.overallScore,
         }).catch((err) => {
           console.error('Failed to check badges:', err);
         });
@@ -406,30 +394,10 @@ export default function RecipeDetailPage() {
       console.error('Error calculating compatibility:', error);
       return null;
     }
-  }, [recipe, queryPetId, userId]);
+  }, [recipe, activePetId, pets, userId]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!id) return;
-    if (!modifiedRecipe) return;
-
-    try {
-      sessionStorage.setItem(`recipe_${id}`, JSON.stringify(modifiedRecipe));
-    } catch {
-      // ignore
-    }
-  }, [id, modifiedRecipe]);
-
-  const modifierResultForQueryPet = (() => {
-    if (!recipe || !queryPetId) return null;
-    const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
-    if (!pet) return null;
-
-    return applyModifiers(recipe, pet as any);
-  })();
-
-  // Load recipe by dynamic route id (handles custom meals, generated recipes, and regular recipes)
-  useEffect(() => {
+    if (!isLoaded) return;
     if (!id) {
       setIsLoading(false);
       return;
@@ -509,21 +477,30 @@ export default function RecipeDetailPage() {
           });
       }
     }
-  }, [id, queryPetId, userId]); // Reload when ID, petId, or userId changes
+  }, [id, isLoaded, queryPetId, userId]); // Reload when ID, petId, or userId changes
 
   // Load pets & saved state
   useEffect(() => {
+    if (!isLoaded) return;
     if (!userId || !id) return;
 
-    try {
-      const loadedPets = getPetsFromLocalStorage(userId);
-      setPets(loadedPets);
-    } catch (error) {
-      // Handle error gracefully - show empty pets array
-      console.error('Failed to load pets:', error);
-      setPets([]);
-    }
-  }, [userId, id]);
+    getPersistedPets(userId)
+      .then((loadedPets) => {
+        const normalized = (Array.isArray(loadedPets) ? loadedPets : []).map((p: any) => ({
+          ...p,
+          names: Array.isArray(p?.names) && p.names.length > 0 ? p.names : (p?.name ? [p.name] : ['Unnamed Pet']),
+          mealPlan: Array.isArray(p?.mealPlan) ? p.mealPlan : [],
+          savedRecipes: Array.isArray(p?.savedRecipes) ? p.savedRecipes : [],
+          healthConcerns: Array.isArray(p?.healthConcerns) ? p.healthConcerns : [],
+          allergies: Array.isArray(p?.allergies) ? p.allergies : [],
+        }));
+        setPets(normalized);
+      })
+      .catch((error) => {
+        console.error('Failed to load pets:', error);
+        setPets([]);
+      });
+  }, [isLoaded, userId, id]);
 
   useEffect(() => {
     // Auto-select pet from URL parameter if available
@@ -533,12 +510,11 @@ export default function RecipeDetailPage() {
   }, [queryPetId, pets, selectedPetId]);
 
   useEffect(() => {
-    // Check if meal is already added for the current pet (check both mealPlan and savedRecipes)
+    // Check if meal is already added for the current pet (saved only)
     const currentPet = selectedPetId ? pets.find(p => p.id === selectedPetId) : (queryPetId ? pets.find(p => p.id === queryPetId) : null);
     if (currentPet && recipe) {
-      const inMealPlan = currentPet.mealPlan?.includes(recipe.id) || false;
       const inSavedRecipes = currentPet.savedRecipes?.includes(recipe.id) || false;
-      setIsMealAdded(inMealPlan || inSavedRecipes);
+      setIsMealAdded(inSavedRecipes);
     } else {
       setIsMealAdded(false);
     }
@@ -562,15 +538,38 @@ export default function RecipeDetailPage() {
     setPetAllergies(pet.allergies?.join(', ') || '');
     setModifierResult(null);
     setModifierError(null);
-    const inMealPlan = pet.mealPlan?.includes(recipe.id) || false;
     const inSavedRecipes = pet.savedRecipes?.includes(recipe.id) || false;
-    setIsMealAdded(inMealPlan || inSavedRecipes);
+    setIsMealAdded(inSavedRecipes);
 
     // Apply modifiers, then vet all ingredients to ensure purchase links
     const { modifiedRecipe } = applyModifiers(recipe, pet);
     const vetted = vetRecipeIngredients(modifiedRecipe);
     setVettedRecipe(vetted);
   }, [selectedPetId, pets, recipe]);
+
+  // Score animation function
+  const animateScoreChange = useCallback((from: number, to: number) => {
+    const duration = 1500; // 1.5 seconds
+    const steps = 60;
+    const increment = (to - from) / steps;
+    let current = from;
+    let step = 0;
+
+    const animate = () => {
+      step++;
+      current = from + (increment * step);
+      
+      if (step < steps) {
+        setAnimatedScore(Math.round(current));
+        requestAnimationFrame(animate);
+      } else {
+        setAnimatedScore(to);
+      }
+    };
+
+    void duration;
+    animate();
+  }, []);
 
   // Function to add supplement to recipe
   const handleAddSupplement = useCallback((supplement: RecommendedSupplement) => {
@@ -603,8 +602,8 @@ export default function RecipeDetailPage() {
     }
 
     // Recalculate score
-    if (queryPetId && scoreForQueryPet) {
-      const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
+    if (activePetId && scoreForQueryPet) {
+      const pet = pets.find((p) => p.id === activePetId);
       if (pet) {
         const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
         const petType = normalizePetType(pet.type, 'recipe/[id].recalcScore');
@@ -641,30 +640,7 @@ export default function RecipeDetailPage() {
         }
       }
     }
-  }, [modifiedRecipe, vettedRecipe, recipe, queryPetId, scoreForQueryPet, userId]);
-
-  // Score animation function
-  const animateScoreChange = useCallback((from: number, to: number) => {
-    const duration = 1500; // 1.5 seconds
-    const steps = 60;
-    const increment = (to - from) / steps;
-    let current = from;
-    let step = 0;
-
-    const animate = () => {
-      step++;
-      current = from + (increment * step);
-      
-      if (step < steps) {
-        setAnimatedScore(Math.round(current));
-        requestAnimationFrame(animate);
-      } else {
-        setAnimatedScore(to);
-      }
-    };
-
-    animate();
-  }, []);
+  }, [modifiedRecipe, vettedRecipe, recipe, activePetId, pets, scoreForQueryPet, animateScoreChange]);
 
   const handleAddToMealPlan = useCallback(async () => {
     if (!recipe || !userId) {
@@ -687,8 +663,8 @@ export default function RecipeDetailPage() {
       return;
     }
 
-    // Check if already added (check both mealPlan and savedRecipes)
-    if (currentPet.mealPlan?.includes(recipe.id) || currentPet.savedRecipes?.includes(recipe.id)) {
+    // Check if already saved
+    if (currentPet.savedRecipes?.includes(recipe.id)) {
       setIsMealAdded(true);
       return;
     }
@@ -699,17 +675,18 @@ export default function RecipeDetailPage() {
     await new Promise(resolve => setTimeout(resolve, 300));
 
     const updatedPets = pets.map((pet) => {
-      if (pet.id === currentPetId) {
-        if (!pet.mealPlan) pet.mealPlan = [];
-        if (!pet.mealPlan.includes(recipe.id)) {
-          pet.mealPlan.push(recipe.id);
-          setIsMealAdded(true);
-        }
-      }
-      return pet;
+      if (pet.id !== currentPetId) return pet;
+      const nextSavedRecipes = Array.isArray(pet.savedRecipes) ? [...pet.savedRecipes] : [];
+      if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
+      return { ...pet, savedRecipes: nextSavedRecipes };
     });
 
-    savePetsToLocalStorage(userId, updatedPets);
+    const updatedPet = updatedPets.find((p) => p.id === currentPetId) || null;
+    if (updatedPet) {
+      await savePersistedPet(userId, updatedPet as any);
+      setIsMealAdded(true);
+    }
+
     setPets(updatedPets);
     setIsAddingMeal(false);
   }, [recipe, selectedPetId, queryPetId, pets, userId]);
@@ -921,7 +898,7 @@ export default function RecipeDetailPage() {
           Back to My Pets
         </Link>
 
-        {/* Full-width title card with radial compatibility score */}
+        {/* Full-width title card with compatibility score + Save Meal */}
         <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
           <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
             <div className="min-w-0">
@@ -936,8 +913,9 @@ export default function RecipeDetailPage() {
                 </div>
               </h1>
 
-              <div className="flex flex-wrap gap-2">
+              {activePet ? <CustomMadeForLine petName={getRandomName(activePet.names)} /> : null}
 
+              <div className="flex flex-wrap gap-2">
                 {recipe.tags?.filter((tag) => tag !== 'Generated').map((tag) => (
                   <span
                     key={tag}
@@ -947,58 +925,77 @@ export default function RecipeDetailPage() {
                   </span>
                 ))}
               </div>
+
+              <div className="-mt-2 pl-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleAddToMealPlan}
+                  disabled={!userId || !activePetId || isAddingMeal || isMealAdded}
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold transition-colors shadow-md border bg-green-800 text-white border-green-900 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+                </button>
+                {!userId && <span className="text-xs text-gray-400">Sign in to save</span>}
+                {userId && !activePetId && <span className="text-xs text-gray-400">Select a pet to add</span>}
+              </div>
             </div>
 
-            {queryPetId && scoreForQueryPet && (
-              <button
-                type="button"
-                onClick={() => setIsScoreModalOpen(true)}
-                className="lg:shrink-0 self-start rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
-              >
-                {(() => {
-                  const score = Math.max(0, Math.min(100, Number(scoreForQueryPet.overallScore) || 0));
-                  const size = 118;
-                  const stroke = 10;
-                  const r = (size - stroke) / 2;
-                  const c = 2 * Math.PI * r;
-                  const dash = (score / 100) * c;
-                  const color = score >= 80 ? '#34d399' : score >= 60 ? '#fbbf24' : '#f87171';
-                  return (
-                    <div className="flex items-center gap-5">
-                      <div className="relative" style={{ width: size, height: size }}>
-                        <svg width={size} height={size} className="block" style={{ transform: 'rotate(-90deg)' }}>
-                          <circle
-                            cx={size / 2}
-                            cy={size / 2}
-                            r={r}
-                            stroke="rgba(255,255,255,0.10)"
-                            strokeWidth={stroke}
-                            fill="transparent"
-                          />
-                          <circle
-                            cx={size / 2}
-                            cy={size / 2}
-                            r={r}
-                            stroke={color}
-                            strokeWidth={stroke}
-                            fill="transparent"
-                            strokeLinecap="round"
-                            strokeDasharray={`${dash} ${c - dash}`}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <div className="text-3xl font-extrabold text-foreground leading-none">{Math.round(score)}%</div>
-                          <div className="text-xs text-gray-400 mt-1">compatibility</div>
+            {scoreForQueryPet && activePet && (
+              <PetCompatibilityBlock
+                avatarSrc={getProfilePictureForPetType(activePet.type)}
+                avatarAlt={`${getRandomName(activePet.names)} profile`}
+                spacerClassName="w-16 shrink-0 bg-surface"
+                right={
+                  <button
+                    type="button"
+                    onClick={() => setIsScoreModalOpen(true)}
+                    className="rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
+                  >
+                    {(() => {
+                      const score = Math.max(0, Math.min(100, Number(scoreForQueryPet.overallScore) || 0));
+                      const size = 118;
+                      const stroke = 10;
+                      const r = (size - stroke) / 2;
+                      const c = 2 * Math.PI * r;
+                      const dash = (score / 100) * c;
+                      const color = score >= 80 ? '#34d399' : score >= 60 ? '#fbbf24' : '#f87171';
+                      return (
+                        <div className="flex items-center gap-5">
+                          <div className="relative" style={{ width: size, height: size }}>
+                            <svg width={size} height={size} className="block" style={{ transform: 'rotate(-90deg)' }}>
+                              <circle
+                                cx={size / 2}
+                                cy={size / 2}
+                                r={r}
+                                stroke="rgba(255,255,255,0.10)"
+                                strokeWidth={stroke}
+                                fill="transparent"
+                              />
+                              <circle
+                                cx={size / 2}
+                                cy={size / 2}
+                                r={r}
+                                stroke={color}
+                                strokeWidth={stroke}
+                                fill="transparent"
+                                strokeLinecap="round"
+                                strokeDasharray={`${dash} ${c - dash}`}
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <div className="text-3xl font-extrabold text-foreground leading-none">{formatPercent(score)}</div>
+                            </div>
+                          </div>
+                          <div className="text-left">
+                            <div className="text-sm font-semibold text-gray-200">Compatibility</div>
+                            <div className="text-xs text-gray-400 mt-1">Tap for details</div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-left">
-                        <div className="text-sm font-semibold text-gray-200">Compatibility</div>
-                        <div className="text-xs text-gray-400 mt-1">Tap for details</div>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </button>
+                      );
+                    })()}
+                  </button>
+                }
+              />
             )}
           </div>
         </div>
@@ -1007,7 +1004,8 @@ export default function RecipeDetailPage() {
           <main className="lg:col-span-3">
             {/* Ingredients & Supplements Tabs */}
             <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3 flex items-center gap-2">
+                <ShoppingCart size={22} />
                 Shopping List
               </h3>
               {/* Tab Navigation */}
@@ -1136,6 +1134,15 @@ export default function RecipeDetailPage() {
                       if (k.includes('activity') && k.includes('fit')) return false;
                       return true;
                     })
+                    .filter(([_key, factor]) => {
+                      const f = factor as { weight: number; reason?: string; recommendations?: any[] };
+                      const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
+                      if (weight > 0) return true;
+
+                      const hasReason = typeof f.reason === 'string' && f.reason.trim().length > 0;
+                      const hasRecs = Array.isArray(f.recommendations) && f.recommendations.length > 0;
+                      return hasReason || hasRecs;
+                    })
                     .map(([key, factor]) => {
                       const f = factor as {
                         score: number;
@@ -1147,8 +1154,7 @@ export default function RecipeDetailPage() {
 
                       const rawScore = typeof f.score === 'number' && Number.isFinite(f.score) ? f.score : 0;
                       const score = Math.round(rawScore);
-                      const weightedContribution =
-                        f.weightedContribution ?? Math.round(rawScore * (f.weight || 0));
+                      const weightedContribution = f.weightedContribution ?? Math.round(rawScore * (f.weight || 0));
                       const weight = f.weight || 0;
 
                       let bgColor = 'bg-green-900/20 border-green-700/50';
@@ -1195,7 +1201,7 @@ export default function RecipeDetailPage() {
                         }
                       }
 
-                      const tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${score}%\nWeight: ${(
+                      const tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${formatPercent(score)}\nWeight: ${(
                         weight * 100
                       ).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${
                         f.reason ? `💡 ${f.reason}` : 'No additional details available'
@@ -1211,7 +1217,7 @@ export default function RecipeDetailPage() {
                               <span className={`text-sm font-medium capitalize ${textColor}`}>{factorName}</span>
                             </div>
                             <div className="flex flex-col items-end">
-                              <span className={`text-sm font-bold ${textColor}`}>{score}%</span>
+                              <span className={`text-sm font-bold ${textColor}`}>{formatPercent(score)}</span>
                               <span className="text-xs text-gray-400">+{weightedContribution} pts</span>
                             </div>
                           </div>
@@ -1221,6 +1227,55 @@ export default function RecipeDetailPage() {
                 </div>
               </div>
             )}
+
+            <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
+                🧊 Storage & Serving
+              </h3>
+              <div className="space-y-4 text-sm text-gray-300">
+                {portionPlan ? (
+                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
+                    <div className="font-semibold text-gray-200">Suggested serving for your pet</div>
+                    <div className="text-gray-300 mt-1">
+                      {portionPlan.dailyGrams}g per day ({portionPlan.mealsPerDay} meals/day)
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
+                    <div className="text-gray-300">
+                      Serving varies by species, size, age, and activity—create a pet profile for exact portions.
+                    </div>
+                    <div className="mt-3">
+                      <Link
+                        href="/sign-up"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-800 text-white font-semibold hover:bg-green-900 transition-colors"
+                      >
+                        Create Free Account
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className="font-semibold text-gray-200">Storage</div>
+                  <div className="text-gray-300 mt-1">Fridge: Store in airtight container up to 3 days</div>
+                  <div className="text-gray-300">Freezer: Freeze portions up to 2 months</div>
+                  <div className="text-gray-300">Thawing: Thaw overnight in fridge</div>
+                </div>
+
+                <div>
+                  <div className="font-semibold text-gray-200">Serving temperature</div>
+                  <div className="text-gray-300 mt-1">Serve at room temp or gently warmed</div>
+                  <div className="text-gray-300">Avoid overheating; stir well and test temperature before serving</div>
+                </div>
+
+                <div>
+                  <div className="font-semibold text-gray-200">Batch prep tip</div>
+                  <div className="text-gray-300 mt-1">Cool fully before portioning; portion into daily containers</div>
+                </div>
+              </div>
+            </div>
+
             {/* Preparation Instructions */}
             <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
               <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
@@ -1246,7 +1301,7 @@ export default function RecipeDetailPage() {
         <RecipeScoreModal
           recipe={recipe}
           pet={(() => {
-            const pet = getPetsFromLocalStorage(userId).find((p) => p.id === queryPetId);
+            const pet = pets.find((p) => p.id === activePetId);
             if (!pet) return null;
             const petType = normalizePetType(pet.type, 'recipe/[id].RecipeScoreModal');
             return {

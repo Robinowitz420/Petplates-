@@ -32,7 +32,11 @@ export function getPetBadges(userId: string, petId: string): PetBadges {
 
     const parsed = safeParseJSON<PetBadges>(stored, { badges: [] });
     if (parsed && Array.isArray(parsed.badges)) {
-      return parsed;
+      const validTypes = new Set(Object.values(BadgeType));
+      return {
+        ...parsed,
+        badges: parsed.badges.filter((b) => b && validTypes.has(b.type)),
+      };
     }
 
     return { badges: [] };

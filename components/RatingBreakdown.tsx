@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatPercent } from '@/lib/utils/formatPercent';
 
 type CompatibilityRating = {
   overallScore: number;
@@ -50,7 +51,7 @@ export const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg font-semibold text-gray-900">Overall Compatibility</span>
-          <span className="text-2xl font-bold text-gray-900">{rating.overallScore}%</span>
+          <span className="text-2xl font-bold text-gray-900">{formatPercent(rating.overallScore)}</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3">
           <div
@@ -72,7 +73,7 @@ export const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
                   {formatFactorName(key)}
                 </span>
                 <span className="text-sm text-gray-600">
-                  {factor.score}% ({factor.weight}% weight)
+                  {formatPercent(factor.score)} ({formatPercent(factor.weight * 100)} weight)
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">

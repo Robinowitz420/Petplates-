@@ -4,30 +4,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Trash2, Edit, Calendar, ChefHat } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
-
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return 'clerk_simulated_user_id_123';
-  return localStorage.getItem('last_user_id') || 'clerk_simulated_user_id_123';
-};
-
-const getPetsFromLocalStorage = (userId: string): Pet[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
-  }
-};
 
 export default function CustomMealsHistoryPage() {
   const params = useParams();
   const router = useRouter();
   const petId = params.id as string;
+  const { userId, isLoaded } = useAuth();
   
   const [pet, setPet] = useState<Pet | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
@@ -35,7 +21,13 @@ export default function CustomMealsHistoryPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const userId = getCurrentUserId();
+      if (!isLoaded) return;
+      if (!userId) {
+        setPet(null);
+        setCustomMeals([]);
+        setLoading(false);
+        return;
+      }
       try {
         const pets = await getPets(userId);
         const foundPet = pets.find(p => p.id === petId) || null;
@@ -53,12 +45,13 @@ export default function CustomMealsHistoryPage() {
       setLoading(false);
     };
     loadData();
-  }, [petId]);
+  }, [isLoaded, petId, userId]);
 
   const handleDelete = async (mealId: string) => {
     if (!confirm('Are you sure you want to delete this custom meal?')) return;
-    
-    const userId = getCurrentUserId();
+
+    if (!isLoaded || !userId) return;
+
     await deleteCustomMeal(userId, petId, mealId);
     
     // Refresh the list

@@ -1,0 +1,219 @@
+Paws & Plates — Marketing Pitch Doc
+One-liner
+
+Paws & Plates helps pet owners meal prep safely at home with free, personalized meal plans and recipes for dogs, cats, birds, reptiles, and pocket pets.
+
+Elevator pitch
+
+Most pet nutrition tools either push supplements, sell expensive delivery subscriptions, or ignore “non-mainstream” pets entirely. Paws & Plates is a free meal-prep platform that creates custom recipes and meal plans based on your pet’s species, breed, age, activity level, and constraints—then gives you a shopping list with optional affiliate purchase links so you can cook confidently and consistently.
+
+The problem
+
+Pet owners who want to cook at home face:
+
+Information overload: contradictory advice, unsafe food lists, unclear portioning
+
+Lack of coverage: birds/reptiles/pocket pets have far fewer trustworthy diet tools
+
+No personalization: generic recipes ignore age, activity, allergies, and health concerns
+
+“Meal prep friction”: planning + shopping + consistent portions is the hardest part
+
+The solution
+
+Paws & Plates turns “What should I feed my pet?” into a guided workflow:
+
+Create a pet profile (species → breed → age → activity → constraints)
+
+Generate meals with a compatibility score + nutrition breakdown
+
+Save meals and assemble a meal plan
+
+Shop ingredients via a curated list (with affiliate links where available)
+
+Who it’s for
+
+Primary: pet owners worldwide who want to meal prep at home
+Power users / underserved audiences (your wedge):
+
+Bird owners (cockatiels, budgies, finches, parrots)
+
+Reptile owners (bearded dragons, geckos, turtles/tortoises)
+
+Pocket pet owners (hamsters, guinea pigs, rabbits, rats, ferrets, etc.)
+
+Why now
+
+Growing interest in fresh/home-prepared feeding
+
+Search demand exploding for “what can my hamster eat / what should I feed my cockatiel”
+
+Competitors are optimized for dogs/cats and/or delivery—not comprehensive meal prep
+
+What makes Paws & Plates different
+1) “Meal prep for ALL your pets”
+
+Dogs and cats have options. Exotics and small animals don’t. Paws & Plates is designed to cover them seriously, not as an afterthought.
+
+2) Built for “at-home prep,” not delivery or supplement upsells
+
+Competitors often monetize via subscription food delivery or product packs. Paws & Plates focuses on planning, preparation, and repeatability.
+
+3) Personalization + safety gating
+
+Meal generation is not just random recipes—it’s filtered and scored based on:
+
+species compatibility and avoid/limit lists
+
+age/activity fit
+
+allergies and constraints
+
+nutrition summary + balance indicators
+
+4) Shopping experience that turns plans into action
+
+Every plan ends with a clear ingredient list and “Buy” / “Buy All” options (affiliate-based), reducing drop-off.
+
+Core features (what the product does)
+
+Pet profile creation (species/breed/age/activity + concerns)
+
+Meal generation (guided multi-step + ingredient categories)
+
+Compatibility scoring per meal
+
+Meal saving + meal plan building
+
+Recipe detail pages with:
+
+shopping list + links
+
+nutrition summary
+
+health analysis factors
+
+Business model
+
+Free for users. Monetized via affiliate commissions on ingredient purchases and vetted product recommendations.
+
+Optional future monetization (not required, but possible later):
+
+premium meal planning (batch cooking schedules, grocery budget optimizer)
+
+advanced health condition guidance modules (with extra disclaimers)
+
+partner placements (brands, specialty retailers)
+
+Positioning vs competitors (simple)
+
+Balance It: recipe tool + supplement ecosystem (strong dogs/cats)
+
+Ollie / Freshpet / PetPlate: delivery subscription brands
+
+Paws & Plates: free personalized meal-prep planning for all pets, with strong coverage of birds/reptiles/pocket pets
+
+Messaging pillars (use these everywhere)
+Pillar 1 — Personalization
+
+“Built around your pet—not a generic recipe.”
+
+Pillar 2 — Confidence & safety
+
+“Clear ingredient choices, compatibility scoring, and transparent nutrition summaries.”
+
+Pillar 3 — Meal prep made easy
+
+“Generate → save → plan → shop. No guesswork.”
+
+Pillar 4 — Underserved pet types
+
+“Birds, reptiles, and pocket pets deserve real nutrition planning too.”
+
+Taglines (pick 1–2 to standardize)
+
+Meal prep for ALL your pets
+
+Free custom meal plans for every pet
+
+Homemade meals, made safe and simple
+
+From pet profile to shopping list in minutes
+
+“How it works” copy (homepage-ready)
+
+Create your pet profile
+
+Generate meals tailored to their needs
+
+Save favorites and build a plan
+
+Shop ingredients and meal prep with confidence
+
+Proof points you can claim safely (without overreaching)
+
+Use claims you can stand behind and explain on a “Methodology” page:
+
+“Species-specific rules and ingredient safety checks”
+
+“Transparent nutrition summaries and scoring explanations”
+
+“Designed to support at-home meal prep workflows”
+
+“References published nutrition standards where applicable (and clearly labeled)”
+
+(If you do cite AAFCO/other frameworks, say “formulated with reference to” or “aligned to published nutrient profiles” rather than “approved.”)
+
+Trust & safety notes (important)
+
+Paws & Plates should present itself as:
+
+Educational and planning support
+
+Not a substitute for veterinary care
+
+Especially cautious about medical claims (kidney disease, allergies, etc.)
+
+Recommended footer disclaimer (boilerplate):
+
+Paws & Plates provides educational information and meal planning tools. It is not veterinary advice. Consult your veterinarian for medical conditions or dietary changes.
+
+Boilerplate (press/partner blurb)
+
+Paws & Plates is a free meal-prep platform that generates personalized pet meals and meal plans across dogs, cats, birds, reptiles, and pocket pets. Users create a pet profile, generate compatible recipes, save meals into plans, and shop ingredients from a curated list—making at-home feeding simpler, safer, and more consistent.
+
+Ideal homepage structure (conversion + SEO-friendly)
+
+Hero: one-liner + 2 CTAs (“Start with species” + “Create free profile”)
+
+Species selector (birds/reptiles/pocket pets prominently featured)
+
+3–4 benefit cards (Personalized, Safety checks, Meal plans, Shopping list)
+
+Example meals (public examples—great for trust)
+
+“How it works”
+
+FAQ + disclaimer
+
+Email capture / signup
+
+Launch strategy (no ad budget)
+
+SEO-first content targeting exotics:
+
+“What should I feed a hamster?”
+
+“Cockatiel safe food list”
+
+“Bearded dragon feeding schedule”
+
+Community seeding:
+
+Reddit + Facebook groups per species (helpful posts first; link when relevant)
+
+Short-form video:
+
+“Safe foods vs avoid foods” by species
+
+Build a “Species hub” landing page for each category and link everything back to home/species selector

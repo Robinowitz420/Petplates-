@@ -16,6 +16,8 @@ export default function ScoringProgress({
   scoredCount,
   currentRecipe,
 }: ScoringProgressProps) {
+  const displayProgress = Math.round(progress);
+
   return (
     <div className="bg-surface rounded-lg shadow-md border border-surface-highlight p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -29,7 +31,7 @@ export default function ScoringProgress({
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-orange-500">
-            {progress}%
+            {displayProgress}%
           </div>
           <div className="text-xs text-gray-500">complete</div>
         </div>

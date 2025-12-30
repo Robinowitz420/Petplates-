@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
 import { CompatibilityBadge } from '@/components/CompatibilityBadge';
 import { getRandomName } from '@/lib/utils/petUtils';
@@ -19,6 +20,8 @@ import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import { getGenericIngredientName, getVettedProduct } from '@/lib/data/vetted-products';
+import { getPetBadges } from '@/lib/utils/badgeStorage';
+import { checkAllBadges } from '@/lib/utils/badgeChecker';
 
 type RecipeCardEstimate = {
   costPerMeal: number;
@@ -49,16 +52,10 @@ interface Pet {
   notes?: string;
 }
 
-const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
-
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return SIMULATED_USER_ID;
-  return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
-};
-
 export default function RecommendedRecipesPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const { userId, isLoaded } = useAuth();
   const [pet, setPet] = useState<Pet | null>(null);
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
   const [engineMeals, setEngineMeals] = useState<ModifiedRecipeResult[] | null>(null);
@@ -72,9 +69,8 @@ export default function RecommendedRecipesPage() {
   const [regenerateNonce, setRegenerateNonce] = useState(0);
 
   const mealsCacheKey = useMemo(() => {
-    const userId = getCurrentUserId();
-    return `generated_meals_v2:${userId}:${petId}`;
-  }, [petId]);
+    return `generated_meals_v2:${userId || 'anon'}:${petId}`;
+  }, [petId, userId]);
 
   const forceRegenerate = searchParams.get('regenerate') === '1';
 
@@ -106,8 +102,14 @@ export default function RecommendedRecipesPage() {
   }, [pet?.id, pet?.type, pet?.breed, pet?.age, pet?.weightKg, healthConcernsKey, allergiesKey, petDisplayName, pet?.dietaryRestrictions]);
 
   useEffect(() => {
-    const userId = getCurrentUserId();
+    if (!isLoaded) return;
     if (!userId || !petId) return;
+
+    checkAllBadges(userId, petId, {
+      action: 'search_discovery',
+    }).catch((err) => {
+      console.error('Failed to check badges:', err);
+    });
 
     if (typeof window !== 'undefined') {
       localStorage.setItem(`active_pet_id_${userId}`, petId);
@@ -146,7 +148,7 @@ export default function RecommendedRecipesPage() {
       }
     };
     loadPet();
-  }, [petId]);
+  }, [isLoaded, petId, userId]);
 
   useEffect(() => {
     if (!pet) return;
@@ -195,7 +197,7 @@ export default function RecommendedRecipesPage() {
 
     (async () => {
       try {
-        const userId = getCurrentUserId();
+        if (!userId) throw new Error('Missing Clerk userId');
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -414,7 +416,7 @@ export default function RecommendedRecipesPage() {
   }, [pet?.id]);
 
   const handleSaveRecipe = async (recipeId: string, recipeName: string) => {
-    const userId = getCurrentUserId();
+    if (!isLoaded) return;
     if (!userId || !pet) return;
 
     if (savedRecipeIds.has(recipeId)) {
@@ -670,18 +672,23 @@ export default function RecommendedRecipesPage() {
                   }}
                 >
                   <div className="relative group">
-                    <div className="bg-surface rounded-lg shadow-md border border-surface-highlight overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/30 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
+                    <div className="bg-surface rounded-lg shadow-md border-2 border-orange-500/40 overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/60 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
                       <div className="p-6 flex-1 flex flex-col">
                         <div className="mb-3">
                           <h3 className="text-xl font-bold text-foreground text-center">{recipe.name}</h3>
-                          <div className="mt-2 text-xs text-gray-400 text-center">
+                          <div className="mt-3 flex justify-center">
                             {costText ? (
-                              <span>
-                                Est. cost: {costText}/meal
-                                {mealsText ? ` • Est. meals: ${mealsText}` : ''}
-                              </span>
+                              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
+                                <span>Cost per meal:</span>
+                                <span className="text-white">{costText}</span>
+                                {mealsText ? (
+                                  <span className="text-gray-300">• Est. meals: {mealsText}</span>
+                                ) : null}
+                              </div>
                             ) : (
-                              <span>Pricing unavailable</span>
+                              <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-surface-highlight border border-white/10 text-xs font-semibold text-gray-300">
+                                Pricing unavailable
+                              </div>
                             )}
                           </div>
 
@@ -695,14 +702,25 @@ export default function RecommendedRecipesPage() {
                                 return (
                                   <div>
                                     <CompatibilityRadial score={score} size={140} />
-                                    <div className="text-xs text-emerald-100/70 text-center">
-                                      {score >= 60 ? 'Balanced for your pet' : 'Needs adjustments for safety'}
-                                    </div>
                                   </div>
                                 );
                               })()}
                             </div>
                           )}
+                        </div>
+
+                        <div className="mt-auto pt-4">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleSaveRecipe(recipeId, recipe.name);
+                            }}
+                            className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold transition-all shadow-md bg-gradient-to-br from-green-600 to-green-800 text-white border-[3px] border-orange-500 hover:from-green-500 hover:to-green-700 hover:border-orange-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Save Meal
+                          </button>
                         </div>
                       </div>
                     </div>

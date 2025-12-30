@@ -1,0 +1,1380 @@
+
+:
+Task: Implement programmatic SEO guide pages from this JSON.
+
+Create content/guides.json containing the provided JSON.
+
+Create a dynamic route app/guides/[...slug]/page.tsx that renders a guide page by looking up the requested path in guides[].slug.
+
+Render content using the category template in templates:
+
+fill {entityName}, {avoidListConservative}, {transitionPlanDays} placeholders
+
+show sections and FAQs
+
+include disclaimer text at bottom
+
+Add generateMetadata() to set meta title + description from the template.
+
+Update category hub pages to include “Explore guides” block using internalLinkBlocks.
+
+Update app/sitemap.ts to include all guide slugs so they can be indexed.
+
+Keep styling consistent with existing site components.
+
+
+
+
+
+A repeatable guide template (so every page is consistent + SEO-friendly)
+
+Full draft copy for 3 high-impact “wedge” guides (Cockatiel, Bearded Dragon, Hamster) you can publish immediately
+
+Guide briefs for every remaining subspecies/breed (slug + title + meta + H2 outline + internal links + CTA plan). These are “ready to expand” into full posts with your AI coder.
+
+If you want, we can then expand them in batches (e.g., 10 at a time) right here.
+
+1) Universal guide template (use for every species/breed page)
+
+URL pattern (recommended):
+
+Birds: /guides/birds/cockatiel-diet
+
+Reptiles: /guides/reptiles/bearded-dragon-feeding-schedule
+
+Pocket pets: /guides/pocket-pets/hamster-safe-foods
+
+Dogs: /guides/dogs/golden-retriever-feeding-guide
+
+Cats: /guides/cats/maine-coon-feeding-guide
+
+On-page structure:
+
+H1: “What to feed a [Species/Breed]: safe foods, routine, and meal prep tips”
+
+Short intro (2–3 sentences)
+
+H2: Quick answer (TL;DR bullets)
+
+H2: Safe staples (what to feed most often)
+
+H2: Foods to limit (why + how often in general terms)
+
+H2: Foods to avoid (only high-confidence items; keep conservative)
+
+H2: Simple routine (daily/weekly structure — no exact grams)
+
+H2: Meal prep + storage (food-form-aware: fresh vs dry)
+
+H2: Switching foods (5–7 day transition)
+
+H2: FAQs
+
+CTA block (link to Homepage + /species)
+
+Disclaimer: educational, not veterinary advice
+
+2) Full draft guides you can publish now
+A) Cockatiel diet guide (Birds)
+
+Slug: /guides/birds/cockatiel-diet
+Meta title: Cockatiel Diet: What to Feed, Safe Foods & What to Avoid | Paws & Plates
+Meta description: A practical cockatiel feeding guide: safe foods, foods to avoid, and a simple routine. Includes meal prep and storage tips for fresh “chop” vs dry foods.
+
+H1
+
+Cockatiel diet: what to feed (safe foods, routine, and what to avoid)
+
+Intro
+If you’ve ever Googled “what should I feed my cockatiel?” you’ve probably seen 50 conflicting answers. This guide gives you a simple, practical structure: what to use as the “base,” what to add for variety, and what to keep out of the bowl.
+
+Quick answer (TL;DR)
+
+Build a consistent base (dry food routine) + fresh add-ons (produce mix) for variety.
+
+Keep fresh foods fresh and short-lived (serve, then remove leftovers).
+
+Avoid “human food assumptions”—some common foods can be risky for birds.
+
+Want it personalized? Use Paws & Plates to generate example meals and a meal prep plan.
+
+Safe staples (most common “go-to” choices)
+
+A good cockatiel routine usually has two buckets:
+
+Dry base (the dependable daily baseline)
+
+Fresh foods (variety and enrichment)
+
+Dry base ideas
+
+A consistent, quality dry routine (often pellet-forward in many modern feeding styles)
+
+Seed mixes can exist as part of the routine for some birds, but over-relying on seeds tends to create imbalance—use them thoughtfully.
+
+Fresh foods (variety bucket)
+
+A rotating mix of vegetables (think “chop”-style mixes)
+
+Small amounts of fruit as occasional variety (not the main event)
+
+Foods to limit (because “more” isn’t always better)
+
+High-sugar treats (sweet fruits, sweet snacks)
+
+Very rich or oily foods as frequent staples
+
+Anything heavily salted, seasoned, or processed
+
+Foods to avoid (high-confidence “don’t do it” list)
+
+Keep this list conservative and obvious:
+
+Alcohol
+
+Caffeine (coffee/tea/energy drinks)
+
+Chocolate/cocoa
+
+Xylitol (common sweetener in sugar-free products)
+
+If you’re unsure about a specific food, treat it as “unknown” until you confirm with a trusted avian resource.
+
+A simple daily routine (easy mode)
+
+Morning: Dry base available (or offered in a routine schedule if you prefer timed feeding)
+
+Later: Offer a small fresh portion (chop/veg mix)
+
+Remove leftovers: Don’t leave fresh food sitting out for long periods.
+
+Repeatable > perfect: Consistency beats constant experimentation.
+
+Meal prep + storage (important)
+
+For dry foods (pellets/seed mixes):
+
+Store cool, dry, airtight (not in the fridge).
+
+Moisture is the enemy (stale/mold risk).
+
+For fresh chop:
+
+Prep in small batches.
+
+Keep refrigerated briefly, or freeze portions if you’re prepping ahead.
+
+Serve fresh; remove leftovers promptly.
+
+Switching foods (transition plan)
+
+If you’re changing your cockatiel’s routine:
+
+Transition gradually over 5–7 days.
+
+Make changes small and observe appetite/behavior.
+
+FAQs
+
+Can I use Paws & Plates without signing up?
+Yes—see example meals instantly. Sign up to save pets and generate personalized plans.
+
+Does this replace an avian vet?
+No—this is educational planning support.
+
+Why does storage guidance vary?
+Because dry foods and fresh mixes behave differently. Paws & Plates shows storage tips based on recipe type.
+
+CTA
+
+See example bird meals on the homepage
+
+Or start at /species → Birds
+
+Disclaimer: Educational tool, not veterinary advice.
+
+B) Bearded dragon feeding schedule (Reptiles)
+
+Slug: /guides/reptiles/bearded-dragon-feeding-schedule
+Meta title: Bearded Dragon Feeding Schedule: What to Feed by Age | Paws & Plates
+Meta description: A practical bearded dragon diet and schedule guide: staple foods, variety foods, what to avoid, and meal prep tips—without the confusion.
+
+H1
+
+Bearded dragon feeding schedule: what to feed and how to build a routine
+
+Intro
+Bearded dragons are one of the most searched reptile pets because feeding feels complicated: insects vs greens, schedule changes with age, and endless conflicting lists. This guide gives you a simple routine structure and safe planning principles.
+
+Quick answer (TL;DR)
+
+Build a routine around staple foods + controlled variety.
+
+Feeding schedules change with life stage—don’t copy a plan meant for a different age.
+
+Keep it consistent and observe body condition and appetite.
+
+Use Paws & Plates to generate example meals and keep “staples vs treats” clear.
+
+Safe staples (the “repeatable core”)
+
+A strong plan separates:
+
+Staples (the consistent base of the routine)
+
+Variety (rotation items so you’re not repeating one thing forever)
+
+Staples vary by age and individual setup; the key is building a repeatable pattern you can follow weekly.
+
+Foods to limit
+
+Very watery or low-value “filler” foods as the bulk of the routine
+
+Novel foods introduced too frequently (makes it hard to see what works)
+
+Anything you can’t identify reliably (unknown wild plants, etc.)
+
+Foods to avoid (high-confidence)
+
+Keep your avoid list conservative and based on clear hazards:
+
+Anything spoiled or left out too long
+
+Highly seasoned/processed human foods
+
+Toxic or unknown plants
+
+Simple schedule framework (no exact grams)
+
+Instead of exact numbers (which depend on age/size/setup), use this structure:
+
+Build a weekly plan with a consistent “staple rotation”
+
+Keep variety foods as a smaller, planned part of the schedule
+
+Introduce new foods one at a time
+
+Meal prep + storage
+
+Prep wash/chop items safely
+
+Store fresh components appropriately
+
+Don’t leave perishable items sitting out indefinitely
+
+Switching foods
+
+Transition gradually, and don’t change five things at once—you’ll never know what caused improvement/problems.
+
+CTA
+
+See example reptile meals
+
+Start at /species → Reptiles
+
+Disclaimer: Educational tool, not veterinary advice.
+
+C) Hamster safe foods guide (Pocket pets)
+
+Slug: /guides/pocket-pets/hamster-safe-foods
+Meta title: Hamster Safe Foods: What to Feed & What to Avoid | Paws & Plates
+Meta description: A simple hamster feeding guide: safe foods, foods to limit, foods to avoid, and a routine you can actually follow. Includes meal prep and storage tips.
+
+H1
+
+Hamster safe foods: what to feed, what to limit, and what to avoid
+
+Intro
+Hamsters are tiny, but feeding mistakes are common because most advice online is vague. This guide helps you plan a routine that’s consistent and safe—without turning feeding into a daily puzzle.
+
+Quick answer (TL;DR)
+
+Use a consistent base routine, then add small, safe variety.
+
+Keep portions small and changes gradual.
+
+Avoid risky “human snacks” and anything processed.
+
+Use Paws & Plates for example meals and a repeatable plan.
+
+Safe staples
+
+Think in categories:
+
+A consistent “base” routine you don’t change every day
+
+Small add-ons for variety (in moderation)
+
+Foods to limit
+
+Sugary treats
+
+High-fat snacks
+
+Too many “new foods” at once
+
+Foods to avoid (high-confidence)
+
+Chocolate/cocoa
+
+Alcohol
+
+Caffeine
+
+Xylitol
+
+Simple routine
+
+Keep the base consistent
+
+Add a small variety item on a schedule
+
+Observe how your hamster responds
+
+Meal prep + storage
+
+Dry foods: airtight, cool, dry
+
+Fresh items: small portions, don’t leave out too long, remove leftovers
+
+CTA
+
+See example pocket pet meals
+
+Start at /species → Pocket pets
+
+Disclaimer: Educational tool, not veterinary advice.
+
+3) Guide briefs for EVERY other subspecies/breed you listed
+
+Each brief includes slug + title + meta + H2 outline and is ready for your AI coder to expand into full posts.
+
+Dogs (breeds)
+
+Use the same outline for all dog breeds; swap the breed name + add a short “breed considerations” paragraph (energy level, typical body condition focus, common sensitivities — keep non-medical).
+
+/guides/dogs/golden-retriever-feeding-guide — “Golden Retriever Feeding Guide: Meal Prep Plan & Portions”
+
+/guides/dogs/labrador-feeding-guide
+
+/guides/dogs/german-shepherd-feeding-guide
+
+/guides/dogs/bulldog-feeding-guide
+
+/guides/dogs/poodle-feeding-guide
+
+/guides/dogs/beagle-feeding-guide
+
+/guides/dogs/rottweiler-feeding-guide
+
+/guides/dogs/yorkshire-terrier-feeding-guide
+
+/guides/dogs/boxer-feeding-guide
+
+/guides/dogs/dachshund-feeding-guide
+
+/guides/dogs/mixed-breed-dog-feeding-guide
+
+/guides/dogs/other-dog-feeding-guide
+
+H2 outline (dogs):
+
+Quick answer
+
+Best “base routine” for meal prep
+
+Safe staples
+
+Foods to limit + avoid
+
+Switching foods (5–7 days)
+
+Meal prep + storage
+
+FAQs
+
+CTA to homepage + /species
+
+Cats (breeds)
+
+/guides/cats/domestic-shorthair-feeding-guide
+
+/guides/cats/persian-feeding-guide
+
+/guides/cats/maine-coon-feeding-guide
+
+/guides/cats/siamese-feeding-guide
+
+/guides/cats/ragdoll-feeding-guide
+
+/guides/cats/bengal-feeding-guide
+
+/guides/cats/sphynx-feeding-guide
+
+/guides/cats/british-shorthair-feeding-guide
+
+/guides/cats/abyssinian-feeding-guide
+
+/guides/cats/mixed-breed-cat-feeding-guide
+
+/guides/cats/other-cat-feeding-guide
+
+H2 outline (cats):
+
+Quick answer
+
+Why cats are different (simple, non-technical)
+
+Safe staples
+
+Foods to limit + avoid
+
+Routine + transitions
+
+Meal prep + storage
+
+FAQs
+
+CTA
+
+Birds (types)
+
+/guides/birds/parakeet-budgie-diet
+
+/guides/birds/canary-diet
+
+/guides/birds/finch-diet
+
+/guides/birds/african-grey-diet
+
+/guides/birds/macaw-diet
+
+/guides/birds/quaker-parakeet-diet
+
+/guides/birds/cockatoo-diet
+
+/guides/birds/conure-diet
+
+/guides/birds/lovebird-diet
+
+/guides/birds/other-bird-diet
+
+H2 outline (birds):
+
+Quick answer
+
+Dry base vs fresh add-ons (and why it matters)
+
+Safe staples
+
+Foods to limit + avoid (conservative)
+
+Routine + leftover handling
+
+Storage: dry vs fresh
+
+FAQs + CTA
+
+Reptiles
+
+/guides/reptiles/leopard-gecko-diet
+
+/guides/reptiles/turtle-diet
+
+/guides/reptiles/tortoise-diet
+
+/guides/reptiles/crested-gecko-diet
+
+/guides/reptiles/iguana-diet
+
+/guides/reptiles/chameleon-diet
+
+/guides/reptiles/other-reptile-diet
+
+H2 outline (reptiles):
+
+Quick answer
+
+Species-specific routine principles (no exact numbers)
+
+Safe staples
+
+Foods to limit + avoid
+
+Weekly feeding framework
+
+Storage/handling
+
+FAQs + CTA
+
+Pocket pets
+
+/guides/pocket-pets/guinea-pig-diet
+
+/guides/pocket-pets/rabbit-diet
+
+/guides/pocket-pets/rat-diet
+
+/guides/pocket-pets/mouse-diet
+
+/guides/pocket-pets/gerbil-diet
+
+/guides/pocket-pets/ferret-diet
+
+/guides/pocket-pets/chinchilla-diet
+
+/guides/pocket-pets/sugar-glider-diet
+
+/guides/pocket-pets/hedgehog-diet
+
+/guides/pocket-pets/other-pocket-pet-diet
+
+H2 outline (pocket pets):
+
+Quick answer
+
+Safe staples + routine
+
+Foods to limit + avoid
+
+Treats vs staples
+
+Storage + leftovers
+
+FAQs + CTA
+
+
+
+
+
+
+{
+  "brand": "Paws & Plates",
+  "generatedAt": "2025-12-29",
+  "language": "en",
+  "templates": {
+    "common": {
+      "disclaimer": "Paws & Plates provides educational meal planning tools and ingredient safety checks. It is not veterinary advice. Consult a veterinarian for medical conditions or prescription diets.",
+      "ctaDefaults": {
+        "primaryText": "See example meals",
+        "primaryHref": "/",
+        "secondaryText": "Choose a pet type",
+        "secondaryHref": "/species"
+      },
+      "avoidListConservative": [
+        "Alcohol",
+        "Caffeine (coffee/tea/energy drinks)",
+        "Chocolate/cocoa",
+        "Xylitol (sweetener in many sugar-free products)"
+      ],
+      "transitionPlanDays": [
+        "Days 1–2: 25% new + 75% current",
+        "Days 3–4: 50% new + 50% current",
+        "Days 5–6: 75% new + 25% current",
+        "Day 7+: 100% new (if appetite and stool look good)"
+      ]
+    },
+    "dogs": {
+      "metaTitle": "{entityName} Feeding Guide: Homemade Meal Prep Plan | Paws & Plates",
+      "metaDescription": "Meal-prep friendly feeding guide for {entityName}: safe staples, foods to limit/avoid, a simple routine, and how to build a personalized plan with Paws & Plates.",
+      "h1": "{entityName} feeding guide: meal prep routine, safe staples, and what to avoid",
+      "intro": "This guide gives you a practical, meal-prep friendly way to answer “what should I feed a {entityName}?”—with safe staples, a simple routine, and clear avoid/limit boundaries.",
+      "sections": [
+        {
+          "heading": "Quick answer",
+          "bullets": [
+            "Start with a consistent base routine you can repeat weekly.",
+            "Use safe staples, then add planned variety (don’t change everything daily).",
+            "Transition changes over 5–7 days.",
+            "Use Paws & Plates to see example meals and save a personalized plan."
+          ]
+        },
+        {
+          "heading": "Safe staples (build your base)",
+          "bullets": [
+            "Pick 1–2 primary proteins and a few rotation options.",
+            "Use simple, recognizable ingredients over heavily processed add-ins.",
+            "Keep recipes consistent so you can observe how your dog responds."
+          ]
+        },
+        {
+          "heading": "Foods to limit",
+          "bullets": [
+            "Highly processed foods, salty foods, and heavily seasoned foods.",
+            "Treat-style extras that add lots of calories without much nutrition.",
+            "Frequent rapid swaps (makes it hard to know what’s working)."
+          ]
+        },
+        {
+          "heading": "Foods to avoid",
+          "bullets": [
+            "{avoidListConservative} (plus anything unknown—confirm first with a trusted source)."
+          ]
+        },
+        {
+          "heading": "Switching foods (5–7 day transition)",
+          "bullets": [
+            "{transitionPlanDays}"
+          ]
+        },
+        {
+          "heading": "Serving & storage notes",
+          "bullets": [
+            "Portions vary by size, age, and activity—create a pet profile for tailored guidance.",
+            "Storage guidance should match the recipe’s food form (fresh vs dry).",
+            "Discard perishable leftovers that sit out too long."
+          ]
+        },
+        {
+          "heading": "FAQ",
+          "bullets": [
+            "Can I use Paws & Plates without signing up?",
+            "Is this veterinary advice?",
+            "How do portions work?"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Can I use Paws & Plates without signing up?",
+          "a": "Yes—example meals can be viewed without signup. You’ll need a free account to save pets, save meals, and generate personalized plans."
+        },
+        {
+          "q": "Is this veterinary advice?",
+          "a": "No. Paws & Plates provides educational meal planning tools. If your pet has a diagnosed medical condition or is on a prescription diet, consult a veterinarian before changing diet."
+        },
+        {
+          "q": "How do portions work?",
+          "a": "Portions vary by size, age, and activity. Create a pet profile for more tailored serving guidance."
+        }
+      ]
+    },
+    "cats": {
+      "metaTitle": "{entityName} Feeding Guide: Homemade Meal Prep Plan | Paws & Plates",
+      "metaDescription": "Meal-prep friendly feeding guide for {entityName}: safe staples, foods to limit/avoid, a simple routine, and how to build a personalized plan with Paws & Plates.",
+      "h1": "{entityName} feeding guide: meal prep routine, safe staples, and what to avoid",
+      "intro": "This guide gives you a practical, meal-prep friendly way to answer “what should I feed a {entityName}?”—with safe staples, a simple routine, and clear avoid/limit boundaries.",
+      "sections": [
+        {
+          "heading": "Quick answer",
+          "bullets": [
+            "Keep routines consistent—cats often prefer predictability.",
+            "Use safe staples, then planned variety.",
+            "Transition changes over 5–7 days.",
+            "Use Paws & Plates for examples and saving plans."
+          ]
+        },
+        {
+          "heading": "Why cats are different",
+          "bullets": [
+            "Cats have distinct nutritional needs and may not tolerate rapid diet changes.",
+            "Consistency and observation are key."
+          ]
+        },
+        {
+          "heading": "Safe staples (build your base)",
+          "bullets": [
+            "Pick a repeatable protein base and rotate intentionally.",
+            "Keep textures and preparation consistent when possible."
+          ]
+        },
+        {
+          "heading": "Foods to limit",
+          "bullets": [
+            "Highly processed foods, salty foods, and heavily seasoned foods.",
+            "Frequent swaps that make picky eating worse."
+          ]
+        },
+        {
+          "heading": "Foods to avoid",
+          "bullets": [
+            "{avoidListConservative} (plus anything unknown—confirm first with a trusted source)."
+          ]
+        },
+        {
+          "heading": "Switching foods (5–7 day transition)",
+          "bullets": [
+            "{transitionPlanDays}"
+          ]
+        },
+        {
+          "heading": "Serving & storage notes",
+          "bullets": [
+            "Portions vary by size, age, and activity—create a pet profile for tailored guidance.",
+            "Storage guidance should match the recipe’s food form (fresh vs dry).",
+            "Discard perishable leftovers that sit out too long."
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Can I use Paws & Plates without signing up?",
+          "a": "Yes—example meals can be viewed without signup. You’ll need a free account to save pets, save meals, and generate personalized plans."
+        },
+        {
+          "q": "Is this veterinary advice?",
+          "a": "No. Paws & Plates provides educational meal planning tools. If your pet has a diagnosed medical condition or is on a prescription diet, consult a veterinarian before changing diet."
+        },
+        {
+          "q": "How do portions work?",
+          "a": "Portions vary by size, age, and activity. Create a pet profile for more tailored serving guidance."
+        }
+      ]
+    },
+    "birds": {
+      "metaTitle": "What to Feed a {entityName}: Safe Foods & Routine | Paws & Plates",
+      "metaDescription": "Practical {entityName} feeding guide: safe staples, foods to avoid, dry vs fresh routines, and storage/leftover tips. See example meals on Paws & Plates.",
+      "h1": "What to feed a {entityName}: safe foods, routine, and what to avoid",
+      "intro": "This guide gives you a practical way to answer “what should I feed a {entityName}?”—with a clear dry-vs-fresh routine, a simple schedule, and conservative safety notes.",
+      "sections": [
+        {
+          "heading": "Quick answer",
+          "bullets": [
+            "Build a consistent dry routine, then add planned fresh variety.",
+            "Serve fresh foods in small portions and remove leftovers promptly.",
+            "Store dry foods cool, dry, airtight (avoid moisture).",
+            "Use Paws & Plates for example meals and routine planning."
+          ]
+        },
+        {
+          "heading": "Dry base vs fresh add-ons (why it matters)",
+          "bullets": [
+            "Dry routine is the dependable baseline (pellets/mixes).",
+            "Fresh add-ons are for variety (produce/chop-style).",
+            "Storage and leftovers differ—don’t treat them the same."
+          ]
+        },
+        {
+          "heading": "Foods to limit",
+          "bullets": [
+            "Sugary treats and fruit-heavy routines.",
+            "Highly salted/seasoned human foods.",
+            "Big changes all at once."
+          ]
+        },
+        {
+          "heading": "Foods to avoid",
+          "bullets": [
+            "{avoidListConservative} (plus anything unknown—confirm first with a trusted avian source)."
+          ]
+        },
+        {
+          "heading": "Meal prep + storage (food-form aware)",
+          "bullets": [
+            "Dry foods: airtight, cool, dry (not the fridge).",
+            "Fresh chop: small batches; refrigerate briefly or freeze portions; remove leftovers.",
+            "Paws & Plates storage guidance should match recipe type."
+          ]
+        },
+        {
+          "heading": "FAQ",
+          "bullets": [
+            "Can I use Paws & Plates without signing up?",
+            "Should I refrigerate pellets/seed mixes?",
+            "Is this veterinary advice?"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Can I use Paws & Plates without signing up?",
+          "a": "Yes—example meals can be viewed without signup. You’ll need a free account to save pets, save meals, and generate personalized plans."
+        },
+        {
+          "q": "Should I refrigerate pellets or seed mixes?",
+          "a": "Typically no—dry foods are best stored sealed, cool, and dry. Refrigeration can introduce moisture. Fresh produce mixes are different and may require refrigeration."
+        },
+        {
+          "q": "Is this veterinary advice?",
+          "a": "No. Paws & Plates provides educational meal planning tools. If your bird has special needs, consult an avian veterinarian before making major changes."
+        }
+      ]
+    },
+    "reptiles": {
+      "metaTitle": "{entityName} Diet Guide: What to Feed & Simple Schedule | Paws & Plates",
+      "metaDescription": "Practical {entityName} diet guide: staple foods vs variety, a simple feeding framework, handling/storage tips, and common mistakes to avoid.",
+      "h1": "{entityName} diet: what to feed and how to build a simple routine",
+      "intro": "This guide helps you build a repeatable reptile feeding routine (staples + planned variety) without relying on rigid numbers that don’t generalize.",
+      "sections": [
+        {
+          "heading": "Quick answer",
+          "bullets": [
+            "Use a weekly framework: staples + planned variety (not random feeding).",
+            "Feeding frequency and staples vary by age and species—personalize slowly.",
+            "Keep ingredients clean and safely handled; remove spoiled leftovers.",
+            "Use Paws & Plates for example meals and routine planning."
+          ]
+        },
+        {
+          "heading": "Staples vs variety",
+          "bullets": [
+            "Staples are the consistent foundation you repeat.",
+            "Variety is planned rotation to reduce over-reliance on one food."
+          ]
+        },
+        {
+          "heading": "Foods to limit",
+          "bullets": [
+            "Unknown wild plants or unidentified items.",
+            "Heavily processed human foods.",
+            "Frequent rapid changes."
+          ]
+        },
+        {
+          "heading": "Foods to avoid",
+          "bullets": [
+            "{avoidListConservative} (plus anything spoiled/moldy or left out too long)."
+          ]
+        },
+        {
+          "heading": "Handling + storage",
+          "bullets": [
+            "Wash produce, store perishables properly, and avoid cross-contamination.",
+            "Remove leftovers promptly to prevent spoilage."
+          ]
+        },
+        {
+          "heading": "FAQ",
+          "bullets": [
+            "Do you provide exact feeding schedules?",
+            "Can I use Paws & Plates without signing up?",
+            "Is this veterinary advice?"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Do you provide exact feeding schedules?",
+          "a": "We focus on a simple, repeatable framework and examples. Exact frequency and portions depend on species, age, and your setup—use trusted care resources for specifics."
+        },
+        {
+          "q": "Can I use Paws & Plates without signing up?",
+          "a": "Yes—example meals can be viewed without signup. You’ll need a free account to save pets, save meals, and generate personalized plans."
+        },
+        {
+          "q": "Is this veterinary advice?",
+          "a": "No. Paws & Plates provides educational meal planning tools. Consult a veterinarian for medical concerns."
+        }
+      ]
+    },
+    "pocket-pets": {
+      "metaTitle": "What Should I Feed My {entityName}? Safe Foods & Routine | Paws & Plates",
+      "metaDescription": "Simple {entityName} feeding guide: safe foods, foods to limit/avoid, a repeatable routine, and meal-prep/storage tips. See examples on Paws & Plates.",
+      "h1": "{entityName} safe foods: what to feed, what to limit, and what to avoid",
+      "intro": "Pocket pets are underserved online. This guide gives you a consistent base routine, small planned variety, and conservative avoid/limit guardrails.",
+      "sections": [
+        {
+          "heading": "Quick answer",
+          "bullets": [
+            "Keep a consistent base routine, then add small planned variety.",
+            "Portions are small—avoid overfeeding treats.",
+            "Store dry foods sealed and dry; remove fresh leftovers promptly.",
+            "Use Paws & Plates for example meals and routine planning."
+          ]
+        },
+        {
+          "heading": "Treats vs staples",
+          "bullets": [
+            "Staples make up the routine; treats are planned and small.",
+            "Introduce new foods slowly so you can observe responses."
+          ]
+        },
+        {
+          "heading": "Foods to limit",
+          "bullets": [
+            "Sugary treats and high-fat snacks.",
+            "Too many new foods at once.",
+            "Human processed foods (salty/seasoned)."
+          ]
+        },
+        {
+          "heading": "Foods to avoid",
+          "bullets": [
+            "{avoidListConservative} (plus anything spoiled/moldy or left out too long)."
+          ]
+        },
+        {
+          "heading": "Meal prep + storage",
+          "bullets": [
+            "Dry foods: airtight, cool, dry (avoid moisture).",
+            "Fresh foods: tiny portions; remove leftovers; refrigerate safely if prepping."
+          ]
+        },
+        {
+          "heading": "FAQ",
+          "bullets": [
+            "Are treats okay?",
+            "Can I use Paws & Plates without signing up?",
+            "Is this veterinary advice?"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Are treats okay?",
+          "a": "Yes in small amounts. The goal is a consistent base routine with planned variety, not frequent snack feeding."
+        },
+        {
+          "q": "Can I use Paws & Plates without signing up?",
+          "a": "Yes—example meals can be viewed without signup. You’ll need a free account to save pets, save meals, and generate personalized plans."
+        },
+        {
+          "q": "Is this veterinary advice?",
+          "a": "No. Paws & Plates provides educational meal planning tools. Consult a veterinarian for medical concerns."
+        }
+      ]
+    }
+  },
+  "internalLinkBlocks": [
+    {
+      "hubCategory": "birds",
+      "heading": "Explore guides",
+      "links": [
+        {
+          "label": "Cockatiel diet: safe foods & routine",
+          "href": "/guides/birds/cockatiel-diet"
+        },
+        {
+          "label": "Budgie (parakeet) diet basics",
+          "href": "/guides/birds/budgie-parakeet-diet"
+        },
+        {
+          "label": "Finch feeding basics",
+          "href": "/guides/birds/finch-diet"
+        },
+        {
+          "label": "Lovebird diet guide",
+          "href": "/guides/birds/lovebird-diet"
+        },
+        {
+          "label": "Conure diet guide",
+          "href": "/guides/birds/conure-diet"
+        }
+      ]
+    },
+    {
+      "hubCategory": "reptiles",
+      "heading": "Explore guides",
+      "links": [
+        {
+          "label": "Bearded dragon feeding schedule",
+          "href": "/guides/reptiles/bearded-dragon-feeding-schedule"
+        },
+        {
+          "label": "Leopard gecko diet basics",
+          "href": "/guides/reptiles/leopard-gecko-diet"
+        },
+        {
+          "label": "Turtle diet basics",
+          "href": "/guides/reptiles/turtle-diet"
+        },
+        {
+          "label": "Tortoise diet basics",
+          "href": "/guides/reptiles/tortoise-diet"
+        },
+        {
+          "label": "Crested gecko diet basics",
+          "href": "/guides/reptiles/crested-gecko-diet"
+        }
+      ]
+    },
+    {
+      "hubCategory": "pocket-pets",
+      "heading": "Explore guides",
+      "links": [
+        {
+          "label": "Hamster safe foods list",
+          "href": "/guides/pocket-pets/hamster-safe-foods"
+        },
+        {
+          "label": "Guinea pig diet guide",
+          "href": "/guides/pocket-pets/guinea-pig-diet"
+        },
+        {
+          "label": "Rabbit hay-first diet",
+          "href": "/guides/pocket-pets/rabbit-diet"
+        },
+        {
+          "label": "Chinchilla diet basics",
+          "href": "/guides/pocket-pets/chinchilla-diet"
+        },
+        {
+          "label": "Hedgehog diet basics",
+          "href": "/guides/pocket-pets/hedgehog-diet"
+        }
+      ]
+    },
+    {
+      "hubCategory": "dogs",
+      "heading": "Explore guides",
+      "links": [
+        {
+          "label": "Golden Retriever feeding guide",
+          "href": "/guides/dogs/golden-retriever-feeding-guide"
+        },
+        {
+          "label": "Labrador feeding guide",
+          "href": "/guides/dogs/labrador-feeding-guide"
+        },
+        {
+          "label": "German Shepherd feeding guide",
+          "href": "/guides/dogs/german-shepherd-feeding-guide"
+        },
+        {
+          "label": "Beagle feeding guide",
+          "href": "/guides/dogs/beagle-feeding-guide"
+        },
+        {
+          "label": "Dachshund feeding guide",
+          "href": "/guides/dogs/dachshund-feeding-guide"
+        }
+      ]
+    },
+    {
+      "hubCategory": "cats",
+      "heading": "Explore guides",
+      "links": [
+        {
+          "label": "Maine Coon feeding guide",
+          "href": "/guides/cats/maine-coon-feeding-guide"
+        },
+        {
+          "label": "Siamese feeding guide",
+          "href": "/guides/cats/siamese-feeding-guide"
+        },
+        {
+          "label": "Ragdoll feeding guide",
+          "href": "/guides/cats/ragdoll-feeding-guide"
+        },
+        {
+          "label": "Bengal feeding guide",
+          "href": "/guides/cats/bengal-feeding-guide"
+        },
+        {
+          "label": "Sphynx feeding guide",
+          "href": "/guides/cats/sphynx-feeding-guide"
+        }
+      ]
+    }
+  ],
+  "guides": [
+    {
+      "slug": "/guides/dogs/golden-retriever-feeding-guide",
+      "category": "dogs",
+      "entityId": "golden-retriever",
+      "entityName": "Golden Retriever"
+    },
+    {
+      "slug": "/guides/dogs/labrador-feeding-guide",
+      "category": "dogs",
+      "entityId": "labrador",
+      "entityName": "Labrador Retriever"
+    },
+    {
+      "slug": "/guides/dogs/german-shepherd-feeding-guide",
+      "category": "dogs",
+      "entityId": "german-shepherd",
+      "entityName": "German Shepherd"
+    },
+    {
+      "slug": "/guides/dogs/bulldog-feeding-guide",
+      "category": "dogs",
+      "entityId": "bulldog",
+      "entityName": "Bulldog"
+    },
+    {
+      "slug": "/guides/dogs/poodle-feeding-guide",
+      "category": "dogs",
+      "entityId": "poodle",
+      "entityName": "Poodle"
+    },
+    {
+      "slug": "/guides/dogs/beagle-feeding-guide",
+      "category": "dogs",
+      "entityId": "beagle",
+      "entityName": "Beagle"
+    },
+    {
+      "slug": "/guides/dogs/rottweiler-feeding-guide",
+      "category": "dogs",
+      "entityId": "rottweiler",
+      "entityName": "Rottweiler"
+    },
+    {
+      "slug": "/guides/dogs/yorkie-feeding-guide",
+      "category": "dogs",
+      "entityId": "yorkie",
+      "entityName": "Yorkshire Terrier"
+    },
+    {
+      "slug": "/guides/dogs/boxer-feeding-guide",
+      "category": "dogs",
+      "entityId": "boxer",
+      "entityName": "Boxer"
+    },
+    {
+      "slug": "/guides/dogs/dachshund-feeding-guide",
+      "category": "dogs",
+      "entityId": "dachshund",
+      "entityName": "Dachshund"
+    },
+    {
+      "slug": "/guides/dogs/mixed-dog-feeding-guide",
+      "category": "dogs",
+      "entityId": "mixed-dog",
+      "entityName": "Mixed Breed Dog"
+    },
+    {
+      "slug": "/guides/dogs/other-dog-feeding-guide",
+      "category": "dogs",
+      "entityId": "other-dog",
+      "entityName": "Other Dog"
+    },
+    {
+      "slug": "/guides/cats/domestic-shorthair-feeding-guide",
+      "category": "cats",
+      "entityId": "domestic-shorthair",
+      "entityName": "Domestic Shorthair"
+    },
+    {
+      "slug": "/guides/cats/persian-feeding-guide",
+      "category": "cats",
+      "entityId": "persian",
+      "entityName": "Persian"
+    },
+    {
+      "slug": "/guides/cats/maine-coon-feeding-guide",
+      "category": "cats",
+      "entityId": "maine-coon",
+      "entityName": "Maine Coon"
+    },
+    {
+      "slug": "/guides/cats/siamese-feeding-guide",
+      "category": "cats",
+      "entityId": "siamese",
+      "entityName": "Siamese"
+    },
+    {
+      "slug": "/guides/cats/ragdoll-feeding-guide",
+      "category": "cats",
+      "entityId": "ragdoll",
+      "entityName": "Ragdoll"
+    },
+    {
+      "slug": "/guides/cats/bengal-feeding-guide",
+      "category": "cats",
+      "entityId": "bengal",
+      "entityName": "Bengal"
+    },
+    {
+      "slug": "/guides/cats/sphynx-feeding-guide",
+      "category": "cats",
+      "entityId": "sphynx",
+      "entityName": "Sphynx"
+    },
+    {
+      "slug": "/guides/cats/british-shorthair-feeding-guide",
+      "category": "cats",
+      "entityId": "british-shorthair",
+      "entityName": "British Shorthair"
+    },
+    {
+      "slug": "/guides/cats/abyssinian-feeding-guide",
+      "category": "cats",
+      "entityId": "abyssinian",
+      "entityName": "Abyssinian"
+    },
+    {
+      "slug": "/guides/cats/mixed-cat-feeding-guide",
+      "category": "cats",
+      "entityId": "mixed-cat",
+      "entityName": "Mixed Breed Cat"
+    },
+    {
+      "slug": "/guides/cats/other-cat-feeding-guide",
+      "category": "cats",
+      "entityId": "other-cat",
+      "entityName": "Other Cat"
+    },
+    {
+      "slug": "/guides/birds/budgie-parakeet-diet",
+      "category": "birds",
+      "entityId": "parakeet-budgie",
+      "entityName": "Parakeet (Budgie)"
+    },
+    {
+      "slug": "/guides/birds/cockatiel-diet",
+      "category": "birds",
+      "entityId": "cockatiel",
+      "entityName": "Cockatiel"
+    },
+    {
+      "slug": "/guides/birds/canary-diet",
+      "category": "birds",
+      "entityId": "canary",
+      "entityName": "Canary"
+    },
+    {
+      "slug": "/guides/birds/finch-diet",
+      "category": "birds",
+      "entityId": "finch",
+      "entityName": "Finch"
+    },
+    {
+      "slug": "/guides/birds/african-grey-diet",
+      "category": "birds",
+      "entityId": "african-grey",
+      "entityName": "African Grey"
+    },
+    {
+      "slug": "/guides/birds/macaw-diet",
+      "category": "birds",
+      "entityId": "macaw",
+      "entityName": "Macaw"
+    },
+    {
+      "slug": "/guides/birds/quaker-parakeet-diet",
+      "category": "birds",
+      "entityId": "quaker-parakeet",
+      "entityName": "Quaker Parakeet"
+    },
+    {
+      "slug": "/guides/birds/cockatoo-diet",
+      "category": "birds",
+      "entityId": "cockatoo",
+      "entityName": "Cockatoo"
+    },
+    {
+      "slug": "/guides/birds/conure-diet",
+      "category": "birds",
+      "entityId": "conure",
+      "entityName": "Conure"
+    },
+    {
+      "slug": "/guides/birds/lovebird-diet",
+      "category": "birds",
+      "entityId": "lovebird",
+      "entityName": "Lovebird"
+    },
+    {
+      "slug": "/guides/birds/other-bird-diet",
+      "category": "birds",
+      "entityId": "other-bird",
+      "entityName": "Other Bird"
+    },
+    {
+      "slug": "/guides/reptiles/bearded-dragon-feeding-schedule",
+      "category": "reptiles",
+      "entityId": "bearded-dragon",
+      "entityName": "Bearded Dragon"
+    },
+    {
+      "slug": "/guides/reptiles/leopard-gecko-diet",
+      "category": "reptiles",
+      "entityId": "leopard-gecko",
+      "entityName": "Leopard Gecko"
+    },
+    {
+      "slug": "/guides/reptiles/turtle-diet",
+      "category": "reptiles",
+      "entityId": "turtle",
+      "entityName": "Turtle (Aquatic)"
+    },
+    {
+      "slug": "/guides/reptiles/tortoise-diet",
+      "category": "reptiles",
+      "entityId": "tortoise",
+      "entityName": "Tortoise"
+    },
+    {
+      "slug": "/guides/reptiles/crested-gecko-diet",
+      "category": "reptiles",
+      "entityId": "crested-gecko",
+      "entityName": "Crested Gecko"
+    },
+    {
+      "slug": "/guides/reptiles/iguana-diet",
+      "category": "reptiles",
+      "entityId": "iguana",
+      "entityName": "Iguana"
+    },
+    {
+      "slug": "/guides/reptiles/chameleon-diet",
+      "category": "reptiles",
+      "entityId": "chameleon",
+      "entityName": "Chameleon"
+    },
+    {
+      "slug": "/guides/reptiles/other-reptile-diet",
+      "category": "reptiles",
+      "entityId": "other-reptile",
+      "entityName": "Other Reptile"
+    },
+    {
+      "slug": "/guides/pocket-pets/hamster-safe-foods",
+      "category": "pocket-pets",
+      "entityId": "hamster",
+      "entityName": "Hamster"
+    },
+    {
+      "slug": "/guides/pocket-pets/guinea-pig-diet",
+      "category": "pocket-pets",
+      "entityId": "guinea-pig",
+      "entityName": "Guinea Pig"
+    },
+    {
+      "slug": "/guides/pocket-pets/rabbit-diet",
+      "category": "pocket-pets",
+      "entityId": "rabbit",
+      "entityName": "Rabbit"
+    },
+    {
+      "slug": "/guides/pocket-pets/rat-diet",
+      "category": "pocket-pets",
+      "entityId": "rat",
+      "entityName": "Rat"
+    },
+    {
+      "slug": "/guides/pocket-pets/mouse-diet",
+      "category": "pocket-pets",
+      "entityId": "mouse",
+      "entityName": "Mouse"
+    },
+    {
+      "slug": "/guides/pocket-pets/gerbil-diet",
+      "category": "pocket-pets",
+      "entityId": "gerbil",
+      "entityName": "Gerbil"
+    },
+    {
+      "slug": "/guides/pocket-pets/ferret-diet",
+      "category": "pocket-pets",
+      "entityId": "ferret",
+      "entityName": "Ferret"
+    },
+    {
+      "slug": "/guides/pocket-pets/chinchilla-diet",
+      "category": "pocket-pets",
+      "entityId": "chinchilla",
+      "entityName": "Chinchilla"
+    },
+    {
+      "slug": "/guides/pocket-pets/sugar-glider-diet",
+      "category": "pocket-pets",
+      "entityId": "sugar-glider",
+      "entityName": "Sugar Glider"
+    },
+    {
+      "slug": "/guides/pocket-pets/hedgehog-diet",
+      "category": "pocket-pets",
+      "entityId": "hedgehog",
+      "entityName": "Hedgehog"
+    },
+    {
+      "slug": "/guides/pocket-pets/other-pocket-pet-diet",
+      "category": "pocket-pets",
+      "entityId": "other-pocket-pet",
+      "entityName": "Other Pocket Pet"
+    }
+  ]
+}

@@ -24,6 +24,11 @@ import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
+import { formatPercent } from '@/lib/utils/formatPercent';
+import { getPortionPlan } from '@/lib/portionCalc';
+import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
+import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
+import CustomMadeForLine from '@/components/CustomMadeForLine';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -43,6 +48,39 @@ interface MealCompleteViewProps {
   getCompatibilityIndicator?: (key: string) => 'safe' | 'warning' | 'blocked' | null;
   isFirstCreation?: boolean; // New prop to indicate if this is the first time creating the meal
   petType?: string; // Pet type (dog, cat, etc.)
+}
+
+function extractSafetyFlags(ingredients: Array<{ name?: string } | string>): string[] {
+  const items = Array.isArray(ingredients) ? ingredients : [];
+  const names = items
+    .map((i) => (typeof i === 'string' ? i : i?.name || ''))
+    .join(' | ')
+    .toLowerCase();
+
+  const flags: Array<{ key: string; text: string }> = [
+    { key: 'onion', text: 'Contains onion — may be unsafe for some pets.' },
+    { key: 'garlic', text: 'Contains garlic — may be unsafe for some pets.' },
+    { key: 'chive', text: 'Contains chives — may be unsafe for some pets.' },
+    { key: 'grape', text: 'Contains grapes — may be unsafe for some pets.' },
+    { key: 'raisin', text: 'Contains raisins — may be unsafe for some pets.' },
+    { key: 'chocolate', text: 'Contains chocolate/cocoa — may be unsafe for some pets.' },
+    { key: 'cocoa', text: 'Contains chocolate/cocoa — may be unsafe for some pets.' },
+    { key: 'xylitol', text: 'Contains xylitol — may be unsafe for some pets.' },
+    { key: 'macadamia', text: 'Contains macadamia — may be unsafe for some pets.' },
+    { key: 'alcohol', text: 'Contains alcohol — may be unsafe for some pets.' },
+    { key: 'caffeine', text: 'Contains caffeine/coffee/tea — may be unsafe for some pets.' },
+    { key: 'coffee', text: 'Contains caffeine/coffee/tea — may be unsafe for some pets.' },
+    { key: 'tea', text: 'Contains caffeine/coffee/tea — may be unsafe for some pets.' },
+  ];
+
+  const found = new Map<string, string>();
+  for (const f of flags) {
+    if (names.includes(f.key)) {
+      found.set(f.key, f.text);
+    }
+  }
+
+  return Array.from(found.values());
 }
 
 export default function MealCompleteView({
@@ -72,6 +110,48 @@ export default function MealCompleteView({
   const [healthAnalysis, setHealthAnalysis] = useState<any>(null);
   const [isCalculatingHealthAnalysis, setIsCalculatingHealthAnalysis] = useState(false);
   const [activeTab, setActiveTab] = useState<'ingredients' | 'supplements'>('ingredients');
+
+  const portionPlan = useMemo(() => {
+    if (!analysis || !pet) return null;
+    const normalizedType = normalizePetType(pet.type, 'MealCompleteView.portionPlan');
+    if (normalizedType !== 'dog' && normalizedType !== 'cat') return null;
+
+    const weightKg = typeof pet.weightKg === 'number' && pet.weightKg > 0 ? pet.weightKg : (parseFloat(String(pet.weight || '')) || 0);
+    if (!Number.isFinite(weightKg) || weightKg <= 0) return null;
+
+    const profile = {
+      species: normalizedType === 'dog' ? 'dogs' : 'cats',
+      ageGroup: pet.age || 'adult',
+      weightKg,
+      breed: pet.breed || null,
+      healthConcerns: pet.healthConcerns || [],
+      allergies: pet.allergies || [],
+      petName: petName,
+    };
+
+    const recipeForPortion = {
+      id: 'custom',
+      name: mealName || 'Custom meal',
+      category: normalizedType === 'dog' ? 'dogs' : 'cats',
+      ageGroup: ['adult'],
+      healthConcerns: [],
+      ingredients: selectedIngredients.map((s, idx) => ({ id: String(idx), name: getIngredientDisplayName(s.key), amount: `${s.grams}g` })),
+      instructions: [],
+      nutritionalInfo: {
+        calories: {
+          min: (analysis.nutrients as any).kcal ?? (analysis.nutrients as any).calories_kcal ?? (analysis.nutrients as any).energy_kcal ?? 0,
+          max: (analysis.nutrients as any).kcal ?? (analysis.nutrients as any).calories_kcal ?? (analysis.nutrients as any).energy_kcal ?? 0,
+          unit: 'kcal',
+        },
+      },
+    } as any;
+
+    try {
+      return getPortionPlan(recipeForPortion, profile as any);
+    } catch {
+      return null;
+    }
+  }, [analysis, pet, selectedIngredients, getIngredientDisplayName, petName, mealName]);
 
   const handleSaveMeal = async () => {
     if (!analysis || !mealName.trim()) {
@@ -240,8 +320,8 @@ export default function MealCompleteView({
         recommendations: recommendations,
       });
 
-      // Check badges if score is 100% (Nutrient Navigator)
-      if (scored.overallScore === 100 && userId && petId) {
+      // Check badges on meal creation (Preparation + Perfect Match if applicable)
+      if (userId && petId) {
         checkAllBadges(userId, petId, {
           action: 'meal_created',
           compatibilityScore: scored.overallScore,
@@ -362,6 +442,7 @@ export default function MealCompleteView({
 
   // Get display score and compatibility
   const displayScore = healthAnalysis?.overallScore ?? (analysis?.score ?? 0);
+  const displayScoreRounded = Math.round(displayScore);
   const compatibility = healthAnalysis?.compatibility ?? 
     (displayScore >= 80 ? 'excellent' : displayScore >= 60 ? 'good' : displayScore >= 40 ? 'fair' : 'poor');
 
@@ -566,7 +647,7 @@ export default function MealCompleteView({
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">
             {/* Meal Title Card */}
-            <div className="bg-surface rounded-xl shadow-md overflow-hidden mb-8 border border-surface-highlight">
+            <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
               <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
                 <div className="flex-1 min-w-0">
                   <input
@@ -576,28 +657,20 @@ export default function MealCompleteView({
                     className="w-full px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Enter meal name..."
                   />
-                  <div className="mt-4 flex flex-col gap-3 text-sm text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <span>Compatibility score:</span>
-                      <span
-                        className={`font-semibold ${
-                          compatibility === 'excellent'
-                            ? 'text-green-300'
-                            : compatibility === 'good'
-                            ? 'text-yellow-300'
-                            : 'text-red-300'
-                        }`}
-                      >
-                        {displayScore}% – {compatibility}
-                      </span>
-                    </div>
-                    {isCalculatingHealthAnalysis && !healthAnalysis && (
+                  <CustomMadeForLine petName={petName} />
+                  {isCalculatingHealthAnalysis && !healthAnalysis && (
+                    <div className="mt-4 flex flex-col gap-3 text-sm text-gray-400">
                       <span className="text-xs text-gray-500">Calculating enhanced score…</span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col items-center gap-4 lg:min-w-[180px]">
-                  <CompatibilityRadial score={displayScore} size={150} />
+                  <PetCompatibilityBlock
+                    avatarSrc={getProfilePictureForPetType(pet?.type || petType)}
+                    avatarAlt={`${petName} profile`}
+                    spacerClassName="w-16 shrink-0 bg-surface"
+                    right={<CompatibilityRadial score={displayScoreRounded} size={150} />}
+                  />
                   {mealEstimateForCost?.costPerMeal ? (
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-sm font-semibold text-orange-200">
                       <span>Cost per meal:</span>
@@ -609,8 +682,9 @@ export default function MealCompleteView({
             </div>
 
             {/* Ingredients & Supplements Tabs */}
-            <div className="bg-surface rounded-xl shadow-md p-8 mb-8 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
+            <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3 flex items-center gap-2">
+                <ShoppingCart size={22} />
                 Shopping List
               </h3>
               {/* Tab Navigation */}
@@ -652,42 +726,6 @@ export default function MealCompleteView({
                         recommendedServingGrams={analysis?.recommendedServingGrams}
                         showHeader={false}
                       />
-                    )}
-                    
-                    {/* Ingredients without ASIN links */}
-                    {ingredientsWithoutASINs.length > 0 && (
-                      <div className="bg-surface-lighter rounded-lg border border-surface-highlight p-6">
-                        <h3 className="text-lg font-semibold text-foreground mb-4">
-                          Additional Ingredients
-                        </h3>
-                        <div className="space-y-2">
-                          {ingredientsWithoutASINs.map((ing, index) => (
-                            <div
-                              key={ing.id || index}
-                              className="flex items-center justify-between p-3 bg-surface rounded-lg border border-surface-highlight"
-                            >
-                              <div className="flex-1">
-                                <div className="font-medium text-gray-200">{ing.name}</div>
-                                <div className="text-sm text-gray-400 mt-1">
-                                  {ing.amount}
-                                  {recommendedAmounts[ing.id] && recommendedAmounts[ing.id] !== parseFloat(ing.amount.replace('g', '')) && (
-                                    <span className="text-orange-400 ml-2">
-                                      (Recommended: {recommendedAmounts[ing.id]}g)
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => onRemove(ing.id)}
-                                className="p-1.5 rounded hover:bg-red-900/30 text-gray-400 hover:text-red-400 transition-colors ml-2"
-                                title="Remove ingredient"
-                              >
-                                <XCircle size={18} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
                     )}
 
                     {selectedIngredients.length === 0 && (
@@ -768,46 +806,6 @@ export default function MealCompleteView({
               )}
             </div>
 
-            {/* Safety Alerts */}
-            {analysis && (analysis.toxicityWarnings.length > 0 || analysis.allergyWarnings.length > 0) && (
-              <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-6 mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <AlertTriangle size={20} className="text-red-400" />
-                  <h2 className="text-lg font-semibold text-red-200">Safety Alerts</h2>
-                </div>
-                <div className="space-y-3">
-                  {analysis.toxicityWarnings.map((warning, idx) => (
-                    <div key={idx} className="text-sm text-red-300">
-                      <div className="font-medium">⚠️ {warning.ingredientName || warning.ingredientKey}</div>
-                      <div className="text-xs mt-1 opacity-90">{warning.message}</div>
-                    </div>
-                  ))}
-                  {analysis.allergyWarnings.map((warning, idx) => (
-                    <div key={idx} className="text-sm text-red-300">
-                      <div className="font-medium">⚠️ {typeof warning === 'string' ? warning : warning.message}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Recommendations */}
-            {analysis && analysis.suggestions.length > 0 && (
-              <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-6 mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <Info size={20} className="text-blue-400" />
-                  <h2 className="text-lg font-semibold text-blue-200">Recommendations</h2>
-                </div>
-                <div className="space-y-2">
-                  {analysis.suggestions.map((suggestion, idx) => (
-                    <div key={idx} className="text-sm text-blue-300">
-                      💡 {typeof suggestion === 'string' ? suggestion : suggestion.message}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Cost Comparison */}
             {ingredientsWithASINs.length > 0 && mealEstimateForCost && mealEstimateForCost.costPerMeal > 0 && (
               <div className="mb-8">
@@ -822,7 +820,7 @@ export default function MealCompleteView({
           </main>
 
           {/* Sidebar */}
-          <aside className="lg:col-span-2 space-y-6">
+          <aside className="lg:col-span-2 space-y-8">
             {/* Health Analysis Panel */}
             {healthAnalysis && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
@@ -844,7 +842,17 @@ export default function MealCompleteView({
                   Proffessor Purfessor has found these individual factors that contribute to the overall compatibility score
                 </p>
                 <div className="space-y-3">
-                  {Object.entries(healthAnalysis.breakdown).map(([key, factor]) => {
+                  {Object.entries(healthAnalysis.breakdown)
+                    .filter(([_key, factor]) => {
+                      const f = factor as { weight: number; reason?: string; recommendations?: any[] };
+                      const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
+                      if (weight > 0) return true;
+
+                      const hasReason = typeof f.reason === 'string' && f.reason.trim().length > 0;
+                      const hasRecs = Array.isArray(f.recommendations) && f.recommendations.length > 0;
+                      return hasReason || hasRecs;
+                    })
+                    .map(([key, factor]) => {
                     const f = factor as { score: number; weightedContribution?: number; weight: number; reason?: string; recommendations?: any[] };
                     const score = f.score || 0;
                     const weightedContribution = f.weightedContribution ?? Math.round(score * (f.weight || 0));
@@ -868,7 +876,7 @@ export default function MealCompleteView({
                     const factorName = key.replace(/([A-Z])/g, ' $1').toLowerCase();
                     const formattedFactorName = factorName.charAt(0).toUpperCase() + factorName.slice(1);
                     
-                    let tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${score}%\nWeight: ${(weight * 100).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${f.reason ? `💡 ${f.reason}` : 'No additional details available'}`;
+                    let tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${formatPercent(score)}\nWeight: ${(weight * 100).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${f.reason ? `💡 ${f.reason}` : 'No additional details available'}`;
                     
                     if (key === 'nutritionalFit' && f.recommendations && f.recommendations.length > 0) {
                       tooltipContent += '\n\n─────────────────────\n\n💊 Recommendations:\n';
@@ -894,7 +902,7 @@ export default function MealCompleteView({
                           </div>
                           <div className="flex flex-col items-end">
                             <span className={`text-sm font-bold ${textColor}`}>
-                              {score}%
+                              {formatPercent(score)}
                             </span>
                             <span className="text-xs text-gray-400">
                               +{weightedContribution} pts
@@ -915,21 +923,64 @@ export default function MealCompleteView({
                       healthAnalysis.overallScore >= 60 ? 'text-yellow-400' :
                       'text-red-400'
                     }`}>
-                      {healthAnalysis.overallScore}%
+                      {formatPercent(healthAnalysis.overallScore)}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2">
-                    {healthAnalysis.overallScore >= 80 ? 'Excellent nutritional balance for your pet!' :
-                     healthAnalysis.overallScore >= 60 ? 'Good balance with some areas for improvement.' :
-                     'Needs nutritional adjustments for optimal health.'}
-                  </p>
                 </div>
               </div>
             )}
 
+            <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
+                🧊 Storage & Serving
+              </h3>
+              <div className="space-y-4 text-sm text-gray-300">
+                {portionPlan ? (
+                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
+                    <div className="font-semibold text-gray-200">Suggested serving for your pet</div>
+                    <div className="text-gray-300 mt-1">
+                      {portionPlan.dailyGrams}g per day ({portionPlan.mealsPerDay} meals/day)
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
+                    <div className="text-gray-300">
+                      Serving varies by species, size, age, and activity—create a pet profile for exact portions.
+                    </div>
+                    <div className="mt-3">
+                      <Link
+                        href="/sign-up"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-800 text-white font-semibold hover:bg-green-900 transition-colors"
+                      >
+                        Create Free Account
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className="font-semibold text-gray-200">Storage</div>
+                  <div className="text-gray-300 mt-1">Fridge: Store in airtight container up to 3 days</div>
+                  <div className="text-gray-300">Freezer: Freeze portions up to 2 months</div>
+                  <div className="text-gray-300">Thawing: Thaw overnight in fridge</div>
+                </div>
+
+                <div>
+                  <div className="font-semibold text-gray-200">Serving temperature</div>
+                  <div className="text-gray-300 mt-1">Serve at room temp or gently warmed</div>
+                  <div className="text-gray-300">Avoid overheating; stir well and test temperature before serving</div>
+                </div>
+
+                <div>
+                  <div className="font-semibold text-gray-200">Batch prep tip</div>
+                  <div className="text-gray-300 mt-1">Cool fully before portioning; portion into daily containers</div>
+                </div>
+              </div>
+            </div>
+
             {/* Nutritional Summary */}
             {analysis && (
-              <div className="bg-surface rounded-lg border border-surface-highlight p-6">
+              <div className="bg-surface rounded-2xl shadow-lg border border-surface-highlight p-6">
                 <h3 className="text-sm font-semibold text-gray-200 mb-3">Nutritional Summary</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">

@@ -136,9 +136,27 @@ function computeBaselineFactors(params: { recipe: Recipe; pet: SpeciesScoringPet
   const nutritionalGaps: string[] = [];
   const nutritionalStrengths: string[] = [];
 
+  const nutritionDebug =
+    process.env.NEXT_PUBLIC_NUTRITION_DEBUG === 'true' ||
+    process.env.NEXT_PUBLIC_SCORE_DEBUG === 'true';
+
   const nutrition = calculateRecipeNutrition(recipe);
   const joined = toTextList(recipe);
   const ageYears = normalizeAgeYears(pet.age);
+
+  if (nutritionDebug) {
+    console.log('[NutritionDebug]', {
+      recipe: recipe?.name,
+      species,
+      ageYears,
+      nutrition,
+      ingredients: (recipe.ingredients || []).map((i: any) => ({
+        name: typeof i === 'string' ? i : i?.name,
+        amount: typeof i === 'string' ? undefined : i?.amount,
+        amountG: typeof i === 'string' ? 0 : (typeof i?.amount === 'string' || typeof i?.amount === 'number' ? i.amount : undefined),
+      })),
+    });
+  }
 
   // Safety: basic allergy/restriction string matching.
   let safety = 100;
@@ -405,6 +423,10 @@ class BirdScoringEngine extends NativeSpeciesEngine {
     _nutritionalGaps: string[],
     _nutritionalStrengths: string[]
   ): void {
+    const nutritionDebug =
+      process.env.NEXT_PUBLIC_NUTRITION_DEBUG === 'true' ||
+      process.env.NEXT_PUBLIC_SCORE_DEBUG === 'true';
+
     const toxic = findBirdToxicIngredients(recipe);
     if (toxic.length > 0) {
       factors.safety = 0;
@@ -417,10 +439,32 @@ class BirdScoringEngine extends NativeSpeciesEngine {
 
     const standards = getBirdStandards(pet.breed || '');
     const pelletPct = getPelletPercentage(recipe);
-    const pelletPenalty = penaltyFromMin(pelletPct, standards.pelletPercentage.min, 35, 4);
-    if (pelletPenalty > 0) {
-      factors.nutrition = clampScore(factors.nutrition - pelletPenalty);
-      warnings.push(`Pellet percentage below target (${pelletPct.toFixed(0)}% vs min ${standards.pelletPercentage.min}%)`);
+    // Many generated bird recipes are "seed/veg" mixes and may not include pellets.
+    // If we can't detect any pellet content, skip the pellet penalty rather than tanking the score.
+    if (pelletPct > 0) {
+      const pelletPenalty = penaltyFromMin(pelletPct, standards.pelletPercentage.min, 35, 4);
+      if (pelletPenalty > 0) {
+        factors.nutrition = clampScore(factors.nutrition - pelletPenalty);
+        warnings.push(`Pellet percentage below target (${pelletPct.toFixed(0)}% vs min ${standards.pelletPercentage.min}%)`);
+      }
+      if (nutritionDebug) {
+        console.log('[NutritionDebug][BirdPellets]', {
+          recipe: recipe?.name,
+          breed: pet.breed,
+          pelletPct,
+          pelletMin: standards.pelletPercentage.min,
+          pelletIdeal: standards.pelletPercentage.ideal,
+          nutritionScoreAfter: factors.nutrition,
+        });
+      }
+    } else if (nutritionDebug) {
+      console.log('[NutritionDebug][BirdPellets]', {
+        recipe: recipe?.name,
+        breed: pet.breed,
+        pelletPct,
+        pelletMin: standards.pelletPercentage.min,
+        skipped: true,
+      });
     }
 
     const nutrition = calculateRecipeNutrition(recipe);
@@ -432,6 +476,19 @@ class BirdScoringEngine extends NativeSpeciesEngine {
         const deficit01 = caP < min ? (min - caP) / min : (caP - max) / max;
         const penalty = smoothPenalty(deficit01, 25, 4);
         factors.nutrition = clampScore(factors.nutrition - penalty);
+      }
+
+      if (nutritionDebug) {
+        console.log('[NutritionDebug][BirdCaP]', {
+          recipe: recipe?.name,
+          breed: pet.breed,
+          calcium: nutrition.calcium,
+          phosphorus: nutrition.phosphorus,
+          caP,
+          min,
+          max,
+          nutritionScoreAfter: factors.nutrition,
+        });
       }
     }
   }

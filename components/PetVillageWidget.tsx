@@ -116,7 +116,7 @@ const PetVillageWidget: React.FC<PetVillageWidgetProps> = ({
         <button
           onClick={incrementStreak}
           className="w-5 h-5 bg-primary-600 text-white rounded-full flex items-center justify-center hover:bg-primary-700 transition-colors text-xs"
-          title="Add meal"
+          title="Save meal"
         >
           <Plus size={10} />
         </button>

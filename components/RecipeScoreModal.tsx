@@ -8,6 +8,7 @@ import healthConcerns from '@/lib/data/healthConcerns';
 import { actionNeededBeep } from '@/lib/utils/beep';
 import { ensureSellerId, isValidAmazonUrl } from '@/lib/utils/affiliateLinks';
 import { normalizePetType } from '@/lib/utils/petType';
+import { formatPercent } from '@/lib/utils/formatPercent';
 
 type ModalPet = {
   id: string;
@@ -39,12 +40,6 @@ const Btn: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ children
 export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
   // Use improved scoring if available, fallback to original
   let rating: any = null;
-
-  const pct = (v: unknown) => {
-    const n = typeof v === 'number' ? v : typeof v === 'string' ? parseFloat(v) : NaN;
-    if (!Number.isFinite(n)) return 0;
-    return Math.round(n);
-  };
 
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -78,7 +73,7 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
         recommendation: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
                        scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
                        scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
-        summaryReasoning: `Compatibility score: ${pct(scored.overallScore)}% (${scored.grade})`,
+        summaryReasoning: `Compatibility score: ${formatPercent(scored.overallScore)} (${scored.grade})`,
         compatibility: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
                        scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
                        scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
@@ -237,19 +232,19 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center justify-between">
                 <div>Ingredient Safety</div>
-                <div className="font-mono text-gray-300">{pct(breakdown.petTypeMatch.score)}%</div>
+                <div className="font-mono text-gray-300">{formatPercent(breakdown.petTypeMatch.score)}</div>
               </div>
               <div className="flex items-center justify-between">
                 <div>Nutritional Adequacy</div>
-                <div className="font-mono text-gray-300">{pct(breakdown.nutritionalFit.score)}%</div>
+                <div className="font-mono text-gray-300">{formatPercent(breakdown.nutritionalFit.score)}</div>
               </div>
               <div className="flex items-center justify-between">
                 <div>Health Alignment</div>
-                <div className="font-mono text-gray-300">{pct(breakdown.healthCompatibility.score)}%</div>
+                <div className="font-mono text-gray-300">{formatPercent(breakdown.healthCompatibility.score)}</div>
               </div>
               <div className="flex items-center justify-between">
                 <div>Allergen Safety</div>
-                <div className="font-mono text-gray-300">{pct(breakdown.allergenSafety.score)}%</div>
+                <div className="font-mono text-gray-300">{formatPercent(breakdown.allergenSafety.score)}</div>
               </div>
             </div>
 

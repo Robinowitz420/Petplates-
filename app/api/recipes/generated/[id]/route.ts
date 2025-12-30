@@ -5,10 +5,11 @@ export const runtime = 'nodejs';
 
 export async function GET(
   _request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const { id } = context.params;
+    const resolvedParams = await (context.params as any);
+    const id = resolvedParams?.id;
     const recipeId = String(id || '').trim();
 
     if (!recipeId) {

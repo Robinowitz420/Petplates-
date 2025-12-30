@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatPercent } from '@/lib/utils/formatPercent';
 
 type ScoreTier = 'perfect' | 'excellent' | 'great' | 'good' | 'fair' | 'poor';
 
@@ -26,14 +27,13 @@ export const CompatibilityBadge: React.FC<CompatibilityBadgeProps> = ({
   isGoldStandard = false,
   hasPerfectMatches = true
 }) => {
-  // Use scoring tier system for better UX
-  const tier = getScoreTier(score);
-  
+  const roundedScore = Math.round(score);
+
   // Determine compatibility from score if not provided
   const effectiveCompatibility = compatibility || (
-    score >= 95 ? 'excellent' :
-    score >= 85 ? 'good' :
-    score >= 70 ? 'fair' : 'poor'
+    roundedScore >= 95 ? 'excellent' :
+    roundedScore >= 85 ? 'good' :
+    roundedScore >= 70 ? 'fair' : 'poor'
   );
   
   const getBadgeStyles = () => {
@@ -52,15 +52,15 @@ export const CompatibilityBadge: React.FC<CompatibilityBadgeProps> = ({
   };
 
   const getCompatibilityLabel = (): string => {
-    if (score >= 95 && isGoldStandard) {
+    if (roundedScore >= 95 && isGoldStandard) {
       return 'Perfect Match';
-    } else if (score >= 90) {
+    } else if (roundedScore >= 90) {
       return 'Excellent Match';
-    } else if (score >= 85) {
+    } else if (roundedScore >= 85) {
       return 'Great Match';
-    } else if (score >= 80) {
+    } else if (roundedScore >= 80) {
       return 'Good Match';
-    } else if (score >= 70) {
+    } else if (roundedScore >= 70) {
       return 'Acceptable Match';
     } else {
       return hasPerfectMatches 
@@ -70,7 +70,7 @@ export const CompatibilityBadge: React.FC<CompatibilityBadgeProps> = ({
   };
 
   const getScoreSubtext = (): string => {
-    if (!hasPerfectMatches && score < 90) {
+    if (!hasPerfectMatches && roundedScore < 90) {
       return ' (no perfect matches for this profile yet)';
     }
     if (isGoldStandard) {
@@ -81,7 +81,7 @@ export const CompatibilityBadge: React.FC<CompatibilityBadgeProps> = ({
 
   return (
     <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getBadgeStyles()} ${className}`}>
-      <span>{score}% {getCompatibilityLabel()}{getScoreSubtext()}</span>
+      <span>{formatPercent(roundedScore)} {getCompatibilityLabel()}{getScoreSubtext()}</span>
     </div>
   );
 };

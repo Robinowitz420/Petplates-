@@ -3,6 +3,7 @@ import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 let cachedApp: App | null = null;
 let cachedDb: Firestore | null = null;
+let didConfigureDb = false;
 
 function normalizePrivateKey(value: string): string {
   return value
@@ -61,8 +62,21 @@ export function getFirebaseAdminApp(): App {
 export function getFirebaseAdminDb(): Firestore {
   if (cachedDb) return cachedDb;
   const app = getFirebaseAdminApp();
-  cachedDb = getFirestore(app);
-  cachedDb.settings({ ignoreUndefinedProperties: true });
+  try {
+    cachedDb = getFirestore(app);
+    if (!didConfigureDb) {
+      try {
+        cachedDb.settings({ ignoreUndefinedProperties: true });
+      } catch {
+        // Firestore throws if settings() is called after the instance is used.
+        // In dev/hot-reload this can happen; ignore and proceed.
+      }
+      didConfigureDb = true;
+    }
+  } catch {
+    // As a last resort, attempt to return a Firestore instance without settings.
+    cachedDb = getFirestore(app);
+  }
   return cachedDb;
 }
 

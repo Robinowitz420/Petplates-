@@ -4,30 +4,14 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import { NutritionDashboard } from '@/components/NutritionDashboard';
 import { calculateDailyNutrition, getNutritionTargets } from '@/lib/nutrition/nutritionHistory';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
+import { getPets } from '@/lib/utils/petStorage';
 import type { Recipe, CustomMeal } from '@/lib/types';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
-
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return SIMULATED_USER_ID;
-  return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
-};
-
-const getPetsFromLocalStorage = (userId: string) => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
 
 const convertCustomMealToRecipe = (customMeal: CustomMeal): Recipe => {
   return {
@@ -79,6 +63,7 @@ export default function NutritionPage() {
   const params = useParams();
   const router = useRouter();
   const petId = params.id as string;
+  const { userId, isLoaded } = useAuth();
   const [pet, setPet] = useState<any>(null);
   const [savedMeals, setSavedMeals] = useState<Recipe[]>([]);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
@@ -86,8 +71,16 @@ export default function NutritionPage() {
 
   useEffect(() => {
     async function loadPetData() {
-      const userId = getCurrentUserId();
-      const pets = getPetsFromLocalStorage(userId);
+      if (!isLoaded) return;
+      if (!userId) {
+        setPet(null);
+        setSavedMeals([]);
+        setCustomMeals([]);
+        setLoading(false);
+        return;
+      }
+
+      const pets = await getPets(userId);
       const foundPet = pets.find((p: any) => p.id === petId) || null;
       setPet(foundPet);
       if (foundPet) {
@@ -99,7 +92,7 @@ export default function NutritionPage() {
       setLoading(false);
     }
     loadPetData();
-  }, [petId]);
+  }, [isLoaded, petId, userId]);
 
   const weeklyPlan = useMemo(() => {
     const allMeals = [...savedMeals, ...customMeals.map(convertCustomMealToRecipe)];

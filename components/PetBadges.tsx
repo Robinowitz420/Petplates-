@@ -40,7 +40,7 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
   }
 
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div className={`flex flex-wrap justify-center gap-4 px-2 ${className}`}>
       {badges.badges.map((badge) => {
         const definition = getBadgeDefinition(badge.type);
         if (!definition) return null;
@@ -75,12 +75,12 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
         return (
           <Tooltip key={`${badge.type}-${badge.tier || 'single'}`} content={tooltipContent} wide={true}>
             <div className="relative group">
-              <div className="w-10 h-10 rounded-full bg-surface-highlight border border-white/10 flex items-center justify-center hover:scale-110 transition-transform cursor-help">
+              <div className="w-24 h-24 rounded-full bg-surface-highlight border border-white/10 flex items-center justify-center hover:scale-110 transition-transform cursor-help">
                 <Image
                   src={iconPath}
                   alt={displayName}
-                  width={32}
-                  height={32}
+                  width={72}
+                  height={72}
                   className="object-contain no-invert-badge"
                   unoptimized
                   onError={(e) => {
@@ -91,7 +91,7 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
               </div>
               {/* Progress indicator for progressive badges */}
               {definition.isProgressive && badge.progress !== undefined && badge.nextTierThreshold && (
-                <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gray-700 rounded-full overflow-hidden">
+                <div className="absolute -bottom-2 left-1 right-1 h-2 bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-orange-400 transition-all"
                     style={{

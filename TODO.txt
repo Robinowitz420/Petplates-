@@ -1,0 +1,265 @@
+we need to use "C:\Users\Robin\Workspace\Pet_plates_meal_platform\public\images\emojis\Mascots\HeroPics\newLogo.png" as our main logo for landing pages
+
+why would health analysis be so critical of a highh scoring meal likethis:
+
+{healthfocus} Sardines Recipe 2
+89%
+Compatibility
+Cost per meal:
+$3.80
+Shopping List
+Ingredients
+Supplements
+Wild Planet Sardines in Water No Salt
+Recipe needs: 84g
+$8.00 est.
+$7.99/lb
+Buy
+Farmer's Market Organic Pumpkin Puree
+Recipe needs: 51g
+$8.00 est.
+$7.99/lb
+Buy
+Fresh Organic Green Peas
+Recipe needs: 34g
+$3.00 est.
+$3.00/lb
+Buy
+Direct product link
+
+Buy All (3 items)
+• $19.00
+✓ Prime eligible
+✓ Free returns
+✓ Supports Paws & Plates
+💚 You're supporting independent pet nutrition!
+As an Amazon Associate, we earn a small commission at no extra cost to you.
+
+Additional Ingredients
+Wild Planet Sardines in Water No Salt
+84g
+
+Farmer's Market Organic Pumpkin Puree
+51g
+
+Recommendations
+💡 Taurine is low — add 0.1g taurine supplement per 100g serving or include more heart/liver.
+💡 Consider removing or reducing Chickpeas: Chickpeas should be limited for cats.
+💰 Cost Comparison
+Homemade (Your Cost)
+
+$3.80/meal
+
+✓ Fresh ingredients
+
+✓ Full control
+
+✓ Custom nutrition
+
+Commercial Pet Food
+
+$4.50/meal
+
+Typical premium brand
+
+You save $0.70 per meal (16%)
+
+That's $21.00 per month!
+
+Total savings from this shopping trip: $3.50
+
+📊 Value Breakdown:
+
+Estimated Meals
+
+5
+
+from these packages
+
+Total Cost
+
+$18.99
+
+one-time purchase
+
+Cost Per Meal
+
+$3.80
+
+average
+
+🏥
+Health Analysis
+Professor Purfessor
+Proffessor Purfessor has found these individual factors that contribute to the overall compatibility score
+
+✅
+pet type match
+100%
++30 pts
+📊 Pet type match
+
+─────────────────────
+
+Raw Score: 100%
+Weight: 30%
+Contribution: 30 points
+
+─────────────────────
+
+No additional details available
+❌
+age appropriate
+0%
++0 pts
+📊 Age appropriate
+
+─────────────────────
+
+Raw Score: 0%
+Weight: 0%
+Contribution: 0 points
+
+─────────────────────
+
+No additional details available
+✅
+health compatibility
+100%
++20 pts
+📊 Health compatibility
+
+─────────────────────
+
+Raw Score: 100%
+Weight: 20%
+Contribution: 20 points
+
+─────────────────────
+
+No additional details available
+❌
+activity fit
+0%
++0 pts
+📊 Activity fit
+
+─────────────────────
+
+Raw Score: 0%
+Weight: 0%
+Contribution: 0 points
+
+─────────────────────
+
+No additional details available
+❌
+allergen safety
+0%
++0 pts
+📊 Allergen safety
+
+─────────────────────
+
+Raw Score: 0%
+Weight: 0%
+Contribution: 0 points
+
+─────────────────────
+
+No additional details available
+Compatibility Score:
+89%
+Excellent nutritional balance for your pet!
+
+🧊 Storage & Serving
+Suggested serving for your pet
+519g per day (2 meals/day)
+Storage
+Fridge: Store in airtight container up to 3 days
+Freezer: Freeze portions up to 2 months
+Thawing: Thaw overnight in fridge
+Serving temperature
+Serve at room temp or gently warmed
+Avoid overheating; stir well and test temperature before serving
+Batch prep tip
+Cool fully before portioning; portion into daily containers
+🛡️ Safety
+When NOT to use this recipe
+Not a substitute for veterinary advice.
+If your pet has a diagnosed medical condition or is on a prescription diet, consult your vet before changing diet.
+Very young animals, pregnant/nursing pets, and seniors may need tailored nutrition—use a pet profile for more precise guidance.
+Safety flags
+⚠️
+Chickpeas should be limited for cats.
+Food handling
+Discard if left out >2 hours (1 hour in hot temps).
+Do not feed if smell/texture changes.
+Nutritional Summary
+Total Weight:
+173g
+Calories:
+228 kcal
+Protein:
+24.2g
+Fat:
+12.6g
+Ca:P Ratio:
+0.71
+Recommended Serving:
+173g
+
+
+
+
+
+instead of the text "Add Meal" for the recipe cards and recipe details pages id rather use the txt "Save Meal"
+
+
+the recipe page ui's are not matching bc the meal title box is not spanning the width of the page and its not at the top of the page above both collumns.. make the two pages match starting with that. 
+
+
+the recipe cards say :
+
+Tuna & Green Bean Medley
+Est. cost: $2.08/meal • Est. meals: 7
+85%
+Compatibility
+Balanced for your pet
+
+i don't like the subtext "balanced for your pet" i dont want any text like that below the score. and i want the cost breakdown to pop more like a badge or even a small box looking like the cost comparison in the recipe details page.. but smaller to fit recipe cards. 
+oh and we still dont have a "Save Meal" button on the meal cards
+
+and i want an orange border around the meal cards. not too thick though
+
+
+we have this issue: 
+
+## Error Type
+Console Error
+
+## Error Message
+Recipe generation failed (500): {"error":"Failed to generate recipes","details":"Gemini model not available (gemini-1.5-pro): {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"models/gemini-1.5-pro is not found for API version v1, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.\",\n    \"status\": \"NOT_FOUND\"\n  }\n}\n"}
+
+
+    at RecommendedRecipesPage.useEffect (app/profile/pet/[id]/page.tsx:234:17)
+
+## Code Frame
+  232 |           }
+  233 |
+> 234 |           throw new Error(
+      |                 ^
+  235 |             `Recipe generation failed (${response.status})${details ? `: ${details}` : ''}`
+  236 |           );
+  237 |         }
+
+Next.js version: 16.0.7 (Turbopack)
+
+
+on the find meals results page
+
+i want orange outlines around all our buttons just like we have around the buttons in the pet profile card. apply that outline to the "Find new Batch" button and the "Add Meal" buttons etc. 
+
+under the saved meals tab of the pet profile 
+
+we need a buton to add a meal from saved meals tab to the meal plan tab 

@@ -4,55 +4,33 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import type { Recipe } from '@/lib/types';
+import { useAuth } from '@clerk/nextjs';
+import type { Recipe, Pet as AppPet } from '@/lib/types';
 import { recipes } from '@/lib/data/recipes-complete';
 import RecipeCard from '@/components/RecipeCard';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { normalizePetType } from '@/lib/utils/petType';
-
-const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
-
-interface Pet {
-  id: string;
-  name: string;
-  type: string;
-  breed: string;
-  age: string;
-  healthConcerns: string[];
-  mealPlan: string[];
-  savedRecipes?: string[];
-  names?: string[];
-  weight?: string | number;
-  weightKg?: number;
-  dietaryRestrictions?: string[];
-  allergies?: string[];
-  dislikes?: string[];
-  activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
-}
-
-const getPetsFromLocalStorage = (userId: string): Pet[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
+import { getPets } from '@/lib/utils/petStorage';
 
 export default function RecommendedRecipesPage() {
   const params = useParams();
   const petId = params.id as string;
+  const { userId, isLoaded } = useAuth();
 
-  const [pet, setPet] = useState<Pet | null>(null);
+  const [pet, setPet] = useState<AppPet | null>(null);
   const [loading, setLoading] = useState(true);
 
   const scoringPet = useMemo(() => {
     if (!pet) return null;
 
-    const ageYears = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
+    const petDisplayName =
+      pet.name || (Array.isArray(pet.names) && pet.names.length > 0 ? pet.names[0] : 'Pet');
+
+    const petType = normalizePetType(String(pet.type || 'dog'), 'recipes/recommended/[id]');
+    const breed = typeof pet.breed === 'string' ? pet.breed : '';
+    const ageRaw = String((pet as any).age || 'adult');
+    const ageYears = ageRaw === 'baby' ? 0.5 : ageRaw === 'young' ? 2 : ageRaw === 'adult' ? 5 : 10;
+
     const weightNum =
       typeof pet.weightKg === 'number'
         ? pet.weightKg
@@ -64,9 +42,9 @@ export default function RecommendedRecipesPage() {
 
     return {
       id: pet.id,
-      name: pet.name,
-      type: normalizePetType(pet.type, 'recipes/recommended/[id]'),
-      breed: pet.breed,
+      name: petDisplayName,
+      type: petType,
+      breed,
       age: ageYears,
       weight: Number.isFinite(weightNum) ? weightNum : 25,
       activityLevel: pet.activityLevel || 'moderate',
@@ -77,14 +55,27 @@ export default function RecommendedRecipesPage() {
   }, [pet]);
 
   useEffect(() => {
-    if (petId) {
-      const userId = SIMULATED_USER_ID;
-      const pets = getPetsFromLocalStorage(userId);
-      const foundPet = pets.find((p) => p.id === petId) || null;
-      setPet(foundPet);
+    if (!isLoaded) return;
+    if (!petId) return;
+    if (!userId) {
+      setPet(null);
       setLoading(false);
+      return;
     }
-  }, [petId]);
+
+    (async () => {
+      try {
+        const pets = await getPets(userId);
+        const foundPet = (pets as any[]).find((p: any) => p.id === petId) || null;
+        setPet(foundPet as AppPet | null);
+      } catch (error) {
+        console.error('Failed to load pet:', error);
+        setPet(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [isLoaded, petId, userId]);
 
   const scoredRecipes = useMemo(() => {
     if (!pet) return [];
@@ -136,6 +127,9 @@ export default function RecommendedRecipesPage() {
     );
   }
 
+  const petDisplayName =
+    pet.name || (Array.isArray(pet.names) && pet.names.length > 0 ? pet.names[0] : 'Pet');
+
   return (
     <div className="min-h-screen bg-background text-foreground py-12">
       <div className="max-w-7xl mx-auto px-4">
@@ -151,10 +145,10 @@ export default function RecommendedRecipesPage() {
 
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-100 mb-2">
-            Best Matches for {pet.name}
+            Best Matches for {petDisplayName}
           </h1>
           <p className="text-gray-400 mb-4">
-            Recipes ranked by how well they match {pet.name}'s nutritional needs, breed, age, and health concerns.
+            Recipes ranked by how well they match {petDisplayName}'s nutritional needs, breed, age, and health concerns.
             Higher compatibility scores indicate better suitability.
           </p>
 

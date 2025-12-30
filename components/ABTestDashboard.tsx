@@ -51,7 +51,7 @@ export default function ABTestDashboard() {
 
   const getPercentage = (count: number) => {
     if (totalClicks === 0) return 0;
-    return ((count / totalClicks) * 100).toFixed(1);
+    return Math.round((count / totalClicks) * 100);
   };
 
   return (

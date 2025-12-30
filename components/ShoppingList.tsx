@@ -201,7 +201,7 @@ export function ShoppingList({
             {/* Price Display */}
             <div className="text-right mr-3">
               <div className="text-lg font-bold text-orange-400">
-                ${item.price.toFixed(2)}{item.isEstimatedPrice ? <span className="text-xs font-semibold text-gray-400"> est.</span> : null}
+                ${item.price.toFixed(2)}<span className="text-xs font-semibold text-gray-400"> est.</span>
               </div>
               {typeof item.pricePerPound === 'number' && Number.isFinite(item.pricePerPound) && item.pricePerPound > 0 && (
                 <div className="text-xs text-gray-500">${item.pricePerPound.toFixed(2)}/lb</div>

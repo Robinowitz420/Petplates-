@@ -10,7 +10,7 @@ import { calculateMealsFromShoppingList } from '@/lib/utils/mealCalculator';
 
 // Format price for display
 const formatPrice = (price: number) => {
-  return `$${price.toFixed(2)}`;
+  return `$${price.toFixed(2)} est.`;
 };
 
 interface CheckoutItem {

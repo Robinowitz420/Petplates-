@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import type { Recipe, CustomMeal } from '@/lib/types';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { VETTED_PRODUCTS, getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
@@ -17,36 +18,12 @@ const formatPrice = (price: number) => {
 };
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const SIMULATED_USER_ID = 'clerk_simulated_user_id_123';
 
 interface PetProfile {
   id: string;
   name: string;
   savedRecipes: string[];
 }
-
-const getCurrentUserId = () => {
-  if (typeof window === 'undefined') return SIMULATED_USER_ID;
-  return localStorage.getItem('last_user_id') || SIMULATED_USER_ID;
-};
-
-const getPetsFromLocalStorage = (userId: string): PetProfile[] => {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(`pets_${userId}`);
-  if (!stored) return [];
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed)
-      ? parsed.map((pet: any) => ({
-          id: pet.id,
-          name: pet.name,
-          savedRecipes: pet.savedRecipes || [],
-        }))
-      : [];
-  } catch {
-    return [];
-  }
-};
 
 const buildEvenPlan = (meals: Recipe[]) => {
   const totalSlots = DAYS.length * 2;
@@ -93,6 +70,7 @@ export default function MealPlanPage() {
   const params = useParams();
   const router = useRouter();
   const petId = params.id as string;
+  const { userId, isLoaded } = useAuth();
 
   const [pet, setPet] = useState<PetProfile | null>(null);
   const [savedMeals, setSavedMeals] = useState<Recipe[]>([]);
@@ -145,7 +123,15 @@ export default function MealPlanPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const userId = getCurrentUserId();
+      if (!isLoaded) return;
+      if (!userId) {
+        setPet(null);
+        setSavedMeals([]);
+        setCustomMeals([]);
+        setWeeklyPlan([]);
+        setLoading(false);
+        return;
+      }
       try {
         const pets = await getPets(userId);
         const foundPet = pets.find((p: any) => p.id === petId) || null;
@@ -173,7 +159,7 @@ export default function MealPlanPage() {
       setLoading(false);
     };
     loadData();
-  }, [petId]);
+  }, [isLoaded, petId, userId]);
 
   const generatePlan = (meals: Recipe[]) => {
     const rotation = buildEvenPlan(meals);
