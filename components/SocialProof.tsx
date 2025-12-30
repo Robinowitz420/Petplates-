@@ -1,6 +1,3 @@
-'use client';
-
-import React from 'react';
 import { Star, Users, ShoppingBag, TrendingUp } from 'lucide-react';
 
 // Social proof component - builds trust BEFORE signup

@@ -1,6 +1,3 @@
-'use client';
-
-import React from 'react';
 import { Shield, Award, Heart, CheckCircle } from 'lucide-react';
 
 export default function TrustBadges() {
