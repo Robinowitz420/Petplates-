@@ -15,6 +15,16 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    localPatterns: [
+      {
+        pathname: '/images/**',
+        search: '',
+      },
+      {
+        pathname: '/images/**',
+        search: '?v=2025-12-30',
+      },
+    ],
     remotePatterns: [
       {
         protocol: 'https',

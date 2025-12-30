@@ -79,7 +79,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto flex flex-col items-center gap-6 text-center">
           <div className="relative w-full max-w-3xl">
             <Image
-              src="/images/emojis/Mascots/HeroPics/newLogo.png?v=2025-12-30"
+              src="/images/emojis/Mascots/HeroPics/newLogo.png"
               alt="Paws & Plates - Meal prep made easy, for ALL your pets!"
               width={720}
               height={405}
