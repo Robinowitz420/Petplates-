@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
 
@@ -11,6 +11,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   }
 
   try {
+    const adminDb = getAdminDb();
     await adminDb
       .collection('users')
       .doc(userId)

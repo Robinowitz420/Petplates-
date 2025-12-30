@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 import type { CustomMeal } from '@/lib/types';
 import { validateCustomMeal } from '@/lib/validation/petSchema';
 
@@ -13,6 +13,7 @@ export async function GET(req: Request) {
   }
 
   try {
+    const adminDb = getAdminDb();
     const url = new URL(req.url);
     const petIdFilter = url.searchParams.get('petId');
 
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    const adminDb = getAdminDb();
     const body = await req.json().catch(() => null);
     const rawMeal = body?.customMeal ?? body?.meal;
     if (!rawMeal || typeof rawMeal !== 'object') {

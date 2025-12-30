@@ -133,5 +133,3 @@ export function getAdminDb(): Firestore {
   cachedDb.settings({ ignoreUndefinedProperties: true });
   return cachedDb;
 }
-
-export const adminDb = getAdminDb();

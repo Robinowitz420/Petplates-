@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 import type { Pet } from '@/lib/types';
 import { validatePet } from '@/lib/validation/petSchema';
 
@@ -13,6 +13,7 @@ export async function GET() {
   }
 
   try {
+    const adminDb = getAdminDb();
     const snapshot = await adminDb
       .collection('users')
       .doc(userId)
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    const adminDb = getAdminDb();
     const body = await req.json().catch(() => null);
     const rawPet = body?.pet;
     if (!rawPet || typeof rawPet !== 'object') {
