@@ -8,7 +8,9 @@ import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap', weight: ['400', '600', '700'] });
 
-const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
+const googleSiteVerification =
+  process.env.GOOGLE_SITE_VERIFICATION ||
+  'oa_48Zv5SXzNQ9oHYAiyExTaU60Yew5MO4ba6VzsjNo';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://paws-and-plates.vercel.app'),
@@ -99,9 +101,7 @@ export default function RootLayout({
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <meta name="theme-color" content="#043136" />
           <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
-          {googleSiteVerification ? (
-            <meta name="google-site-verification" content={googleSiteVerification} />
-          ) : null}
+          <meta name="google-site-verification" content={googleSiteVerification} />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         </head>
