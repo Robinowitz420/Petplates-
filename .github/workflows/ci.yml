@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Health check
+        run: npm run check
+
+      - name: Dead code report (warning)
+        run: npm run deadcode
+
+      - name: Dependencies report (warning)
+        run: npm run deps:check
+
+      - name: Public assets report (warning)
+        run: npm run assets:check
+
+      - name: Bundle budget report (warning)
+        run: npm run bundle:check
