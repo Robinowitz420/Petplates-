@@ -1,14 +1,19 @@
-import { Award, Heart, Users, CheckCircle, ChefHat } from 'lucide-react';
 import { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
-  title: 'About Us - Vet-Approved Pet Meal Prep',
-  description: 'Learn how Paws & Plates provides AAFCO & WSAVA compliant meal plans for dogs, cats, birds, reptiles, and pocket pets. Free personalized nutrition planning.',
-  keywords: ['about pet meal prep', 'vet approved pet food', 'AAFCO compliant', 'pet nutrition platform'],
+  title: 'Our Story - Paws & Plates',
+  description: 'Pet Plates helps you plan homemade pet meals with clarity, safety, and common sense — without replacing your vet.',
+  keywords: ['about us', 'pet nutrition', 'our story', 'pet-loving team'],
+  alternates: {
+    canonical: '/about',
+  },
   openGraph: {
-    title: 'About Paws & Plates - Vet-Approved Pet Meal Prep',
-    description: 'AAFCO & WSAVA compliant meal plans for all pet types. Free personalized nutrition planning.',
+    title: 'Our Story - Paws & Plates',
+    description: 'Meet the team and learn why we are so passionate about pet nutrition.',
+    url: absoluteUrl('/about'),
   },
 };
 
@@ -20,6 +25,121 @@ const organizationJsonLd = {
   logo: absoluteUrl('/images/emojis/Mascots/HeroPics/newLogo.png'),
 };
 
+const teamMembers = [
+  {
+    name: 'Prep Puppy',
+    title: 'Head Chef / Final Meal Prep',
+    image: '/images/emojis/Mascots/PrepPuppy/PrepPuppyMug.png',
+    bio: "Tries to be Gordon Ramsay. Deep down he's a goof. Owns the final meal prep and cooking steps.",
+  },
+  {
+    name: 'Professor Purfessor',
+    title: 'Nutritional Specialist / Food Scientist',
+    image: '/images/emojis/Mascots/Proffessor Purfessor/ProfessorMug.png',
+    bio: 'Nerdy, scatterbrained, and brilliant. Explains nutrition logic and standards without the fluff.',
+  },
+  {
+    name: 'Sherlock Shells',
+    title: 'Ingredient Detective / Meal Finder',
+    image: '/images/emojis/Mascots/Sherlock Shells/SherlockMug.png',
+    bio: 'Stoic, cold, mopey. Discovers ingredients, curates meals, and keeps the standards uncomfortably high.',
+  },
+  {
+    name: 'Robin RedRoute',
+    title: 'Delivery & Logistics',
+    image: '/images/emojis/Mascots/Robin Red-Route/RedRobinMug.png',
+    bio: 'Talkative and stubborn. Delivers ingredients to you whether the weather agrees or not.',
+  },
+  {
+    name: 'Harvest Hamster',
+    title: 'Ingredient Farmer',
+    image: '/images/emojis/Mascots/Harvest Hamster/HamsterMug.png',
+    bio: 'ADHD and jovial. Farms the ingredients, celebrates freshness, and gets distracted by… everything.',
+  },
+];
+
+const teamInfoByName = Object.fromEntries(
+  teamMembers.map((member) => [member.name, { title: member.title, bio: member.bio }])
+);
+
+const lineupRecords = [
+  {
+    name: 'Prep Puppy',
+    number: '#00143',
+    date: '12.30.2025',
+    frontImage: '/images/emojis/Mascots/PrepPuppy/PrepPuppyMug.png',
+    sideImage: '/images/emojis/Mascots/PrepPuppy/PrepPuppyMug.png',
+    crimes: [
+      'Excessive enthusiasm in the kitchen',
+      'Unauthorized taste testing (all ingredients)',
+      'Impersonating Gordon Ramsay (poorly)',
+      'Possession of illegal levels of flavor',
+    ],
+    quote:
+      "I can explain! I was just making sure it was PAWFECT. It's not a crime to care too much about food quality.",
+  },
+  {
+    name: 'Professor Purfessor',
+    number: '#31415',
+    date: '12.30.2025',
+    frontImage: '/images/emojis/Mascots/Proffessor Purfessor/ProfessorMug.png',
+    sideImage: '/images/emojis/Mascots/Proffessor Purfessor/ProfessorMug.png',
+    crimes: [
+      'Illegal possession of 47 degrees (it is actually just one)',
+      'Misdemeanor tangent-going in the first degree',
+      'Aggravated nutrition nerding',
+      'Grand theft of your attention during explanations',
+    ],
+    quote:
+      "This is preposterous! By definition a 'crime' is— wait, where are my glasses? Oh. Right. Continue.",
+  },
+  {
+    name: 'Sherlock Shells',
+    number: '#221B',
+    date: '12.30.2025',
+    frontImage: '/images/emojis/Mascots/Sherlock Shells/SherlockMug.png',
+    sideImage: '/images/emojis/Mascots/Sherlock Shells/SherlockMug.png',
+    crimes: [
+      "Excessive skepticism of 'premium' labels",
+      'Aggravated side-eye',
+      'Investigation without a warrant (your pantry)',
+      'Grand theft of your subpar ingredients',
+    ],
+    quote:
+      "I've committed no crime—unless you count exposing mediocre ingredients masquerading as quality. In that case, guilty.",
+  },
+  {
+    name: 'Harvest Hamster',
+    number: '#47896',
+    date: '12.30.2025',
+    frontImage: '/images/emojis/Mascots/Harvest Hamster/HamsterMug.png',
+    sideImage: '/images/emojis/Mascots/Harvest Hamster/HamsterMug.png',
+    crimes: [
+      'Farming without a chill permit',
+      'Reckless enthusiasm',
+      'Possession of seventeen carrot varieties (only needed one)',
+      'Talking at 385 WPM in a 25 WPM zone',
+    ],
+    quote:
+      'OHMYGOSH AM I IN TROUBLE?! Is this about the carrots?! Because I can explain each variety—wait, are those handcuffs?!',
+  },
+  {
+    name: 'Robin RedRoute',
+    number: '#10538',
+    date: '12.30.2025',
+    frontImage: '/images/emojis/Mascots/Robin Red-Route/RedRobinMug.png',
+    sideImage: '/images/emojis/Mascots/Robin Red-Route/RedRobinMug.png',
+    crimes: [
+      'Arguing with GPS (and winning)',
+      'Unauthorized route optimization',
+      'Excessive opinions on porch placement',
+      "Refusing to accept 'delay' as an answer",
+    ],
+    quote:
+      "This is ridiculous! I'm still delivering your ingredients on time. I have standards. Are we done here?",
+  },
+];
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -28,282 +148,227 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-800 to-green-900 text-white py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            About Paws & Plates
+      <div className="text-white py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold">
+            About Us
           </h1>
-          <p className="text-xl text-orange-200">
-            Fresh, personalized nutrition for pets we love
-          </p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* Mission */}
-        <div className="bg-surface rounded-lg shadow-md p-8 mb-8 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Our Mission</h2>
+        <div className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <div className="text-center mb-8">
+            <div className="text-sm font-semibold tracking-widest text-orange-400">WANTED</div>
+            <h2 className="text-3xl font-bold text-foreground mt-2">By the Department of Pet Nutrition</h2>
+            <p className="text-white/70 mt-3">
+              These individuals are wanted for crimes against boring pet food.
+            </p>
+          </div>
+
+          <div className="space-y-10">
+            {lineupRecords.map((record) => (
+              <div key={record.name} className="rounded-lg border border-surface-highlight bg-background/40 p-6">
+                <div className="flex flex-col md:flex-row md:items-start gap-6">
+                  <div className="w-full md:w-[320px]">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                        <div className="relative w-full aspect-square">
+                          <Image
+                            src={record.frontImage}
+                            alt={`${record.name} front photo`}
+                            fill
+                            className="object-cover rounded"
+                            sizes="160px"
+                          />
+                        </div>
+                      </div>
+                      <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                        <div className="relative w-full aspect-square">
+                          <Image
+                            src={record.sideImage}
+                            alt={`${record.name} side photo`}
+                            fill
+                            className="object-cover rounded grayscale"
+                            sizes="160px"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    {teamInfoByName[record.name] && (
+                      <div className="mt-4 rounded border border-white/10 bg-black/10 p-3 text-sm text-white/80">
+                        <div className="text-orange-300 font-semibold">{teamInfoByName[record.name].title}</div>
+                        <p className="mt-1">{teamInfoByName[record.name].bio}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-foreground">{record.name}</h3>
+                    <div className="mt-4">
+                      <div className="text-sm font-semibold text-orange-400">WANTED FOR</div>
+                      <ul className="mt-2 list-disc pl-5 text-white/80 space-y-1">
+                        {record.crimes.map((crime) => (
+                          <li key={crime}>{crime}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="mt-5 rounded-md border border-white/10 bg-black/20 p-4 text-white/80">
+                      <div className="text-sm font-semibold text-orange-400 mb-2">QUOTE</div>
+                      <p className="text-sm">“{record.quote}”</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center rounded-lg border border-orange-500/30 bg-black/20 p-6">
+            <div className="text-sm font-semibold tracking-widest text-orange-400">RECORD SCRATCH</div>
+            <h3 className="text-2xl font-bold text-foreground mt-2">OKAY OKAY… we had some fun.</h3>
+            <p className="text-white/70 mt-3">Scroll for the real About Us.</p>
+          </div>
+        </div>
+
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">Real food for pets shouldn’t be confusing.</h2>
           <p className="text-lg text-white/80 leading-relaxed mb-4">
-            Paws & Plates was founded on a simple belief: our pets deserve the same quality nutrition we give ourselves.
-            Just as meal prep has transformed human health, we're bringing that same personalized, 
-            fresh-food approach to pet nutrition.
+            Pet Plates helps you plan homemade pet meals with clarity, structure, and safety — without pretending to replace your vet.
           </p>
-          <p className="text-lg text-white/80 leading-relaxed">
-            Every recipe is scientifically formulated to meet AAFCO and WSAVA guidelines, ensuring your pet 
-            gets complete, balanced nutrition tailored to their specific needs.
-          </p>
-        </div>
-
-        {/* Values */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <div className="bg-surface rounded-lg shadow-md p-6">
-            <Award className="text-orange-400 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-foreground mb-2">
-              Science-Based
-            </h3>
-            <p className="text-white/80">
-              All recipes meet or exceed AAFCO and WSAVA nutritional standards, 
-              developed with pet health specialist expertise.
-            </p>
-          </div>
-
-          <div className="bg-surface rounded-lg shadow-md p-6">
-            <Heart className="text-orange-400 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-foreground mb-2">
-              Pet-First
-            </h3>
-            <p className="text-white/80">
-              Every decision we make prioritizes your pet's health, happiness, and wellbeing.
-            </p>
-          </div>
-
-          <div className="bg-surface rounded-lg shadow-md p-6">
-            <Users className="text-orange-400 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-foreground mb-2">
-              Community Driven
-            </h3>
-            <p className="text-white/80">
-              Our recipes are refined based on feedback from thousands of pet parents like you.
-            </p>
-          </div>
-
-          <div className="bg-surface rounded-lg shadow-md p-6">
-            <CheckCircle className="text-orange-400 mb-4" size={40} />
-            <h3 className="text-xl font-bold text-foreground mb-2">
-              Transparency
-            </h3>
-            <p className="text-white/80">
-              Complete ingredient lists, full nutritional breakdowns, and clear sourcing information.
-            </p>
-          </div>
-        </div>
-
-
-        {/* Nutritional Standards */}
-        <div className="bg-surface rounded-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Our Nutritional Standards
-          </h2>
-          <p className="text-lg text-white/80 leading-relaxed mb-6">
-            We adhere to the highest standards in pet nutrition:
-          </p>
-          <ul className="space-y-3">
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>AAFCO Guidelines:</strong> All recipes meet Association of American Feed Control Officials standards
-              </span>
+          <ul className="space-y-2 text-white/80">
+            <li className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">•</span>
+              <span>Ingredient-first meal planning</span>
             </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>WSAVA Recommendations:</strong> Aligned with World Small Animal Veterinary Association best practices
-              </span>
+            <li className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">•</span>
+              <span>Species-specific safety guardrails</span>
             </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>Pet Specialist Reviewed:</strong> Recipes developed and reviewed by pet nutritionists
-              </span>
+            <li className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">•</span>
+              <span>Clear nutrition explanations (not buzzwords)</span>
             </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>Regular Updates:</strong> Formulations updated as new research emerges
-              </span>
+            <li className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">•</span>
+              <span>Built for real kitchens, real budgets</span>
             </li>
           </ul>
-        </div>
+          <p className="text-white/70 mt-4">We take pet food seriously — but not ourselves.</p>
+          <div className="mt-5">
+            <a href="/profile" className="btn btn-success btn-md">See how Pet Plates works</a>
+          </div>
+        </section>
 
-        {/* Vetting Process */}
-        <div className="bg-surface rounded-lg shadow-md p-8 mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            How We Choose Your Ingredients: The Vetted Vetting Process
-          </h2>
-          <p className="text-lg text-white/80 leading-relaxed mb-6">
-            When you see a specific product recommendation (e.g., "Brand X Fish Oil") instead of a generic item (e.g., "Fish Oil"),
-            it means that item has passed our three-tiered pet health specialist screening process.
-          </p>
-          <p className="text-lg text-white/80 leading-relaxed mb-6">
-            Our goal is to ensure that the products you purchase are as safe and high-quality as the recipes you cook.
-            We select the "best pick" for every core ingredient based on:
-          </p>
-          <ul className="space-y-4 mb-6">
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>Safety & Purity:</strong> Every supplement and oil is vetted for third-party testing (e.g., heavy metal or contaminant checks) to guarantee safety. We choose minimal processing where possible.
-              </span>
-            </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>Nutritional Superiority:</strong> We prioritize sourcing that maximizes the intended benefit—for instance, choosing low-fat meats for sensitive pets or specific fish (like Wild-Caught Alaskan Salmon) for high Omega-3 concentration.
-              </span>
-            </li>
-            <li className="flex items-start gap-3">
-              <CheckCircle className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-              <span className="text-white/80">
-                <strong>Dietary Completeness:</strong> For foundational components like multi-vitamin/mineral mixes, we exclusively select professionally formulated products that meet AAFCO/FEDIAF standards to guarantee your homemade meal is 100% balanced and complete.
-              </span>
-            </li>
-          </ul>
-          <p className="text-lg text-white/80 leading-relaxed">
-            Our shopping list is designed to be a recommendation from a pet health specialist, not just a search result.
-          </p>
-        </div>
-
-        {/* Why Paws & Plates */}
-        <div className="bg-surface border border-surface-highlight rounded-lg p-8">
-          <h2 className="text-3xl font-bold text-foreground mb-6">
-            Why Paws & Plates?
-          </h2>
-          <p className="text-lg text-white/80 leading-relaxed mb-8">
-            The global pet food market is undergoing a dramatic shift toward fresh, human-grade diets, growing at 20% CAGR.
-            But this transition creates significant challenges for pet owners. Here's how Paws & Plates solves the key problems:
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Problem 1 */}
-            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-green-900/20 text-orange-300 rounded-full p-2 flex-shrink-0">
-                  <span className="text-xl">⚠️</span>
-                </div>
-                <h3 className="text-lg font-bold text-foreground">
-                  Information Overload
-                </h3>
-              </div>
-              <p className="text-sm text-white/80 mb-3">
-                Pet owners face analysis paralysis from countless conflicting recipes, blogs, and studies online.
-              </p>
-              <div className="bg-green-900/20 border-l-4 border-orange-500/80 p-3 rounded">
-                <h4 className="font-bold text-orange-300 mb-1 text-sm">✅ Our Solution:</h4>
-                <p className="text-white/80 text-sm">
-                  <strong>Single authoritative platform</strong> with 1000+ vet-reviewed recipes featuring real nutritional
-                  calculations and compatibility scoring.
-                </p>
-              </div>
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-6">What Pet Plates is (and is not)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
+              <h3 className="text-xl font-bold text-foreground mb-3">What Pet Plates is</h3>
+              <ul className="space-y-2 text-white/80">
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>A meal-planning tool for homemade pet food</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>A safety-first ingredient and nutrition guide</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>A starting point for informed pet owners</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>A way to understand what goes into the bowl</span></li>
+              </ul>
             </div>
-
-            {/* Problem 2 */}
-            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-green-900/20 text-orange-300 rounded-full p-2 flex-shrink-0">
-                  <span className="text-xl">🏥</span>
-                </div>
-                <h3 className="text-lg font-bold text-foreground">
-                  Specialist Skepticism
-                </h3>
-              </div>
-              <p className="text-sm text-white/80 mb-3">
-                Pet health specialists worry about homemade diets due to risks of nutritional imbalance and missing essential minerals.
-              </p>
-              <div className="bg-green-900/20 border-l-4 border-orange-500/80 p-3 rounded">
-                <h4 className="font-bold text-orange-300 mb-1 text-sm">✅ Our Solution:</h4>
-                <p className="text-white/80 text-sm">
-                  <strong>Clinical-grade nutrition</strong> with AAFCO/WSAVA-compliant recipes and transparent nutritional breakdowns that specialists can trust.
-                </p>
-              </div>
-            </div>
-
-            {/* Problem 3 */}
-            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-green-900/20 text-orange-300 rounded-full p-2 flex-shrink-0">
-                  <span className="text-xl">🛒</span>
-                </div>
-                <h3 className="text-lg font-bold text-foreground">
-                  Cooking Inconvenience
-                </h3>
-              </div>
-              <p className="text-sm text-white/80 mb-3">
-                Time investment, shopping complexity, and meal prep work deter most from actually cooking fresh food.
-              </p>
-              <div className="bg-green-900/20 border-l-4 border-orange-500/80 p-3 rounded">
-                <h4 className="font-bold text-orange-300 mb-1 text-sm">✅ Our Solution:</h4>
-                <p className="text-white/80 text-sm">
-                  <strong>Seamless shopping</strong> with direct Amazon links, "Buy All" functionality, and interactive cooking mode with timers.
-                </p>
-              </div>
-            </div>
-
-            {/* Problem 4 */}
-            <div className="bg-surface rounded-lg p-5 shadow-sm border border-surface-highlight hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-green-900/20 text-orange-300 rounded-full p-2 flex-shrink-0">
-                  <span className="text-xl">🎯</span>
-                </div>
-                <h3 className="text-lg font-bold text-foreground">
-                  Health Conditions
-                </h3>
-              </div>
-              <p className="text-sm text-white/80 mb-3">
-                Most pets have specific health concerns that require non-generic diets. One-size-fits-all recipes fail these pets.
-              </p>
-              <div className="bg-green-900/20 border-l-4 border-orange-500/80 p-3 rounded">
-                <h4 className="font-bold text-orange-300 mb-1 text-sm">✅ Our Solution:</h4>
-                <p className="text-white/80 text-sm">
-                  <strong>11 health conditions</strong> with dynamic recipe modifications, allergy-safe alternatives, and condition-specific supplements.
-                </p>
-              </div>
+            <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
+              <h3 className="text-xl font-bold text-foreground mb-3">What Pet Plates is not</h3>
+              <ul className="space-y-2 text-white/80">
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a veterinary service</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a diagnosis or treatment tool</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a replacement for professional care</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a guarantee of medical outcomes</span></li>
+              </ul>
             </div>
           </div>
+          <p className="mt-5 text-white/80">
+            Always consult a licensed veterinarian for medical conditions, allergies, or long-term diet decisions.
+          </p>
+        </section>
 
-          <div className="mt-8 p-6 bg-green-900/20 border border-green-800/30 rounded-lg">
-            <h3 className="text-xl font-bold mb-3 text-orange-300">The Result: Fresh Food Made Simple</h3>
-            <p className="text-white/80 leading-relaxed">
-              Paws & Plates bridges the gap between pet owners' desire for fresh, healthy food and the nutritional
-              safety veterinarians demand. We're not just another recipe site—we're the trusted partner that makes
-              homemade pet nutrition accessible, safe, and effective for every pet parent.
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">Why this exists</h2>
+          <div className="text-white/80 leading-relaxed space-y-4">
+            <p>
+              Pet owners want to do better, but commercial food labels are confusing and online advice can be contradictory — or flat-out unsafe.
+            </p>
+            <p>
+              Homemade food shouldn’t require a nutrition degree. Pet Plates exists to make thinking clearly about ingredients, portions, and tradeoffs easier.
+            </p>
+            <p>
+              We’re not here to sell miracles. We’re here to give you structure, guardrails, and straightforward explanations you can actually use.
             </p>
           </div>
+        </section>
+
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">How recipes are created</h2>
+          <ol className="space-y-2 text-white/80">
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">1.</span><span>Species + basic profile</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">2.</span><span>Ingredient safety screening</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">3.</span><span>Nutrition guardrails applied</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">4.</span><span>Portion logic for real kitchens</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">5.</span><span>Final sanity checks</span></li>
+          </ol>
+          <div className="mt-5 text-white/80 space-y-2">
+            <p>Standards are used as guidance, not prescriptions.</p>
+            <p>Edge cases trigger warnings, not silent failures.</p>
+          </div>
+        </section>
+
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">Safety & responsibility</h2>
+          <ul className="space-y-2 text-white/80">
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Ingredient bans for known toxic foods</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Conservative assumptions when data is uncertain</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Clear warnings for red-flag ingredients and edge cases</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Encouragement to double-check with professionals</span></li>
+          </ul>
+        </section>
+
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-6">Who this is for (and not for)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
+              <h3 className="text-xl font-bold text-foreground mb-3">For</h3>
+              <ul className="space-y-2 text-white/80">
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Curious, cautious pet owners</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>People considering homemade food</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Owners who want to understand ingredients</span></li>
+              </ul>
+            </div>
+            <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
+              <h3 className="text-xl font-bold text-foreground mb-3">Not for</h3>
+              <ul className="space-y-2 text-white/80">
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Emergency situations</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Medical treatment plans</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Anyone looking for “miracle diets”</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">Next steps</h2>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/guides" className="btn btn-success btn-md">Start with an ingredient question</Link>
+            <Link href="/profile" className="btn btn-darkgreen btn-md">Explore recipes safely</Link>
+          </div>
+        </section>
+
+        <section id="user-agreement-disclaimer" className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
+          <h2 className="text-3xl font-bold text-foreground mb-4">User Agreement Disclaimer</h2>
+          <p className="text-white/80 leading-relaxed">
+            <strong>User Agreement Disclaimer:</strong>
+            <br />
+            Pet Plates is designed for informational and educational purposes only. It is not intended to diagnose, treat, or replace professional veterinary advice. Always consult your veterinarian for any health-related questions or concerns about your pet. By continuing to use this site, you acknowledge and agree to these terms.
+          </p>
+        </section>
+
+        <div className="text-sm text-white/70">
+          <a href="#user-agreement-disclaimer" className="text-orange-300 hover:text-orange-200">View the User Agreement Disclaimer</a>
         </div>
 
-        {/* Call to Action */}
-        <div className="bg-gradient-to-r from-green-800 to-green-900 text-white rounded-lg p-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
-          <p className="text-xl text-orange-200 mb-6 max-w-2xl mx-auto">
-            Be part of the movement that's transforming pet nutrition. Your ratings, reviews, and modifications
-            help create better recipes for pets everywhere.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/forum"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-orange-700 font-semibold rounded-lg hover:bg-orange-50 transition-colors"
-            >
-              <Users className="w-5 h-5" />
-              Join the Discussion
-            </a>
-            <a
-              href="/forum/gallery"
-              className="inline-flex items-center gap-2 px-6 py-3 border-2 border-orange-200 text-white font-semibold rounded-lg hover:bg-white hover:text-orange-700 transition-colors"
-            >
-              <ChefHat className="w-5 h-5" />
-              Browse Modifications
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -195,6 +195,28 @@ export default function OneClickCheckoutModal({
     setCurrentStep(items.length);
   };
 
+  // Calculate total price
+  const totalPrice = useMemo(() => {
+    return items.reduce((sum, item) => {
+      const price = getProductPrice(item.name);
+      if (typeof price === 'number') return sum + price;
+      return sum;
+    }, 0);
+  }, [items]);
+
+  // Calculate how many meals this shopping list will provide
+  const mealsCount = useMemo(() => {
+    if (selectedIngredients && totalGrams && recommendedServingGrams) {
+      return calculateMealsFromShoppingList(
+        items.map(item => ({ id: item.id, name: item.name, amount: item.amount || '' })),
+        selectedIngredients,
+        totalGrams,
+        recommendedServingGrams
+      );
+    }
+    return null;
+  }, [items, selectedIngredients, totalGrams, recommendedServingGrams]);
+
   if (!isOpen) return null;
 
   // Safety check for empty items
@@ -222,28 +244,6 @@ export default function OneClickCheckoutModal({
       </div>
     );
   }
-
-  // Calculate total price
-  const totalPrice = useMemo(() => {
-    return items.reduce((sum, item) => {
-      const price = getProductPrice(item.name);
-      if (typeof price === 'number') return sum + price;
-      return sum;
-    }, 0);
-  }, [items]);
-
-  // Calculate how many meals this shopping list will provide
-  const mealsCount = useMemo(() => {
-    if (selectedIngredients && totalGrams && recommendedServingGrams) {
-      return calculateMealsFromShoppingList(
-        items.map(item => ({ id: item.id, name: item.name, amount: item.amount || '' })),
-        selectedIngredients,
-        totalGrams,
-        recommendedServingGrams
-      );
-    }
-    return null;
-  }, [items, selectedIngredients, totalGrams, recommendedServingGrams]);
 
   const progress = (currentStep / items.length) * 100;
   const allAdded = currentStep >= items.length;
