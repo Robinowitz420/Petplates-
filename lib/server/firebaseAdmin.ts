@@ -1,5 +1,5 @@
 // lib/server/firebaseAdmin.ts
-import { cert, getApp, getApps, initializeApp, type App } from 'firebase-admin/app';
+import { applicationDefault, cert, getApp, getApps, initializeApp, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import { readFileSync } from 'node:fs';
 
@@ -53,11 +53,13 @@ function tryLoadServiceAccountFromEnvOrFile(): ServiceAccountLike | null {
   return null;
 }
 
-function resolveFirebaseAdminCredentials(): {
+type FirebaseAdminCredentials = {
   projectId: string;
   clientEmail: string;
   privateKey: string;
-} {
+};
+
+function resolveFirebaseAdminCredentials(): FirebaseAdminCredentials | null {
   // Standalone env vars
   const standaloneProjectId =
     getOptionalEnv('FIREBASE_PROJECT_ID') || getOptionalEnv('NEXT_PUBLIC_FIREBASE_PROJECT_ID');
@@ -99,10 +101,8 @@ function resolveFirebaseAdminCredentials(): {
     };
   }
 
-  throw new Error(
-    'Missing Firebase Admin credentials. Provide either FIREBASE_ADMIN_SERVICE_ACCOUNT_JSON / GOOGLE_APPLICATION_CREDENTIALS, ' +
-      'or set ALL of FIREBASE_PROJECT_ID (or NEXT_PUBLIC_FIREBASE_PROJECT_ID), FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY.'
-  );
+  // No credentials found; allow fallback to ADC/application default.
+  return null;
 }
 
 export function getFirebaseAdminApp(): App {
@@ -113,15 +113,32 @@ export function getFirebaseAdminApp(): App {
     return cachedApp;
   }
 
-  const { projectId, clientEmail, privateKey } = resolveFirebaseAdminCredentials();
+  const resolved = resolveFirebaseAdminCredentials();
+  if (resolved) {
+    const { projectId, clientEmail, privateKey } = resolved;
+    cachedApp = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
+    return cachedApp;
+  }
 
-  cachedApp = initializeApp({
-    credential: cert({
-      projectId,
-      clientEmail,
-      privateKey,
-    }),
-  });
+  // Fallback: rely on ADC / GOOGLE_APPLICATION_CREDENTIALS or metadata server.
+  try {
+    cachedApp = initializeApp({
+      credential: applicationDefault(),
+    });
+    return cachedApp;
+  } catch (err) {
+    throw new Error(
+      'Missing Firebase Admin credentials. Provide FIREBASE_ADMIN_SERVICE_ACCOUNT_JSON / GOOGLE_APPLICATION_CREDENTIALS ' +
+        'or set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY.\n' +
+        `Original error: ${(err as Error)?.message || err}`
+    );
+  }
 
   return cachedApp;
 }
