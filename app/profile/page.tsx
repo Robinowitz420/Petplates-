@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, startTransition } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, startTransition, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import HealthConcernsDropdown from '@/components/HealthConcernsDropdown';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { getMascotFaceForPetType, getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
+import AddPetImageButton from '@/components/AddPetImageButton';
 import AddPetModal from '@/components/CreatePetModal';
 import { getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets, savePet, deletePet } from '@/lib/utils/petStorage'; // Import from storage util
@@ -34,7 +35,7 @@ import BioBanner from '@/public/images/Site Banners/BIO.png';
 import SavedMealsBanner from '@/public/images/Site Banners/SavedMeals.png';
 import MealPlanBanner from '@/public/images/Site Banners/MealPlan.png';
 import BadgesBanner from '@/public/images/Site Banners/Badges.png';
-import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -117,6 +118,17 @@ const PROFILE_TAB_BANNERS: Record<'bio' | 'saved' | 'plan', { image: StaticImage
   plan: { image: MealPlanBanner, alt: 'Meal plan banner' },
 };
 
+const BADGE_SUMMARY_TEXT =
+  'Badges you can earn:\n' +
+  '• Cats Cunning Circles – score a perfect 100% compatibility.\n' +
+  '• The Dog’s Divine Toque – finish a weekly meal plan.\n' +
+  '• Week Whisker tiers – complete multiple weekly plans (1, 10, 50).\n' +
+  '• Purchase Champion tiers – confirm your ingredient purchases (1+ up to 50).\n' +
+  '• Turtle’s Lens – explore meal results.\n' +
+  '• Bird’s Cap – log in daily.\n' +
+  '• Hamster’s Suspenders – set up your pet profile.\n' +
+  '• Dog’s Spoon – create or prepare a meal.';
+
 const renderTabBanner = (tab: 'bio' | 'saved' | 'plan') => {
   const banner = PROFILE_TAB_BANNERS[tab];
   if (!banner) return null;
@@ -125,7 +137,7 @@ const renderTabBanner = (tab: 'bio' | 'saved' | 'plan') => {
       <Image
         src={banner.image}
         alt={banner.alt}
-        className="h-auto w-full max-w-3xl"
+        className="h-auto w-full max-w-3xl border-2 border-orange-400 rounded-xl"
         priority={tab === 'bio'}
       />
     </div>
@@ -554,10 +566,10 @@ export default function MyPetsPage() {
   const [activePetId, setActivePetId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'bio' | 'saved' | 'plan'>('bio');
   const [planOffset, setPlanOffset] = useState(0);
-const [planWeekly, setPlanWeekly] = useState<{ day: string; meals: any[] }[]>([]);
-const [swapTarget, setSwapTarget] = useState<{ dayIdx: number; mealIdx: number } | null>(null);
+  const [planWeekly, setPlanWeekly] = useState<{ day: string; meals: any[] }[]>([]);
+  const [swapTarget, setSwapTarget] = useState<{ dayIdx: number; mealIdx: number } | null>(null);
   const [badgeRefreshKey, setBadgeRefreshKey] = useState(0);
-const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activePetId) : null), [activePetId, pets]);
+  const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activePetId) : null), [activePetId, pets]);
 
   // Cache of generated recipes keyed by id
   const [genRecipesById, setGenRecipesById] = useState<Record<string, Recipe>>({});
@@ -580,6 +592,47 @@ const activePet = useMemo(() => (activePetId ? pets.find((p) => p.id === activeP
     if (!id) return 'Unnamed Meal';
     return formatRecipeName(id);
   }, []);
+  const compatibilityCacheRef = useRef<Record<string, number>>({});
+
+  useEffect(() => {
+    compatibilityCacheRef.current = {};
+  }, [activePetId]);
+
+  const getCompatibilityScoreForMeal = useCallback(
+    (meal: any): number | null => {
+      if (!activePet || !meal || !meal.id) return null;
+      const cacheKey = `${activePet.id}-${meal.id}`;
+      if (compatibilityCacheRef.current[cacheKey] !== undefined) {
+        return compatibilityCacheRef.current[cacheKey];
+      }
+
+      try {
+        const scoringPet = {
+          id: activePet.id,
+          name: getPrimaryName(activePet.names || []) || 'Pet',
+          type: activePet.type,
+          breed: activePet.breed,
+          age: activePet.age,
+          weight: activePet.weight,
+          weightKg: activePet.weightKg,
+          healthConcerns: activePet.healthConcerns || [],
+          dietaryRestrictions: activePet.dietaryRestrictions || [],
+          allergies: activePet.allergies || [],
+        } as any;
+        const result = scoreWithSpeciesEngine(meal as Recipe, scoringPet);
+        const score = typeof result?.overallScore === 'number' ? result.overallScore : null;
+        if (score !== null) {
+          compatibilityCacheRef.current[cacheKey] = score;
+        }
+        return score;
+      } catch (error) {
+        console.error('Error calculating compatibility:', error);
+        return null;
+      }
+    },
+    [activePet]
+  );
+
 const buildWeeklyPlan = useCallback(
     (saved: string[], offset: number): WeeklyPlanEntry[] => {
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -1095,9 +1148,6 @@ const buildWeeklyPlan = useCallback(
             // ignore storage errors
           }
         }
-
-        // Navigate to the pet's Sherlock Shells / Find Meals page
-        router.push(`/profile/pet/${newPetId}`);
       }
     },
     [userId, router]
@@ -1235,51 +1285,57 @@ const buildWeeklyPlan = useCallback(
 
   return (
     <div className="min-h-screen bg-background text-foreground py-6">
-      <div className="max-w-6xl mx-auto px-4 space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-extrabold">My Pets</h1>
-            {pets.length > 0 && (
-              <p className="text-sm text-gray-400 mt-1">
-                Choose a pet to view details, saved meals, and meal plans.
-              </p>
-            )}
+      <div className="max-w-screen-2xl mx-auto px-4 space-y-6">
+        <header className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] items-center">
+          <div className="flex justify-center lg:translate-x-[200px]">
+            <Image
+              src="/images/Site Banners/MyPets.png"
+              alt="My Pets"
+              width={520}
+              height={120}
+              className="h-auto w-[160px] sm:w-[210px] md:w-[260px]"
+              priority
+              unoptimized
+            />
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setEditingPet(null);
-                setIsModalOpen(true);
-              }}
-              className="btn btn-success btn-sm btn-ripple"
-            >
-              <Plus size={16} className="mr-1" />
-              Add Pet
-            </button>
-          </div>
+          <div className="hidden lg:block" />
         </header>
 
         {pets.length === 0 ? (
-          <div className="text-center py-14 px-6 bg-surface rounded-2xl border border-surface-highlight shadow-lg">
-            <div className="text-4xl mb-3">🐾</div>
-            <h2 className="text-2xl font-bold mb-2">No Pets Yet</h2>
-            <p className="text-gray-400 mb-6">
-              Add your first pet to start building personalized meals and plans.
-            </p>
-            <button
-              onClick={() => {
-                setEditingPet(null);
-                setIsModalOpen(true);
-              }}
-              className="btn btn-success btn-md btn-ripple"
-            >
-              <Plus size={18} className="mr-2" />
-              Add Your First Pet
-            </button>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
+            <div className="text-center py-14 px-6 bg-surface rounded-2xl border border-surface-highlight shadow-lg">
+              <div className="text-4xl mb-3">🐾</div>
+              <h2 className="text-2xl font-bold mb-2">No Pets Yet</h2>
+              <p className="text-gray-400 mb-6">
+                Add your first pet to start building personalized meals and plans.
+              </p>
+              <button
+                onClick={() => {
+                  setEditingPet(null);
+                  setIsModalOpen(true);
+                }}
+                className="btn btn-success btn-md btn-ripple"
+              >
+                <Plus size={18} className="mr-2" />
+                Add Your First Pet
+              </button>
+            </div>
+
+            <div className="hidden lg:flex justify-end sticky top-24">
+              <AddPetImageButton
+                width={440}
+                height={300}
+                onClick={() => {
+                  setEditingPet(null);
+                  setIsModalOpen(true);
+                }}
+              />
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 lg:gap-6 items-start">
-            <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-4 space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 lg:gap-6 items-start">
+              <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">Pets</h3>
                   <span className="text-xs text-gray-400">{pets.length} total</span>
@@ -1329,7 +1385,7 @@ const buildWeeklyPlan = useCallback(
                   );
                   })}
                 </div>
-            </div>
+              </div>
 
             {activePet ? (
               <div className="bg-surface border border-surface-highlight rounded-2xl shadow-xl p-5 flex flex-col">
@@ -1395,14 +1451,16 @@ const buildWeeklyPlan = useCallback(
                         <div className="flex flex-col gap-3 mt-9">
                           {/* Badges Section - moved to far right, maintaining current height */}
                           <div className="flex justify-center">
-                            <Image
-                              src={BadgesBanner}
-                              alt="Badges"
-                              className="h-auto w-[220px]"
-                              priority
-                            />
+                            <Tooltip content={BADGE_SUMMARY_TEXT} wide>
+                              <Image
+                                src={BadgesBanner}
+                                alt="Badges"
+                                className="h-auto w-[220px] cursor-help border-2 border-orange-400 rounded-md"
+                                priority
+                              />
+                            </Tooltip>
                           </div>
-                          <div className="p-4 border border-surface-highlight rounded-lg bg-surface-highlight/30 min-h-[140px] w-[600px]">
+                          <div className="p-4 border border-orange-400 rounded-lg bg-surface-highlight/30 min-h-[140px] w-[520px] max-w-full">
                             <PetBadges key={badgeRefreshKey} petId={activePet.id} userId={userId} />
                           </div>
                         </div>
@@ -1410,9 +1468,9 @@ const buildWeeklyPlan = useCallback(
 
                     <div className="mt-4">
                       <div className="flex gap-0 border-b-2 border-surface-highlight">
-                        {['bio', 'saved', 'plan'].map((tab) => {
-                          const label = tab === 'bio' ? 'Bio' : tab === 'saved' ? 'Saved Meals' : 'Meal Plan';
+                        {(["bio", "saved", "plan"] as const).map((tab) => {
                           const isActive = activeTab === tab;
+                          const banner = PROFILE_TAB_BANNERS[tab];
                           return (
                             <button
                               key={tab}
@@ -1423,23 +1481,31 @@ const buildWeeklyPlan = useCallback(
                                   loadPets();
                                 }
                               }}
-                              className={`relative px-6 py-3 text-sm font-semibold transition-all duration-200 ${
+                              className={`group relative px-4 py-2 transition-all duration-200 ${
                                 isActive
-                                  ? 'text-orange-400 border-b-3 border-orange-400 bg-transparent'
-                                  : 'text-gray-400 hover:text-gray-300 bg-transparent border-b-3 border-transparent'
+                                  ? 'border-b-3 border-orange-400'
+                                  : 'border-b-3 border-transparent'
                               }`}
-                              style={isActive ? { borderBottomWidth: '3px' } : { borderBottomWidth: '3px' }}
+                              style={{ borderBottomWidth: '3px' }}
                               aria-selected={isActive}
                               role="tab"
                             >
-                              {label}
+                              <Image
+                                src={banner.image}
+                                alt={banner.alt}
+                                className="h-8 w-auto transition-opacity duration-200 group-hover:opacity-100 border-2 rounded-md"
+                                style={{
+                                  opacity: isActive ? 1 : 0.65,
+                                  borderColor: '#fb923c',
+                                }}
+                                unoptimized
+                              />
                             </button>
                           );
                         })}
                       </div>
 
                       <div className="mt-3 min-h-[70px]">
-                        {renderTabBanner(activeTab)}
                         {activeTab === 'bio' && (
                           <div className="flex gap-6">
                             {/* Bio Column */}
@@ -1480,13 +1546,7 @@ const buildWeeklyPlan = useCallback(
 
                             {/* Health Concerns Column - Always rendered for consistent layout */}
                             <div className="flex-shrink-0 min-w-[180px]">
-                              <div className="flex justify-center mb-2">
-                                <Image
-                                  src={HealthAnalysisBanner}
-                                  alt="Health Analysis"
-                                  className="h-auto w-full max-w-[220px]"
-                                />
-                              </div>
+                              <h3 className="text-sm font-semibold text-gray-300 mb-2">Health Concerns</h3>
                               <div className="flex flex-col gap-1.5">
                                 {(activePet.healthConcerns || []).length > 0 ? (
                                   (activePet.healthConcerns || []).map((concern) => (
@@ -1589,33 +1649,11 @@ const buildWeeklyPlan = useCallback(
                                     }
                                     const mealName = recipeObj.name || (isCustomMeal ? 'Custom Meal' : rid);
 
-                                    // Calculate compatibility score
-                                    let compatibilityScore: number | null = null;
-                                    if (activePet) {
-                                      try {
-                                        const scoringPet = {
-                                          id: activePet.id,
-                                          name: getPrimaryName(activePet.names || []) || 'Pet',
-                                          type: normalizePetType(activePet.type, 'profile.page.saved.compat'),
-                                          breed: activePet.breed || '',
-                                          age: activePet.age === 'baby' ? 0.5 : activePet.age === 'young' ? 2 : activePet.age === 'adult' ? 5 : 10,
-                                          weight: activePet.weightKg || 10,
-                                          activityLevel: 'moderate',
-                                          healthConcerns: activePet.healthConcerns || [],
-                                          dietaryRestrictions: activePet.allergies || [],
-                                          allergies: activePet.allergies || [],
-                                        } as any;
-                                        const result = scoreWithSpeciesEngine(recipeObj, scoringPet);
-                                        compatibilityScore = result.overallScore;
-                                      } catch (error) {
-                                        console.error('Error calculating compatibility:', error);
-                                        compatibilityScore = null;
-                                      }
-                                    }
+                                    const compatibilityScore = getCompatibilityScoreForMeal(recipeObj);
 
                                     return (
-                                      <div key={rid} className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto_auto] items-center gap-4">
-                                        <div className="min-w-0">
+                                      <div key={rid} className="p-3 rounded border border-white/5 flex items-center justify-between gap-4 min-h-[90px]">
+                                        <div className="min-w-0 flex flex-col gap-1">
                                           <button
                                             onClick={() => {
                                               window.location.href = `/recipe/${rid}?petId=${activePet.id}`;
@@ -1624,46 +1662,35 @@ const buildWeeklyPlan = useCallback(
                                           >
                                             {mealName}
                                           </button>
-                                        </div>
-                                        <div className="flex items-center justify-center min-w-[60px]">
-                                          {compatibilityScore !== null && (
-                                            <div className={`text-sm font-bold rounded-full w-10 h-10 flex items-center justify-center border-2 ${
-                                              compatibilityScore >= 80 
-                                                ? 'text-green-400 border-green-400' 
-                                                : compatibilityScore >= 60 
-                                                ? 'text-yellow-400 border-yellow-400' 
-                                                : 'text-red-400 border-red-400'
-                                            }`}>
-                                              {formatPercent(compatibilityScore)}
-                                            </div>
-                                          )}
-                                          <div className="ml-3 text-xs text-gray-400 min-w-[96px]">
+                                          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/15 text-orange-200 border border-orange-400/40 whitespace-nowrap w-fit">
                                             {typeof costPerMealMap[rid] === 'number'
                                               ? `Cost/meal: $${(costPerMealMap[rid] as number).toFixed(2)}`
                                               : 'Cost/meal: —'}
                                           </div>
                                         </div>
-                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                        <div className="flex items-center gap-3 flex-shrink-0">
                                           <button
-                                            onClick={async (e) => {
+                                            onClick={(e) => {
                                               e.preventDefault();
                                               if (!userId || !activePet) return;
 
-                                              const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
-                                              if (!petToUpdate) return;
+                                              void (async () => {
+                                                const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
+                                                if (!petToUpdate) return;
 
-                                              const nextMealPlan = Array.isArray((petToUpdate as any).mealPlan)
-                                                ? ([...(petToUpdate as any).mealPlan] as string[])
-                                                : ([] as string[]);
-                                              if (!nextMealPlan.includes(rid)) nextMealPlan.push(rid);
+                                                const nextMealPlan = Array.isArray((petToUpdate as any).mealPlan)
+                                                  ? ([...(petToUpdate as any).mealPlan] as string[])
+                                                  : ([] as string[]);
+                                                if (!nextMealPlan.includes(rid)) nextMealPlan.push(rid);
 
-                                              const updatedPet = {
-                                                ...petToUpdate,
-                                                mealPlan: nextMealPlan,
-                                              };
+                                                const updatedPet = {
+                                                  ...petToUpdate,
+                                                  mealPlan: nextMealPlan,
+                                                };
 
-                                              await savePet(userId, updatedPet as any);
-                                              await loadPets();
+                                                await savePet(userId, updatedPet as any);
+                                                await loadPets();
+                                              })();
                                             }}
                                             disabled={!userId || !activePet || (Array.isArray((activePet as any).mealPlan) && ((activePet as any).mealPlan as string[]).includes(rid))}
                                             className="btn btn-success btn-sm"
@@ -1673,6 +1700,25 @@ const buildWeeklyPlan = useCallback(
                                               ? 'In Plan'
                                               : 'Add to Plan'}
                                           </button>
+
+                                          <button
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              setConfirmModal({
+                                                isOpen: true,
+                                                title: 'Remove Meal',
+                                                message: `Remove "${mealName}" from saved meals?`,
+                                                onConfirm: () => {
+                                                  handleRemoveSavedMeal(rid);
+                                                },
+                                              });
+                                            }}
+                                            className="btn btn-success btn-sm"
+                                            title="Remove meal"
+                                          >
+                                            Remove
+                                          </button>
+
                                           {Array.isArray((recipeObj as any).ingredients) && (
                                             <button
                                               onClick={(e) => {
@@ -1692,7 +1738,9 @@ const buildWeeklyPlan = useCallback(
                                                   })
                                                   .filter(Boolean);
                                                 if (cartItems.length > 0) {
-                                                  const cartUrl = ensureCartUrlSellerId(`https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`);
+                                                  const cartUrl = ensureCartUrlSellerId(
+                                                    `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`
+                                                  );
                                                   window.open(cartUrl, '_blank');
                                                 } else {
                                                   alert('No ingredient links available for this recipe.');
@@ -1705,23 +1753,20 @@ const buildWeeklyPlan = useCallback(
                                               Buy
                                             </button>
                                           )}
-                                          <button
-                                            onClick={(e) => {
-                                              e.preventDefault();
-                                              setConfirmModal({
-                                                isOpen: true,
-                                                title: 'Remove Meal',
-                                                message: `Remove "${mealName}" from saved meals?`,
-                                                onConfirm: () => {
-                                                  handleRemoveSavedMeal(rid);
-                                                },
-                                              });
-                                            }}
-                                            className="btn btn-success btn-sm"
-                                            title="Remove meal"
-                                          >
-                                            Remove
-                                          </button>
+
+                                          <div className="flex items-center justify-center min-w-[70px]">
+                                            {compatibilityScore !== null ? (
+                                              <CompatibilityRadial
+                                                score={compatibilityScore}
+                                                size={48}
+                                                strokeWidth={6}
+                                                label=""
+                                                textClassName="text-base"
+                                              />
+                                            ) : (
+                                              <div className="text-xs text-gray-400">--</div>
+                                            )}
+                                          </div>
                                         </div>
                                       </div>
                                     );
@@ -1736,159 +1781,58 @@ const buildWeeklyPlan = useCallback(
                           <div className="space-y-4 text-sm">
                             {planWeekly.length > 0 ? (
                               <>
-                                {/* Weekly Nutritional Coverage Summary */}
+                                {/* Weekly compatibility average */}
                                 {(() => {
                                   if (!activePet) return null;
-                                  
-                                  // Calculate weekly nutrition totals
-                                  const calculateMealNutrition = (meal: any): { protein: number; fat: number; fiber: number; calcium: number; phosphorus: number; calories: number } => {
-                                    // Use calculateRecipeNutrition directly to get actual nutrition values
-                                    try {
-                                      const nutrition = calculateRecipeNutrition(meal as Recipe);
-                                      return {
-                                        protein: nutrition.protein || 0,
-                                        fat: nutrition.fat || 0,
-                                        fiber: nutrition.fiber || 0,
-                                        calcium: nutrition.calcium || 0,
-                                        phosphorus: nutrition.phosphorus || 0,
-                                        calories: nutrition.calories || 0,
-                                      };
-                                    } catch {
-                                      return { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0, calories: 0 };
-                                    }
-                                  };
-                                  
-                                  const weeklyTotals = planWeekly.reduce((acc, day) => {
-                                    day.meals.forEach(meal => {
-                                      const nutrition = calculateMealNutrition(meal);
-                                      acc.protein += nutrition.protein;
-                                      acc.fat += nutrition.fat;
-                                      acc.fiber += nutrition.fiber;
-                                      acc.calcium += nutrition.calcium;
-                                      acc.phosphorus += nutrition.phosphorus;
-                                      acc.calories += nutrition.calories;
-                                    });
-                                    return acc;
-                                  }, { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0, calories: 0 });
-                                  
-                                  // Average per day (divide by 7)
-                                  const dailyAvg = {
-                                    protein: weeklyTotals.protein / 7,
-                                    fat: weeklyTotals.fat / 7,
-                                    fiber: weeklyTotals.fiber / 7,
-                                    calcium: weeklyTotals.calcium / 7,
-                                    phosphorus: weeklyTotals.phosphorus / 7,
-                                    calories: weeklyTotals.calories / 7,
-                                  };
-                                  
-                                  // Get pet requirements
-                                  const petType = activePet.type as keyof typeof nutritionalGuidelines;
-                                  const ageGroup = activePet.age === 'baby' ? 'puppy' : activePet.age === 'senior' ? 'senior' : 'adult';
-                                  const requirements = nutritionalGuidelines[petType]?.[ageGroup] || nutritionalGuidelines[petType]?.adult;
-                                  
-                                  if (!requirements) return null;
-                                  
-                                  // Calculate coverage scores (0-100)
-                                  const calculateCoverage = (value: number, min: number, max: number): number => {
-                                    if (value < min) return (value / min) * 50; // Below min: 0-50
-                                    if (value > max) return 100 - Math.min((value - max) / max * 50, 50); // Above max: 50-100
-                                    return 50 + ((value - min) / (max - min)) * 50; // In range: 50-100
-                                  };
-                                  
-                                  const proteinScore = calculateCoverage(dailyAvg.protein, requirements.protein.min, requirements.protein.max);
-                                  const fatScore = calculateCoverage(dailyAvg.fat, requirements.fat.min, requirements.fat.max);
-                                  const fiberScore = requirements.fiber ? calculateCoverage(dailyAvg.fiber, requirements.fiber.min, requirements.fiber.max) : 100;
-                                  const calciumScore = requirements.calcium ? calculateCoverage(dailyAvg.calcium, requirements.calcium.min, requirements.calcium.max) : 100;
-                                  const phosphorusScore = requirements.phosphorus ? calculateCoverage(dailyAvg.phosphorus, requirements.phosphorus.min, requirements.phosphorus.max) : 100;
-                                  
-                                  const overallScore = Math.round((proteinScore + fatScore + fiberScore + calciumScore + phosphorusScore) / 5);
-                                  
+                                  const allScores = planWeekly
+                                    .flatMap((day) => day.meals.map((meal) => getCompatibilityScoreForMeal(meal)))
+                                    .filter((score): score is number => typeof score === 'number');
+                                  if (allScores.length === 0) return null;
+                                  const weekAverage = Math.round(
+                                    allScores.reduce((sum, score) => sum + score, 0) / allScores.length
+                                  );
                                   return (
-                                    <div className="mb-4 p-3 bg-surface-highlight rounded-lg border border-surface-highlight flex items-center gap-3">
-                                      <h3 className="text-base font-semibold text-foreground">Compatibility score for the week:</h3>
-                                      <div className={`text-xl font-bold ${overallScore >= 80 ? 'text-green-400' : overallScore >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                        {formatPercent(overallScore)}
-                                      </div>
+                                    <div className="mb-4 p-3 bg-surface-highlight rounded-lg border border-surface-highlight flex items-center justify-between gap-4">
+                                      <h3 className="text-base font-semibold text-foreground">
+                                        Compatibility score for the week
+                                      </h3>
+                                      <CompatibilityRadial
+                                        score={weekAverage}
+                                        size={48}
+                                        strokeWidth={6}
+                                        label=""
+                                        textClassName="text-base"
+                                      />
                                     </div>
                                   );
                                 })()}
                                 <div className="max-h-[480px] overflow-y-auto pr-2 space-y-3">
                                   {planWeekly.map((dayPlan, index) => {
-                                    // Calculate day score for this day's meals
-                                    const calculateDayScore = (meals: any[]): number => {
-                                      if (!activePet || meals.length === 0) return 0;
-                                      
-                                      const calculateMealNutrition = (meal: any): { protein: number; fat: number; fiber: number; calcium: number; phosphorus: number } => {
-                                        // Use calculateRecipeNutrition directly to get actual nutrition values
-                                        try {
-                                          const nutrition = calculateRecipeNutrition(meal as Recipe);
-                                          return {
-                                            protein: nutrition.protein || 0,
-                                            fat: nutrition.fat || 0,
-                                            fiber: nutrition.fiber || 0,
-                                            calcium: nutrition.calcium || 0,
-                                            phosphorus: nutrition.phosphorus || 0,
-                                          };
-                                        } catch {
-                                          return { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0 };
-                                        }
-                                      };
-                                      
-                                      const dayTotals = meals.reduce((acc, meal) => {
-                                        const nutrition = calculateMealNutrition(meal);
-                                        acc.protein += nutrition.protein;
-                                        acc.fat += nutrition.fat;
-                                        acc.fiber += nutrition.fiber;
-                                        acc.calcium += nutrition.calcium;
-                                        acc.phosphorus += nutrition.phosphorus;
-                                        return acc;
-                                      }, { protein: 0, fat: 0, fiber: 0, calcium: 0, phosphorus: 0 });
-                                      
-                                      // Average per meal (divide by number of meals)
-                                      const mealAvg = {
-                                        protein: dayTotals.protein / meals.length,
-                                        fat: dayTotals.fat / meals.length,
-                                        fiber: dayTotals.fiber / meals.length,
-                                        calcium: dayTotals.calcium / meals.length,
-                                        phosphorus: dayTotals.phosphorus / meals.length,
-                                      };
-                                      
-                                      const petType = activePet.type as keyof typeof nutritionalGuidelines;
-                                      const ageGroup = activePet.age === 'baby' ? 'puppy' : activePet.age === 'senior' ? 'senior' : 'adult';
-                                      const requirements = nutritionalGuidelines[petType]?.[ageGroup] || nutritionalGuidelines[petType]?.adult;
-                                      
-                                      if (!requirements) return 0;
-                                      
-                                      const calculateCoverage = (value: number, min: number, max: number): number => {
-                                        if (value < min) return (value / min) * 50;
-                                        if (value > max) return 100 - Math.min((value - max) / max * 50, 50);
-                                        return 50 + ((value - min) / (max - min)) * 50;
-                                      };
-                                      
-                                      const proteinScore = calculateCoverage(mealAvg.protein, requirements.protein.min, requirements.protein.max);
-                                      const fatScore = calculateCoverage(mealAvg.fat, requirements.fat.min, requirements.fat.max);
-                                      const fiberScore = requirements.fiber ? calculateCoverage(mealAvg.fiber, requirements.fiber.min, requirements.fiber.max) : 100;
-                                      const calciumScore = requirements.calcium ? calculateCoverage(mealAvg.calcium, requirements.calcium.min, requirements.calcium.max) : 100;
-                                      const phosphorusScore = requirements.phosphorus ? calculateCoverage(mealAvg.phosphorus, requirements.phosphorus.min, requirements.phosphorus.max) : 100;
-                                      
-                                      return Math.round((proteinScore + fatScore + fiberScore + calciumScore + phosphorusScore) / 5);
+                                    const calculateDayScore = (meals: any[]): number | null => {
+                                      const scores = meals
+                                        .map((meal) => getCompatibilityScoreForMeal(meal))
+                                        .filter((score): score is number => typeof score === 'number');
+                                      if (scores.length === 0) return null;
+                                      return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
                                     };
                                     
                                     const dayScore = calculateDayScore(dayPlan.meals);
                                     
                                     return (
-                                      <div key={dayPlan.day} className="rounded-lg border border-surface-highlight px-3 py-2">
-                                        <div className="text-white font-semibold mb-2 flex items-center gap-2">
-                                          {dayPlan.day}
-                                          <div className={`text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border ${
-                                            dayScore >= 80 
-                                              ? 'text-green-400 border-green-400' 
-                                              : dayScore >= 60 
-                                              ? 'text-yellow-400 border-yellow-400' 
-                                              : 'text-red-400 border-red-400'
-                                          }`}>
-                                            {formatPercent(dayScore)}
-                                          </div>
+                                      <div key={dayPlan.day} className="rounded-lg border border-orange-400 px-3 py-2">
+                                        <div className="text-white font-semibold mb-2 flex items-center justify-between gap-3">
+                                          <span>{dayPlan.day}</span>
+                                          {dayScore !== null ? (
+                                            <CompatibilityRadial
+                                              score={dayScore}
+                                              size={48}
+                                              strokeWidth={6}
+                                              label=""
+                                              textClassName="text-base"
+                                            />
+                                          ) : (
+                                            <div className="text-xs text-gray-400">--</div>
+                                          )}
                                         </div>
                                         <div className="space-y-2">
                                           {dayPlan.meals.map((meal, mealIndex) => (
@@ -2009,80 +1953,6 @@ const buildWeeklyPlan = useCallback(
                             {planWeekly.length > 0 && (
                               <div className="pt-2 flex gap-2 items-center">
                                 <BuyAllMealPlanIngredientsButton weeklyPlan={planWeekly as any} petId={activePet?.id || ''} />
-                                <button
-                                  onClick={async () => {
-                                    if (!activePet) return;
-                                    
-                                    // Mark plan as completed
-                                    const updatedPet = {
-                                      ...activePet,
-                                      completedMealPlans: (activePet.completedMealPlans || 0) + 1,
-                                    };
-                                    await savePet(userId, updatedPet);
-                                    setPets(prevPets => prevPets.map(p => p.id === activePet.id ? updatedPet : p));
-                                    
-                                    // Check badges
-                                    const uniqueMealIds = new Set<string>();
-                                    planWeekly.forEach(day => {
-                                      day.meals.forEach(meal => {
-                                        if (meal && meal.id) uniqueMealIds.add(meal.id);
-                                      });
-                                    });
-                                    
-                                    await checkAllBadges(userId, activePet.id, {
-                                      action: 'meal_plan_completed',
-                                      weeklyPlanCompleted: true,
-                                      completionCount: updatedPet.completedMealPlans || 1,
-                                    });
-                                  }}
-                                  className="btn btn-success btn-sm"
-                                  title="Mark this weekly plan as completed (saved and locked)"
-                                >
-                                  ✓ Lock Plan
-                                </button>
-                              </div>
-                            )}
-                            {planWeekly.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mt-4">
-                                <button
-                                  onClick={handleRandomizePlan}
-                                  className="btn btn-success btn-sm"
-                                >
-                                  Randomize Week
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (!activePet) return;
-                                    setConfirmModal({
-                                      isOpen: true,
-                                      title: 'Clear Meal Plan',
-                                      message: 'Clear this pet\'s Meal Plan? This will remove all meals from the Meal Plan tab (Saved Meals will stay).',
-                                      onConfirm: async () => {
-                                        if (!userId || !activePet) return;
-                                        const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
-                                        if (!petToUpdate) return;
-                                        const updatedPet = {
-                                          ...petToUpdate,
-                                          mealPlan: [],
-                                        };
-                                        await savePet(userId, updatedPet as any);
-                                        setPlanWeekly([]);
-                                        await loadPets();
-                                      },
-                                    });
-                                  }}
-                                  className="btn btn-success btn-sm"
-                                  title="Clear this pet's meal plan"
-                                >
-                                  Clear Meal Plan
-                                </button>
-                                <Link
-                                  href={`/pets/${activePet?.id}/nutrition`}
-                                  className="btn btn-success btn-sm"
-                                >
-                                  View Nutrition Dashboard
-                                </Link>
                               </div>
                             )}
                           </div>
@@ -2094,8 +1964,57 @@ const buildWeeklyPlan = useCallback(
 
                       <div className="mt-4 pt-4 border-t border-surface-highlight flex items-center justify-between gap-3">
                         <div className="flex flex-wrap gap-2">
-                          <a href={`/profile/pet/${activePet.id}`} className="btn btn-success btn-sm">Find Meals</a>
-                          <a href={`/profile/pet/${activePet.id}/recipe-builder`} className="btn btn-success btn-sm">Create Meal</a>
+                          <Link
+                            href={`/profile/pet/${activePet.id}`}
+                            className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-xl"
+                            aria-label="Find Meals"
+                          >
+                            <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-xl">
+                              <Image
+                                src="/images/Buttons/FindMealsUnclicked.png"
+                                alt=""
+                                fill
+                                sizes="300px"
+                                className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                                priority
+                              />
+                              <Image
+                                src="/images/Buttons/FindMealsClicked.png"
+                                alt=""
+                                fill
+                                sizes="300px"
+                                className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                                priority
+                              />
+                            </span>
+                            <span className="sr-only">Find Meals</span>
+                          </Link>
+
+                          <Link
+                            href={`/profile/pet/${activePet.id}/recipe-builder`}
+                            className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-xl"
+                            aria-label="Create Meal"
+                          >
+                            <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-xl">
+                              <Image
+                                src="/images/Buttons/CreateMealUnclicked.png"
+                                alt=""
+                                fill
+                                sizes="300px"
+                                className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                                priority
+                              />
+                              <Image
+                                src="/images/Buttons/CreateMealClicked.png"
+                                alt=""
+                                fill
+                                sizes="300px"
+                                className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                                priority
+                              />
+                            </span>
+                            <span className="sr-only">Create Meal</span>
+                          </Link>
                         </div>
                         <div className="flex flex-wrap gap-2 justify-end">
                           <button
@@ -2117,11 +2036,23 @@ const buildWeeklyPlan = useCallback(
               <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-6 flex items-center justify-center text-center min-h-[280px]">
                 <div>
                   <div className="text-3xl mb-2">🐾</div>
-                  <p className="text-lg font-semibold">Select a pet to view details</p>
-                  <p className="text-sm text-gray-400 mt-1">Choose a pet from the list on the left.</p>
+                  <div className="text-gray-400">Select a pet to see details.</div>
                 </div>
               </div>
             )}
+
+            </div>
+
+            <div className="hidden lg:flex justify-end sticky top-24">
+              <AddPetImageButton
+                width={440}
+                height={300}
+                onClick={() => {
+                  setEditingPet(null);
+                  setIsModalOpen(true);
+                }}
+              />
+            </div>
           </div>
         )}
 

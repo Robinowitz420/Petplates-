@@ -284,11 +284,15 @@ export default function SavedRecipesPage() {
                       {recipe.isCustom && recipe.compatibilityScore !== undefined && (
                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-100">
                           <span className="text-xs font-medium text-gray-600">Score:</span>
-                          <span className={`text-xs font-bold ${
-                            recipe.compatibilityScore >= 80 ? 'text-green-600' :
-                            recipe.compatibilityScore >= 60 ? 'text-yellow-600' :
-                            'text-red-600'
-                          }`}>
+                          <span
+                            className={`text-xs font-bold ${
+                              recipe.compatibilityScore >= 80
+                                ? 'text-green-600'
+                                : recipe.compatibilityScore >= 60
+                                  ? 'text-yellow-600'
+                                  : 'text-red-600'
+                            }`}
+                          >
                             {recipe.compatibilityScore}
                           </span>
                         </div>
@@ -297,9 +301,7 @@ export default function SavedRecipesPage() {
                     {recipe.dateAdded && (
                       <div className="flex items-center text-sm text-gray-500 mt-1">
                         <Clock className="w-3 h-3 mr-1" />
-                        <span>
-                          Saved: {new Date(recipe.dateAdded).toLocaleDateString()}
-                        </span>
+                        <span>Saved: {new Date(recipe.dateAdded).toLocaleDateString()}</span>
                       </div>
                     )}
                   </div>
@@ -323,9 +325,28 @@ export default function SavedRecipesPage() {
               </p>
               <Link
                 href={`/profile/pet/${pet.id}`}
-                className="mt-4 inline-block px-6 py-2 bg-green-800 text-white rounded-lg hover:bg-green-900 transition-colors font-medium shadow-md"
+                className="mt-4 group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl"
+                aria-label="Find Meals"
               >
-                Find Meals
+                <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-2xl">
+                  <Image
+                    src="/images/Buttons/FindMealsUnclicked.png"
+                    alt=""
+                    fill
+                    sizes="300px"
+                    className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                    priority
+                  />
+                  <Image
+                    src="/images/Buttons/FindMealsClicked.png"
+                    alt=""
+                    fill
+                    sizes="300px"
+                    className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                    priority
+                  />
+                </span>
+                <span className="sr-only">Find Meals</span>
               </Link>
             </div>
           )}

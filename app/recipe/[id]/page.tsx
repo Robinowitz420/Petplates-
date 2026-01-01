@@ -26,7 +26,6 @@ import {
   getGenericIngredientName,
 } from '@/lib/data/vetted-products';
 
-import Tooltip from '@/components/Tooltip';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import RecipeScoreModal from '@/components/RecipeScoreModal';
 import { getRandomName, type Pet } from '@/lib/utils/petUtils';
@@ -54,6 +53,7 @@ import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
 import CustomMadeForLine from '@/components/CustomMadeForLine';
 import ShoppingListBanner from '@/public/images/Site Banners/ShoppingList.png';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 // =================================================================
 // 1. CONSTANTS
@@ -643,6 +643,28 @@ export default function RecipeDetailPage() {
     }
   }, [modifiedRecipe, vettedRecipe, recipe, activePetId, pets, scoreForQueryPet, animateScoreChange]);
 
+  useEffect(() => {
+    if (!activePet || !scoreForQueryPet) {
+      setRecommendedSupplements([]);
+      return;
+    }
+
+    const petType = normalizePetType(activePet.type, 'recipe/[id].supplementRecommendations');
+    const nutritionScoreRaw = (scoreForQueryPet as any)?.breakdown?.nutrition?.score;
+    const nutritionScore = typeof nutritionScoreRaw === 'number' && Number.isFinite(nutritionScoreRaw) ? nutritionScoreRaw : null;
+
+    if (nutritionScore == null || nutritionScore >= 75) {
+      setRecommendedSupplements([]);
+      return;
+    }
+
+    const gaps = Array.isArray((scoreForQueryPet as any)?.nutritionalGaps) ? ((scoreForQueryPet as any).nutritionalGaps as string[]) : [];
+    const healthConcerns = Array.isArray((activePet as any)?.healthConcerns) ? ((activePet as any).healthConcerns as string[]) : [];
+
+    const recs = getRecommendationsForRecipe(gaps, petType, healthConcerns).filter((r) => !r.isIngredient);
+    setRecommendedSupplements(recs);
+  }, [activePet, scoreForQueryPet]);
+
   const handleAddToMealPlan = useCallback(async () => {
     if (!recipe || !userId) {
       setMessage('Please select a pet.');
@@ -701,7 +723,7 @@ export default function RecipeDetailPage() {
       return;
     }
 
-    const parsedWeight = parseFloat(petWeight);
+    const parsedWeight = parseFloat(String(petWeight));
     if (!parsedWeight || parsedWeight <= 0) {
       setModifierError('Enter a valid weight in kilograms.');
       return;
@@ -767,21 +789,25 @@ export default function RecipeDetailPage() {
 
     const ingredientsEnrichedWithLinks = allIngredients.map((ing: any) => {
       const existingLink = ing?.asinLink || ing?.amazonLink;
+      const rawName = typeof ing?.name === 'string' ? ing.name : '';
 
-      const lookupName = getGenericIngredientName(ing?.productName || ing?.name) || ing?.name;
-      if (!lookupName) return ing;
+      const genericKey = getGenericIngredientName((ing as any)?.productName || rawName);
+      const displayName = genericKey ? formatIngredientNameForDisplay(genericKey) : rawName;
 
-      const product = getVettedProduct(lookupName, (baseRecipe as any)?.category);
+      const product = genericKey ? getVettedProduct(genericKey, (baseRecipe as any)?.category) : undefined;
       const productLink = product?.asinLink || product?.purchaseLink;
-      const displayName = String(ing?.name || lookupName);
-      const amazonSearchUrl = ensureSellerId(buildAmazonSearchUrl(displayName));
-      const enrichedLink = productLink ? ensureSellerId(productLink) : (existingLink ? ensureSellerId(existingLink) : undefined);
+      const enrichedLink = productLink
+        ? ensureSellerId(productLink)
+        : existingLink
+          ? ensureSellerId(existingLink)
+          : undefined;
 
       return {
         ...ing,
-        ...(product?.productName ? { productName: ing?.productName || product.productName } : {}),
+        name: displayName,
+        ...(product?.productName ? { productName: (ing as any)?.productName || product.productName } : {}),
         ...(enrichedLink ? { amazonLink: enrichedLink, asinLink: enrichedLink } : {}),
-        amazonSearchUrl,
+        amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName || rawName || 'ingredient')),
       };
     });
 
@@ -790,11 +816,12 @@ export default function RecipeDetailPage() {
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
-      amazonSearchUrl: ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(ing.name)),
+      amazonSearchUrl:
+        ing.amazonSearchUrl ||
+        ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'ingredient')),
     }));
 
     const supplementItems: any[] = [];
-
     const shoppingItems = [...ingredientItems];
 
     const totalCost = ingredientItems.reduce((sum: number, item: any) => {
@@ -807,19 +834,26 @@ export default function RecipeDetailPage() {
     if (ingredientItems.length > 0) {
       try {
         const shoppingListItems = ingredientItems.map((item: any) => {
-          const genericName = getGenericIngredientName(item.name) || item.name.toLowerCase();
-          const vettedProduct = getVettedProduct(genericName, (baseRecipe as any)?.category);
+          const itemName = typeof item?.name === 'string' ? item.name : '';
+          const genericName = itemName ? getGenericIngredientName(itemName) || itemName.toLowerCase() : '';
+          const vettedProduct = genericName ? getVettedProduct(genericName, (baseRecipe as any)?.category) : undefined;
+
           return {
             id: item.id,
-            name: item.name,
+            name: itemName,
             amount: item.amount,
             category: vettedProduct?.category || 'other',
           };
         });
 
-        const servings = typeof (baseRecipe as any)?.servings === 'number' && (baseRecipe as any).servings > 0
-          ? (baseRecipe as any).servings
-          : 1;
+        const servingsRaw = (baseRecipe as any)?.servings;
+        const servingsParsed =
+          typeof servingsRaw === 'number'
+            ? servingsRaw
+            : typeof servingsRaw === 'string'
+              ? parseFloat(servingsRaw)
+              : NaN;
+        const servings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
 
         const rawEstimate = calculateMealsFromGroceryList(
           shoppingListItems,
@@ -853,10 +887,6 @@ export default function RecipeDetailPage() {
     };
   }, [vettedRecipe, recipe, modifiedRecipe]);
 
-  const guidelines =
-    NUTRITION_GUIDELINES[recipe?.category as CategoryType] ||
-    ({ protein: 'N/A', fat: 'N/A', fiber: 'N/A' } as const);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-xl font-semibold text-gray-400 bg-background">
@@ -881,7 +911,7 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-12 font-sans text-foreground">
+    <>
       {/* Message Toast */}
       {message && (
         <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
@@ -889,7 +919,7 @@ export default function RecipeDetailPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background py-12 font-sans text-foreground">
         {/* Breadcrumb */}
         <Link
           href="/profile"
@@ -914,7 +944,11 @@ export default function RecipeDetailPage() {
                 </div>
               </h1>
 
-              {activePet ? <CustomMadeForLine petName={getRandomName(activePet.names)} /> : null}
+              {activePet ? (
+                <div className="ml-5 mt-[15px]">
+                  <CustomMadeForLine petName={getRandomName(activePet.names)} />
+                </div>
+              ) : null}
 
               <div className="flex flex-wrap gap-2">
                 {recipe.tags?.filter((tag) => tag !== 'Generated').map((tag) => (
@@ -939,48 +973,13 @@ export default function RecipeDetailPage() {
                     onClick={() => setIsScoreModalOpen(true)}
                     className="rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
                   >
-                    {(() => {
-                      const score = Math.max(0, Math.min(100, Number(scoreForQueryPet.overallScore) || 0));
-                      const size = 118;
-                      const stroke = 10;
-                      const r = (size - stroke) / 2;
-                      const c = 2 * Math.PI * r;
-                      const dash = (score / 100) * c;
-                      const color = score >= 80 ? '#34d399' : score >= 60 ? '#fbbf24' : '#f87171';
-                      return (
-                        <div className="flex items-center gap-5">
-                          <div className="relative" style={{ width: size, height: size }}>
-                            <svg width={size} height={size} className="block" style={{ transform: 'rotate(-90deg)' }}>
-                              <circle
-                                cx={size / 2}
-                                cy={size / 2}
-                                r={r}
-                                stroke="rgba(255,255,255,0.10)"
-                                strokeWidth={stroke}
-                                fill="transparent"
-                              />
-                              <circle
-                                cx={size / 2}
-                                cy={size / 2}
-                                r={r}
-                                stroke={color}
-                                strokeWidth={stroke}
-                                fill="transparent"
-                                strokeLinecap="round"
-                                strokeDasharray={`${dash} ${c - dash}`}
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <div className="text-3xl font-extrabold text-foreground leading-none">{formatPercent(score)}</div>
-                            </div>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-sm font-semibold text-gray-200">Compatibility</div>
-                            <div className="text-xs text-gray-400 mt-1">Tap for details</div>
-                          </div>
-                        </div>
-                      );
-                    })()}
+                    <div className="flex items-center gap-5">
+                      <CompatibilityRadial score={scoreForQueryPet.overallScore} size={118} strokeWidth={10} label="" />
+                      <div className="text-left">
+                        <div className="text-sm font-semibold text-gray-200">Compatibility</div>
+                        <div className="text-xs text-gray-400 mt-1">Tap for details</div>
+                      </div>
+                    </div>
                   </button>
                 }
               />
@@ -1084,6 +1083,59 @@ export default function RecipeDetailPage() {
                   )}
                 </div>
               )}
+
+              {activeTab === 'supplements' && (
+                <div className="space-y-4">
+                  {recommendedSupplements.length > 0 ? (
+                    <div className="space-y-4">
+                      {recommendedSupplements.map((supplement) => {
+                        const link = supplement.asinLink || supplement.amazonLink;
+                        return (
+                          <div
+                            key={`${supplement.name}-${supplement.addressesDeficiency}`}
+                            className="rounded-xl border border-surface-highlight bg-surface-lighter p-5"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                              <div className="min-w-0">
+                                <div className="text-lg font-bold text-gray-100">{supplement.name}</div>
+                                <div className="mt-1 text-sm text-gray-300">{supplement.benefits}</div>
+                                {supplement.defaultAmount ? (
+                                  <div className="mt-2 text-xs text-gray-400">Suggested: {supplement.defaultAmount}</div>
+                                ) : null}
+                              </div>
+                              <div className="flex flex-col gap-2 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddSupplement(supplement)}
+                                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-green-800 text-white border border-green-900 hover:bg-green-900 transition-colors"
+                                >
+                                  Add to meal
+                                </button>
+                                {link ? (
+                                  <a
+                                    href={ensureSellerId(link)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-surface border border-orange-500/60 text-orange-200 hover:border-orange-500 hover:text-orange-100 transition-colors"
+                                  >
+                                    Buy
+                                  </a>
+                                ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="py-10 flex justify-center">
+                      <span className="inline-flex items-center px-4 py-2 rounded-full bg-green-900/40 text-green-200 border border-green-700/50 text-sm font-semibold">
+                        Meal is Complete!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Cost Comparison */}
@@ -1152,21 +1204,19 @@ export default function RecipeDetailPage() {
                       const rawScore = typeof f.score === 'number' && Number.isFinite(f.score) ? f.score : 0;
                       const score = Math.round(rawScore);
                       const weightedContribution = f.weightedContribution ?? Math.round(rawScore * (f.weight || 0));
-                      const weight = f.weight || 0;
 
                       let bgColor = 'bg-green-900/20 border-green-700/50';
                       let icon = '✅';
                       let textColor = 'text-green-200';
 
-                      if (score < 70) {
-                        bgColor = 'bg-yellow-900/20 border-yellow-700/50';
-                        icon = '⚠️';
-                        textColor = 'text-yellow-200';
-                      }
                       if (score < 40) {
                         bgColor = 'bg-red-900/20 border-red-700/50';
                         icon = '❌';
                         textColor = 'text-red-200';
+                      } else if (score < 70) {
+                        bgColor = 'bg-yellow-900/20 border-yellow-700/50';
+                        icon = '⚠️';
+                        textColor = 'text-yellow-200';
                       }
 
                       const factorNameMap: Record<string, string> = {
@@ -1175,50 +1225,22 @@ export default function RecipeDetailPage() {
                         health: 'health alignment',
                         quality: 'ingredient quality',
                       };
-                      const factorName =
-                        factorNameMap[key] || key.replace(/([A-Z])/g, ' $1').toLowerCase();
-                      const formattedFactorName =
-                        factorName.charAt(0).toUpperCase() + factorName.slice(1);
-
-                      let recommendationText = '';
-                      if (key === 'nutrition' && f.recommendations && f.recommendations.length > 0) {
-                        recommendationText += '\n\n─────────────────────\n\n💊 Recommendations:\n';
-                        const supplements = f.recommendations.filter((r: any) => !r.isIngredient);
-                        const ingredients = f.recommendations.filter((r: any) => r.isIngredient);
-
-                        if (supplements.length > 0) {
-                          recommendationText += `\nCheck Supplements tab for: ${supplements
-                            .map((r: any) => r.productName || r.name)
-                            .join(', ')}`;
-                        }
-                        if (ingredients.length > 0) {
-                          recommendationText += `\nCheck Ingredients tab for: ${ingredients
-                            .map((r: any) => r.name)
-                            .join(', ')}`;
-                        }
-                      }
-
-                      const tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${formatPercent(score)}\nWeight: ${(
-                        weight * 100
-                      ).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${
-                        f.reason ? `💡 ${f.reason}` : 'No additional details available'
-                      }${recommendationText}`;
+                      const factorName = factorNameMap[key] || key.replace(/([A-Z])/g, ' $1').toLowerCase();
 
                       return (
-                        <Tooltip key={key} content={tooltipContent} wide={key === 'nutrition'}>
-                          <div
-                            className={`flex items-center justify-between p-3 ${bgColor} rounded-lg border cursor-help hover:opacity-80 transition-colors`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">{icon}</span>
-                              <span className={`text-sm font-medium capitalize ${textColor}`}>{factorName}</span>
-                            </div>
-                            <div className="flex flex-col items-end">
-                              <span className={`text-sm font-bold ${textColor}`}>{formatPercent(score)}</span>
-                              <span className="text-xs text-gray-400">+{weightedContribution} pts</span>
-                            </div>
+                        <div
+                          key={key}
+                          className={`flex items-center justify-between p-3 ${bgColor} rounded-lg border transition-colors`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{icon}</span>
+                            <span className={`text-sm font-medium capitalize ${textColor}`}>{factorName}</span>
                           </div>
-                        </Tooltip>
+                          <div className="flex flex-col items-end">
+                            <span className={`text-sm font-bold ${textColor}`}>{formatPercent(score)}</span>
+                            <span className="text-xs text-gray-400">+{weightedContribution} pts</span>
+                          </div>
+                        </div>
                       );
                     })}
                 </div>
@@ -1237,9 +1259,7 @@ export default function RecipeDetailPage() {
                       {portionPlan.dailyGrams}g per day ({portionPlan.mealsPerDay} meals/day)
                     </div>
                   </div>
-                ) : (
-                  null
-                )}
+                ) : null}
 
                 <div>
                   <div className="font-semibold text-gray-200">Storage</div>
@@ -1290,13 +1310,25 @@ export default function RecipeDetailPage() {
                 type="button"
                 onClick={handleAddToMealPlan}
                 disabled={!userId || !activePetId || isAddingMeal || isMealAdded}
-                className="w-full inline-flex items-center justify-center px-10 py-4 rounded-full text-base font-semibold transition-colors shadow-md bg-green-800 text-white border-[3px] border-orange-500 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}
               >
-                {isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+                <span className="relative h-16 w-full overflow-hidden rounded-2xl">
+                  <Image
+                    src="/images/Buttons/SaveMeal.png"
+                    alt=""
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
+                    priority
+                  />
+                </span>
+                <span className="sr-only">{isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}</span>
               </button>
               {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
               {userId && !activePetId && <div className="mt-2 text-xs text-gray-400">Select a pet to add</div>}
             </div>
+
           </aside>
         </div>
       </div>
@@ -1343,6 +1375,6 @@ export default function RecipeDetailPage() {
           userId={userId}
         />
       )}
-    </div>
+    </>
   );
 }

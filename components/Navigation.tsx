@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,15 +40,20 @@ export default function Navigation() {
               Community
             </Link>
 
-            <Link href="/profile" className="text-gray-300 hover:text-orange-400 transition-colors">
-              My Pets
-            </Link>
-            <Link
-              href="/sign-in"
-              className="btn btn-primary btn-md btn-ripple"
-            >
-              Sign In
-            </Link>
+            <SignedIn>
+              <Link href="/profile" className="text-gray-300 hover:text-orange-400 transition-colors">
+                My Pets
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                className="btn btn-primary btn-md btn-ripple"
+              >
+                Sign In
+              </Link>
+            </SignedOut>
           </div>
 
           <div className="md:hidden">
@@ -76,15 +82,22 @@ export default function Navigation() {
                 Community
               </Link>
 
-              <Link href="/profile" className="text-gray-300 hover:text-orange-400">
-                My Pets
-              </Link>
-              <Link
-                href="/sign-in"
-                className="btn btn-primary btn-md btn-ripple"
-              >
-                Sign In
-              </Link>
+              <SignedIn>
+                <Link href="/profile" className="text-gray-300 hover:text-orange-400">
+                  My Pets
+                </Link>
+                <div className="mt-2">
+                  <UserButton afterSignOutUrl="/" />
+                </div>
+              </SignedIn>
+              <SignedOut>
+                <Link
+                  href="/sign-in"
+                  className="btn btn-primary btn-md btn-ripple"
+                >
+                  Sign In
+                </Link>
+              </SignedOut>
             </div>
           </div>
         )}

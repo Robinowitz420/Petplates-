@@ -1,16 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 const QuickPreviewModal = dynamic(() => import('@/components/QuickPreviewModal'), {
-  ssr: false,
-});
-
-const EmailCaptureModal = dynamic(() => import('@/components/EmailCaptureModal'), {
   ssr: false,
 });
 
@@ -22,10 +18,7 @@ export default function HomePageClient() {
   const searchParams = useSearchParams();
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
   const [mountABDashboard, setMountABDashboard] = useState(false);
-
-  const hasShownExitIntentRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -50,22 +43,6 @@ export default function HomePageClient() {
     if (searchParams.get('demo') !== '1') return;
     setShowPreviewModal(true);
   }, [searchParams]);
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 10 && !hasShownExitIntentRef.current) {
-        hasShownExitIntentRef.current = true;
-        setShowEmailCapture(true);
-      }
-    };
-
-    document.addEventListener('mouseleave', handleMouseLeave);
-    return () => {
-      document.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, []);
 
   return (
     <>
@@ -98,15 +75,6 @@ export default function HomePageClient() {
       <QuickPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
-      />
-
-      {/* Email Capture Modal (Exit Intent) */}
-      <EmailCaptureModal
-        isOpen={showEmailCapture}
-        onClose={() => setShowEmailCapture(false)}
-        petType="your pet"
-        mealCount={5}
-        trigger="exit-intent"
       />
 
       {/* A/B Test Dashboard (Admin) */}

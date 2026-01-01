@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Trash2, Edit, Calendar, ChefHat } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 export default function CustomMealsHistoryPage() {
   const params = useParams();
@@ -98,9 +100,16 @@ export default function CustomMealsHistoryPage() {
 
   // Get random name from pet's names array
   const petNames = Array.isArray(pet.names) ? pet.names.filter(n => n && n.trim() !== '') : [];
-  const petDisplayName = petNames.length > 0 
-    ? petNames[Math.floor(Math.random() * petNames.length)]
-    : 'Pet';
+  const petDisplayName = (() => {
+    if (petNames.length === 0) return 'Pet';
+    const seed = String(petId ?? '');
+    let hash = 0;
+    for (let i = 0; i < seed.length; i += 1) {
+      hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    }
+    const idx = hash % petNames.length;
+    return petNames[idx] ?? 'Pet';
+  })();
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,10 +135,28 @@ export default function CustomMealsHistoryPage() {
             </div>
             <Link
               href={`/profile/pet/${petId}/recipe-builder`}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-md hover:bg-green-900 transition-colors"
+              className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl"
+              aria-label="Create Meal"
             >
-              <ChefHat size={16} />
-              Create New Meal
+              <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-2xl">
+                <Image
+                  src="/images/Buttons/CreateMealUnclicked.png"
+                  alt=""
+                  fill
+                  sizes="300px"
+                  className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                  priority
+                />
+                <Image
+                  src="/images/Buttons/CreateMealClicked.png"
+                  alt=""
+                  fill
+                  sizes="300px"
+                  className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                  priority
+                />
+              </span>
+              <span className="sr-only">Create Meal</span>
             </Link>
           </div>
         </div>
@@ -145,10 +172,28 @@ export default function CustomMealsHistoryPage() {
             </p>
             <Link
               href={`/profile/pet/${petId}/recipe-builder`}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors"
+              className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl"
+              aria-label="Create Meal"
             >
-              <ChefHat size={16} />
-              Create Your First Meal
+              <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-2xl">
+                <Image
+                  src="/images/Buttons/CreateMealUnclicked.png"
+                  alt=""
+                  fill
+                  sizes="300px"
+                  className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                  priority
+                />
+                <Image
+                  src="/images/Buttons/CreateMealClicked.png"
+                  alt=""
+                  fill
+                  sizes="300px"
+                  className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                  priority
+                />
+              </span>
+              <span className="sr-only">Create Meal</span>
             </Link>
           </div>
         ) : (
@@ -182,17 +227,9 @@ export default function CustomMealsHistoryPage() {
                 <div className={`mb-4 p-3 rounded-lg border ${getScoreColor(meal.analysis.score)}`}>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Compatibility Score</span>
-                    <span className="text-2xl font-bold">{meal.analysis.score}</span>
                   </div>
-                  <div className="w-full bg-white/50 rounded-full h-2 mt-2">
-                    <div
-                      className={`h-2 rounded-full ${
-                        meal.analysis.score >= 80 ? 'bg-green-600' :
-                        meal.analysis.score >= 60 ? 'bg-yellow-600' :
-                        'bg-red-600'
-                      }`}
-                      style={{ width: `${meal.analysis.score}%` }}
-                    />
+                  <div className="mt-3 flex justify-center">
+                    <CompatibilityRadial score={meal.analysis.score} size={96} strokeWidth={8} label="" />
                   </div>
                 </div>
 

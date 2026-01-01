@@ -7,12 +7,12 @@ import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
-import { CompatibilityBadge } from '@/components/CompatibilityBadge';
 import { getRandomName } from '@/lib/utils/petUtils';
 import EmojiIcon from '@/components/EmojiIcon';
 import { getPets, savePet } from '@/lib/utils/petStorage';
 import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
 import ScoringProgress from '@/components/ScoringProgress';
+
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
@@ -22,6 +22,9 @@ import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import { getGenericIngredientName, getVettedProduct } from '@/lib/data/vetted-products';
 import { getPetBadges } from '@/lib/utils/badgeStorage';
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
+import UserAgreementModal from '@/components/UserAgreementModal';
+import { USER_AGREEMENT_STORAGE_KEY } from '@/lib/userAgreementDisclaimer';
+import MealGenerationScene, { type SceneStatus } from '@/components/MealGenerationScene';
 
 type RecipeCardEstimate = {
   costPerMeal: number;
@@ -57,6 +60,7 @@ export default function RecommendedRecipesPage() {
   const searchParams = useSearchParams();
   const { userId, isLoaded } = useAuth();
   const [pet, setPet] = useState<Pet | null>(null);
+
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
   const [engineMeals, setEngineMeals] = useState<ModifiedRecipeResult[] | null>(null);
   const [engineError, setEngineError] = useState<string | null>(null);
@@ -67,6 +71,15 @@ export default function RecommendedRecipesPage() {
   const lastGeneratedPetIdRef = useRef<string | null>(null);
   const petId = params.id as string;
   const [regenerateNonce, setRegenerateNonce] = useState(0);
+  const [hasAgreedToDisclaimer, setHasAgreedToDisclaimer] = useState(false);
+  const [disclaimerChecked, setDisclaimerChecked] = useState(false);
+
+  const sceneStatus: SceneStatus = useMemo(() => {
+    if (engineError) return 'error';
+    if (loadingMeals) return 'loading';
+    if (engineMeals && engineMeals.length > 0) return 'ready';
+    return 'idle';
+  }, [engineError, engineMeals, loadingMeals]);
 
   const mealsCacheKey = useMemo(() => {
     return `generated_meals_v2:${userId || 'anon'}:${petId}`;
@@ -105,16 +118,20 @@ export default function RecommendedRecipesPage() {
     if (!isLoaded) return;
     if (!userId || !petId) return;
 
+    try {
+      const raw = localStorage.getItem(USER_AGREEMENT_STORAGE_KEY);
+      setHasAgreedToDisclaimer(raw === 'true');
+    } catch {
+      setHasAgreedToDisclaimer(false);
+    } finally {
+      setDisclaimerChecked(true);
+    }
+
     checkAllBadges(userId, petId, {
       action: 'search_discovery',
     }).catch((err) => {
       console.error('Failed to check badges:', err);
     });
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`active_pet_id_${userId}`, petId);
-      localStorage.setItem('last_active_pet_id', petId);
-    }
 
     const loadPet = async () => {
       try {
@@ -152,6 +169,12 @@ export default function RecommendedRecipesPage() {
 
   useEffect(() => {
     if (!pet) return;
+
+    if (!disclaimerChecked) return;
+    if (!hasAgreedToDisclaimer) {
+      setLoadingMeals(false);
+      return;
+    }
 
     if (forceRegenerate && typeof window !== 'undefined') {
       try {
@@ -356,7 +379,14 @@ export default function RecommendedRecipesPage() {
           };
         });
 
-        const servings = typeof recipe?.servings === 'number' && recipe.servings > 0 ? recipe.servings : 1;
+        const servingsRaw = (recipe as any)?.servings;
+        const servingsParsed =
+          typeof servingsRaw === 'number'
+            ? servingsRaw
+            : typeof servingsRaw === 'string'
+              ? parseFloat(servingsRaw)
+              : NaN;
+        const servings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
         const rawEstimate = calculateMealsFromGroceryList(shoppingListItems, undefined, recipe?.category, true, servings);
         estimatedMeals = rawEstimate?.estimatedMeals || 0;
       } catch {
@@ -373,11 +403,13 @@ export default function RecommendedRecipesPage() {
   }, [mealsToRender]);
 
   const handleRegenerate = () => {
+    if (!hasAgreedToDisclaimer) return;
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(mealsCacheKey);
       } catch {
       }
+
       lastGeneratedPetIdRef.current = null;
       setEngineMeals(null);
     }
@@ -386,6 +418,15 @@ export default function RecommendedRecipesPage() {
   };
 
   const closeQuotaPopup = () => setShowQuotaPopup(false);
+
+  const handleAgreeToDisclaimer = () => {
+    try {
+      localStorage.setItem(USER_AGREEMENT_STORAGE_KEY, 'true');
+    } catch {
+    }
+    setHasAgreedToDisclaimer(true);
+    setRegenerateNonce(Date.now());
+  };
 
   const { scoredMeals, isLoading: isScoring, progress, totalMeals: totalMealsToScore, scoredCount } = useChunkedRecipeScoring(
     mealsToRender,
@@ -499,6 +540,9 @@ export default function RecommendedRecipesPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground py-4">
+      {disclaimerChecked && !hasAgreedToDisclaimer ? (
+        <UserAgreementModal isOpen={true} onAgree={handleAgreeToDisclaimer} />
+      ) : null}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/profile"
@@ -511,13 +555,17 @@ export default function RecommendedRecipesPage() {
         <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex gap-6">
           <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1">
             <span className="relative block w-40 md:w-48 lg:w-56 h-full overflow-hidden rounded-md">
-              <Image
-                src="/images/emojis/Mascots/Sherlock%20Shells/Shell4.jpg"
+              <MealGenerationScene
+                status={sceneStatus}
+                idleImageSrc="/images/emojis/Mascots/Sherlock Shells/Shell4.jpg"
+                loadingVideoMp4Src="/images/emojis/Mascots/Sherlock Shells/ShellsLoading.mp4"
+                readyImageSrc="/images/emojis/Mascots/Sherlock Shells/ShellsMealsFound.png"
+                errorImageSrc="/images/emojis/Mascots/Sherlock Shells/Shell4.jpg"
                 alt="Sherlock Shells"
-                fill
-                sizes="(min-width: 1024px) 224px, (min-width: 768px) 192px, 160px"
-                className="object-cover"
-                unoptimized
+                width={640}
+                height={540}
+                respectReducedMotion={false}
+                className="w-full h-full"
               />
             </span>
           </span>
@@ -547,9 +595,20 @@ export default function RecommendedRecipesPage() {
                 <button
                   onClick={handleRegenerate}
                   disabled={loadingMeals}
-                  className="px-10 py-4 rounded-full text-base font-semibold transition-colors bg-green-800 text-white border-[3px] border-orange-500 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap"
+                  className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
                 >
-                  {loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
+                  <span className="relative h-16 w-[360px] sm:w-[420px] max-w-full overflow-hidden rounded-2xl">
+                    <Image
+                      src="/images/Buttons/FindNewBatch.png"
+                      alt=""
+                      fill
+                      sizes="420px"
+                      className="object-contain"
+                      priority
+                    />
+                  </span>
+                  <span className="sr-only">{loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}</span>
                 </button>
               </div>
 
@@ -722,9 +781,19 @@ export default function RecommendedRecipesPage() {
                               e.stopPropagation();
                               handleSaveRecipe(recipeId, recipe.name);
                             }}
-                            className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold transition-all shadow-md bg-gradient-to-br from-green-600 to-green-800 text-white border-[3px] border-orange-500 hover:from-green-500 hover:to-green-700 hover:border-orange-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95"
+                            aria-label="Save Meal"
                           >
-                            Save Meal
+                            <span className="relative h-16 w-full overflow-hidden rounded-2xl">
+                              <Image
+                                src="/images/Buttons/SaveMeal.png"
+                                alt=""
+                                fill
+                                sizes="100vw"
+                                className="object-contain"
+                              />
+                            </span>
+                            <span className="sr-only">Save Meal</span>
                           </button>
                         </div>
                       </div>

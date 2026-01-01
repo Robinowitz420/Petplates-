@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Clock, Users } from 'lucide-react';
 import { Recipe } from '@/lib/types';
 import { useAuth } from '@clerk/nextjs';
@@ -9,8 +10,8 @@ import { useAuth } from '@clerk/nextjs';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import type { Pet } from '@/lib/types';
 import RecipeScoreModal from './RecipeScoreModal';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
-import { formatPercent } from '@/lib/utils/formatPercent';
 import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
 
 interface RecipeCardProps {
@@ -96,47 +97,20 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
             {recipe.description}
           </p>
 
-          {/* Compact compatibility score bar (unified with recipe detail view) */}
           {speciesScore && (
-            <div className="mb-4 rounded-lg border border-emerald-500/60 bg-gradient-to-r from-emerald-900/70 via-emerald-800/70 to-emerald-900/70 p-3 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-emerald-200/80">
-                    Compatibility Score
-                  </span>
+            <div className="mb-4 flex items-center justify-between rounded-lg border border-surface-highlight bg-surface-highlight/40 p-3">
+              <CompatibilityRadial score={speciesScore.overallScore} size={88} strokeWidth={8} label="" />
+              <div className="flex flex-col items-end gap-1">
+                <div className="text-[10px] uppercase tracking-wide text-gray-400">
+                  {gradeToCompatibility(speciesScore.grade)} match
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold leading-none text-emerald-50">
-                    {formatPercent(speciesScore.overallScore)}
-                  </div>
-                  <div className="mt-0.5 text-[10px] uppercase tracking-wide text-emerald-100/80">
-                    {gradeToCompatibility(speciesScore.grade)} match
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full bg-black/40 rounded-full h-[3px] mb-2 overflow-hidden">
-                <div
-                  className={`h-[3px] rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-                    speciesScore.overallScore >= 80
-                      ? 'bg-emerald-400'
-                      : speciesScore.overallScore >= 60
-                      ? 'bg-amber-300'
-                      : 'bg-red-400'
-                  }`}
-                  style={{ width: `${speciesScore.overallScore}%` }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between text-[11px] text-emerald-100/80">
-                <span />
                 <button
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     setIsModalOpen(true);
                   }}
-                  className="text-[11px] font-medium underline underline-offset-4 hover:opacity-80"
+                  className="text-[11px] font-medium underline underline-offset-4 text-gray-300 hover:opacity-80"
                 >
                   View details
                 </button>
@@ -214,13 +188,19 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                   }
                 }}
                 disabled={!userId || isAddingMeal || isMealAdded}
-                className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-colors shadow-md border ${
-                  isMealAdded
-                    ? 'bg-green-900/40 text-green-200 border-green-700/50 cursor-default'
-                    : 'bg-green-800 text-white border-green-900 hover:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed'
-                }`}
+                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}
               >
-                {isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+                <span className="relative h-12 w-full overflow-hidden rounded-2xl">
+                  <Image
+                    src="/images/Buttons/SaveMeal.png"
+                    alt=""
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
+                  />
+                </span>
+                <span className="sr-only">{isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}</span>
               </button>
             </div>
           ) : null}
