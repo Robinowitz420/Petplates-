@@ -1,6 +1,22 @@
 'use client';
 
+import { debugEnabled } from '@/lib/utils/debugLog';
+
 export default function ImageInversionDetector() {
+  if (!debugEnabled) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-xl font-bold text-foreground">Diagnostics Disabled</h1>
+          <p className="text-sm text-gray-500 mt-2">
+            This diagnostics page is disabled in production. To enable it, set{' '}
+            <code className="font-mono">NEXT_PUBLIC_ENABLE_DEBUG=true</code>.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       margin: 0,

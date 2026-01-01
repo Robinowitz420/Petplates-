@@ -1,6 +1,7 @@
 'use client';
 
 import { calculateMealsFromGroceryList, type MealEstimate, type ShoppingListItem } from '@/lib/utils/mealEstimation';
+import { debugEnabled, debugLog } from '@/lib/utils/debugLog';
 import { getProductPrice } from '@/lib/data/product-prices';
 import { Info } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -38,12 +39,12 @@ export function ShoppingListSummary({ shoppingList, recipeServings, species, cla
   // Calculate estimate with error handling and memoization
   const estimate = useMemo(() => {
     if (!filteredShoppingList || filteredShoppingList.length === 0) {
-      console.log('[ShoppingListSummary] No shopping list provided');
+      if (debugEnabled) debugLog('[ShoppingListSummary] No shopping list provided');
       return null;
     }
     
-    console.log('[ShoppingListSummary] Calculating estimate for', filteredShoppingList.length, 'ingredients');
-    console.log('[ShoppingListSummary] Shopping list:', filteredShoppingList);
+    if (debugEnabled) debugLog('[ShoppingListSummary] Calculating estimate for', filteredShoppingList.length, 'ingredients');
+    if (debugEnabled) debugLog('[ShoppingListSummary] Shopping list:', filteredShoppingList);
     
     try {
       const result = calculateMealsFromGroceryList(
@@ -53,8 +54,8 @@ export function ShoppingListSummary({ shoppingList, recipeServings, species, cla
         true,
         recipeServings
       );
-      console.log('[ShoppingListSummary] Estimate calculated:', result);
-      console.log('[ShoppingListSummary] UI totalCost prop (not used):', totalCost);
+      if (debugEnabled) debugLog('[ShoppingListSummary] Estimate calculated:', result);
+      if (debugEnabled) debugLog('[ShoppingListSummary] UI totalCost prop (not used):', totalCost);
       return result;
     } catch (error) {
       console.error('[ShoppingListSummary] Error calculating meals:', error);
@@ -64,7 +65,7 @@ export function ShoppingListSummary({ shoppingList, recipeServings, species, cla
   
   // Don't show if no estimate or invalid
   if (!estimate || estimate.estimatedMeals === 0) {
-    console.log('[ShoppingListSummary] Showing error fallback - estimate:', estimate, 'estimatedMeals:', estimate?.estimatedMeals);
+    if (debugEnabled) debugLog('[ShoppingListSummary] Showing error fallback - estimate:', estimate, 'estimatedMeals:', estimate?.estimatedMeals);
     // Show fallback message instead of returning null to verify component is being called
     return (
       <div className="bg-red-500 border-2 border-red-700 rounded-xl p-6 text-white">

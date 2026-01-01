@@ -17,13 +17,14 @@ import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import Link from 'next/link';
-import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
+import { debugEnabled, debugLog } from '@/lib/utils/debugLog';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
+import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { formatPercent } from '@/lib/utils/formatPercent';
 import { getPortionPlan } from '@/lib/portionCalc';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
@@ -100,7 +101,7 @@ export default function MealCompleteView({
   getIngredientDisplayName,
   getCompatibilityIndicator,
   isFirstCreation = false,
-  petType = 'dog' // Default to dog if not provided
+  petType = 'dog', // Default to dog if not provided
 }: MealCompleteViewProps) {
   const totalGrams = selectedIngredients.reduce((sum, s) => sum + s.grams, 0);
   const [mealName, setMealName] = useState<string>('');
@@ -110,6 +111,8 @@ export default function MealCompleteView({
   const [healthAnalysis, setHealthAnalysis] = useState<any>(null);
   const [isCalculatingHealthAnalysis, setIsCalculatingHealthAnalysis] = useState(false);
   const [activeTab, setActiveTab] = useState<'ingredients' | 'supplements'>('ingredients');
+
+  const debug = debugEnabled;
 
   const portionPlan = useMemo(() => {
     if (!analysis || !pet) return null;
@@ -510,18 +513,18 @@ export default function MealCompleteView({
 
   // Prepare ingredients for ShoppingList (memoized)
   const ingredientsWithASINs = useMemo(() => {
-    console.log('[MealCompleteView] ========== ingredientsWithASINs Calculation ==========');
-    console.log('[MealCompleteView] selectedIngredients:', selectedIngredients);
-    console.log('[MealCompleteView] selectedIngredients.length:', selectedIngredients.length);
+    if (debugEnabled) debugLog('[MealCompleteView] ========== ingredientsWithASINs Calculation ==========');
+    if (debugEnabled) debugLog('[MealCompleteView] selectedIngredients:', selectedIngredients);
+    if (debugEnabled) debugLog('[MealCompleteView] selectedIngredients.length:', selectedIngredients.length);
     
     const result = ingredientSelections
       .map((ing, index) => {
-        console.log(`[MealCompleteView] Processing ingredient ${index + 1}:`, ing);
+        if (debugEnabled) debugLog(`[MealCompleteView] Processing ingredient ${index + 1}:`, ing);
         const displayName = getIngredientDisplayName(ing.key);
-        console.log(`[MealCompleteView]   Display name from getIngredientDisplayName:`, displayName);
+        if (debugEnabled) debugLog(`[MealCompleteView]   Display name from getIngredientDisplayName:`, displayName);
         
         const link = getProductUrl(displayName);
-        console.log(`[MealCompleteView]   Product-prices purchase link:`, link);
+        if (debugEnabled) debugLog(`[MealCompleteView]   Product-prices purchase link:`, link);
 
         const item = {
           id: ing.key,
@@ -530,16 +533,16 @@ export default function MealCompleteView({
           ...(link ? { asinLink: ensureSellerId(link) } : {}),
           amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
         };
-        console.log(`[MealCompleteView]   ✅ Added to ingredientsWithASINs:`, item);
+        if (debugEnabled) debugLog(`[MealCompleteView]   ✅ Added to ingredientsWithASINs:`, item);
         return item;
       })
       .filter(Boolean) as Array<{ id: string; name: string; amount: string; asinLink?: string; amazonSearchUrl?: string }>;
     
-    console.log('[MealCompleteView] Final ingredientsWithASINs array:', result);
-    console.log('[MealCompleteView] ingredientsWithASINs.length:', result.length);
-    console.log('[MealCompleteView] =====================================================');
+    if (debugEnabled) debugLog('[MealCompleteView] Final ingredientsWithASINs array:', result);
+    if (debugEnabled) debugLog('[MealCompleteView] ingredientsWithASINs.length:', result.length);
+    if (debugEnabled) debugLog('[MealCompleteView] =====================================================');
     return result;
-  }, [ingredientSelections, getIngredientDisplayName]);
+  }, [debugEnabled, ingredientSelections, getIngredientDisplayName, selectedIngredients]);
 
   const ingredientsWithoutASINs = useMemo(() => {
     return ingredientSelections
@@ -574,11 +577,11 @@ export default function MealCompleteView({
 
   // Calculate meal estimate only for CostComparison component
   const mealEstimateForCost = useMemo(() => {
-    console.log('[MealCompleteView] Calculating mealEstimateForCost...');
-    console.log('[MealCompleteView] ingredientsWithASINs:', ingredientsWithASINs);
+    if (debug) debugLog('[MealCompleteView] Calculating mealEstimateForCost...');
+    if (debug) debugLog('[MealCompleteView] ingredientsWithASINs:', ingredientsWithASINs);
     
     if (!ingredientsWithASINs || ingredientsWithASINs.length === 0) {
-      console.log('[MealCompleteView] No ingredients with ASINs, returning null');
+      if (debug) debugLog('[MealCompleteView] No ingredients with ASINs, returning null');
       return null;
     }
     
@@ -592,7 +595,7 @@ export default function MealCompleteView({
         };
       });
       
-      console.log('[MealCompleteView] Shopping list items for calculation:', shoppingListItems);
+      if (debug) debugLog('[MealCompleteView] Shopping list items for calculation:', shoppingListItems);
       
       // Use the dedicated meal estimation utility, passing in inferred
       // recipeServings so amounts are interpreted as per-meal usage
@@ -604,19 +607,22 @@ export default function MealCompleteView({
         true,
         recipeServings
       );
-      console.log('[MealCompleteView] mealEstimateForCost result:', result);
+      if (debug) debugLog('[MealCompleteView] mealEstimateForCost result:', result);
       return result;
     } catch (error) {
       console.error('[MealCompleteView] Error calculating meal estimate for cost:', error);
       return null;
     }
-  }, [ingredientsWithASINs, petType, recipeServings]);
+  }, [debug, ingredientsWithASINs, petType, recipeServings]);
 
   // Diagnostic logging - NOW AFTER DECLARATIONS
   useEffect(() => {
+    if (!debug) return;
+
     // #region agent log
     fetch('http://127.0.0.1:7242/ingest/0b2cb572-34bf-468c-9297-dd079c8c4c2d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MealCompleteView.tsx:463',message:'Diagnostic useEffect executing',data:{hasIngredientsWithASINs:!!ingredientsWithASINs,length:ingredientsWithASINs?.length,hasMealEstimate:!!mealEstimateForCost},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
+
     console.group('🔍 MealCompleteView Diagnostic');
     console.log('selectedIngredients:', selectedIngredients);
     console.log('selectedIngredients.length:', selectedIngredients.length);
@@ -630,7 +636,7 @@ export default function MealCompleteView({
     }
     console.log('mealEstimateForCost:', mealEstimateForCost);
     console.groupEnd();
-  }, [selectedIngredients, ingredientsWithASINs, mealEstimateForCost]);
+  }, [debug, selectedIngredients, ingredientsWithASINs, mealEstimateForCost]);
 
   return (
     <div className="min-h-screen bg-background py-12 font-sans text-foreground">
@@ -914,19 +920,6 @@ export default function MealCompleteView({
                   })}
                 </div>
 
-                {/* Compatibility Score Summary */}
-                <div className="mt-4 pt-4 border-t border-surface-highlight">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Compatibility Score:</span>
-                    <span className={`text-lg font-bold ${
-                      healthAnalysis.overallScore >= 80 ? 'text-green-400' :
-                      healthAnalysis.overallScore >= 60 ? 'text-yellow-400' :
-                      'text-red-400'
-                    }`}>
-                      {formatPercent(healthAnalysis.overallScore)}
-                    </span>
-                  </div>
-                </div>
               </div>
             )}
 

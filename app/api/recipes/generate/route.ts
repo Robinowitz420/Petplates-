@@ -410,6 +410,10 @@ export async function POST(request: NextRequest) {
     const userId = typeof body.userId === 'string' && body.userId.trim() ? body.userId.trim() : 'anonymous';
 
     const debug = request.nextUrl.searchParams.get('debug') === '1';
+    const debugEnabled =
+      debug ||
+      process.env.NODE_ENV !== 'production' ||
+      ['true', '1'].includes(String(process.env.NEXT_PUBLIC_ENABLE_DEBUG ?? '').toLowerCase());
 
     const requestedByClient =
       typeof body.count === 'number' && Number.isFinite(body.count) && body.count > 0
@@ -419,15 +423,17 @@ export async function POST(request: NextRequest) {
     const requestedCount = Math.max(12, targetCount * 2);
     const maxAttempts = 6;
 
-    console.log('[API] Generating Gemini recipes for pet:', {
-      name: petProfile?.name,
-      species,
-      userId,
-      requestedCount,
-      healthConcerns: petProfile?.healthConcerns || [],
-      allergies: petProfile?.allergies || [],
-      bannedIngredients: petProfile?.bannedIngredients || [],
-    });
+    if (debugEnabled) {
+      console.log('[API] Generating Gemini recipes for pet:', {
+        name: petProfile?.name,
+        species,
+        userId,
+        requestedCount,
+        healthConcerns: petProfile?.healthConcerns || [],
+        allergies: petProfile?.allergies || [],
+        bannedIngredients: petProfile?.bannedIngredients || [],
+      });
+    }
 
     const allowedIngredientIds = getIngredientsForSpecies(species as any)
       .filter((i: any) => {
@@ -526,7 +532,9 @@ export async function POST(request: NextRequest) {
       const { payload, modelUsed } = generationResult;
       lastPayload = payload;
       lastModelUsed = modelUsed;
-      console.info(`[API] Gemini generation completed using model: ${modelUsed} (attempt ${attempt}/3)`);
+      if (debugEnabled) {
+        console.info(`[API] Gemini generation completed using model: ${modelUsed} (attempt ${attempt}/3)`);
+      }
 
       const generatedRecipesRaw = validateAndNormalizeRecipes({
         species,
