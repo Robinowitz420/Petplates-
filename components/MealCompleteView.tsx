@@ -30,6 +30,8 @@ import { getPortionPlan } from '@/lib/portionCalc';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
 import CustomMadeForLine from '@/components/CustomMadeForLine';
+import IngredientsTabImage from '@/public/images/Buttons/ingredients.png';
+import SupplementsTabImage from '@/public/images/Buttons/Supplements.jpg';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -274,11 +276,14 @@ export default function MealCompleteView({
         if (nutrition.phosphorus <= 0) nutritionalGaps.push('phosphorus');
       }
 
-      const recommendations = getRecommendationsForRecipe(
-        nutritionalGaps,
-        (scoringPet as any).type,
-        (scoringPet as any).healthConcerns || []
-      );
+      const recommendations =
+        scored.overallScore < 80
+          ? getRecommendationsForRecipe(
+              nutritionalGaps,
+              (scoringPet as any).type,
+              (scoringPet as any).healthConcerns || []
+            ).filter((r) => !r.isIngredient)
+          : [];
 
       setHealthAnalysis({
         overallScore: scored.overallScore,
@@ -655,12 +660,12 @@ export default function MealCompleteView({
             {/* Meal Title Card */}
             <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
               <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 lg:pr-[260px]">
                   <input
                     type="text"
                     value={mealName}
                     onChange={(e) => setMealName(e.target.value)}
-                    className="w-full px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 lg:pr-[260px]"
                     placeholder="Enter meal name..."
                   />
                   <CustomMadeForLine petName={petName} />
@@ -697,23 +702,35 @@ export default function MealCompleteView({
               <div className="flex border-b border-surface-highlight mb-6">
                 <button
                   onClick={() => setActiveTab('ingredients')}
-                  className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
                     activeTab === 'ingredients'
                       ? 'border-orange-500 text-orange-400'
                       : 'border-transparent text-gray-500 hover:text-gray-300'
                   }`}
                 >
-                  Ingredients
+                  <span className="sr-only">Ingredients</span>
+                  <Image
+                    src={IngredientsTabImage}
+                    alt="Ingredients"
+                    className={`h-8 w-auto ${activeTab === 'ingredients' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
                 </button>
                 <button
                   onClick={() => setActiveTab('supplements')}
-                  className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
                     activeTab === 'supplements'
                       ? 'border-orange-500 text-orange-400'
                       : 'border-transparent text-gray-500 hover:text-gray-300'
                   }`}
                 >
-                  Supplements
+                  <span className="sr-only">Supplements</span>
+                  <Image
+                    src={SupplementsTabImage}
+                    alt="Supplements"
+                    className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
                 </button>
               </div>
 
@@ -827,6 +844,30 @@ export default function MealCompleteView({
 
           {/* Sidebar */}
           <aside className="lg:col-span-2 space-y-8">
+            <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
+              <button
+                type="button"
+                onClick={handleSaveMeal}
+                disabled={!userId || !analysis || !mealName.trim() || isSaving || isSaved}
+                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}
+              >
+                <span className="relative h-32 w-full overflow-hidden rounded-2xl">
+                  <Image
+                    src={isSaved ? "/images/Buttons/MealSaved.png" : "/images/Buttons/SaveMeal.png"}
+                    alt={isSaved ? "Meal Saved" : "Save Meal"}
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
+                    priority
+                    unoptimized
+                  />
+                </span>
+                <span className="sr-only">{isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}</span>
+              </button>
+              {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
+            </div>
+
             {/* Health Analysis Panel */}
             {healthAnalysis && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
@@ -939,14 +980,6 @@ export default function MealCompleteView({
                   <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
                     <div className="text-gray-300">
                       Serving varies by species, size, age, and activity—create a pet profile for exact portions.
-                    </div>
-                    <div className="mt-3">
-                      <Link
-                        href="/sign-up"
-                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-800 text-white font-semibold hover:bg-green-900 transition-colors"
-                      >
-                        Create Free Account
-                      </Link>
                     </div>
                   </div>
                 )}

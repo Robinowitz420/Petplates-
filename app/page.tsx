@@ -4,6 +4,15 @@ import HomePageClient from '@/components/HomePageClient';
 import SocialProof, { TestimonialSection } from '@/components/SocialProof';
 import TrustBadges from '@/components/TrustBadges';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    alternates: {
+      canonical: '/',
+    },
+  };
+}
 
 export const dynamic = 'force-static';
 

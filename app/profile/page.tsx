@@ -35,6 +35,14 @@ import BioBanner from '@/public/images/Site Banners/BIO.png';
 import SavedMealsBanner from '@/public/images/Site Banners/SavedMeals.png';
 import MealPlanBanner from '@/public/images/Site Banners/MealPlan.png';
 import BadgesBanner from '@/public/images/Site Banners/Badges.png';
+import FindMealsUnclickedButton from '@/public/images/Buttons/FindMealsUnclicked.png';
+import FindMealsClickedButton from '@/public/images/Buttons/FindMealsClicked.png';
+import CreateMealUnclickedButton from '@/public/images/Buttons/CreateMealUnclicked.png';
+import CreateMealClickedButton from '@/public/images/Buttons/CreateMealClicked.png';
+import EditButton from '@/public/images/Buttons/Edit.png';
+import EditClickedButton from '@/public/images/Buttons/EditClicked.png';
+import DeleteButton from '@/public/images/Buttons/Delete.png';
+import DeleteClickedButton from '@/public/images/Buttons/DeleteClicked.png';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -1287,7 +1295,7 @@ const buildWeeklyPlan = useCallback(
     <div className="min-h-screen bg-background text-foreground py-6">
       <div className="max-w-screen-2xl mx-auto px-4 space-y-6">
         <header className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] items-center">
-          <div className="flex justify-center lg:translate-x-[200px]">
+          <div className="flex justify-center lg:translate-x-[130px]">
             <Image
               src="/images/Site Banners/MyPets.png"
               alt="My Pets"
@@ -1388,13 +1396,117 @@ const buildWeeklyPlan = useCallback(
               </div>
 
             {activePet ? (
-              <div className="bg-surface border border-surface-highlight rounded-2xl shadow-xl p-5 flex flex-col">
+              <div className="bg-surface border border-surface-highlight rounded-2xl shadow-xl p-5 pb-[80px] flex flex-col relative">
+                <div className="absolute bottom-2 left-2 flex gap-2">
+                  <Link
+                    href={`/profile/pet/${activePet.id}`}
+                    className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
+                    aria-label="Find Meals"
+                  >
+                    <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
+                      <Image
+                        src={FindMealsUnclickedButton}
+                        alt=""
+                        fill
+                        sizes="300px"
+                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                        priority
+                      />
+                      <Image
+                        src={FindMealsClickedButton}
+                        alt=""
+                        fill
+                        sizes="300px"
+                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                        priority
+                      />
+                    </span>
+                    <span className="sr-only">Find Meals</span>
+                  </Link>
+
+                  <Link
+                    href={`/profile/pet/${activePet.id}/recipe-builder`}
+                    className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
+                    aria-label="Create Meal"
+                  >
+                    <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
+                      <Image
+                        src={CreateMealUnclickedButton}
+                        alt=""
+                        fill
+                        sizes="300px"
+                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                        priority
+                      />
+                      <Image
+                        src={CreateMealClickedButton}
+                        alt=""
+                        fill
+                        sizes="300px"
+                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                        priority
+                      />
+                    </span>
+                    <span className="sr-only">Create Meal</span>
+                  </Link>
+                </div>
+
+                <div className="absolute bottom-[3px] right-2 flex gap-2">
+                  <button
+                    onClick={() => handleEditPet(activePet)}
+                    className="group inline-flex focus:outline-none rounded-md"
+                    aria-label="Edit Pet"
+                  >
+                    <span className="relative h-[80px] w-[120px] overflow-hidden">
+                      <Image
+                        src={EditButton}
+                        alt=""
+                        fill
+                        sizes="150px"
+                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                        priority
+                      />
+                      <Image
+                        src={EditClickedButton}
+                        alt=""
+                        fill
+                        sizes="150px"
+                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                        priority
+                      />
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleDeletePet(activePet.id)}
+                    className="group inline-flex focus:outline-none rounded-md"
+                    aria-label="Delete Pet"
+                  >
+                    <span className="relative h-[80px] w-[120px] overflow-hidden">
+                      <Image
+                        src={DeleteButton}
+                        alt=""
+                        fill
+                        sizes="150px"
+                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                        priority
+                      />
+                      <Image
+                        src={DeleteClickedButton}
+                        alt=""
+                        fill
+                        sizes="150px"
+                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                        priority
+                      />
+                    </span>
+                  </button>
+                </div>
                       <div className="flex-1">
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="relative float-left mr-4 mb-2 flex flex-col items-center" style={{ shapeOutside: 'circle(50%)', width: '168px', height: '260px' }}>
                             <h2
-                              className="text-xl font-bold text-center text-gray-100 whitespace-nowrap leading-tight"
+                              className="text-xl font-bold text-center text-gray-100 whitespace-nowrap leading-tight translate-y-[8px]"
                               style={{ margin: 0 }}
                             >
                               {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
@@ -1898,7 +2010,7 @@ const buildWeeklyPlan = useCallback(
                                   <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
                                     <div className="bg-surface rounded-xl border border-surface-highlight shadow-2xl max-w-lg w-full p-5">
                                       <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-lg font-bold text-foreground">Edit Meal Slot</h3>
+                                        <h2 className="text-3xl font-bold text-foreground">Edit Meal Slot</h2>
                                         <button
                                           onClick={() => setSwapTarget(null)}
                                           className="text-gray-400 hover:text-white"
@@ -1961,76 +2073,6 @@ const buildWeeklyPlan = useCallback(
                       </div>
 
                       </div>
-
-                      <div className="mt-4 pt-4 border-t border-surface-highlight flex items-center justify-between gap-3">
-                        <div className="flex flex-wrap gap-2">
-                          <Link
-                            href={`/profile/pet/${activePet.id}`}
-                            className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-xl"
-                            aria-label="Find Meals"
-                          >
-                            <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-xl">
-                              <Image
-                                src="/images/Buttons/FindMealsUnclicked.png"
-                                alt=""
-                                fill
-                                sizes="300px"
-                                className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                                priority
-                              />
-                              <Image
-                                src="/images/Buttons/FindMealsClicked.png"
-                                alt=""
-                                fill
-                                sizes="300px"
-                                className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                                priority
-                              />
-                            </span>
-                            <span className="sr-only">Find Meals</span>
-                          </Link>
-
-                          <Link
-                            href={`/profile/pet/${activePet.id}/recipe-builder`}
-                            className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-xl"
-                            aria-label="Create Meal"
-                          >
-                            <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-xl">
-                              <Image
-                                src="/images/Buttons/CreateMealUnclicked.png"
-                                alt=""
-                                fill
-                                sizes="300px"
-                                className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                                priority
-                              />
-                              <Image
-                                src="/images/Buttons/CreateMealClicked.png"
-                                alt=""
-                                fill
-                                sizes="300px"
-                                className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                                priority
-                              />
-                            </span>
-                            <span className="sr-only">Create Meal</span>
-                          </Link>
-                        </div>
-                        <div className="flex flex-wrap gap-2 justify-end">
-                          <button
-                            onClick={() => handleEditPet(activePet)}
-                            className="btn btn-success btn-sm"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeletePet(activePet.id)}
-                            className="btn btn-darkgreen btn-sm"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
               </div>
             ) : (
               <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-6 flex items-center justify-center text-center min-h-[280px]">
@@ -2077,3 +2119,5 @@ const buildWeeklyPlan = useCallback(
     </div>
   );
 }
+
+

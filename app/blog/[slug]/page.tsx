@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Bookmark } from 'lucide-react';
+import type { Metadata } from 'next';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
+import { blogIndex } from '@/lib/blog/blogIndex';
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
@@ -23,12 +25,35 @@ interface BlogPost {
   tags: string[];
 }
 
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const slug = `/blog/${params.slug}`;
+  const entry = blogIndex.find((p) => p.slug === slug);
+
+  const title = entry?.title || 'Pet Nutrition Blog - Paws & Plates';
+  const description = entry?.excerpt || 'Expert insights, research-backed advice, and the latest in pet nutrition science.';
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: slug,
+    },
+    openGraph: {
+      title,
+      description,
+      url: absoluteUrl(slug),
+    },
+  };
+}
+
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
+  const slug = `/blog/${params.slug}`;
+  const entry = blogIndex.find((p) => p.slug === slug);
 
   // Mock blog post data - in real app, this would come from a CMS or database
   const blogPost: BlogPost = {
     id: params.slug,
-    title: 'The Complete Guide to Homemade Dog Food: What Every Pet Parent Needs to Know',
+    title: entry?.title || 'The Complete Guide to Homemade Dog Food: What Every Pet Parent Needs to Know',
     content: `
       <p className="text-lg text-orange-300 leading-relaxed mb-6">
         Making homemade dog food can be incredibly rewarding, but it requires careful planning to ensure your dog gets complete, balanced nutrition. This comprehensive guide will walk you through everything you need to know to safely prepare nutritious meals at home.
@@ -184,10 +209,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         Remember, these are starting points. Every dog is unique, and their nutritional needs can vary based on age, activity level, health status, and individual metabolism. When in doubt, consult with a pet health specialist to create a diet perfectly tailored to your dog's needs.
       </p>
     `,
-    author: 'Dr. Sarah Mitchell, DVM',
-    date: '2024-11-20',
-    readTime: '8 min read',
-    category: 'Nutrition',
+    author: entry?.author || 'Dr. Sarah Mitchell, DVM',
+    date: entry?.date || '2024-11-20',
+    readTime: entry?.readTime || '8 min read',
+    category: entry?.category || 'Nutrition',
     image: '/images/emojis/Mascots/Prep Puppy.jpg',
     tags: ['homemade dog food', 'nutrition', 'recipes', 'pet health specialist advice']
   };
@@ -201,6 +226,23 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       {/* Navigation */}
       <div className="bg-surface border-b border-green-800/40">
         <div className="max-w-4xl mx-auto px-4 py-4">
+          <nav aria-label="Breadcrumb" className="text-sm text-white/70 mb-3">
+            <ol className="flex flex-wrap items-center gap-2">
+              <li>
+                <Link href="/" className="text-orange-300 hover:text-orange-200">
+                  Home
+                </Link>
+              </li>
+              <li className="text-white/50">→</li>
+              <li>
+                <Link href="/blog" className="text-orange-300 hover:text-orange-200">
+                  Blog
+                </Link>
+              </li>
+              <li className="text-white/50">→</li>
+              <li className="text-white">{blogPost.title}</li>
+            </ol>
+          </nav>
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-orange-300 hover:text-orange-200 font-medium"

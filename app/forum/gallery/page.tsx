@@ -9,6 +9,11 @@ import { getEmojiGroup } from '@/lib/utils/imageMapping';
 export default function CommunityGalleryPage() {
   const [communityRecipes, setCommunityRecipes] = useState<any[]>([]);
   const [filter, setFilter] = useState('all');
+  const [recentCutoff, setRecentCutoff] = useState<number | null>(null);
+
+  useEffect(() => {
+    setRecentCutoff(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  }, []);
 
   useEffect(() => {
     // Load all community modifications from localStorage
@@ -41,7 +46,10 @@ export default function CommunityGalleryPage() {
   const filteredRecipes = communityRecipes.filter(recipe => {
     if (filter === 'all') return true;
     if (filter === 'highly-rated') return recipe.averageRating >= 4;
-    if (filter === 'recent') return new Date(recipe.lastModified) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    if (filter === 'recent') {
+      if (!recentCutoff) return true;
+      return new Date(recipe.lastModified) > new Date(recentCutoff);
+    }
     if (filter === 'popular') return recipe.totalModifications >= 3;
     return true;
   });

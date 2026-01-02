@@ -168,6 +168,97 @@ export function getRecommendationsForDeficiency(
   return uniqueRecommendations;
 }
 
+function normalizeHealthConcern(value: string): string {
+  const raw = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-')
+    .replace(/\s+/g, '-');
+
+  if (!raw) return '';
+
+  const map: Record<string, string> = {
+    'allergy-support': 'allergy-support',
+    allergies: 'allergy-support',
+    allergy: 'allergy-support',
+    'weight-management': 'weight-management',
+    obesity: 'weight-management',
+    weight: 'weight-management',
+    'joint-health': 'joint-mobility',
+    'joint-&-mobility': 'joint-mobility',
+    arthritis: 'joint-mobility',
+    'joint-mobility': 'joint-mobility',
+    'digestive-health': 'digestive-health',
+    digestive: 'digestive-health',
+    'sensitive-stomach': 'digestive-health',
+    'skin-coat': 'skin-coat',
+    'skin-and-coat': 'skin-coat',
+    'skin-&-coat': 'skin-coat',
+    'dental-health': 'dental-health',
+    dental: 'dental-health',
+    'kidney-urinary': 'kidney-urinary',
+    kidney: 'kidney-urinary',
+    'kidney/urinary-support': 'kidney-urinary',
+  };
+
+  return map[raw] || raw;
+}
+
+function getCategoryRecommendations(
+  categories: string[],
+  species: 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet',
+  addressesDeficiency: string
+): RecommendedSupplement[] {
+  const recommendations: RecommendedSupplement[] = [];
+
+  const isCodLiverOil = (value: string | undefined | null): boolean =>
+    /\bcod\s+liver\s+oil\b/i.test(String(value || ''));
+
+  const supplementSpecies = species === 'pocket-pet' ? 'pocket-pets' : species === 'reptile' ? 'reptiles' : species;
+  const speciesSupplements = petSupplements[supplementSpecies as keyof typeof petSupplements];
+  if (!speciesSupplements) return recommendations;
+
+  for (const category of categories) {
+    const categorySupplements = speciesSupplements[category as keyof typeof speciesSupplements];
+    if (!Array.isArray(categorySupplements)) continue;
+
+    for (const supplement of categorySupplements) {
+      if (isCodLiverOil(supplement.name) || isCodLiverOil(supplement.description) || isCodLiverOil(supplement.amazonLink)) {
+        continue;
+      }
+
+      const lowerName = String(supplement.name || '').toLowerCase();
+      const lowerDesc = String(supplement.description || '').toLowerCase();
+      const isFishOilLike =
+        lowerName.includes('omega') ||
+        lowerName.includes('fish oil') ||
+        lowerName.includes('salmon oil') ||
+        lowerDesc.includes('omega') ||
+        lowerDesc.includes('fish oil') ||
+        lowerDesc.includes('salmon') ||
+        lowerDesc.includes('sardine') ||
+        lowerDesc.includes('anchovy');
+
+      const vettedProduct = isFishOilLike ? getVettedProduct('fish oil') : getVettedProduct(supplement.name);
+      const bestLink = ensureSellerId(vettedProduct?.asinLink || supplement.amazonLink);
+
+      recommendations.push({
+        name: supplement.name,
+        description: supplement.description,
+        benefits: supplement.benefits,
+        addressesDeficiency,
+        defaultAmount: 'As directed',
+        amazonLink: supplement.amazonLink,
+        asinLink: bestLink,
+        productName: vettedProduct?.productName || supplement.name,
+        vetNote: vettedProduct?.vetNote,
+      });
+    }
+  }
+
+  return recommendations;
+}
+
 /**
  * Get all recommendations for a recipe based on nutritional gaps
  */
@@ -178,9 +269,27 @@ export function getRecommendationsForRecipe(
 ): RecommendedSupplement[] {
   const allRecommendations: RecommendedSupplement[] = [];
 
-  for (const gap of nutritionalGaps) {
+  const normalizedGaps = Array.isArray(nutritionalGaps)
+    ? nutritionalGaps.map((g) => String(g || '').trim()).filter(Boolean)
+    : [];
+
+  for (const gap of normalizedGaps) {
     const recommendations = getRecommendationsForDeficiency(gap, species, healthConcerns);
     allRecommendations.push(...recommendations);
+  }
+
+  const normalizedConcerns = Array.isArray(healthConcerns)
+    ? healthConcerns.map(normalizeHealthConcern).filter(Boolean)
+    : [];
+
+  if (normalizedConcerns.length > 0) {
+    allRecommendations.push(
+      ...getCategoryRecommendations(
+        normalizedConcerns,
+        species,
+        `Health concern support: ${normalizedConcerns.join(', ')}`
+      )
+    );
   }
 
   // Remove duplicates

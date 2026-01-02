@@ -103,7 +103,7 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
           {/* Pet Type Selector */}
           <div className="mb-6">
             <p className="text-gray-300 text-sm mb-3 text-center">
-              👇 Pick your pet type to see example meals
+              👇 Pick your pet type to preview meals
             </p>
             <div className="flex justify-center gap-3 flex-wrap">
               {PET_TYPES.map(type => (
@@ -263,27 +263,6 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
             </div>
           )}
 
-          {/* Bottom CTA */}
-          <div className="mt-8 pt-6 border-t-2 border-orange-500/30">
-            <div className="bg-gradient-to-r from-orange-500/20 to-green-900/20 rounded-xl p-6 text-center border border-orange-500/30">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Want Personalized Recommendations?
-              </h3>
-              <p className="text-gray-300 mb-4">
-                Create a profile for your {selectedType.replace('-', ' ')} and get meals tailored to their specific needs, age, and health concerns.
-              </p>
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all border-3 border-orange-500"
-              >
-                Create Free Account
-                <ArrowRight size={20} />
-              </Link>
-              <p className="text-xs text-gray-500 mt-3">
-                Free forever • No credit card required
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

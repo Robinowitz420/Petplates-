@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -82,9 +83,6 @@ export const metadata: Metadata = {
     description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering.',
     images: [absoluteUrl('/images/emojis/Mascots/HeroPics/hero4.jpg')],
   },
-  alternates: {
-    canonical: siteUrl,
-  },
   verification: {
     // Add these later when you have accounts:
     // google: 'your-google-verification-code',
@@ -100,32 +98,39 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Additional SEO tags */}
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="dns-prefetch" href="//neat-grackle-2.clerk.accounts.dev" />
-        <link rel="preconnect" href="https://neat-grackle-2.clerk.accounts.dev" crossOrigin="anonymous" />
-        <meta name="theme-color" content="#043136" />
-        <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
-        <meta name="google-site-verification" content={googleSiteVerification} />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
-        />
-      </head>
-      <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
-        <ErrorBoundaryWrapper>
-          <Navigation />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </ErrorBoundaryWrapper>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          {/* Additional SEO tags */}
+          <link rel="icon" href="/favicon.ico" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <link rel="dns-prefetch" href="//neat-grackle-2.clerk.accounts.dev" />
+          <link rel="preconnect" href="https://neat-grackle-2.clerk.accounts.dev" crossOrigin="anonymous" />
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6986862746984728"
+            crossOrigin="anonymous"
+          />
+          <meta name="theme-color" content="#043136" />
+          <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
+          <meta name="google-site-verification" content={googleSiteVerification} />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
+          />
+        </head>
+        <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
+          <ErrorBoundaryWrapper>
+            <Navigation />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </ErrorBoundaryWrapper>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

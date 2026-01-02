@@ -1,4 +1,18 @@
-'use client';
+import { Metadata } from 'next';
+import { absoluteUrl } from '@/lib/siteUrl';
+
+export const metadata: Metadata = {
+  title: 'Contact Us - Paws & Plates',
+  description: 'Have a question about meal planning, partnerships, or support? We’re here to help. Contact the Paws & Plates team.',
+  alternates: {
+    canonical: '/contact',
+  },
+  openGraph: {
+    title: 'Contact Us - Paws & Plates',
+    description: 'Get in touch with the Paws & Plates team for support, partnerships, or any questions about our meal planning services.',
+    url: absoluteUrl('/contact'),
+  },
+};
 
 import Link from 'next/link';
 

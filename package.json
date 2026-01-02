@@ -14,7 +14,10 @@
     "prestart": "npm run clean:next",
     "start": "next start",
     "lint": "eslint \"app/**/*.{js,jsx,ts,tsx}\" \"components/**/*.{js,jsx,ts,tsx}\" \"hooks/**/*.{js,jsx,ts,tsx}\" \"lib/**/*.{js,jsx,ts,tsx}\" \"middleware.ts\" \"next.config.mjs\" \"config/**/*.{js,ts,mjs,cjs}\"",
-    "test": "vitest -c config/vitest.config.ts",
+    "lint:strict": "eslint --max-warnings 0 \"app/**/*.{js,jsx,ts,tsx}\" \"components/**/*.{js,jsx,ts,tsx}\" \"hooks/**/*.{js,jsx,ts,tsx}\" \"lib/**/*.{js,jsx,ts,tsx}\" \"middleware.ts\" \"next.config.mjs\" \"config/**/*.{js,ts,mjs,cjs}\"",
+    "lint:budget": "node scripts/lint-budget.mjs",
+    "test": "vitest run -c config/vitest.config.ts",
+    "test:watch": "vitest -c config/vitest.config.ts",
     "check": "npm run typecheck && npm run lint && npm run test --if-present && npm run build",
     "deadcode": "knip --exports --no-exit-code",
     "deps:check": "knip --dependencies --no-exit-code",
@@ -42,6 +45,9 @@
     "validate:retail:quick": "tsx lib/generator/Phase1_5_AutoClassify.ts 2>&1 | Select-String -Pattern 'RESULTS|accepted|review'",
     "audit:comprehensive": "tsx lib/generator/ComprehensiveAudit.ts",
     "prepare": "node scripts/prepare.js"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",
@@ -83,6 +89,7 @@
     "husky": "^9.1.7",
     "jsdom": "^27.2.0",
     "knip": "^5.78.0",
+    "lint-staged": "^15.2.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "tsconfig-paths": "^4.2.0",

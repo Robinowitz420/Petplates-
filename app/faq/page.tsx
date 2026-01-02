@@ -1,7 +1,19 @@
-'use client';
-
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
+
+export const metadata: Metadata = {
+  title: 'Frequently Asked Questions - Paws & Plates',
+  description: 'Answers to the most common questions about how Paws & Plates works, from meal planning to veterinarian approval.',
+  alternates: {
+    canonical: '/faq',
+  },
+  openGraph: {
+    title: 'Frequently Asked Questions - Paws & Plates',
+    description: 'Find answers to common questions about Paws & Plates.',
+    url: absoluteUrl('/faq'),
+  },
+};
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',

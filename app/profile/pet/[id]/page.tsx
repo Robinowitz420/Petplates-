@@ -449,6 +449,7 @@ export default function RecommendedRecipesPage() {
   }, [scoredMeals]);
 
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
+  const [isSaving, setIsSaving] = useState<string | null>(null);
 
   useEffect(() => {
     if (pet?.savedRecipes) {
@@ -457,8 +458,7 @@ export default function RecommendedRecipesPage() {
   }, [pet?.id]);
 
   const handleSaveRecipe = async (recipeId: string, recipeName: string) => {
-    if (!isLoaded) return;
-    if (!userId || !pet) return;
+    if (!isLoaded || !userId || !pet || isSaving) return;
 
     if (savedRecipeIds.has(recipeId)) {
       setCardMessage({ id: recipeId, text: 'Already saved for this pet.' });
@@ -466,17 +466,26 @@ export default function RecommendedRecipesPage() {
       return;
     }
 
-    const updatedPet = {
-      ...pet,
-      savedRecipes: [...(pet.savedRecipes || []), recipeId]
-    };
+    setIsSaving(recipeId);
 
-    await savePet(userId, updatedPet);
+    try {
+      const updatedPet = {
+        ...pet,
+        savedRecipes: [...(pet.savedRecipes || []), recipeId]
+      };
 
-    setPet(updatedPet);
-    setSavedRecipeIds(new Set([...savedRecipeIds, recipeId]));
-    setCardMessage({ id: recipeId, text: `${recipeName} added to ${petDisplayName}'s meals.` });
-    setTimeout(() => setCardMessage(null), 2500);
+      await savePet(userId, updatedPet);
+
+      setPet(updatedPet);
+      setSavedRecipeIds(new Set(updatedPet.savedRecipes));
+      setCardMessage({ id: recipeId, text: `${recipeName} added to ${petDisplayName}'s meals.` });
+      setTimeout(() => setCardMessage(null), 2500);
+    } catch (error) {
+      console.error('Failed to save recipe:', error);
+      // Optionally, revert state or show an error message
+    } finally {
+      setIsSaving(null);
+    }
   };
 
   if (!pet) {
@@ -571,7 +580,7 @@ export default function RecommendedRecipesPage() {
           </span>
           <div className="flex-1 flex flex-col gap-6 min-w-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0" style={{ marginLeft: '150px' }}>
+              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0">
                 Sherlock Shells is detecting meals for:
                 <span className="inline-flex items-center gap-3">
                   <span className="font-semibold text-2xl">{petDisplayName}</span>
@@ -580,14 +589,14 @@ export default function RecommendedRecipesPage() {
             </div>
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-              <div className="flex flex-col items-center flex-shrink-0 gap-0">
-                <span className="w-16 h-16 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle relative top-[-10px]">
+              <div className="flex flex-col items-center flex-shrink-0 gap-0" style={{ marginLeft: '-60px' }}>
+                <span className="w-48 h-48 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle -translate-y-[15px]">
                   <Image
                     src={getProfilePictureForPetType(pet.type)}
                     alt={`${petDisplayName} profile`}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-cover"
+                    width={192}
+                    height={192}
+                    className="w-48 h-48 object-cover"
                     unoptimized
                   />
                 </span>
@@ -613,9 +622,10 @@ export default function RecommendedRecipesPage() {
               </div>
 
               <div
-                className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1"
+                className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1 lg:-translate-y-[60px] pb-10"
                 style={{ marginLeft: '-65px' }}
               >
+
                 <div className="flex-shrink-0 min-w-[200px]">
                   <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
                   <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
@@ -781,19 +791,31 @@ export default function RecommendedRecipesPage() {
                               e.stopPropagation();
                               handleSaveRecipe(recipeId, recipe.name);
                             }}
-                            className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95"
-                            aria-label="Save Meal"
+                            disabled={isSaving === recipeId}
+                            className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50"
+                            aria-label={savedRecipeIds.has(recipeId) ? 'Meal Saved' : 'Save Meal'}
                           >
-                            <span className="relative h-16 w-full overflow-hidden rounded-2xl">
+                            <span className="relative h-12 w-full overflow-hidden rounded-2xl">
                               <Image
-                                src="/images/Buttons/SaveMeal.png"
-                                alt=""
+                                src={
+                                  isSaving === recipeId || savedRecipeIds.has(recipeId)
+                                    ? '/images/Buttons/MealSaved.png'
+                                    : '/images/Buttons/SaveMeal.png'
+                                }
+                                alt={savedRecipeIds.has(recipeId) ? 'Meal Saved' : 'Save Meal'}
                                 fill
                                 sizes="100vw"
                                 className="object-contain"
+                                unoptimized
                               />
                             </span>
-                            <span className="sr-only">Save Meal</span>
+                            <span className="sr-only">
+                              {isSaving === recipeId
+                                ? 'Saving...'
+                                : savedRecipeIds.has(recipeId)
+                                  ? 'Meal Saved'
+                                  : 'Save Meal'}
+                            </span>
                           </button>
                         </div>
                       </div>

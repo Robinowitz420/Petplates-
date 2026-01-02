@@ -69,7 +69,7 @@ function mapScoreToStars(score: number) {
 }
 
 // Helper function to get related keywords for health concerns
-function getRelatedKeywords(concern: string): string[] {
+function _getRelatedKeywords(concern: string): string[] {
   const keywordMap: Record<string, string[]> = {
     'allergies': ['skin', 'itch', 'immune', 'inflammatory'],
     'joint-health': ['arthritis', 'mobility', 'inflammatory', 'bone', 'cartilage'],

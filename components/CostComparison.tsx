@@ -8,7 +8,7 @@ interface CostComparisonProps {
   exceedsBudget?: boolean; // True if costPerMeal > 4.50
 }
 
-export function CostComparison({ costPerMeal, totalCost, estimatedMeals, className = '', exceedsBudget = false }: CostComparisonProps) {
+export function CostComparison({ costPerMeal, totalCost, estimatedMeals, className = '', exceedsBudget: _exceedsBudget = false }: CostComparisonProps) {
   const commercialCost = 4.50; // Average commercial pet food per meal
   const savings = commercialCost - costPerMeal;
   const savingsPercent = savings > 0 ? Math.round((savings / commercialCost) * 100) : 0;
@@ -24,10 +24,10 @@ export function CostComparison({ costPerMeal, totalCost, estimatedMeals, classNa
       
       <div className="grid md:grid-cols-2 gap-4">
         {/* Homemade */}
-        <div className="bg-surface rounded-lg p-4 border border-green-700/30">
+        <div className="bg-surface rounded-lg p-4 border border-green-700/30 text-center">
           <p className="text-sm text-gray-400 mb-2">Homemade (Your Cost)</p>
           <p className="text-3xl font-bold text-green-400">${costPerMeal.toFixed(2)}/meal</p>
-          <div className="mt-2 space-y-1">
+          <div className="mt-2 space-y-1 inline-block text-left">
             <p className="text-xs text-green-300">✓ Fresh ingredients</p>
             <p className="text-xs text-green-300">✓ Full control</p>
             <p className="text-xs text-green-300">✓ Custom nutrition</p>
@@ -35,7 +35,7 @@ export function CostComparison({ costPerMeal, totalCost, estimatedMeals, classNa
         </div>
         
         {/* Commercial */}
-        <div className="bg-surface rounded-lg p-4 border border-gray-700/30">
+        <div className="bg-surface rounded-lg p-4 border border-gray-700/30 text-center">
           <p className="text-sm text-gray-400 mb-2">Commercial Pet Food</p>
           <p className="text-3xl font-bold text-gray-400">${commercialCost.toFixed(2)}/meal</p>
           <p className="text-xs text-gray-500 mt-2">Typical premium brand</p>

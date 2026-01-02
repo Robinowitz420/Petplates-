@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatPercent } from '@/lib/utils/formatPercent';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 type CompatibilityRating = {
   overallScore: number;
@@ -49,17 +50,10 @@ export const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
 
       {/* Overall Score */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-lg font-semibold text-gray-900">Overall Compatibility</span>
-          <span className="text-2xl font-bold text-gray-900">{formatPercent(rating.overallScore)}</span>
+        <div className="flex flex-col items-center gap-2">
+          <CompatibilityRadial score={rating.overallScore} size={140} strokeWidth={10} label="Overall" />
+          <p className="text-sm text-gray-600 mt-2 capitalize">{rating.compatibility} match for your pet</p>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className={`h-3 rounded-full transition-all duration-300 ${getProgressBarColor(rating.overallScore)}`}
-            style={{ width: `${rating.overallScore}%` }}
-          />
-        </div>
-        <p className="text-sm text-gray-600 mt-2 capitalize">{rating.compatibility} match for your pet</p>
       </div>
 
       {/* Detailed Breakdown */}

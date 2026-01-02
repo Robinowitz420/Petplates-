@@ -1,4 +1,4 @@
-import { IngredientOption, ModifierRule, Species } from '@/lib/types';
+import type { IngredientOption, ModifierRule } from '@/lib/types';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 
 export const ingredientAlternatives: Record<string, string[]> = {

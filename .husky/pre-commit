@@ -38,8 +38,9 @@ if [ -n "$CSV_FILES" ]; then
   echo "$CSV_FILES"
   echo ""
   echo "Make sure these are intentional changes, not auto-generated artifacts."
-  echo "Press Enter to continue or Ctrl+C to abort..."
-  read
 fi
+
+echo "🧹 Running lint-staged (eslint --fix on staged JS/TS)..."
+npx lint-staged
 
 echo "✅ Pre-commit checks passed"

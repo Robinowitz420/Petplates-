@@ -169,41 +169,41 @@ export default function AboutPage() {
           <div className="space-y-10">
             {lineupRecords.map((record) => (
               <div key={record.name} className="rounded-lg border border-surface-highlight bg-background/40 p-6">
-                <div className="flex flex-col md:flex-row md:items-start gap-6">
-                  <div className="w-full md:w-[320px]">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                <div className="flex flex-col md:flex-row md:items-stretch gap-6">
+                  <div className="w-full md:w-[380px] flex flex-col h-full">
+                    <div className="grid grid-cols-2 gap-5">
+                      <div className="rounded-md border border-white/10 bg-black/20 p-4">
                         <div className="relative w-full aspect-square">
                           <Image
                             src={record.frontImage}
                             alt={`${record.name} front photo`}
                             fill
                             className="object-cover rounded"
-                            sizes="160px"
+                            sizes="220px"
                           />
                         </div>
                       </div>
-                      <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                      <div className="rounded-md border border-white/10 bg-black/20 p-4">
                         <div className="relative w-full aspect-square">
                           <Image
                             src={record.sideImage}
                             alt={`${record.name} side photo`}
                             fill
                             className="object-cover rounded grayscale"
-                            sizes="160px"
+                            sizes="220px"
                           />
                         </div>
                       </div>
                     </div>
                     {teamInfoByName[record.name] && (
-                      <div className="mt-4 rounded border border-white/10 bg-black/10 p-3 text-sm text-white/80">
+                      <div className="mt-4 rounded border border-white/10 bg-black/10 p-3 text-sm text-white/80 mt-auto">
                         <div className="text-orange-300 font-semibold">{teamInfoByName[record.name].title}</div>
                         <p className="mt-1">{teamInfoByName[record.name].bio}</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1">
+                  <div className="flex-1 flex flex-col">
                     <h3 className="text-2xl font-bold text-foreground">{record.name}</h3>
                     <div className="mt-4">
                       <div className="text-sm font-semibold text-orange-400">WANTED FOR</div>
@@ -213,7 +213,7 @@ export default function AboutPage() {
                         ))}
                       </ul>
                     </div>
-                    <div className="mt-5 rounded-md border border-white/10 bg-black/20 p-4 text-white/80">
+                    <div className="mt-5 rounded-md border border-white/10 bg-black/20 p-4 text-white/80 mt-auto">
                       <div className="text-sm font-semibold text-orange-400 mb-2">QUOTE</div>
                       <p className="text-sm">“{record.quote}”</p>
                     </div>
@@ -235,28 +235,15 @@ export default function AboutPage() {
           <p className="text-lg text-white/80 leading-relaxed mb-4">
             Pet Plates helps you plan homemade pet meals with clarity, structure, and safety — without pretending to replace your vet.
           </p>
-          <ul className="space-y-2 text-white/80">
-            <li className="flex items-start gap-2">
-              <span className="text-orange-400 mt-0.5">•</span>
-              <span>Ingredient-first meal planning</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-400 mt-0.5">•</span>
-              <span>Species-specific safety guardrails</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-400 mt-0.5">•</span>
-              <span>Clear nutrition explanations (not buzzwords)</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-400 mt-0.5">•</span>
-              <span>Built for real kitchens, real budgets</span>
-            </li>
+          <p className="text-white/80 leading-relaxed">
+            Pet Plates is a learning project. We test ideas about ingredient safety, nutrition guardrails, and how to make meal planning more transparent.
+          </p>
+          <ul className="mt-4 space-y-2 text-white/80">
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>We prioritize clarity over hype</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>We don’t hide edge cases</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>We show our assumptions</span></li>
           </ul>
           <p className="text-white/70 mt-4">We take pet food seriously — but not ourselves.</p>
-          <div className="mt-5">
-            <a href="/profile" className="btn btn-success btn-md">See how Pet Plates works</a>
-          </div>
         </section>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">

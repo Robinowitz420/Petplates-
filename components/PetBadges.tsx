@@ -39,9 +39,15 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
     return null;
   }
 
+  const sortedBadges = [...badges.badges].sort((a, b) => {
+    const aTime = a.unlockedAt ? new Date(a.unlockedAt).getTime() : 0;
+    const bTime = b.unlockedAt ? new Date(b.unlockedAt).getTime() : 0;
+    return aTime - bTime;
+  });
+
   return (
-    <div className={`flex flex-wrap justify-center gap-6 px-2 ${className}`}>
-      {badges.badges.map((badge) => {
+    <div className={`flex flex-wrap justify-start gap-3 px-2 ${className}`}>
+      {sortedBadges.map((badge) => {
         const definition = getBadgeDefinition(badge.type);
         if (!definition) return null;
 
@@ -75,12 +81,12 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
         return (
           <Tooltip key={`${badge.type}-${badge.tier || 'single'}`} content={tooltipContent} wide={true}>
             <div className="relative group">
-              <div className="w-[141px] h-[141px] rounded-full bg-surface-highlight border border-white/10 flex items-center justify-center hover:scale-110 transition-transform cursor-help">
+              <div className="w-12 h-12 rounded-full bg-surface-highlight border border-emerald-200 flex items-center justify-center hover:scale-105 transition-transform cursor-help">
                 <Image
                   src={iconPath}
                   alt={displayName}
-                  width={117}
-                  height={117}
+                  width={28}
+                  height={28}
                   className="object-contain no-invert-badge"
                   unoptimized
                   onError={(e) => {

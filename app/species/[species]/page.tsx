@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { guidesIndex } from '@/lib/guides/guidesIndex';
-import { getSiteUrl } from '@/lib/siteUrl';
+import { getSiteUrl, absoluteUrl } from '@/lib/siteUrl';
+import type { Metadata } from 'next';
 
 const BASE_URL = getSiteUrl();
 
@@ -86,6 +87,32 @@ export const dynamic = 'force-static';
 
 export const revalidate = 3600;
 
+export async function generateMetadata({ params }: { params: { species: string } }): Promise<Metadata> {
+  const species = params.species as SpeciesSlug;
+  const hub = speciesHubs[species];
+
+  if (!hub) {
+    return {};
+  }
+
+  const title = hub.title;
+  const description = hub.subtitle;
+  const url = absoluteUrl(`/species/${hub.slug}`);
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/species/${hub.slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+    },
+  };
+}
+
 export default async function SpeciesHubPage(props: { params: Promise<{ species: string }> }) {
   const params = await props.params;
   const raw = String(params?.species || '').trim();
@@ -148,18 +175,6 @@ export default async function SpeciesHubPage(props: { params: Promise<{ species:
 
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">{hub.title}</h1>
           <p className="mt-4 text-lg text-orange-200">{hub.subtitle}</p>
-
-          <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/?demo=1"
-              className="btn btn-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-3 border-orange-400 shadow-xl hover:shadow-2xl transition-all"
-            >
-              See Example Meals
-            </Link>
-            <Link href="/sign-up" className="btn btn-lg btn-success">
-              Create Free Account
-            </Link>
-          </div>
         </div>
       </header>
 

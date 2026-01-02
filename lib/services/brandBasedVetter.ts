@@ -1,9 +1,6 @@
 // lib/services/brandBasedVetter.ts
 // Brand-based product suggestions using analyze-brands.js data
 
-import fs from 'fs';
-import path from 'path';
-
 interface BrandMatch {
   ingredient: string;
   brand: string;

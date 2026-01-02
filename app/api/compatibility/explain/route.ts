@@ -32,7 +32,7 @@ type ExplainRequestBody = {
 
 type ExplainResponse = {
   summary: string;
-  healthConcerns: string;
+  healthConcernNotes: Array<{ concern: string; note: string }>;
   weight: string;
   age: string;
   modelUsed: string;
@@ -118,11 +118,19 @@ export async function POST(req: Request): Promise<NextResponse> {
     'You are a veterinary nutritionist. Return ONLY valid JSON. No markdown. No extra keys.\n\n' +
     'Task: Explain why this recipe is or is not a good fit for this specific pet.\n' +
     'You MUST address: (1) health concerns fit, (2) weight appropriateness, (3) age suitability.\n\n' +
+    'Use all available inputs, including pet allergies/dietaryRestrictions and score.warnings/score.strengths, to ground your reasoning.\n\n' +
+    'Important: For EVERY item in pet.healthConcerns, you must return one note in healthConcernNotes.\n' +
+    'If a concern cannot be evaluated from the provided data, say that explicitly and provide a safe, practical suggestion.\n\n' +
     'Output JSON schema:\n' +
     JSON.stringify(
       {
         summary: 'string (1-2 sentences)',
-        healthConcerns: 'string (2-4 sentences)',
+        healthConcernNotes: [
+          {
+            concern: 'string (exactly as provided in pet.healthConcerns)',
+            note: 'string (1-3 sentences, specific to this concern)',
+          },
+        ],
         weight: 'string (2-4 sentences)',
         age: 'string (2-4 sentences)',
       },
@@ -146,9 +154,35 @@ export async function POST(req: Request): Promise<NextResponse> {
       const text = await generateWithModel({ apiKey, model, prompt });
       const parsed = JSON.parse(cleanJSON(text));
 
+      const petConcerns = Array.isArray(pet.healthConcerns)
+        ? pet.healthConcerns.map((c) => String(c || '').trim()).filter(Boolean)
+        : [];
+
+      const rawNotes = Array.isArray(parsed?.healthConcernNotes) ? parsed.healthConcernNotes : [];
+      const normalizedNotes = rawNotes
+        .map((item: any) => {
+          const concern = String(item?.concern || '').trim();
+          const note = String(item?.note || '').trim();
+          return concern && note ? { concern, note } : null;
+        })
+        .filter(Boolean) as Array<{ concern: string; note: string }>;
+
+      const fallbackHealthConcernsText = String(parsed?.healthConcerns || '').trim();
+      const healthConcernNotes: Array<{ concern: string; note: string }> = petConcerns.map((concern) => {
+        const existing = normalizedNotes.find((n) => n.concern.toLowerCase() === concern.toLowerCase());
+        if (existing) return existing;
+        if (fallbackHealthConcernsText) {
+          return { concern, note: fallbackHealthConcernsText };
+        }
+        return {
+          concern,
+          note: 'No specific note available for this concern based on the current data. Consider confirming with your veterinarian.',
+        };
+      });
+
       const response: ExplainResponse = {
         summary: String(parsed?.summary || ''),
-        healthConcerns: String(parsed?.healthConcerns || ''),
+        healthConcernNotes,
         weight: String(parsed?.weight || ''),
         age: String(parsed?.age || ''),
         modelUsed: model,

@@ -115,7 +115,7 @@ export class UnifiedVettingService {
         const results = JSON.parse(fs.readFileSync(latestFile, 'utf-8'));
         return results[ingredientName] || [];
       }
-    } catch (error) {
+    } catch (_error) {
       // No Amazon results available
     }
     

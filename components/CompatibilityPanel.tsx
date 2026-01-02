@@ -2,6 +2,7 @@
 
 import { AlertTriangle, CheckCircle, XCircle, Target, Info } from 'lucide-react';
 import { MealAnalysis } from '@/lib/analyzeCustomMeal';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 interface CompatibilityPanelProps {
   analysis: MealAnalysis | null;
@@ -59,25 +60,16 @@ export default function CompatibilityPanel({
             {getScoreIcon(analysis.score)}
             <h3 className="font-semibold text-lg">Compatibility Score</h3>
           </div>
-          <div className="text-3xl font-bold">{analysis.score}/100</div>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="w-full bg-white/50 rounded-full h-3 mb-2">
-          <div
-            className={`h-3 rounded-full transition-[width] duration-500 ease-out will-change-[width] ${
-              analysis.score >= 80 ? 'bg-green-600' :
-              analysis.score >= 60 ? 'bg-yellow-600' :
-              'bg-red-600'
-            }`}
-            style={{ width: `${analysis.score}%` }}
-          />
         </div>
 
-        <div className="text-xs opacity-75 mt-2">
-          {analysis.score >= 80 && '✓ Excellent match for your pet'}
-          {analysis.score >= 60 && analysis.score < 80 && '⚠ Good, but could be improved'}
-          {analysis.score < 60 && '✗ Needs adjustments for safety'}
+        <div className="flex flex-col items-center gap-2">
+          <CompatibilityRadial score={analysis.score} size={120} strokeWidth={10} label="" />
+
+          <div className="text-xs opacity-75 mt-2">
+            {analysis.score >= 80 && '✓ Excellent match for your pet'}
+            {analysis.score >= 60 && analysis.score < 80 && '⚠ Good, but could be improved'}
+            {analysis.score < 60 && '✗ Needs adjustments for safety'}
+          </div>
         </div>
       </div>
 

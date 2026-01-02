@@ -3,6 +3,21 @@ import { Clock } from 'lucide-react';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 import Image from 'next/image';
 import BlogBanner from '@/public/images/Site Banners/BlogBanner.png';
+import { Metadata } from 'next';
+import { blogIndex } from '@/lib/blog/blogIndex';
+
+export const metadata: Metadata = {
+  title: 'Pet Nutrition Blog - Paws & Plates',
+  description: 'Expert insights, research-backed advice, and the latest in pet nutrition science from the team at Paws & Plates.',
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'Pet Nutrition Blog - Paws & Plates',
+    description: 'Expert insights, research-backed advice, and the latest in pet nutrition science.',
+    url: absoluteUrl('/blog'),
+  },
+};
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
@@ -13,62 +28,15 @@ const organizationJsonLd = {
 };
 
 export default function BlogPage() {
-  const blogPosts = [
-    {
-      id: 'complete-guide-homemade-dog-food',
-      title: 'The Complete Guide to Homemade Dog Food: What Every Pet Parent Needs to Know',
-      excerpt: 'Learn how to safely transition your dog to homemade meals while ensuring complete nutrition. Our pet health specialist-approved guide covers everything from ingredient selection to portion calculations.',
-      author: 'Dr. Sarah Mitchell, DVM',
-      date: '2024-11-20',
-      readTime: '8 min read',
-      category: 'Nutrition'
-    },
-    {
-      id: 'cat-nutrition-myths-debunked',
-      title: 'Cat Nutrition Myths Debunked: Separating Fact from Fiction',
-      excerpt: 'From "cats need milk" to "raw diets are dangerous," we examine common misconceptions about feline nutrition and provide evidence-based guidance.',
-      author: 'Dr. Michael Chen, Pet Health Specialist',
-      date: '2024-11-18',
-      readTime: '6 min read',
-      category: 'Myths',
-    },
-    {
-      id: 'fresh-pet-food-market-trends',
-      title: 'The Rise of Fresh Pet Food: Market Trends and What They Mean for Your Pet',
-      excerpt: 'The pet food industry is undergoing a revolution. Discover the latest trends in fresh, human-grade pet nutrition and how to choose the best options.',
-      author: 'Emma Rodriguez, Pet Industry Analyst',
-      date: '2024-11-15',
-      readTime: '5 min read',
-      category: 'Industry',
-    },
-    {
-      id: 'supplements-every-pet-needs',
-      title: 'Essential Supplements Every Pet Needs (And Why)',
-      excerpt: 'Not all pets need supplements, but many benefit from targeted nutritional support. Learn which supplements are essential and how to choose quality products.',
-      author: 'Dr. James Park, Pet Health Researcher',
-      date: '2024-11-12',
-      readTime: '7 min read',
-      category: 'Supplements',
-    },
-    {
-      id: 'reading-pet-food-labels',
-      title: 'How to Read Pet Food Labels Like a Pro',
-      excerpt: 'Pet food labels can be confusing, but they contain crucial information about nutrition. Master the art of label reading to make informed choices.',
-      author: 'Lisa Thompson, Pet Nutrition Consultant',
-      date: '2024-11-10',
-      readTime: '4 min read',
-      category: 'Education',
-    },
-    {
-      id: 'seasonal-pet-nutrition',
-      title: 'Seasonal Pet Nutrition: Adjusting Diets for Winter, Summer, and Everything In Between',
-      excerpt: 'Your pet\'s nutritional needs change with the seasons. Learn how to adjust their diet for optimal health year-round.',
-      author: 'Dr. Rachel Green, Holistic Veterinarian',
-      date: '2024-11-08',
-      readTime: '6 min read',
-      category: 'Seasonal',
-    }
-  ];
+  const blogPosts = blogIndex.map((p) => ({
+    id: p.slug.replace('/blog/', ''),
+    title: p.title,
+    excerpt: p.excerpt,
+    author: p.author,
+    date: p.date,
+    readTime: p.readTime,
+    category: p.category,
+  }));
 
   const categories = ['All', 'Nutrition', 'Myths', 'Industry', 'Supplements', 'Education', 'Seasonal'];
 
@@ -79,22 +47,22 @@ export default function BlogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       {/* Header */}
-      <div className="relative text-white py-12 px-4 overflow-hidden">
-        <Image
-          src={BlogBanner}
-          alt="Blog banner"
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative max-w-4xl mx-auto text-center">
+      <div className="text-white py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Pet Nutrition Blog
           </h1>
           <p className="text-lg text-orange-200">
             Expert insights, research-backed advice, and the latest in pet nutrition science
           </p>
+        </div>
+        <div className="max-w-5xl mx-auto flex justify-center">
+          <Image
+            src={BlogBanner}
+            alt="Blog banner"
+            priority
+            className="rounded-lg border border-orange-500 w-full sm:w-1/2 h-auto"
+          />
         </div>
       </div>
 

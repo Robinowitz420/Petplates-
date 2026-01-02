@@ -28,7 +28,7 @@ export function ensureSellerId(url: string | undefined | null): string {
     urlObj.searchParams.set('tag', SELLER_ID);
     
     return urlObj.toString();
-  } catch (e) {
+  } catch (_e) {
     // If URL parsing fails, try simple string manipulation as fallback
     if (url.includes('?')) {
       return `${url}&tag=${SELLER_ID}`;
@@ -117,7 +117,7 @@ export function extractASIN(url: string | undefined | null): string | null {
     if (asinParam && /^[A-Z0-9]{10}$/.test(asinParam)) {
       return asinParam;
     }
-  } catch (e) {
+  } catch (_e) {
     // Invalid URL, continue
   }
   
@@ -152,7 +152,7 @@ export function isValidAmazonUrl(url: string | undefined | null): boolean {
   try {
     const urlObj = new URL(url);
     return urlObj.hostname.includes('amazon.com') || urlObj.hostname.includes('amzn.');
-  } catch (e) {
+  } catch (_e) {
     return false;
   }
 }

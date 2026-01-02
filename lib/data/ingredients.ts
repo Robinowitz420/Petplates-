@@ -43,6 +43,28 @@ export interface Ingredient {
     CaP_ratio?: number;
     copper_mg_per_100g?: number;  // PHASE 2: Micronutrient toxicity
     iodine_mcg_per_100g?: number; // PHASE 2: Micronutrient toxicity
+
+    // --- TIER 1 (Critical) micronutrients ---
+    omega6_g_100g?: number;
+    vitaminD_mcg_100g?: number;
+    vitaminE_mg_100g?: number;
+    vitaminB12_mcg_100g?: number;
+    zinc_mg_100g?: number;
+    iron_mg_100g?: number;
+
+    // --- TIER 2 (Medium) micronutrients ---
+    magnesium_mg_100g?: number;
+    potassium_mg_100g?: number;
+    selenium_mcg_100g?: number;
+    folate_mcg_100g?: number;
+    vitaminB6_mg_100g?: number;
+    niacin_mg_100g?: number;
+
+    // --- TIER 3 (Lower) micronutrients ---
+    manganese_mg_100g?: number;
+    vitaminK_mcg_100g?: number;
+    sodium_mg_100g?: number;
+    chloride_mg_100g?: number;
   };
   
   // Species compatibility
@@ -157,6 +179,28 @@ function convertUnifiedToIngredient(unified: UnifiedIngredient): Ingredient {
       CaP_ratio: nutrition.CaP_ratio,
       copper_mg_per_100g: (nutrition as any).copper_mg_per_100g || micronutrients.copper_mg_per_100g,
       iodine_mcg_per_100g: (nutrition as any).iodine_mcg_per_100g || micronutrients.iodine_mcg_per_100g,
+
+      // --- TIER 1 ---
+      omega6_g_100g: (nutrition as any).omega6_g_100g,
+      vitaminD_mcg_100g: (nutrition as any).vitaminD_mcg_100g,
+      vitaminE_mg_100g: (nutrition as any).vitaminE_mg_100g,
+      vitaminB12_mcg_100g: (nutrition as any).vitaminB12_mcg_100g,
+      zinc_mg_100g: (nutrition as any).zinc_mg_100g,
+      iron_mg_100g: (nutrition as any).iron_mg_100g,
+
+      // --- TIER 2 ---
+      magnesium_mg_100g: (nutrition as any).magnesium_mg_100g,
+      potassium_mg_100g: (nutrition as any).potassium_mg_100g,
+      selenium_mcg_100g: (nutrition as any).selenium_mcg_100g,
+      folate_mcg_100g: (nutrition as any).folate_mcg_100g,
+      vitaminB6_mg_100g: (nutrition as any).vitaminB6_mg_100g,
+      niacin_mg_100g: (nutrition as any).niacin_mg_100g,
+
+      // --- TIER 3 ---
+      manganese_mg_100g: (nutrition as any).manganese_mg_100g,
+      vitaminK_mcg_100g: (nutrition as any).vitaminK_mcg_100g,
+      sodium_mg_100g: (nutrition as any).sodium_mg_100g,
+      chloride_mg_100g: (nutrition as any).chloride_mg_100g,
     },
     compatibility,
     feedingRole: (nutrition.feedingRole as any) || 'staple',

@@ -1,6 +1,5 @@
-import type { Recipe, ModifiedRecipeResult, PetNutritionProfile, PortionPlan, ShoppingListItem, WeeklyPlanEntry, AppliedModifierSummary } from './types';
+import type { Recipe, ModifiedRecipeResult, PetNutritionProfile, ShoppingListItem } from './types';
 import { dogModifiers } from './data/nutrition-dog-modifiers';
-import { catModifiers } from './data/nutrition-cat-modifiers';
 import { scoreRecipeImproved } from './scoreRecipe';
 import { getPortionPlan } from './portionCalc';
 import { scaleAmount } from './portionCalc';
@@ -8,7 +7,6 @@ import { recipes } from './data/recipes-complete';
 import { getVettedProduct, getAllAffiliateLinks, getGenericIngredientName } from './data/vetted-products'; // <--- UPDATED to use expanded vetted products with commission optimization
 import { matchesSpecies } from './utils/recipeRecommendations';
 import { normalizePetCategory } from './utils/petType';
-import { calculateRecipeNutrition } from './utils/recipeNutrition';
 
 interface ApplyModifiersResult {
   modifiedRecipe: Recipe;
@@ -45,10 +43,19 @@ const formatIngredientNameForDisplay = (value: string): string => {
 
 export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult & { conflictCount: number; hasHydrationSupport: boolean } {
   const petCategory = normalizePetCategory(pet?.type, 'applyModifiers');
-  const modifiers = petCategory === 'dogs' ? dogModifiers : petCategory === 'cats' ? catModifiers : {};
+  const modifiers = dogModifiers;
   const modifiedRecipe: Recipe = JSON.parse(JSON.stringify(recipe)); // Deep clone to modify
 
-  let addedIngredients: ApplyModifiersResult['addedIngredients'] = [];
+  if (petCategory !== 'dogs') {
+    return {
+      modifiedRecipe,
+      addedIngredients: [],
+      conflictCount: 0,
+      hasHydrationSupport: false,
+    };
+  }
+
+  const addedIngredients: ApplyModifiersResult['addedIngredients'] = [];
   let conflictCount = 0;
   let hasHydrationSupport = false;
 
@@ -167,48 +174,6 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
     });
   }
 
-  if (petCategory === 'cats') {
-    const allText = (
-      (modifiedRecipe.ingredients || []).map((i: any) => String(i?.name || '')).join(' ') +
-      ' ' +
-      (((modifiedRecipe as any).supplements || []) as any[]).map((s: any) => String(s?.name || s?.productName || '')).join(' ')
-    ).toLowerCase();
-
-    const hasCalciumSource =
-      allText.includes('eggshell') ||
-      allText.includes('egg shell') ||
-      allText.includes('calcium carbonate') ||
-      allText.includes('bone meal') ||
-      allText.includes('cuttlebone') ||
-      allText.includes('neck') ||
-      allText.includes('bone');
-
-    if (!hasCalciumSource) {
-      const nutrition = calculateRecipeNutrition(modifiedRecipe);
-      const ca = nutrition.calcium;
-      const p = nutrition.phosphorus;
-      const ratio = ca > 0 && p > 0 ? ca / p : 0;
-
-      const needsCalcium = ca <= 0 || p <= 0 || (ratio > 0 && (ratio < 1.0 || ratio > 2.0));
-      if (needsCalcium) {
-        const suppArr = (((modifiedRecipe as any).supplements || []) as any[]);
-        (modifiedRecipe as any).supplements = suppArr;
-        suppArr.push({
-          name: 'Eggshell Powder',
-          amount: '1/4 tsp',
-          notes: 'Added automatically to support calcium balance (Ca:P) for cats.',
-          category: 'supplement',
-        });
-        addedIngredients.push({
-          name: 'Eggshell Powder',
-          benefit: 'Supports calcium balance (Ca:P) for cats',
-          amazon: '',
-          forConcern: 'nutrition_balance',
-        });
-      }
-    }
-  }
-
   return {
     modifiedRecipe,
     addedIngredients,
@@ -311,7 +276,12 @@ export function generateModifiedRecommendations({ profile, recipeIds, limit, min
             weightKg: profile.weightKg,
         };
         // Apply modifiers, which now performs the ingredient vetting lookup (Step 2 in applyModifiers)
-        const { modifiedRecipe, addedIngredients, conflictCount, hasHydrationSupport } = applyModifiers(recipe, petForModifiers);
+        const {
+            modifiedRecipe,
+            addedIngredients,
+            conflictCount: _conflictCount,
+            hasHydrationSupport: _hasHydrationSupport,
+        } = applyModifiers(recipe, petForModifiers);
 
         const portionPlan = getPortionPlan(recipe, profile);
 

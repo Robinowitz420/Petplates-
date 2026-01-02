@@ -53,6 +53,8 @@ import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
 import CustomMadeForLine from '@/components/CustomMadeForLine';
 import ShoppingListBanner from '@/public/images/Site Banners/ShoppingList.png';
+import IngredientsTabImage from '@/public/images/Buttons/ingredients.png';
+import SupplementsTabImage from '@/public/images/Buttons/Supplements.jpg';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 
 // =================================================================
@@ -158,6 +160,19 @@ interface RecipeDetailPet {
   mealPlan: string[];
   savedRecipes: string[];
 }
+
+const toRecipeDetailPet = (pet: any): RecipeDetailPet => ({
+  id: String(pet?.id || ''),
+  names: Array.isArray(pet?.names) && pet.names.length > 0 ? pet.names : pet?.name ? [pet.name] : ['Unnamed Pet'],
+  type: String(pet?.type || 'dog'),
+  breed: String(pet?.breed || ''),
+  age: String(pet?.age || ''),
+  healthConcerns: Array.isArray(pet?.healthConcerns) ? pet.healthConcerns : [],
+  allergies: Array.isArray(pet?.allergies) ? pet.allergies : [],
+  weight: String(pet?.weight || ''),
+  mealPlan: Array.isArray(pet?.mealPlan) ? pet.mealPlan : [],
+  savedRecipes: Array.isArray(pet?.savedRecipes) ? pet.savedRecipes : [],
+});
 
 // Removed getPetsFromLocalStorage and savePetsToLocalStorage
 
@@ -294,6 +309,25 @@ export default function RecipeDetailPage() {
   const activePet = useMemo(() => {
     if (!activePetId) return null;
     return pets.find((p) => p.id === activePetId) || null;
+  }, [pets, activePetId]);
+
+  const modalPet = useMemo(() => {
+    const pet = pets.find((p) => p.id === activePetId);
+    if (!pet) return null;
+
+    const petType = normalizePetType(pet.type, 'recipe/[id].RecipeScoreModal');
+
+    return {
+      id: pet.id,
+      name: Array.isArray(pet.names) && pet.names.length > 0 ? pet.names[0] : 'Pet',
+      type: petType,
+      breed: pet.breed,
+      age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10,
+      weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
+      activityLevel: 'moderate' as const,
+      healthConcerns: pet.healthConcerns || [],
+      dietaryRestrictions: pet.allergies || [],
+    };
   }, [pets, activePetId]);
 
   const portionPlan = useMemo(() => {
@@ -487,14 +521,7 @@ export default function RecipeDetailPage() {
 
     getPersistedPets(userId)
       .then((loadedPets) => {
-        const normalized = (Array.isArray(loadedPets) ? loadedPets : []).map((p: any) => ({
-          ...p,
-          names: Array.isArray(p?.names) && p.names.length > 0 ? p.names : (p?.name ? [p.name] : ['Unnamed Pet']),
-          mealPlan: Array.isArray(p?.mealPlan) ? p.mealPlan : [],
-          savedRecipes: Array.isArray(p?.savedRecipes) ? p.savedRecipes : [],
-          healthConcerns: Array.isArray(p?.healthConcerns) ? p.healthConcerns : [],
-          allergies: Array.isArray(p?.allergies) ? p.allergies : [],
-        }));
+        const normalized: RecipeDetailPet[] = (Array.isArray(loadedPets) ? loadedPets : []).map(toRecipeDetailPet);
         setPets(normalized);
       })
       .catch((error) => {
@@ -509,6 +536,25 @@ export default function RecipeDetailPage() {
       setSelectedPetId(queryPetId);
     }
   }, [queryPetId, pets, selectedPetId]);
+
+  // Add event listener for cross-component state synchronization
+  useEffect(() => {
+    const handlePetsUpdated = () => {
+      if (userId) {
+        getPersistedPets(userId)
+          .then((loadedPets) => {
+            const normalized: RecipeDetailPet[] = (Array.isArray(loadedPets) ? loadedPets : []).map(toRecipeDetailPet);
+            setPets(normalized);
+          })
+          .catch(console.error);
+      }
+    };
+
+    window.addEventListener('petsUpdated', handlePetsUpdated);
+    return () => {
+      window.removeEventListener('petsUpdated', handlePetsUpdated);
+    };
+  }, [userId]);
 
   useEffect(() => {
     // Check if meal is already added for the current pet (saved only)
@@ -643,6 +689,59 @@ export default function RecipeDetailPage() {
     }
   }, [modifiedRecipe, vettedRecipe, recipe, activePetId, pets, scoreForQueryPet, animateScoreChange]);
 
+  const handleAddBuiltInSupplement = useCallback(
+    (supplementItem: any) => {
+      const baseRecipe: any = modifiedRecipe || vettedRecipe || recipe;
+      if (!baseRecipe) return;
+
+      const targetId = typeof supplementItem?.id === 'string' ? supplementItem.id : '';
+      const targetName = typeof supplementItem?.name === 'string' ? supplementItem.name : '';
+
+      const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
+      const nextId = `supplement-${Date.now()}`;
+
+      let promoted = false;
+      if (Array.isArray(newRecipe.ingredients)) {
+        newRecipe.ingredients = newRecipe.ingredients.map((ing: any) => {
+          const ingId = typeof ing?.id === 'string' ? ing.id : '';
+          const ingName = typeof ing?.name === 'string' ? ing.name : '';
+          const shouldPromote = (targetId && ingId === targetId) || (!targetId && targetName && ingName === targetName);
+          if (!shouldPromote) return ing;
+          promoted = true;
+          return {
+            ...ing,
+            id: nextId,
+          };
+        });
+      }
+
+      if (!promoted) {
+        const ingredientToAdd: any = {
+          id: nextId,
+          name: targetName || 'Supplement',
+          amount: supplementItem?.amount || '',
+          asinLink: supplementItem?.asinLink || undefined,
+          amazonLink: supplementItem?.asinLink || undefined,
+          amazonSearchUrl: supplementItem?.amazonSearchUrl || undefined,
+        };
+        if (!Array.isArray(newRecipe.ingredients)) newRecipe.ingredients = [];
+        newRecipe.ingredients.unshift(ingredientToAdd);
+      }
+
+      const vettedAdded = vetRecipeIngredients(newRecipe);
+      setModifiedRecipe(vettedAdded);
+      setActiveTab('ingredients');
+      setHopAddedLabel(targetName || 'Supplement');
+      setTimeout(() => setHopAddedLabel(null), 700);
+      try {
+        ingredientsTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch {
+        // ignore
+      }
+    },
+    [modifiedRecipe, vettedRecipe, recipe]
+  );
+
   useEffect(() => {
     if (!activePet || !scoreForQueryPet) {
       setRecommendedSupplements([]);
@@ -650,10 +749,10 @@ export default function RecipeDetailPage() {
     }
 
     const petType = normalizePetType(activePet.type, 'recipe/[id].supplementRecommendations');
-    const nutritionScoreRaw = (scoreForQueryPet as any)?.breakdown?.nutrition?.score;
-    const nutritionScore = typeof nutritionScoreRaw === 'number' && Number.isFinite(nutritionScoreRaw) ? nutritionScoreRaw : null;
+    const overallScoreRaw = (scoreForQueryPet as any)?.overallScore;
+    const overallScore = typeof overallScoreRaw === 'number' && Number.isFinite(overallScoreRaw) ? overallScoreRaw : null;
 
-    if (nutritionScore == null || nutritionScore >= 75) {
+    if (overallScore == null || overallScore >= 80) {
       setRecommendedSupplements([]);
       return;
     }
@@ -708,6 +807,8 @@ export default function RecipeDetailPage() {
     if (updatedPet) {
       await savePersistedPet(userId, updatedPet as any);
       setIsMealAdded(true);
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: currentPetId } }));
     }
 
     setPets(updatedPets);
@@ -787,6 +888,8 @@ export default function RecipeDetailPage() {
 
     const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
 
+    const supplementCategories = new Set(['Supplement', 'Oil']);
+
     const ingredientsEnrichedWithLinks = allIngredients.map((ing: any) => {
       const existingLink = ing?.asinLink || ing?.amazonLink;
       const rawName = typeof ing?.name === 'string' ? ing.name : '';
@@ -802,16 +905,33 @@ export default function RecipeDetailPage() {
           ? ensureSellerId(existingLink)
           : undefined;
 
+      const productCategory = typeof product?.category === 'string' ? product.category : undefined;
+
       return {
         ...ing,
         name: displayName,
         ...(product?.productName ? { productName: (ing as any)?.productName || product.productName } : {}),
         ...(enrichedLink ? { amazonLink: enrichedLink, asinLink: enrichedLink } : {}),
         amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName || rawName || 'ingredient')),
+        __productCategory: productCategory,
       };
     });
 
-    const ingredientItems = ingredientsEnrichedWithLinks.map((ing: any) => ({
+    const isUserAddedSupplement = (ing: any) => {
+      const id = typeof ing?.id === 'string' ? ing.id : '';
+      return id.startsWith('supplement-');
+    };
+
+    const isSupplementLike = (ing: any) => {
+      if (isUserAddedSupplement(ing)) return false;
+      const cat = typeof ing?.__productCategory === 'string' ? ing.__productCategory : '';
+      return supplementCategories.has(cat);
+    };
+
+    const ingredientCandidates = ingredientsEnrichedWithLinks.filter((ing: any) => !isSupplementLike(ing));
+    const supplementCandidates = ingredientsEnrichedWithLinks.filter((ing: any) => isSupplementLike(ing));
+
+    const ingredientItems = ingredientCandidates.map((ing: any) => ({
       id: ing.id,
       name: ing.name,
       amount: ing.amount || '',
@@ -821,7 +941,16 @@ export default function RecipeDetailPage() {
         ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'ingredient')),
     }));
 
-    const supplementItems: any[] = [];
+    const supplementItems = supplementCandidates.map((ing: any) => ({
+      id: ing.id,
+      name: ing.name,
+      amount: ing.amount || '',
+      asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
+      amazonSearchUrl:
+        ing.amazonSearchUrl ||
+        ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'supplement')),
+    }));
+
     const shoppingItems = [...ingredientItems];
 
     const totalCost = ingredientItems.reduce((sum: number, item: any) => {
@@ -920,102 +1049,118 @@ export default function RecipeDetailPage() {
       )}
 
       <div className="min-h-screen bg-background py-12 font-sans text-foreground">
-        {/* Breadcrumb */}
-        <Link
-          href="/profile"
-          className="inline-flex items-center text-gray-400 hover:text-primary-400 mb-6 font-medium transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5 mr-1" />
-          Back to My Pets
-        </Link>
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+          {/* Breadcrumb */}
+          <Link
+            href="/profile"
+            className="inline-flex items-center text-gray-400 hover:text-primary-400 mb-6 font-medium transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            Back to My Pets
+          </Link>
 
-        {/* Full-width title card with compatibility score + Save Meal */}
-        <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
-          <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-            <div className="min-w-0">
-              <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span>{recipe.name}</span>
-                  {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
-                      Experimental / Topper Only
+          {/* Full-width title card with compatibility score + Save Meal */}
+          <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
+            <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+              <div className="min-w-0 lg:pr-[260px]">
+                <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight leading-tight break-words">
+                  <div className="flex items-center gap-3 flex-wrap break-words">
+                    <span className="break-words">{recipe.name}</span>
+                    {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
+                        Experimental / Topper Only
+                      </span>
+                    )}
+                  </div>
+                </h1>
+
+                {activePet ? (
+                  <div className="ml-5 mt-[15px]">
+                    <CustomMadeForLine petName={getRandomName(activePet.names)} />
+                  </div>
+                ) : null}
+
+                <div className="flex flex-wrap gap-2">
+                  {recipe.tags?.filter((tag) => tag !== 'Generated').map((tag) => (
+                    <span
+                      key={tag}
+                      className="bg-surface-highlight text-gray-300 px-3 py-1 rounded-full text-sm font-medium border border-surface-highlight"
+                    >
+                      {tag}
                     </span>
-                  )}
+                  ))}
                 </div>
-              </h1>
-
-              {activePet ? (
-                <div className="ml-5 mt-[15px]">
-                  <CustomMadeForLine petName={getRandomName(activePet.names)} />
-                </div>
-              ) : null}
-
-              <div className="flex flex-wrap gap-2">
-                {recipe.tags?.filter((tag) => tag !== 'Generated').map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-surface-highlight text-gray-300 px-3 py-1 rounded-full text-sm font-medium border border-surface-highlight"
-                  >
-                    {tag}
-                  </span>
-                ))}
               </div>
-            </div>
 
-            {scoreForQueryPet && activePet && (
-              <PetCompatibilityBlock
-                avatarSrc={getProfilePictureForPetType(activePet.type)}
-                avatarAlt={`${getRandomName(activePet.names)} profile`}
-                spacerClassName="w-16 shrink-0 bg-surface"
-                right={
-                  <button
-                    type="button"
-                    onClick={() => setIsScoreModalOpen(true)}
-                    className="rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
-                  >
-                    <div className="flex items-center gap-5">
-                      <CompatibilityRadial score={scoreForQueryPet.overallScore} size={118} strokeWidth={10} label="" />
-                      <div className="text-left">
-                        <div className="text-sm font-semibold text-gray-200">Compatibility</div>
-                        <div className="text-xs text-gray-400 mt-1">Tap for details</div>
+              {scoreForQueryPet && activePet && (
+                <PetCompatibilityBlock
+                  avatarSrc={getProfilePictureForPetType(activePet.type)}
+                  avatarAlt={`${getRandomName(activePet.names)} profile`}
+                  spacerClassName="w-16 shrink-0 bg-surface"
+                  right={
+                    <button
+                      type="button"
+                      onClick={() => setIsScoreModalOpen(true)}
+                      className="rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
+                    >
+                      <div className="flex items-center gap-5">
+                        <CompatibilityRadial score={scoreForQueryPet.overallScore} size={118} strokeWidth={10} label="" />
+                        <div className="text-left">
+                          <div className="text-sm font-semibold text-gray-200">Compatibility</div>
+                          <div className="text-xs text-gray-400 mt-1">Tap for details</div>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                }
-              />
-            )}
+                    </button>
+                  }
+                />
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <main className="lg:col-span-3">
             {/* Ingredients & Supplements Tabs */}
             <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3 flex items-center gap-2">
-                <ShoppingCart size={22} />
-                Shopping List
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3 flex items-center justify-center">
+                <Image
+                  src={ShoppingListBanner}
+                  alt="Shopping List"
+                  className="h-auto w-full max-w-md border-[2px] border-orange-500/60 rounded-lg"
+                />
               </h3>
               {/* Tab Navigation */}
               <div className="flex border-b border-surface-highlight mb-6">
                 <button
                   onClick={() => setActiveTab('ingredients')}
-                  className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
                     activeTab === 'ingredients'
                       ? 'border-orange-500 text-orange-400'
                       : 'border-transparent text-gray-500 hover:text-gray-300'
                   }`}
                 >
-                  Ingredients
+                  <span className="sr-only">Ingredients</span>
+                  <Image
+                    src={IngredientsTabImage}
+                    alt="Ingredients"
+                    className={`h-8 w-auto ${activeTab === 'ingredients' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
                 </button>
                 <button
                   onClick={() => setActiveTab('supplements')}
-                  className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
                     activeTab === 'supplements'
                       ? 'border-orange-500 text-orange-400'
                       : 'border-transparent text-gray-500 hover:text-gray-300'
                   }`}
                 >
-                  Supplements
+                  <span className="sr-only">Supplements</span>
+                  <Image
+                    src={SupplementsTabImage}
+                    alt="Supplements"
+                    className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
                 </button>
               </div>
 
@@ -1062,13 +1207,6 @@ export default function RecipeDetailPage() {
 
                   {ingredientShoppingItems.length > 0 ? (
                     <>
-                      <div className="mb-4 flex justify-center">
-                        <Image
-                          src={ShoppingListBanner}
-                          alt="Shopping List"
-                          className="h-auto w-full max-w-md"
-                        />
-                      </div>
                       <ShoppingList
                         ingredients={ingredientShoppingItems}
                         recipeName={recipe.name}
@@ -1086,6 +1224,48 @@ export default function RecipeDetailPage() {
 
               {activeTab === 'supplements' && (
                 <div className="space-y-4">
+                  {supplementShoppingItems.length > 0 ? (
+                    <div className="space-y-4">
+                      {supplementShoppingItems.map((supplementItem: any) => {
+                        const link = supplementItem?.asinLink || supplementItem?.amazonLink || supplementItem?.amazonSearchUrl;
+                        return (
+                          <div
+                            key={supplementItem.id || supplementItem.name}
+                            className="rounded-xl border border-surface-highlight bg-surface-lighter p-5"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                              <div className="min-w-0">
+                                <div className="text-lg font-bold text-gray-100">{supplementItem.name}</div>
+                                {supplementItem.amount ? (
+                                  <div className="mt-2 text-xs text-gray-400">Suggested: {supplementItem.amount}</div>
+                                ) : null}
+                              </div>
+                              <div className="flex flex-col gap-2 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddBuiltInSupplement(supplementItem)}
+                                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-green-800 text-white border border-green-900 hover:bg-green-900 transition-colors"
+                                >
+                                  Add to meal
+                                </button>
+                                {link ? (
+                                  <a
+                                    href={ensureSellerId(link)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-surface border border-orange-500/60 text-orange-200 hover:border-orange-500 hover:text-orange-100 transition-colors"
+                                  >
+                                    Buy
+                                  </a>
+                                ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+
                   {recommendedSupplements.length > 0 ? (
                     <div className="space-y-4">
                       {recommendedSupplements.map((supplement) => {
@@ -1127,13 +1307,13 @@ export default function RecipeDetailPage() {
                         );
                       })}
                     </div>
-                  ) : (
+                  ) : supplementShoppingItems.length === 0 ? (
                     <div className="py-10 flex justify-center">
                       <span className="inline-flex items-center px-4 py-2 rounded-full bg-green-900/40 text-green-200 border border-green-700/50 text-sm font-semibold">
                         Meal is Complete!
                       </span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
@@ -1173,7 +1353,7 @@ export default function RecipeDetailPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-400 mb-4">
-                  Proffessor Purfessor has found these individual factors that contribute to the overall compatibility score
+                  Professor Purfessor is here to break it down for you!
                 </p>
                 <div className="space-y-3">
                   {Object.entries(scoreForQueryPet.breakdown)
@@ -1252,18 +1432,17 @@ export default function RecipeDetailPage() {
                 🧊 Storage & Serving
               </h3>
               <div className="space-y-4 text-sm text-gray-300">
-                {portionPlan ? (
-                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
-                    <div className="font-semibold text-gray-200">Suggested serving for your pet</div>
-                    <div className="text-gray-300 mt-1">
-                      {portionPlan.dailyGrams}g per day ({portionPlan.mealsPerDay} meals/day)
-                    </div>
-                  </div>
-                ) : null}
-
                 <div>
                   <div className="font-semibold text-gray-200">Storage</div>
                   <ul className="mt-2 space-y-1">
+                    {portionPlan ? (
+                      <li className="flex items-start gap-2 text-gray-300">
+                        <span className="text-orange-400 mt-0.5">•</span>
+                        <span>
+                          Suggested serving size: {portionPlan.dailyGrams}g per day ({portionPlan.mealsPerDay} meals/day)
+                        </span>
+                      </li>
+                    ) : null}
                     <li className="flex items-start gap-2 text-gray-300">
                       <span className="text-orange-400 mt-0.5">•</span>
                       <span>Fridge: Store in airtight container up to 3 days</span>
@@ -1311,19 +1490,20 @@ export default function RecipeDetailPage() {
                 onClick={handleAddToMealPlan}
                 disabled={!userId || !activePetId || isAddingMeal || isMealAdded}
                 className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+                aria-label={isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}
               >
-                <span className="relative h-16 w-full overflow-hidden rounded-2xl">
+                <span className="relative h-32 w-full overflow-hidden rounded-2xl">
                   <Image
-                    src="/images/Buttons/SaveMeal.png"
-                    alt=""
+                    src={isMealAdded ? "/images/Buttons/MealSaved.png" : "/images/Buttons/SaveMeal.png"}
+                    alt={isMealAdded ? "Meal Saved" : "Save Meal"}
                     fill
                     sizes="100vw"
                     className="object-contain"
                     priority
+                    unoptimized
                   />
                 </span>
-                <span className="sr-only">{isMealAdded ? 'Added' : isAddingMeal ? 'Saving…' : 'Save Meal'}</span>
+                <span className="sr-only">{isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}</span>
               </button>
               {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
               {userId && !activePetId && <div className="mt-2 text-xs text-gray-400">Select a pet to add</div>}
@@ -1331,28 +1511,14 @@ export default function RecipeDetailPage() {
 
           </aside>
         </div>
+        </div>
       </div>
 
       {/* Recipe Score Modal */}
       {isScoreModalOpen && scoreForQueryPet && (
         <RecipeScoreModal
           recipe={recipe}
-          pet={(() => {
-            const pet = pets.find((p) => p.id === activePetId);
-            if (!pet) return null;
-            const petType = normalizePetType(pet.type, 'recipe/[id].RecipeScoreModal');
-            return {
-              id: pet.id,
-              name: getRandomName(pet.names),
-              type: petType,
-              breed: pet.breed,
-              age: pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10,
-              weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
-              activityLevel: 'moderate' as const,
-              healthConcerns: pet.healthConcerns || [],
-              dietaryRestrictions: pet.allergies || []
-            };
-          })()}
+          pet={modalPet}
           onClose={() => setIsScoreModalOpen(false)}
         />
       )}

@@ -4569,11 +4569,18 @@ function classifyCostTier(price: number): 'budget' | 'standard' | 'premium' {
  * @param preferBudget If true, prioritize budget-tier products when multiple options exist.
  */
 export function getVettedProduct(
-  genericName: string,
+  genericName?: string | null,
   species?: 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets' | string,
   preferBudget?: boolean
 ): VettedProduct | undefined {
+  if (typeof genericName !== 'string') {
+    return undefined;
+  }
+
   const normalizedName = genericName.toLowerCase().trim();
+  if (!normalizedName) {
+    return undefined;
+  }
   
   // If preferBudget is true, collect all compatible products and filter by tier
   if (preferBudget) {
@@ -4589,23 +4596,23 @@ export function getVettedProduct(
     const normalized = normalizeIngredientName(genericName);
     product = VETTED_PRODUCTS[normalized];
     if (product && isProductCompatibleWithSpecies(product, species)) {
-      if (!candidates.some(c => c.asinLink === product.asinLink)) {
+      if (!candidates.some((c) => c.asinLink === product.asinLink)) {
         candidates.push(product);
       }
     }
     
     // Try reverse lookup by productName
     const productByReverseLookup = Object.values(VETTED_PRODUCTS).find(
-      p => p.productName.toLowerCase() === normalizedName && isProductCompatibleWithSpecies(p, species)
+      (p) => p.productName.toLowerCase() === normalizedName && isProductCompatibleWithSpecies(p, species)
     );
-    if (productByReverseLookup && !candidates.some(c => c.asinLink === productByReverseLookup.asinLink)) {
+    if (productByReverseLookup && !candidates.some((c) => c.asinLink === productByReverseLookup.asinLink)) {
       candidates.push(productByReverseLookup);
     }
     
     // If we have candidates, prioritize budget tier
     if (candidates.length > 0) {
       // Get prices and classify tiers
-      const withTiers = candidates.map(p => ({
+      const withTiers = candidates.map((p) => ({
         product: p,
         price: p.price?.amount || 999, // High price if missing
         tier: p.costTier || classifyCostTier(p.price?.amount || 999),
@@ -4652,7 +4659,7 @@ export function getVettedProduct(
   
   // Try reverse lookup by productName (for branded names)
   const productByReverseLookup = Object.values(VETTED_PRODUCTS).find(
-    p => p.productName.toLowerCase() === normalizedName
+    (p) => p.productName.toLowerCase() === normalizedName
   );
   if (productByReverseLookup) {
     // Check species compatibility
@@ -4707,9 +4714,7 @@ function isProductCompatibleWithSpecies(
   }
   
   if (Array.isArray(product.species)) {
-    const isCompatible = product.species.some(
-      s => s.toLowerCase() === normalizedSpecies
-    );
+    const isCompatible = product.species.some((s) => s.toLowerCase() === normalizedSpecies);
     if (isCompatible) {
       return !hasSpeciesMismatchInName(product.productName, species);
     }
@@ -4730,9 +4735,11 @@ function hasSpeciesMismatchInName(productName: string, species: string): boolean
   
   // Check for explicit "for Dogs" / "for Cats" patterns
   if (speciesLower === 'cats') {
-    if (nameLower.includes('for dogs') || 
-        nameLower.includes('for dog') ||
-        (nameLower.includes('dog food') && !nameLower.includes('cat'))) {
+    if (
+      nameLower.includes('for dogs') ||
+      nameLower.includes('for dog') ||
+      (nameLower.includes('dog food') && !nameLower.includes('cat'))
+    ) {
       if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
         console.warn(`[Species Mismatch] Rejecting product "${productName}" for cats (contains "for Dogs" or "dog food")`);
       }
@@ -4741,9 +4748,11 @@ function hasSpeciesMismatchInName(productName: string, species: string): boolean
   }
   
   if (speciesLower === 'dogs') {
-    if (nameLower.includes('for cats') || 
-        nameLower.includes('for cat') ||
-        (nameLower.includes('cat food') && !nameLower.includes('dog'))) {
+    if (
+      nameLower.includes('for cats') ||
+      nameLower.includes('for cat') ||
+      (nameLower.includes('cat food') && !nameLower.includes('dog'))
+    ) {
       if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
         console.warn(`[Species Mismatch] Rejecting product "${productName}" for dogs (contains "for Cats" or "cat food")`);
       }
@@ -4761,8 +4770,15 @@ function hasSpeciesMismatchInName(productName: string, species: string): boolean
  * @param productName The specific branded product name
  * @returns The generic ingredient name (key) or undefined
  */
-export function getGenericIngredientName(productName: string): string | undefined {
+export function getGenericIngredientName(productName?: string | null): string | undefined {
+  if (typeof productName !== 'string') {
+    return undefined;
+  }
+
   const normalizedProductName = productName.toLowerCase().trim();
+  if (!normalizedProductName) {
+    return undefined;
+  }
   
   // Search through all vetted products to find a match
   for (const [genericKey, product] of Object.entries(VETTED_PRODUCTS)) {

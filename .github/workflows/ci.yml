@@ -26,6 +26,9 @@ jobs:
       - name: Health check
         run: npm run check
 
+      - name: Lint budget
+        run: npm run lint:budget
+
       - name: Dead code report (warning)
         run: npm run deadcode
 

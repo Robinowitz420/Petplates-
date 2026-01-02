@@ -1,337 +1,51 @@
-'use client';
+import { Suspense } from 'react';
+import { Metadata } from 'next';
+import { absoluteUrl } from '@/lib/siteUrl';
+import ForumClientPage from './client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { MessageSquare, Users, TrendingUp, Plus, Search, Filter, ThumbsUp, MessageCircle, Eye, ChefHat } from 'lucide-react';
-import Image from 'next/image';
-import CommunityBanner from '@/public/images/Site Banners/CommunityBanner.png';
+export async function generateMetadata(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const category = searchParams?.category;
+
+  if (category) {
+    return {
+      title: 'Pet Nutrition Community - Paws & Plates',
+      description: 'Connect with fellow pet parents, share recipes, get advice from experts, and learn from real experiences in our supportive community.',
+      robots: {
+        index: false,
+        follow: true,
+      },
+      alternates: {
+        canonical: '/forum',
+      },
+      openGraph: {
+        title: 'Pet Nutrition Community - Paws & Plates',
+        description: 'Join the conversation about pet nutrition, recipes, and health.',
+        url: absoluteUrl('/forum'),
+      },
+    };
+  }
+
+  return {
+    title: 'Pet Nutrition Community - Paws & Plates',
+    description: 'Connect with fellow pet parents, share recipes, get advice from experts, and learn from real experiences in our supportive community.',
+    alternates: {
+      canonical: '/forum',
+    },
+    openGraph: {
+      title: 'Pet Nutrition Community - Paws & Plates',
+      description: 'Join the conversation about pet nutrition, recipes, and health.',
+      url: absoluteUrl('/forum'),
+    },
+  };
+}
 
 export default function ForumPage() {
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const categories = [
-    { id: 'all', name: 'All Topics', count: 1247, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
-    { id: 'recipes', name: 'Recipe Discussions', count: 456, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
-    { id: 'nutrition', name: 'Nutrition Questions', count: 234, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
-    { id: 'health', name: 'Health & Conditions', count: 189, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
-    { id: 'training', name: 'Training & Behavior', count: 156, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
-    { id: 'products', name: 'Product Reviews', count: 98, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' },
-    { id: 'general', name: 'General Discussion', count: 114, color: 'bg-green-900/20 text-orange-300 border border-green-800/40' }
-  ];
-
-  const forumThreads = [
-    {
-      id: 1,
-      title: "Homemade chicken and rice recipe - my dog won't eat it!",
-      author: "SarahPetMom",
-      avatar: "/images/avatars/sarah.jpg",
-      category: "recipes",
-      replies: 23,
-      views: 1456,
-      lastReply: "2 hours ago",
-      lastReplyBy: "ChefMike",
-      isSticky: false,
-      tags: ["chicken", "rice", "picky-eater"],
-      excerpt: "I've been trying this recipe for 3 days now but my golden retriever just sniffs it and walks away. Any suggestions for making it more appealing?"
-    },
-    {
-      id: 2,
-      title: "STICKY: Community Recipe Contest - Winter Warmers!",
-      author: "Paws & Plates",
-      avatar: "/images/avatars/admin.jpg",
-      category: "recipes",
-      replies: 67,
-      views: 3241,
-      lastReply: "1 hour ago",
-      lastReplyBy: "RecipeQueen",
-      isSticky: true,
-      tags: ["contest", "winter", "featured"],
-      excerpt: "Share your best warming recipes for cold weather! Winner gets featured on our blog and a $50 Amazon gift card. Contest ends December 15th."
-    },
-    {
-      id: 3,
-      title: "Kidney disease diet modifications - success stories?",
-      author: "HopefulOwner",
-      avatar: "/images/avatars/hope.jpg",
-      category: "health",
-      replies: 34,
-      views: 892,
-      lastReply: "4 hours ago",
-      lastReplyBy: "KidneyWarrior",
-      isSticky: false,
-      tags: ["kidney-disease", "success-story", "chronic-illness"],
-      excerpt: "My 12-year-old lab was diagnosed with early kidney disease. We've been on a homemade diet for 6 months. Anyone else have positive experiences to share?"
-    },
-    {
-      id: 4,
-      title: "Best supplements for senior dogs (8+ years)",
-      author: "SeniorDogDad",
-      avatar: "/images/avatars/senior.jpg",
-      category: "nutrition",
-      replies: 28,
-      views: 756,
-      lastReply: "6 hours ago",
-      lastReplyBy: "VetAssistant",
-      isSticky: false,
-      tags: ["senior-dogs", "supplements", "joint-health"],
-      excerpt: "My 10-year-old shepherd has arthritis. What supplements have you found most helpful for mobility and joint health?"
-    },
-    {
-      id: 5,
-      title: "Cat food recipes that actually work",
-      author: "CatLady2024",
-      avatar: "/images/avatars/cat.jpg",
-      category: "recipes",
-      replies: 45,
-      views: 1234,
-      lastReply: "3 hours ago",
-      lastReplyBy: "FelineExpert",
-      isSticky: false,
-      tags: ["cats", "recipes", "picky-eaters"],
-      excerpt: "My Maine Coon is so picky! She turns her nose up at most commercial foods. What homemade recipes have worked for your finicky felines?"
-    },
-    {
-      id: 6,
-      title: "Allergy testing vs elimination diet - which is better?",
-      author: "AllergyMom",
-      avatar: "/images/avatars/allergy.jpg",
-      category: "health",
-      replies: 19,
-      views: 543,
-      lastReply: "8 hours ago",
-      lastReplyBy: "Dermatologist",
-      isSticky: false,
-      tags: ["allergies", "testing", "elimination-diet"],
-      excerpt: "My vet recommended allergy testing ($300) but I'm considering trying an elimination diet first. What has your experience been?"
-    }
-  ];
-
-  const stats = [
-    { label: 'Active Members', value: '12,847', icon: Users, color: 'text-orange-400' },
-    { label: 'Discussions', value: '3,421', icon: MessageSquare, color: 'text-orange-400' },
-    { label: 'Recipes Shared', value: '1,892', icon: TrendingUp, color: 'text-orange-400' },
-    { label: 'Success Stories', value: '756', icon: ThumbsUp, color: 'text-orange-400' }
-  ];
-
-  const filteredThreads = forumThreads.filter(thread => {
-    const matchesCategory = activeCategory === 'all' || thread.category === activeCategory;
-    const matchesSearch = searchQuery === '' ||
-      thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      thread.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      thread.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
-
   return (
-    <div className="min-h-screen bg-background">
-
-      {/* Header */}
-      <div className="relative text-white py-16 px-4 overflow-hidden">
-        <Image
-          src={CommunityBanner}
-          alt="Community banner"
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="relative max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Pet Nutrition Community
-          </h1>
-          <p className="text-xl text-orange-200 max-w-3xl mx-auto">
-            Connect with fellow pet parents, share recipes, get advice from experts,
-            and learn from real experiences in our supportive community.
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Community Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-surface rounded-lg shadow-md p-6 text-center">
-
-              <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color}`} />
-              <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-white/70">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Quick Links */}
-        <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
-
-          <h3 className="text-lg font-semibold text-orange-400 mb-4">Explore Community</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/forum/gallery"
-              className="flex items-center gap-3 p-4 border border-green-800/40 rounded-lg hover:bg-surface-highlight transition-colors"
-            >
-              <ChefHat className="w-8 h-8 text-orange-400" />
-              <div>
-                <div className="font-semibold text-white">Recipe Gallery</div>
-                <div className="text-sm text-white/70">Browse community modifications</div>
-              </div>
-            </Link>
-            <Link
-              href="/forum?category=recipes"
-              className="flex items-center gap-3 p-4 border border-green-800/40 rounded-lg hover:bg-surface-highlight transition-colors"
-            >
-              <MessageSquare className="w-8 h-8 text-orange-400" />
-              <div>
-                <div className="font-semibold text-white">Recipe Discussions</div>
-                <div className="text-sm text-white/70">Ask questions, share tips</div>
-              </div>
-            </Link>
-            <Link
-              href="/forum?category=health"
-              className="flex items-center gap-3 p-4 border border-green-800/40 rounded-lg hover:bg-surface-highlight transition-colors"
-            >
-              <Users className="w-8 h-8 text-orange-400" />
-              <div>
-                <div className="font-semibold text-white">Health Support</div>
-                <div className="text-sm text-white/70">Connect with other pet parents</div>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
-
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-300/70 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search discussions, recipes, or topics..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-surface border border-green-800/40 rounded-lg text-white placeholder:text-orange-300/60 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50"
-              />
-            </div>
-            <button className="px-6 py-3 bg-green-800 text-white border-[3px] border-orange-500 rounded-lg hover:bg-green-900 transition-colors flex items-center gap-2">
-              <Plus className="w-5 h-5" />
-              Start Discussion
-            </button>
-          </div>
-
-          {/* Category Filters */}
-          <div className="flex flex-wrap gap-2 mt-4">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === category.id
-                    ? 'bg-green-800 text-white border-[3px] border-orange-500'
-                    : category.color + ' hover:bg-surface-highlight hover:text-orange-200'
-                }`}
-              >
-                {category.name} ({category.count})
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Forum Threads */}
-        <div className="space-y-4">
-          {filteredThreads.map((thread) => (
-            <div key={thread.id} className="bg-surface rounded-lg shadow-md hover:shadow-lg transition-shadow">
-
-              <div className="p-6">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className="w-12 h-12 bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0 border border-green-800/40">
-                    <span className="text-orange-300 font-semibold text-lg">
-                      {thread.author.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-
-                  {/* Thread Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {thread.isSticky && (
-                            <span className="bg-green-900/20 text-orange-300 border border-green-800/40 px-2 py-1 rounded text-xs font-medium">
-                              STICKY
-                            </span>
-                          )}
-                          <span className="px-2 py-1 rounded text-xs font-medium bg-green-900/20 text-orange-300 border border-green-800/40">
-                            {categories.find(c => c.id === thread.category)?.name}
-                          </span>
-                        </div>
-
-                        <Link href="/forum">
-                          <h3 className="text-lg font-semibold text-white hover:text-orange-200 transition-colors mb-2">
-                            {thread.title}
-                          </h3>
-                        </Link>
-
-                        <p className="text-white/70 text-sm mb-3 line-clamp-2">
-                          {thread.excerpt}
-                        </p>
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {thread.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="bg-green-900/20 text-orange-300/90 border border-green-800/40 px-2 py-1 rounded text-xs"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Thread Meta */}
-                        <div className="flex items-center gap-4 text-sm text-white/70">
-                          <span>by <strong className="text-orange-300">{thread.author}</strong></span>
-                          <span>Last reply {thread.lastReply} by {thread.lastReplyBy}</span>
-                        </div>
-                      </div>
-
-                      {/* Thread Stats */}
-                      <div className="flex flex-col items-end gap-2 text-sm text-white/70">
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="w-4 h-4" />
-                          <span>{thread.replies} replies</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{thread.views.toLocaleString()} views</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Load More */}
-        <div className="text-center mt-8">
-          <button className="px-6 py-3 bg-surface border border-orange-500/60 text-orange-300 rounded-lg hover:bg-surface-highlight hover:text-orange-200 transition-colors">
-            Load More Discussions
-          </button>
-        </div>
-
-        {/* Community Guidelines */}
-        <div className="bg-surface border border-green-800/40 rounded-lg p-6 mt-8">
-          <h3 className="text-lg font-semibold text-orange-400 mb-3">Community Guidelines</h3>
-          <ul className="text-white/80 text-sm space-y-2">
-            <li>• Be respectful and supportive of fellow pet parents</li>
-            <li>• Always consult your veterinarian for health-related advice</li>
-            <li>• Share your experiences and learn from others</li>
-            <li>• No spam, self-promotion, or inappropriate content</li>
-            <li>• Report any concerns to our moderation team</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForumClientPage />
+    </Suspense>
   );
 }

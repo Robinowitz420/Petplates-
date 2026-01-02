@@ -54,9 +54,9 @@ export async function processAmazonPurchaseConfirmation(
  * Verify Amazon webhook signature
  */
 export function verifyAmazonWebhookSignature(
-  signature: string,
-  payload: string,
-  secret: string
+  _signature: string,
+  _payload: string,
+  _secret: string
 ): boolean {
   // TODO: Implement Amazon webhook signature verification
   // This would use HMAC-SHA256 to verify the signature
