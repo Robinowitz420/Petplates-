@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { CheckCircle, AlertTriangle, XCircle, Info, Plus, Save, ShoppingCart, Star, ChevronLeft } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { CheckCircle, AlertTriangle, XCircle, Info, Plus, Save, ShoppingCart, Star, ChevronLeft, Edit3 } from 'lucide-react';
 import { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
 import MealCompositionList from '@/components/MealCompositionList';
 import { generateMealName } from '@/lib/utils/mealNameGenerator';
@@ -12,7 +12,7 @@ import Tooltip from '@/components/Tooltip';
 import { getPets } from '@/lib/utils/petStorage';
 import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendations';
 import { logger } from '@/lib/utils/logger';
-import { getProductByIngredient, getProductPrice, getProductUrl } from '@/lib/data/product-prices';
+import { getProductUrl } from '@/lib/data/product-prices';
 import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
@@ -23,6 +23,7 @@ import { debugEnabled, debugLog } from '@/lib/utils/debugLog';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
+import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
 import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { formatPercent } from '@/lib/utils/formatPercent';
@@ -31,7 +32,12 @@ import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
 import CustomMadeForLine from '@/components/CustomMadeForLine';
 import IngredientsTabImage from '@/public/images/Buttons/ingredients.png';
-import SupplementsTabImage from '@/public/images/Buttons/Supplements.jpg';
+import SupplementsTabImage from '@/public/images/Buttons/Supplements.png';
+import RecipeScoreModal from '@/components/RecipeScoreModal';
+import AlphabetText from '@/components/AlphabetText';
+import ShoppingListBanner from '@/public/images/Site Banners/ShoppingList.png';
+import StorageServingBanner from '@/public/images/Site Banners/unnamed.jpg';
+import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -113,6 +119,11 @@ export default function MealCompleteView({
   const [healthAnalysis, setHealthAnalysis] = useState<any>(null);
   const [isCalculatingHealthAnalysis, setIsCalculatingHealthAnalysis] = useState(false);
   const [activeTab, setActiveTab] = useState<'ingredients' | 'supplements'>('ingredients');
+  const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [scoreContext, setScoreContext] = useState<{ recipe: Recipe; pet: any } | null>(null);
+  const renameInputRef = useRef<HTMLInputElement | null>(null);
+  const [isRenamingMeal, setIsRenamingMeal] = useState(false);
+  const [draftMealName, setDraftMealName] = useState('');
 
   const debug = debugEnabled;
 
@@ -158,6 +169,45 @@ export default function MealCompleteView({
     }
   }, [analysis, pet, selectedIngredients, getIngredientDisplayName, petName, mealName]);
 
+  useEffect(() => {
+    if (!mealName) {
+      setMealName('Custom Meal');
+    }
+  }, [mealName]);
+
+  useEffect(() => {
+    if (isRenamingMeal) {
+      setDraftMealName(mealName.trim() || 'Custom Meal');
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }
+  }, [isRenamingMeal, mealName]);
+
+  const commitRename = useCallback(() => {
+    const next = draftMealName.trim();
+    setMealName(next.length > 0 ? next : 'Custom Meal');
+    setIsRenamingMeal(false);
+  }, [draftMealName]);
+
+  const cancelRename = useCallback(() => {
+    setDraftMealName(mealName.trim() || 'Custom Meal');
+    setIsRenamingMeal(false);
+  }, [mealName]);
+
+  const handleRenameKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        commitRename();
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelRename();
+      }
+    },
+    [commitRename, cancelRename],
+  );
+
   const handleSaveMeal = async () => {
     if (!analysis || !mealName.trim()) {
       return;
@@ -200,6 +250,7 @@ export default function MealCompleteView({
   useEffect(() => {
     if (!analysis || selectedIngredients.length === 0) {
       setHealthAnalysis(null);
+      setScoreContext(null);
       setIsCalculatingHealthAnalysis(false);
       return;
     }
@@ -261,71 +312,105 @@ export default function MealCompleteView({
       const scored = scoreWithSpeciesEngine(recipe, scoringPet);
 
       const nutrition = calculateRecipeNutrition(recipe);
-      const nutritionalGaps: string[] = [];
+      const fallbackNutritionalGaps: string[] = [];
       if ((scoringPet as any).type === 'cat') {
         const joined = (recipe.ingredients || []).map((i: any) => String(i?.name || '')).join(' ').toLowerCase();
-        if (!joined.includes('taurine') && !joined.includes('heart')) nutritionalGaps.push('taurine');
+        if (!joined.includes('taurine') && !joined.includes('heart')) fallbackNutritionalGaps.push('taurine');
       }
-      if (nutrition.protein < 18) nutritionalGaps.push('protein');
-      if (nutrition.fiber < 2) nutritionalGaps.push('fiber');
+      if (nutrition.protein < 18) fallbackNutritionalGaps.push('protein');
+      if (nutrition.fiber < 2) fallbackNutritionalGaps.push('fiber');
       if (nutrition.calcium > 0 && nutrition.phosphorus > 0) {
         const ratio = nutrition.calcium / nutrition.phosphorus;
-        if (ratio < 1.0 || ratio > 2.0) nutritionalGaps.push('ca:p');
+        if (ratio < 1.0 || ratio > 2.0) fallbackNutritionalGaps.push('ca:p');
       } else {
-        if (nutrition.calcium <= 0) nutritionalGaps.push('calcium');
-        if (nutrition.phosphorus <= 0) nutritionalGaps.push('phosphorus');
+        if (nutrition.calcium <= 0) fallbackNutritionalGaps.push('calcium');
+        if (nutrition.phosphorus <= 0) fallbackNutritionalGaps.push('phosphorus');
       }
 
-      const recommendations =
+      const rawBreakdown = scored.raw?.factors ?? {};
+      const breakdown = Object.entries(rawBreakdown).reduce(
+        (acc, [key, factor]) => {
+          const f = factor as {
+            score?: number;
+            weight?: number;
+            reasoning?: string;
+            issues?: string[];
+            strengths?: string[];
+            recommendations?: any[];
+          };
+          const score = typeof f.score === 'number' && Number.isFinite(f.score) ? f.score : 0;
+          const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
+          acc[key] = {
+            score,
+            weightedContribution: Math.round(score * weight),
+            weight,
+            reason:
+              f.reasoning && f.reasoning.trim().length > 0
+                ? f.reasoning
+                : (Array.isArray(f.issues) && f.issues.length > 0
+                    ? f.issues.join('; ')
+                    : Array.isArray(f.strengths) && f.strengths.length > 0
+                      ? f.strengths.join('; ')
+                      : ''),
+            recommendations: f.recommendations,
+          };
+          return acc;
+        },
+        {} as Record<string, { score: number; weightedContribution: number; weight: number; reason?: string; recommendations?: any[] }>,
+      );
+
+      const rawRecommendations = Array.isArray(scored.raw?.detailedBreakdown?.recommendations)
+        ? (scored.raw?.detailedBreakdown?.recommendations as any[])
+        : [];
+      const fallbackRecommendations =
         scored.overallScore < 80
           ? getRecommendationsForRecipe(
-              nutritionalGaps,
+              fallbackNutritionalGaps,
               (scoringPet as any).type,
-              (scoringPet as any).healthConcerns || []
-            ).filter((r) => !r.isIngredient)
+              (scoringPet as any).healthConcerns || [],
+            )
           : [];
+      const combinedRecommendations = rawRecommendations.length > 0 ? rawRecommendations : fallbackRecommendations;
+      const supplementRecommendations = combinedRecommendations.filter((r: any) => !r?.isIngredient);
+
+      const rawNutritionalGaps = Array.isArray(scored.raw?.detailedBreakdown?.nutritionalGaps)
+        ? (scored.raw?.detailedBreakdown?.nutritionalGaps as string[])
+        : [];
+      const nutritionalGaps = rawNutritionalGaps.length > 0 ? rawNutritionalGaps : fallbackNutritionalGaps;
+
+      const summaryReasoning = scored.warnings.length > 0
+        ? scored.warnings.slice(0, 3).join('. ')
+        : scored.strengths.length > 0
+          ? scored.strengths.slice(0, 3).join('. ')
+          : 'Custom meal evaluated for compatibility with your pet.';
 
       setHealthAnalysis({
         overallScore: scored.overallScore,
-        compatibility: scored.grade === 'A+' || scored.grade === 'A' ? 'excellent' :
-                       scored.grade === 'B+' || scored.grade === 'B' ? 'good' :
-                       scored.grade === 'C+' || scored.grade === 'C' ? 'fair' : 'poor',
-        breakdown: {
-          petTypeMatch: {
-            score: scored.factors.safety,
-            weightedContribution: Math.round(scored.factors.safety * 0.3),
-            weight: 0.3,
-            reason: '',
-          },
-          ageAppropriate: {
-            score: 0,
-            weightedContribution: 0,
-            weight: 0,
-            reason: '',
-          },
-          healthCompatibility: {
-            score: scored.factors.health,
-            weightedContribution: Math.round(scored.factors.health * 0.2),
-            weight: 0.2,
-            reason: '',
-          },
-          activityFit: {
-            score: 0,
-            weightedContribution: 0,
-            weight: 0,
-            reason: '',
-          },
-          allergenSafety: {
-            score: 0,
-            weightedContribution: 0,
-            weight: 0,
-            reason: '',
-          },
-        },
+        compatibility:
+          scored.grade === 'A+' || scored.grade === 'A'
+            ? 'excellent'
+            : scored.grade === 'B+' || scored.grade === 'B'
+              ? 'good'
+              : scored.grade === 'C+' || scored.grade === 'C'
+                ? 'fair'
+                : 'poor',
+        breakdown,
         warnings: scored.warnings,
         strengths: scored.strengths,
-        nutritionalGaps: nutritionalGaps,
-        recommendations: recommendations,
+        nutritionalGaps,
+        recommendations: supplementRecommendations,
+        summaryReasoning,
+        usesFallbackNutrition:
+          Array.isArray(scored.raw?.detailedBreakdown?.nutritionalGaps) &&
+          scored.raw?.detailedBreakdown?.nutritionalGaps.includes('fallback-nutrition'),
+      });
+
+      setScoreContext({
+        recipe,
+        pet: {
+          ...scoringPet,
+          weightKg: scoringPet.weightKg ?? scoringPet.weight,
+        },
       });
 
       // Check badges on meal creation (Preparation + Perfect Match if applicable)
@@ -344,8 +429,7 @@ export default function MealCompleteView({
       // Log error but don't hide the compatibility score
       console.error('Error calculating enhanced health analysis:', error);
       logger.error('Error calculating enhanced health analysis', error);
-      // Keep existing healthAnalysis if there was one, otherwise null
-      // Don't set to null here - let the fallback score show instead
+      setScoreContext(null);
       setIsCalculatingHealthAnalysis(false);
     }
   }, [pet, analysis, selectedIngredients, mealName, petName, petBreed, petAge, petWeight, petType, petId, getIngredientDisplayName, totalGrams, userId]);
@@ -421,18 +505,6 @@ export default function MealCompleteView({
     return Math.max(1, Math.round(rawServings));
   }, [analysis?.recommendedServingGrams, totalGrams]);
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
-    if (score >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-red-600 bg-red-50 border-red-200';
-  };
-
-  const getScoreIcon = (score: number) => {
-    if (score >= 80) return <CheckCircle size={24} className="text-green-600" />;
-    if (score >= 60) return <AlertTriangle size={24} className="text-yellow-600" />;
-    return <XCircle size={24} className="text-red-600" />;
-  };
-
   const getProgressGradientColor = (score: number) => {
     if (score === 0) return '#dc2626'; // red-600
     if (score <= 10) return '#dc2626'; // red-600
@@ -453,6 +525,39 @@ export default function MealCompleteView({
   const displayScoreRounded = Math.round(displayScore);
   const compatibility = healthAnalysis?.compatibility ?? 
     (displayScore >= 80 ? 'excellent' : displayScore >= 60 ? 'good' : displayScore >= 40 ? 'fair' : 'poor');
+  const canShowScoreDetails = !!scoreContext;
+  const hasCompatibilityScore = Boolean(healthAnalysis) || (typeof analysis?.score === 'number' && Number.isFinite(analysis.score));
+
+  const scoreAdvisory =
+    displayScoreRounded < 70
+      ? '⚠️ Needs attention — add supplements or adjust ingredients.'
+      : displayScoreRounded < 80
+        ? 'Add the recommended supplements to reach complete nutrition.'
+        : 'Great match for your pet!';
+  const scoreAdvisoryClass =
+    displayScoreRounded < 70 ? 'text-red-300' : displayScoreRounded < 80 ? 'text-amber-300' : 'text-gray-400';
+  const healthScore = typeof healthAnalysis?.overallScore === 'number' ? healthAnalysis.overallScore : null;
+  const recommendedPanelClass =
+    healthScore !== null && healthScore < 70 ? 'bg-red-900/30 border-red-700/60' : 'bg-orange-900/20 border border-orange-700/50';
+  const recommendedHeadingClass =
+    healthScore !== null && healthScore < 70 ? 'text-red-200' : 'text-orange-200';
+  const HEALTH_BREAKDOWN_ORDER = ['ingredientSafety', 'nutritionalAdequacy', 'healthAlignment', 'ingredientQuality'];
+  const HEALTH_BREAKDOWN_LABELS: Record<string, string> = {
+    ingredientSafety: 'ingredient safety',
+    nutritionalAdequacy: 'nutritional adequacy',
+    healthAlignment: 'health alignment',
+    ingredientQuality: 'ingredient quality',
+  };
+
+  const handleOpenScoreModal = useCallback(() => {
+    if (!scoreContext) return;
+    if (userId && petId) {
+      checkAllBadges(userId, petId, { action: 'score_details_viewed' }).catch(() => {
+        // ignore
+      });
+    }
+    setIsScoreModalOpen(true);
+  }, [scoreContext, userId, petId]);
 
   const SUPPLEMENT_KEYWORDS = [
     'vitamin',
@@ -579,6 +684,30 @@ export default function MealCompleteView({
 
   // Get recommended supplements
   const recommendedSupplements = healthAnalysis?.recommendations || [];
+  const recommendedSupplementShoppingItems = useMemo(() => {
+    return recommendedSupplements.map((supplement, index) => {
+      const baseId = (supplement.name || supplement.productName || `supplement-${index}`)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-');
+      const link = supplement.asinLink || supplement.amazonLink;
+      const fallbackName = supplement.productName || supplement.name || 'Recommended supplement';
+
+      return {
+        id: `recommended-${index}-${baseId}`,
+        name: fallbackName,
+        amount: supplement.defaultAmount || 'As directed',
+        ...(link ? { asinLink: ensureSellerId(link) } : {}),
+        amazonSearchUrl: ensureSellerId(
+          buildAmazonSearchUrl(supplement.name || supplement.productName || 'pet supplement'),
+        ),
+      };
+    });
+  }, [recommendedSupplements]);
+
+  const allSupplementShoppingItems = useMemo(
+    () => [...supplementItems, ...recommendedSupplementShoppingItems],
+    [supplementItems, recommendedSupplementShoppingItems],
+  );
 
   // Calculate meal estimate only for CostComparison component
   const mealEstimateForCost = useMemo(() => {
@@ -620,6 +749,45 @@ export default function MealCompleteView({
     }
   }, [debug, ingredientsWithASINs, petType, recipeServings]);
 
+  const recipeForPricing = useMemo(() => {
+    const servings = typeof recipeServings === 'number' && recipeServings > 0 ? recipeServings : 1;
+
+    return {
+      id: 'custom',
+      name: mealName || 'Custom meal',
+      servings,
+      category: petType,
+      ageGroup: ['adult'],
+      healthConcerns: [],
+      ingredients: selectedIngredients.map((s, idx) => ({
+        id: String(idx),
+        name: getIngredientDisplayName(s.key),
+        amount: `${s.grams}g`,
+      })),
+      instructions: [],
+      nutritionalInfo: {
+        calories: {
+          min: 0,
+          max: 0,
+          unit: 'kcal',
+        },
+      },
+    } as any;
+  }, [getIngredientDisplayName, mealName, petType, recipeServings, selectedIngredients]);
+
+  const { pricingByRecipeId: apiPricingById } = useRecipePricing(recipeForPricing ? [recipeForPricing] : null);
+  const apiPricing = apiPricingById?.[String((recipeForPricing as any)?.id || '')];
+  const apiCostPerMeal = apiPricing?.costPerMealUsd;
+  const canonicalCostPerMeal =
+    typeof apiCostPerMeal === 'number' && Number.isFinite(apiCostPerMeal) && apiCostPerMeal > 0
+      ? apiCostPerMeal
+      : null;
+  const fallbackCostPerMeal =
+    typeof mealEstimateForCost?.costPerMeal === 'number' && Number.isFinite(mealEstimateForCost.costPerMeal) && mealEstimateForCost.costPerMeal > 0
+      ? mealEstimateForCost.costPerMeal
+      : null;
+  const costPerMealForDisplay = canonicalCostPerMeal ?? fallbackCostPerMeal;
+
   // Diagnostic logging - NOW AFTER DECLARATIONS
   useEffect(() => {
     if (!debug) return;
@@ -640,12 +808,13 @@ export default function MealCompleteView({
       console.log('Product-prices url for first ingredient:', pricedUrl);
     }
     console.log('mealEstimateForCost:', mealEstimateForCost);
+    console.log('apiCostPerMeal:', canonicalCostPerMeal);
     console.groupEnd();
-  }, [debug, selectedIngredients, ingredientsWithASINs, mealEstimateForCost]);
+  }, [debug, selectedIngredients, ingredientsWithASINs, mealEstimateForCost, canonicalCostPerMeal]);
 
   return (
     <div className="min-h-screen bg-background py-12 font-sans text-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <Link
           href={`/profile/pet/${petId}`}
@@ -655,226 +824,262 @@ export default function MealCompleteView({
           Back to Pet Profile
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-          <main className="lg:col-span-3">
-            {/* Meal Title Card */}
-            <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
-              <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-                <div className="flex-1 min-w-0 lg:pr-[260px]">
+        {/* Full-width hero */}
+        <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
+          <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+            <div className="flex-1 min-w-0 lg:pr-[260px]">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-4xl font-extrabold text-foreground tracking-tight leading-tight break-words">
+                  <AlphabetText text={mealName.trim() || 'Custom Meal'} size={40} />
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => setIsRenamingMeal(true)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-surface-highlight bg-surface-highlight/50 text-gray-300 hover:border-orange-500/50 hover:text-orange-200 transition-colors"
+                  aria-label="Rename meal"
+                >
+                  <Edit3 size={16} />
+                </button>
+              </div>
+              {isRenamingMeal && (
+                <div className="mt-3 max-w-xl">
                   <input
+                    ref={renameInputRef}
                     type="text"
-                    value={mealName}
-                    onChange={(e) => setMealName(e.target.value)}
-                    className="w-full px-4 py-3 text-4xl font-extrabold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 lg:pr-[260px]"
+                    value={draftMealName}
+                    onChange={(event) => setDraftMealName(event.target.value)}
+                    onBlur={commitRename}
+                    onKeyDown={handleRenameKeyDown}
+                    className="w-full px-4 py-2.5 text-base font-semibold text-foreground bg-surface-highlight border border-surface-highlight rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Enter meal name..."
                   />
-                  <CustomMadeForLine petName={petName} />
-                  {isCalculatingHealthAnalysis && !healthAnalysis && (
-                    <div className="mt-4 flex flex-col gap-3 text-sm text-gray-400">
-                      <span className="text-xs text-gray-500">Calculating enhanced score…</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col items-center gap-4 lg:min-w-[180px]">
-                  <PetCompatibilityBlock
-                    avatarSrc={getProfilePictureForPetType(pet?.type || petType)}
-                    avatarAlt={`${petName} profile`}
-                    spacerClassName="w-16 shrink-0 bg-surface"
-                    right={<CompatibilityRadial score={displayScoreRounded} size={150} />}
-                  />
-                  {mealEstimateForCost?.costPerMeal ? (
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-sm font-semibold text-orange-200">
-                      <span>Cost per meal:</span>
-                      <span className="text-white">${mealEstimateForCost.costPerMeal.toFixed(2)}</span>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            {/* Ingredients & Supplements Tabs */}
-            <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3 flex items-center gap-2">
-                <ShoppingCart size={22} />
-                Shopping List
-              </h3>
-              {/* Tab Navigation */}
-              <div className="flex border-b border-surface-highlight mb-6">
-                <button
-                  onClick={() => setActiveTab('ingredients')}
-                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
-                    activeTab === 'ingredients'
-                      ? 'border-orange-500 text-orange-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-300'
-                  }`}
-                >
-                  <span className="sr-only">Ingredients</span>
-                  <Image
-                    src={IngredientsTabImage}
-                    alt="Ingredients"
-                    className={`h-8 w-auto ${activeTab === 'ingredients' ? '' : 'opacity-70 group-hover:opacity-100'}`}
-                    unoptimized
-                  />
-                </button>
-                <button
-                  onClick={() => setActiveTab('supplements')}
-                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
-                    activeTab === 'supplements'
-                      ? 'border-orange-500 text-orange-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-300'
-                  }`}
-                >
-                  <span className="sr-only">Supplements</span>
-                  <Image
-                    src={SupplementsTabImage}
-                    alt="Supplements"
-                    className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
-                    unoptimized
-                  />
-                </button>
-              </div>
-
-              {/* Tab Content */}
-              {activeTab === 'ingredients' && (
-                <div className="relative">
-                  <div className="space-y-6">
-                    {/* Ingredients with ASIN links */}
-                    {ingredientsWithASINs.length > 0 && (
-                      <ShoppingList
-                        ingredients={ingredientsWithASINs}
-                        recipeName={mealName || 'Custom Meal'}
-                        userId={userId}
-                        selectedIngredients={selectedIngredients}
-                        totalGrams={totalGrams}
-                        recommendedServingGrams={analysis?.recommendedServingGrams}
-                        showHeader={false}
-                      />
-                    )}
-
-                    {selectedIngredients.length === 0 && (
-                      <div className="text-center py-8 text-gray-400 text-sm">
-                        No ingredients added yet.
-                      </div>
-                    )}
+                  <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
+                    <span>Press Enter to save</span>
+                    <button type="button" onClick={cancelRename} className="text-orange-200 hover:text-orange-100">Cancel</button>
                   </div>
                 </div>
               )}
-
-              {activeTab === 'supplements' && (
-                <div className="relative space-y-6">
-                  {supplementItems.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-200 mb-4">
-                        Added Supplements
-                      </h3>
-                      <ShoppingList
-                        ingredients={supplementItems}
-                        recipeName={mealName || 'Custom Meal'}
-                        userId={userId}
-                        selectedIngredients={selectedIngredients}
-                        totalGrams={totalGrams}
-                        recommendedServingGrams={analysis?.recommendedServingGrams}
-                        showHeader={false}
-                      />
-                    </div>
-                  )}
-
-                  {/* Recommended Supplements */}
-                  {recommendedSupplements.length > 0 && (
-                    <div className="bg-orange-900/20 border border-orange-700/50 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold text-orange-200 mb-4 flex items-center gap-2">
-                        <span>💊</span>
-                        Recommended Supplements
-                      </h3>
-                      <p className="text-sm text-gray-400 mb-4">
-                        These supplements can help address nutritional deficiencies in this meal:
-                      </p>
-                      <div className="space-y-3">
-                        {recommendedSupplements.map((supplement: any, index: number) => (
-                          <div key={index} className="bg-surface rounded-lg p-4 border border-surface-highlight">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <h5 className="font-semibold text-gray-200">{supplement.productName || supplement.name}</h5>
-                                <p className="text-sm text-gray-400 mt-1">{supplement.description}</p>
-                                <p className="text-xs text-orange-300 mt-2">
-                                  Addresses: {supplement.addressesDeficiency}
-                                </p>
-                                <p className="text-sm text-gray-300 mt-2">
-                                  <strong>Benefits:</strong> {supplement.benefits}
-                                </p>
-                                <p className="text-sm text-gray-400 mt-1">
-                                  <strong>Amount:</strong> {supplement.defaultAmount}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {recommendedSupplements.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No supplements recommended for this meal.</p>
-                      <p className="text-sm mt-2">Check the ingredients tab for all components.</p>
-                    </div>
-                  )}
-
-                  {supplementItems.length === 0 && recommendedSupplements.length === 0 && (
-                    <div className="text-center py-6 text-gray-400 text-sm">
-                      No supplements added yet.
-                    </div>
-                  )}
+              <CustomMadeForLine petName={petName} />
+              {isCalculatingHealthAnalysis && !healthAnalysis && (
+                <div className="mt-4 flex flex-col gap-3 text-sm text-gray-400">
+                  <span className="text-xs text-gray-500">Calculating enhanced score…</span>
                 </div>
               )}
             </div>
+            <div className="flex flex-col items-center gap-4 lg:min-w-[220px]">
+              <PetCompatibilityBlock
+                avatarSrc={getProfilePictureForPetType(pet?.type || petType)}
+                avatarAlt={`${petName} profile`}
+                spacerClassName="w-16 shrink-0 bg-surface"
+                right={
+                  <div className="flex flex-col items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleOpenScoreModal}
+                      disabled={!canShowScoreDetails}
+                      className={`rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 transition-colors ${
+                        canShowScoreDetails ? 'hover:border-orange-500/40' : 'opacity-60 cursor-not-allowed'
+                      }`}
+                      aria-label="View compatibility details"
+                    >
+                      <div className="flex items-center gap-5">
+                        <CompatibilityRadial score={displayScoreRounded} size={118} strokeWidth={10} label="" />
+                        <div className="text-left">
+                          <div className="text-sm font-semibold text-gray-200">Compatibility</div>
+                          <div className="text-xs text-gray-400 mt-1">Click for details</div>
+                        </div>
+                      </div>
+                    </button>
+                    {hasCompatibilityScore && (
+                      <div className={`text-sm font-semibold text-center ${scoreAdvisoryClass}`}>{scoreAdvisory}</div>
+                    )}
+                  </div>
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Cost Comparison */}
-            {ingredientsWithASINs.length > 0 && mealEstimateForCost && mealEstimateForCost.costPerMeal > 0 && (
-              <div className="mb-8">
-                <CostComparison 
-                  costPerMeal={mealEstimateForCost.costPerMeal}
-                  totalCost={mealEstimateForCost.totalCost}
-                  estimatedMeals={mealEstimateForCost.estimatedMeals}
-                  exceedsBudget={mealEstimateForCost.exceedsBudget || false}
-                />
-              </div>
-            )}
-          </main>
-
-          {/* Sidebar */}
-          <aside className="lg:col-span-2 space-y-8">
-            <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <main className="lg:col-span-3">
+          {/* Ingredients & Supplements Tabs */}
+          <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
+            <div className="mb-6 flex justify-center">
+              <Image
+                src={ShoppingListBanner}
+                alt="Shopping list"
+                className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
+                unoptimized
+              />
+            </div>
+            {/* Tab Navigation */}
+            <div className="flex border-b border-surface-highlight mb-6">
               <button
-                type="button"
-                onClick={handleSaveMeal}
-                disabled={!userId || !analysis || !mealName.trim() || isSaving || isSaved}
-                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}
+                onClick={() => setActiveTab('ingredients')}
+                className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                  activeTab === 'ingredients'
+                    ? 'border-orange-500 text-orange-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-300'
+                }`}
               >
-                <span className="relative h-32 w-full overflow-hidden rounded-2xl">
-                  <Image
-                    src={isSaved ? "/images/Buttons/MealSaved.png" : "/images/Buttons/SaveMeal.png"}
-                    alt={isSaved ? "Meal Saved" : "Save Meal"}
-                    fill
-                    sizes="100vw"
-                    className="object-contain"
-                    priority
-                    unoptimized
-                  />
-                </span>
-                <span className="sr-only">{isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}</span>
+                <span className="sr-only">Ingredients</span>
+                <Image
+                  src={IngredientsTabImage}
+                  alt="Ingredients"
+                  className={`h-8 w-auto ${activeTab === 'ingredients' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                  unoptimized
+                />
               </button>
-              {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
+              <button
+                onClick={() => setActiveTab('supplements')}
+                className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                  activeTab === 'supplements'
+                    ? 'border-orange-500 text-orange-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                <span className="sr-only">Supplements</span>
+                <Image
+                  src={SupplementsTabImage}
+                  alt="Supplements"
+                  className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                  unoptimized
+                />
+              </button>
             </div>
 
+            {/* Tab Content */}
+            {activeTab === 'ingredients' && (
+              <div className="relative">
+                <div className="space-y-6">
+                  {/* Ingredients with ASIN links */}
+                  {ingredientsWithASINs.length > 0 && (
+                    <ShoppingList
+                      ingredients={ingredientsWithASINs}
+                      recipeName={mealName || 'Custom Meal'}
+                      userId={userId}
+                      selectedIngredients={selectedIngredients}
+                      totalGrams={totalGrams}
+                      recommendedServingGrams={analysis?.recommendedServingGrams}
+                      showHeader={false}
+                    />
+                  )}
+
+                  {selectedIngredients.length === 0 && (
+                    <div className="text-center py-8 text-gray-400 text-sm">
+                      No ingredients added yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'supplements' && (
+              <div className="relative space-y-6">
+                {allSupplementShoppingItems.length > 0 ? (
+                  <ShoppingList
+                    ingredients={allSupplementShoppingItems}
+                    recipeName={mealName || 'Custom Meal'}
+                    userId={userId}
+                    selectedIngredients={selectedIngredients}
+                    totalGrams={totalGrams}
+                    recommendedServingGrams={analysis?.recommendedServingGrams}
+                    showHeader={false}
+                  />
+                ) : (
+                  <div className="text-center py-6 text-gray-400 text-sm">
+                    No supplements added yet.
+                  </div>
+                )}
+
+                {/* Recommended Supplements */}
+                {recommendedSupplements.length > 0 && (
+                  <div className={`${recommendedPanelClass} rounded-lg p-6`}>
+                    <h3 className={`text-lg font-semibold ${recommendedHeadingClass} mb-4 flex items-center gap-2`}>
+                      <span>💊</span>
+                      Recommended Supplements
+                    </h3>
+                    {healthScore !== null && healthScore < 70 ? (
+                      <p className="text-sm text-red-200 mb-4">
+                        This meal still needs support — add the supplements below or adjust ingredients before serving.
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-400 mb-4">
+                        These supplements can help address nutritional deficiencies in this meal:
+                      </p>
+                    )}
+                    <div className="space-y-3">
+                      {recommendedSupplements.map((supplement: any, index: number) => (
+                        <div key={index} className="bg-surface rounded-lg p-4 border border-surface-highlight">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <h5 className="font-semibold text-gray-200">{supplement.productName || supplement.name}</h5>
+                              <p className="text-sm text-gray-400 mt-1">{supplement.description}</p>
+                              <p className="text-xs text-orange-300 mt-2">
+                                Addresses: {supplement.addressesDeficiency}
+                              </p>
+                              <p className="text-sm text-gray-300 mt-2">
+                                <strong>Benefits:</strong> {supplement.benefits}
+                              </p>
+                              <p className="text-sm text-gray-400 mt-1">
+                                <strong>Amount:</strong> {supplement.defaultAmount}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {recommendedSupplements.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No supplements recommended for this meal.</p>
+                    <p className="text-sm mt-2">Check the ingredients tab for all components.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Cost Comparison */}
+          {ingredientsWithASINs.length > 0 && costPerMealForDisplay && costPerMealForDisplay > 0 && (
+            <div className="mb-8">
+              {canonicalCostPerMeal ? (
+                <CostComparison
+                  costPerMeal={canonicalCostPerMeal}
+                  pricingSource={apiPricing?.pricingSource}
+                  asOf={apiPricing?.asOf}
+                  missingIngredientCount={Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0}
+                  isComplete={apiPricing?.isComplete}
+                />
+              ) : (
+                mealEstimateForCost && mealEstimateForCost.costPerMeal > 0 && (
+                  <CostComparison
+                    costPerMeal={mealEstimateForCost.costPerMeal}
+                    totalCost={mealEstimateForCost.totalCost}
+                    estimatedMeals={mealEstimateForCost.estimatedMeals}
+                    exceedsBudget={mealEstimateForCost.exceedsBudget || false}
+                  />
+                )
+              )}
+            </div>
+          )}
+        </main>
+
+        <aside className="lg:col-span-2 space-y-8">
             {/* Health Analysis Panel */}
             {healthAnalysis && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
-                <h4 className="text-lg font-bold mb-4 flex items-center justify-center text-gray-200">
-                  <span className="text-2xl mr-2">🏥</span>
-                  Health Analysis
-                </h4>
+                <div className="mb-4 flex justify-center">
+                  <Image
+                    src={HealthAnalysisBanner}
+                    alt="Health analysis"
+                    className="h-auto w-full max-w-xs border border-surface-highlight rounded-lg"
+                    unoptimized
+                  />
+                </div>
                 <div className="mb-4 flex justify-center">
                   <Image
                     src="/images/emojis/Mascots/Proffessor Purfessor/PUrfessorDesk.jpg"
@@ -886,169 +1091,154 @@ export default function MealCompleteView({
                   />
                 </div>
                 <p className="text-xs text-gray-400 mb-4">
-                  Proffessor Purfessor has found these individual factors that contribute to the overall compatibility score
+                  Professor Purfessor is here to break it down for you!
                 </p>
                 <div className="space-y-3">
-                  {Object.entries(healthAnalysis.breakdown)
-                    .filter(([_key, factor]) => {
-                      const f = factor as { weight: number; reason?: string; recommendations?: any[] };
-                      const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
-                      if (weight > 0) return true;
+                  {HEALTH_BREAKDOWN_ORDER.map((factorKey) => {
+                    const factor = (healthAnalysis.breakdown as any)?.[factorKey];
+                    if (!factor) return null;
 
-                      const hasReason = typeof f.reason === 'string' && f.reason.trim().length > 0;
-                      const hasRecs = Array.isArray(f.recommendations) && f.recommendations.length > 0;
-                      return hasReason || hasRecs;
-                    })
-                    .map(([key, factor]) => {
-                    const f = factor as { score: number; weightedContribution?: number; weight: number; reason?: string; recommendations?: any[] };
-                    const score = f.score || 0;
-                    const weightedContribution = f.weightedContribution ?? Math.round(score * (f.weight || 0));
-                    const weight = f.weight || 0;
+                    const f = factor as {
+                      score?: number;
+                      weight?: number;
+                      reason?: string;
+                      recommendations?: any[];
+                    };
+                    const score = typeof f.score === 'number' && Number.isFinite(f.score) ? f.score : 0;
+                    const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
+                    const label = HEALTH_BREAKDOWN_LABELS[factorKey] || factorKey;
+                    const title = label.replace(/\b\w/g, (c) => c.toUpperCase());
+                    const hasReason = typeof f.reason === 'string' && f.reason.trim().length > 0;
+                    const hasRecommendations = Array.isArray(f.recommendations) && f.recommendations.length > 0;
 
-                    let bgColor = 'bg-green-900/20 border-green-700/50';
-                    let icon = '✅';
-                    let textColor = 'text-green-200';
-
-                    if (score < 70) {
-                      bgColor = 'bg-yellow-900/20 border-yellow-700/50';
-                      icon = '⚠️';
-                      textColor = 'text-yellow-200';
-                    }
-                    if (score < 40) {
-                      bgColor = 'bg-red-900/20 border-red-700/50';
-                      icon = '❌';
-                      textColor = 'text-red-200';
-                    }
-
-                    const factorName = key.replace(/([A-Z])/g, ' $1').toLowerCase();
-                    const formattedFactorName = factorName.charAt(0).toUpperCase() + factorName.slice(1);
-                    
-                    let tooltipContent = `📊 ${formattedFactorName}\n\n─────────────────────\n\nRaw Score: ${formatPercent(score)}\nWeight: ${(weight * 100).toFixed(0)}%\nContribution: ${weightedContribution} points\n\n─────────────────────\n\n${f.reason ? `💡 ${f.reason}` : 'No additional details available'}`;
-                    
-                    if (key === 'nutritionalFit' && f.recommendations && f.recommendations.length > 0) {
-                      tooltipContent += '\n\n─────────────────────\n\n💊 Recommendations:\n';
-                      const supplements = f.recommendations.filter((r: any) => !r.isIngredient);
-                      const ingredients = f.recommendations.filter((r: any) => r.isIngredient);
-                      
-                      if (supplements.length > 0) {
-                        tooltipContent += `\nCheck Supplements tab for: ${supplements.map((r: any) => r.productName || r.name).join(', ')}`;
-                      }
-                      if (ingredients.length > 0) {
-                        tooltipContent += `\nCheck Ingredients tab for: ${ingredients.map((r: any) => r.name).join(', ')}`;
-                      }
+                    if (!hasReason && !hasRecommendations && score === 0 && weight === 0) {
+                      return null;
                     }
 
                     return (
-                      <Tooltip key={key} content={tooltipContent} wide={key === 'nutritionalFit'}>
-                        <div className={`flex items-center justify-between p-3 ${bgColor} rounded-lg border cursor-help hover:opacity-80 transition-colors`}>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">{icon}</span>
-                            <span className={`text-sm font-medium capitalize ${textColor}`}>
-                              {factorName}
-                            </span>
+                      <div key={factorKey} className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-sm font-semibold text-gray-200">{title}</div>
+                            <div className="text-xs text-gray-500 mt-1">Weight: {(weight * 100).toFixed(0)}%</div>
                           </div>
-                          <div className="flex flex-col items-end">
-                            <span className={`text-sm font-bold ${textColor}`}>
-                              {formatPercent(score)}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              +{weightedContribution} pts
-                            </span>
-                          </div>
+                          <div className="text-lg font-bold text-green-300">{Math.round(score)}</div>
                         </div>
-                      </Tooltip>
+                        {hasReason ? (
+                          <div className="text-xs text-gray-400 mt-3 leading-relaxed">
+                            {f.reason!.split('. ').map((sentence, idx) => (
+                              <p key={idx} className="mb-1 last:mb-0">
+                                {sentence.trim()}
+                              </p>
+                            ))}
+                          </div>
+                        ) : null}
+                        {hasRecommendations ? (
+                          <div className="mt-3">
+                            <div className="text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2">
+                              Recommendations
+                            </div>
+                            <ul className="list-disc list-inside text-xs text-gray-400 space-y-1">
+                              {f.recommendations!.map((rec, idx) => (
+                                <li key={idx}>{String(rec || '')}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+                      </div>
                     );
                   })}
                 </div>
-
               </div>
             )}
 
             <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
-                🧊 Storage & Serving
-              </h3>
-              <div className="space-y-4 text-sm text-gray-300">
-                {portionPlan ? (
-                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
-                    <div className="font-semibold text-gray-200">Suggested serving for your pet</div>
-                    <div className="text-gray-300 mt-1">
-                      {portionPlan.dailyGrams}g per day ({portionPlan.mealsPerDay} meals/day)
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
-                    <div className="text-gray-300">
-                      Serving varies by species, size, age, and activity—create a pet profile for exact portions.
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <div className="font-semibold text-gray-200">Storage</div>
-                  <div className="text-gray-300 mt-1">Fridge: Store in airtight container up to 3 days</div>
-                  <div className="text-gray-300">Freezer: Freeze portions up to 2 months</div>
-                  <div className="text-gray-300">Thawing: Thaw overnight in fridge</div>
-                </div>
-
-                <div>
-                  <div className="font-semibold text-gray-200">Serving temperature</div>
-                  <div className="text-gray-300 mt-1">Serve at room temp or gently warmed</div>
-                  <div className="text-gray-300">Avoid overheating; stir well and test temperature before serving</div>
-                </div>
-
-                <div>
-                  <div className="font-semibold text-gray-200">Batch prep tip</div>
-                  <div className="text-gray-300 mt-1">Cool fully before portioning; portion into daily containers</div>
-                </div>
+              <div className="mb-4 flex justify-center">
+                <Image
+                  src={StorageServingBanner}
+                  alt="Storage and serving"
+                  className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
+                  unoptimized
+                />
               </div>
+              {portionPlan ? (
+                <div className="space-y-4 text-sm text-gray-300">
+                  <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4">
+                    <div className="font-semibold text-gray-200">Daily portion guide</div>
+                    {Array.isArray(portionPlan.mealsPerDay) && portionPlan.mealsPerDay.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-3 mt-3 text-xs text-gray-400">
+                        {portionPlan.mealsPerDay.map((item, idx) => (
+                          <div key={idx} className="flex flex-col">
+                            <span className="text-gray-300 font-semibold">{item.label}</span>
+                            <span>{item.amount}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3 text-xs text-gray-400">
+                        Portion sizing guidance unavailable for this meal.
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-gray-200">Storage</div>
+                    <div className="text-gray-300 mt-1">Fridge: Store in airtight container up to 3 days</div>
+                    <div className="text-gray-300">Freezer: Freeze portions up to 2 months</div>
+                    <div className="text-gray-300">Thawing: Thaw overnight in fridge</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-gray-200">Serving temperature</div>
+                    <div className="text-gray-300 mt-1">Serve at room temp or gently warmed</div>
+                    <div className="text-gray-300">Avoid overheating; stir well and test temperature before serving</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-gray-200">Batch prep tip</div>
+                    <div className="text-gray-300 mt-1">Cool fully before portioning; portion into daily containers</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-surface-lighter border border-surface-highlight rounded-lg p-4 text-sm text-gray-300">
+                  Serving varies by species, size, age, and activity—create a pet profile for exact portions.
+                </div>
+              )}
             </div>
 
-            {/* Nutritional Summary */}
-            {analysis && (
-              <div className="bg-surface rounded-2xl shadow-lg border border-surface-highlight p-6">
-                <h3 className="text-sm font-semibold text-gray-200 mb-3">Nutritional Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Total Weight:</span>
-                    <span className="font-medium text-gray-200">{totalGrams}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Calories:</span>
-                    <span className="font-medium text-gray-200">
-                      {((analysis.nutrients as any).kcal ?? (analysis.nutrients as any).calories_kcal ?? (analysis.nutrients as any).energy_kcal ?? 0).toFixed(0)} kcal
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Protein:</span>
-                    <span className="font-medium text-gray-200">
-                      {((analysis.nutrients as any).protein_g ?? 0).toFixed(1)}g
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Fat:</span>
-                    <span className="font-medium text-gray-200">
-                      {((analysis.nutrients as any).fat_g ?? 0).toFixed(1)}g
-                    </span>
-                  </div>
-                  {analysis.caToPratio && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Ca:P Ratio:</span>
-                      <span className="font-medium text-gray-200">{analysis.caToPratio.toFixed(2)}</span>
-                    </div>
-                  )}
-                  {analysis.recommendedServingGrams > 0 && (
-                    <div className="flex justify-between pt-2 border-t border-surface-highlight">
-                      <span className="text-gray-300 font-medium">Recommended Serving:</span>
-                      <span className="font-semibold text-orange-400">{analysis.recommendedServingGrams}g</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </aside>
-        </div>
+            <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
+              <button
+                type="button"
+                onClick={handleSaveMeal}
+                disabled={!userId || !analysis || !mealName.trim() || isSaving || isSaved}
+                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}
+              >
+                <span className="relative h-32 w-full overflow-hidden rounded-2xl">
+                  <Image
+                    src={isSaved ? '/images/Buttons/MealSaved.png' : '/images/Buttons/SaveMeal.png'}
+                    alt={isSaved ? 'Meal Saved' : 'Save Meal'}
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
+                    priority
+                    unoptimized
+                  />
+                </span>
+                <span className="sr-only">{isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}</span>
+              </button>
+              {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
+            </div>
+        </aside>
       </div>
+
+      {isScoreModalOpen && scoreContext && (
+        <RecipeScoreModal
+          recipe={scoreContext.recipe}
+          pet={scoreContext.pet}
+          onClose={() => setIsScoreModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
