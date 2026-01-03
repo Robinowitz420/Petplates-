@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, Star, ArrowUp } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import Image, { type StaticImageData } from 'next/image';
@@ -37,6 +37,14 @@ interface MealBuilderWizardProps {
 }
 
 const CATEGORY_ORDER = ['proteins', 'grains', 'greens', 'fruits', 'supplements'] as const;
+
+const CATEGORY_ART: Record<string, StaticImageData> = {
+  proteins: MeatBanner,
+  grains: GrainsBanner,
+  greens: VegetablesBanner,
+  fruits: FruitsBanner,
+  supplements: SupplementsBanner,
+};
 
 /**
  * Get the highest nutrient value for an ingredient
@@ -171,14 +179,6 @@ export default function MealBuilderWizard({
     });
     onClose();
   };
-
-  const CATEGORY_ART: Record<string, StaticImageData> = useMemo(() => ({
-    proteins: MeatBanner,
-    grains: GrainsBanner,
-    greens: VegetablesBanner,
-    fruits: FruitsBanner,
-    supplements: SupplementsBanner,
-  }), []);
 
   const categoryArt = CATEGORY_ART[currentCategoryKey] || MeatBanner;
 

@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
+import SherlockDetectingImg from '@/public/images/Buttons/SherlockShellsIsNowDetectingMealsFor.png';
 import { useAuth } from '@clerk/nextjs';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
 import { getRandomName } from '@/lib/utils/petUtils';
@@ -581,7 +582,12 @@ export default function RecommendedRecipesPage() {
           <div className="flex-1 flex flex-col gap-6 min-w-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0">
-                Sherlock Shells is detecting meals for:
+                <Image
+                  src={SherlockDetectingImg}
+                  alt="Sherlock Shells is detecting meals for:"
+                  className="h-8 w-auto"
+                  priority
+                />
                 <span className="inline-flex items-center gap-3">
                   <span className="font-semibold text-2xl">{petDisplayName}</span>
                 </span>

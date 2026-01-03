@@ -44,6 +44,17 @@ const nextConfig = {
   async headers() {
     const isPreview = process.env.VERCEL_ENV === 'preview';
 
+    const swHeaders = [
+      {
+        key: 'Content-Type',
+        value: 'application/javascript; charset=utf-8',
+      },
+      {
+        key: 'Cache-Control',
+        value: 'no-cache, no-store, must-revalidate',
+      },
+    ];
+
     const noindexHeaders = [
       {
         key: 'X-Robots-Tag',
@@ -54,6 +65,10 @@ const nextConfig = {
     if (isPreview) {
       return [
         {
+          source: '/sw.js',
+          headers: swHeaders,
+        },
+        {
           source: '/:path*',
           headers: noindexHeaders,
         },
@@ -61,6 +76,10 @@ const nextConfig = {
     }
 
     return [
+      {
+        source: '/sw.js',
+        headers: swHeaders,
+      },
       {
         source: '/profile/:path*',
         headers: noindexHeaders,

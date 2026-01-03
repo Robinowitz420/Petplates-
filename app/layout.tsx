@@ -5,6 +5,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
+import PWARegister from "@/components/PWARegister";
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 const inter = Inter({ subsets: ["latin"], display: 'swap', weight: ['400', '600', '700'] });
@@ -29,6 +30,13 @@ export const metadata: Metadata = {
     template: "%s | Paws & Plates"
   },
   description: "Free vet-approved meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO & WSAVA compliant.",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#f97316",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Paws & Plates" },
+  icons: {
+    icon: ["/icon-192x192.png", "/icon-512x512.png"],
+    apple: ["/icon-192x192.png"],
+  },
   keywords: [
     "homemade dog food",
     "homemade cat food", 
@@ -111,17 +119,18 @@ export default function RootLayout({
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6986862746984728"
             crossOrigin="anonymous"
           />
-          <meta name="theme-color" content="#043136" />
+          <meta name="theme-color" content="#f97316" />
           <meta name="msvalidate.01" content="F3A32F722F4B0E5C5F4737A8443E4F31" />
           <meta name="google-site-verification" content={googleSiteVerification} />
           <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
           />
         </head>
         <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
+          <PWARegister />
           <ErrorBoundaryWrapper>
             <Navigation />
             <main className="min-h-screen">
