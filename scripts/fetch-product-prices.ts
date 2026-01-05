@@ -26,7 +26,7 @@ interface ProgressData {
 }
 
 const PROGRESS_FILE = path.join(__dirname, '../data/price-fetch-progress.json');
-const RESULTS_FILE = path.join(__dirname, '../data/product-prices.json');
+const RESULTS_FILE = path.join(__dirname, '../data/product-prices-UPDATED.json');
 const UPDATE_CODE_FILE = path.join(__dirname, '../data/vetted-products-price-updates.ts');
 
 // Delay between requests (milliseconds)

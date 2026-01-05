@@ -9,10 +9,17 @@ export enum BadgeType {
   FEAST_ARCHITECT = 'feast_architect',
   WEEK_WHISKER = 'week_whisker',
   PURCHASE_CHAMPION = 'purchase_champion',
+  PURCHASE_BASKET = 'purchase_basket',
+  PURCHASE_HOE = 'purchase_hoe',
+  PURCHASE_BOWL = 'purchase_bowl',
+  PURCHASE_GOGGLES = 'purchase_goggles',
+  PURCHASE_MONOCLE = 'purchase_monocle',
   SEARCH_DISCOVERY = 'search_discovery',
-  DAILY_LOGIN = 'daily_login',
+  BIRD_HAT = 'bird_hat',
   PROFILE_SETUP = 'profile_setup',
   PREPARATION = 'preparation',
+  LAB_COAT = 'lab_coat',
+  SHERLOCK_HAT = 'sherlock_hat',
 }
 
 /**
@@ -50,17 +57,22 @@ export interface PetBadges {
  */
 export interface BadgeCheckContext {
   action:
+    | 'daily_login'
     | 'meal_created'
+    | 'custom_meal_saved'
     | 'recipe_viewed'
     | 'meal_plan_completed'
     | 'purchase_confirmed'
     | 'search_discovery'
-    | 'daily_login'
-    | 'profile_setup';
+    | 'profile_setup'
+    | 'pet_photo_uploaded'
+    | 'score_details_viewed'
+    | 'meal_plan_updated';
   compatibilityScore?: number;
   mealPlanCount?: number;
   weeklyPlanCompleted?: boolean;
   completionCount?: number;
   purchaseCount?: number;
+  customMealCount?: number;
 }
 

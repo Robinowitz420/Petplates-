@@ -9,6 +9,7 @@ import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
 import { recipes } from '@/lib/data/recipes-complete';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
+import AlphabetText from '@/components/AlphabetText';
 
 // Format price for display
 const formatPrice = (price: number) => {
@@ -185,7 +186,9 @@ export default function MultiPetShoppingModal({
                         {isSelected && <Check size={16} className="text-white" />}
                       </div>
                       <div className="text-left">
-                        <div className="font-semibold">{petName}</div>
+                        <div className="font-semibold">
+                          <AlphabetText text={petName} size={18} />
+                        </div>
                         <div className="text-xs capitalize">{pet.type}</div>
                       </div>
                     </div>

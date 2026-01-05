@@ -1,16 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useCallback, useMemo, useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, Star, ArrowUp } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import Image, { type StaticImageData } from 'next/image';
 import { INGREDIENT_COMPOSITIONS, getIngredientComposition, type IngredientComposition } from '@/lib/data/ingredientCompositions';
 import { getFallbackNutrition } from '@/lib/utils/nutritionFallbacks';
-import MeatBanner from '@/public/images/Site Banners/Meat.png';
-import VegetablesBanner from '@/public/images/Site Banners/Vegetables.png';
-import FruitsBanner from '@/public/images/Site Banners/Fruits.png';
-import GrainsBanner from '@/public/images/Site Banners/Grains.png';
-import SupplementsBanner from '@/public/images/Site Banners/Supplements.png';
+import AlphabetText from '@/components/AlphabetText';
 
 interface Category {
   name: string;
@@ -19,6 +14,14 @@ interface Category {
   ingredients: string[];
   required: boolean;
 }
+
+const FALLBACK_CATEGORY: Category = {
+  name: '',
+  description: '',
+  icon: '',
+  ingredients: [],
+  required: false,
+};
 
 interface MealBuilderWizardProps {
   isOpen: boolean;
@@ -38,19 +41,19 @@ interface MealBuilderWizardProps {
 
 const CATEGORY_ORDER = ['proteins', 'grains', 'greens', 'fruits', 'supplements'] as const;
 
-const CATEGORY_ART: Record<string, StaticImageData> = {
-  proteins: MeatBanner,
-  grains: GrainsBanner,
-  greens: VegetablesBanner,
-  fruits: FruitsBanner,
-  supplements: SupplementsBanner,
-};
+const nutrientBadgeCache = new Map<string, Array<{ name: string; value: number }>>();
 
 /**
  * Get the highest nutrient value for an ingredient
  * Returns the nutrient name and a normalized value for comparison
  */
 function getTopNutrients(ingredientName: string, count: number = 3): Array<{ name: string; value: number }> {
+  const cacheKey = ingredientName.toLowerCase();
+  const cached = nutrientBadgeCache.get(cacheKey);
+  if (cached) {
+    return cached.slice(0, count);
+  }
+
   // Normalize ingredient name
   const normalized = ingredientName.toLowerCase()
     .trim()
@@ -68,7 +71,10 @@ function getTopNutrients(ingredientName: string, count: number = 3): Array<{ nam
     composition = getFallbackNutrition(ingredientName);
   }
   
-  if (!composition) return [];
+  if (!composition) {
+    nutrientBadgeCache.set(cacheKey, []);
+    return [];
+  }
   
   // Define nutrients to check with their display names and normalization factors
   const nutrients = [
@@ -99,8 +105,71 @@ function getTopNutrients(ingredientName: string, count: number = 3): Array<{ nam
       value: nutrient.value
     }));
   
+  nutrientBadgeCache.set(cacheKey, topNutrients);
   return topNutrients;
 }
+
+type IngredientTileProps = {
+  ingredient: string;
+  isSelected: boolean;
+  isRecommended: boolean;
+  onToggle: (ingredient: string) => void;
+};
+
+const IngredientTile = memo(function IngredientTile({
+  ingredient,
+  isSelected,
+  isRecommended,
+  onToggle,
+}: IngredientTileProps) {
+  const showNutrients = isSelected || isRecommended;
+  const topNutrients = useMemo(() => (showNutrients ? getTopNutrients(ingredient, 3) : []), [ingredient, showNutrients]);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onToggle(ingredient)}
+      className={`relative p-4 text-left rounded-2xl border transition-colors duration-75 bg-gradient-to-br [content-visibility:auto] [contain-intrinsic-size:180px] ${
+        isSelected
+          ? 'from-orange-500/20 via-orange-500/10 to-transparent border-orange-300/80 ring-2 ring-orange-400/40 shadow-[0_12px_30px_rgba(249,115,22,0.25)] scale-[1.01]'
+          : isRecommended
+          ? 'from-emerald-700/40 via-emerald-900/30 to-transparent border-emerald-400/60 hover:border-orange-300/70 hover:shadow-[0_10px_25px_rgba(249,115,22,0.15)]'
+          : 'from-emerald-900/30 via-emerald-950/30 to-transparent border-emerald-800/50 hover:border-emerald-500/70 hover:-translate-y-0.5'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {isRecommended && (
+            <span className="inline-flex items-center gap-1 text-amber-200 text-xs font-semibold uppercase tracking-wide">
+              <Star size={14} className="fill-amber-200 text-amber-200" />
+              Pick
+            </span>
+          )}
+          <span className="text-sm font-semibold text-gray-100 truncate">{ingredient}</span>
+        </div>
+        {isSelected && (
+          <span className="flex items-center gap-1 text-xs font-bold text-emerald-200 bg-emerald-500/20 border border-emerald-400/50 px-2 py-0.5 rounded-full">
+            <Check size={14} />
+            Added
+          </span>
+        )}
+      </div>
+      {topNutrients.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {topNutrients.map((nutrient, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-orange-200 bg-orange-400/10 border border-orange-300/30 px-2 py-1 rounded-full"
+            >
+              <ArrowUp size={12} className="text-orange-300" />
+              {nutrient.name}
+            </span>
+          ))}
+        </div>
+      )}
+    </button>
+  );
+});
 
 export default function MealBuilderWizard({
   isOpen,
@@ -111,11 +180,17 @@ export default function MealBuilderWizard({
   petType,
   recommendedIngredients = []
 }: MealBuilderWizardProps) {
-  const skipProteins = !categories.proteins.required || categories.proteins.ingredients.length === 0;
-  const skipFruits = petType && ['dogs', 'cats', 'dog', 'cat'].includes(petType.toLowerCase());
+  const skipProteins = categories.proteins.ingredients.length === 0;
+  const skipGrains = categories.grains.ingredients.length === 0;
+  const skipGreens = categories.greens.ingredients.length === 0;
+  const skipFruits = petType && ['dogs', 'cats', 'dog', 'cat'].includes(petType.toLowerCase()) || categories.fruits.ingredients.length === 0;
+  const skipSupplements = categories.supplements.ingredients.length === 0;
   const stepOrder = CATEGORY_ORDER.filter((key) => {
     if (skipProteins && key === 'proteins') return false;
+    if (skipGrains && key === 'grains') return false;
+    if (skipGreens && key === 'greens') return false;
     if (skipFruits && key === 'fruits') return false;
+    if (skipSupplements && key === 'supplements') return false;
     return true;
   });
 
@@ -128,30 +203,46 @@ export default function MealBuilderWizard({
     supplements: []
   });
 
-  if (!isOpen) return null;
+  const recommendedSet = useMemo(() => new Set(recommendedIngredients), [recommendedIngredients]);
 
-  const currentCategoryKey = stepOrder[currentStep];
-  const currentCategory = categories[currentCategoryKey];
+  const currentCategoryKey = (stepOrder[currentStep] || stepOrder[0] || 'proteins') as keyof typeof categories;
+  const currentCategory = categories[currentCategoryKey] || FALLBACK_CATEGORY;
+  const sortedIngredients = useMemo(() => {
+    if (!currentCategory) return [] as string[];
+    const recommended: string[] = [];
+    const regular: string[] = [];
+    currentCategory.ingredients.forEach((ingredient) => {
+      if (recommendedSet.has(ingredient)) {
+        recommended.push(ingredient);
+      } else {
+        regular.push(ingredient);
+      }
+    });
+    return [...recommended, ...regular];
+  }, [currentCategory, recommendedSet]);
+
   const isRequired = currentCategory.required;
   const currentSelections = selections[currentCategoryKey] || [];
+  const currentSelectionSet = useMemo(() => new Set(currentSelections), [currentSelections]);
   const hasSelection = currentSelections.length > 0;
   const hasIngredients = currentCategory.ingredients.length > 0;
   // Allow proceeding if: not required, OR has selection, OR required but no ingredients available
   const canProceed = !isRequired || hasSelection || !hasIngredients;
-  const isLastStep = currentStep === stepOrder.length - 1;
+  const isLastStep = stepOrder.length === 0 || currentStep === stepOrder.length - 1;
 
-  const handleSelect = (ingredient: string) => {
-    setSelections(prev => {
+  const handleSelect = useCallback((ingredient: string) => {
+    setSelections((prev) => {
       const current = prev[currentCategoryKey] || [];
       const isSelected = current.includes(ingredient);
-      return {
+      const newSelections = {
         ...prev,
-        [currentCategoryKey]: isSelected 
-          ? current.filter(ing => ing !== ingredient)
-          : [...current, ingredient]
+        [currentCategoryKey]: isSelected ? current.filter((ing) => ing !== ingredient) : [...current, ingredient],
       };
+      return newSelections;
     });
-  };
+  }, [currentCategoryKey]);
+
+  if (!isOpen) return null;
 
   const handleNext = () => {
     if (isLastStep) {
@@ -180,7 +271,6 @@ export default function MealBuilderWizard({
     onClose();
   };
 
-  const categoryArt = CATEGORY_ART[currentCategoryKey] || MeatBanner;
 
   const wizardContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
@@ -190,7 +280,8 @@ export default function MealBuilderWizard({
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.25em] text-emerald-200/60">Chef Mode</p>
             <h2 className="text-3xl font-black text-gray-100 tracking-tight">
-              Create Meal for {petName}
+              <span className="mr-2">Create Meal for</span>
+              <AlphabetText text={petName} size={28} />
             </h2>
             <p className="text-sm text-emerald-200/80">
               Step {currentStep + 1} of {stepOrder.length}
@@ -235,44 +326,9 @@ export default function MealBuilderWizard({
 
         {/* Category Content */}
         <div className="flex-1 overflow-y-auto p-6 lg:p-8">
-          <div className="grid gap-6 lg:grid-cols-[320px_1fr] xl:grid-cols-[360px_1fr]">
-            <div className="space-y-4 rounded-2xl border border-emerald-800/60 bg-emerald-900/40 p-6 shadow-inner shadow-emerald-900/40">
-              <div className="relative w-full h-40 sm:h-48 rounded-2xl overflow-hidden border border-emerald-700/50 shadow-lg">
-                <Image
-                  src={categoryArt}
-                  alt={`${currentCategory.name} inspiration`}
-                  fill
-                  sizes="400px"
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                <div className="absolute bottom-3 left-4">
-                  <div className="text-xs uppercase tracking-[0.25em] text-emerald-200/70 mb-1">
-                    Ingredient vibe
-                  </div>
-                  <div className="text-2xl font-black text-white drop-shadow-lg">
-                    {currentCategory.name}
-                  </div>
-                </div>
-              </div>
-              {currentStep === 0 && (
-                <div className="mb-4 flex justify-center">
-                  <Image
-                    src="/images/emojis/Mascots/PrepPuppy/PrepPuppyKitchen.jpg"
-                    alt="Puppy Prepper"
-                    width={240}
-                    height={240}
-                    className="w-[220px] h-[220px] object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.45)]"
-                    unoptimized
-                  />
-                </div>
-              )}
-              <div className="text-5xl">{currentCategory.icon}</div>
-              <div>
-                <h3 className="text-2xl font-semibold text-gray-100 mb-2">{currentCategory.name}</h3>
-                <p className="text-sm text-gray-300 leading-relaxed">{currentCategory.description}</p>
-              </div>
+          <div className="space-y-6">
+            {/* Show required step info at the top if needed */}
+            <div className="flex justify-center">
               {isRequired && hasIngredients && (
                 <div className="text-xs font-semibold text-orange-200 bg-orange-400/10 border border-orange-300/40 px-3 py-2 rounded-full inline-flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-orange-300 animate-pulse" />
@@ -288,70 +344,25 @@ export default function MealBuilderWizard({
 
             {/* Ingredient List */}
             <div className="rounded-3xl border border-emerald-800/60 bg-gradient-to-br from-emerald-950/80 via-emerald-950/60 to-black/70 p-4 lg:p-6 shadow-[0_20px_45px_rgba(0,0,0,0.55)]">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {currentCategory.ingredients.length === 0 ? (
-                  <div className="col-span-full text-center py-12 text-gray-400">
-                    No ingredients available in this category for this pet.
-                  </div>
-                ) : (() => {
-                  const recommended = currentCategory.ingredients.filter((ing) => recommendedIngredients.includes(ing));
-                  const regular = currentCategory.ingredients.filter((ing) => !recommendedIngredients.includes(ing));
-                  const sortedIngredients = [...recommended, ...regular];
-
-                  return sortedIngredients.map((ingredient) => {
-                    const isSelected = currentSelections.includes(ingredient);
-                    const isRecommended = recommendedIngredients.includes(ingredient);
-                    const topNutrients = getTopNutrients(ingredient, 3);
-
-                    return (
-                      <button
+              {currentCategory.ingredients.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  No ingredients available in this category for this pet.
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {sortedIngredients.map((ingredient) => (
+                      <IngredientTile
                         key={ingredient}
-                        onClick={() => handleSelect(ingredient)}
-                        className={`relative p-4 text-left rounded-2xl border transition-all duration-200 bg-gradient-to-br ${
-                          isSelected
-                            ? 'from-orange-500/20 via-orange-500/10 to-transparent border-orange-300/80 ring-2 ring-orange-400/40 shadow-[0_12px_30px_rgba(249,115,22,0.25)] scale-[1.01]'
-                            : isRecommended
-                            ? 'from-emerald-700/40 via-emerald-900/30 to-transparent border-emerald-400/60 hover:border-orange-300/70 hover:shadow-[0_10px_25px_rgba(249,115,22,0.15)]'
-                            : 'from-emerald-900/30 via-emerald-950/30 to-transparent border-emerald-800/50 hover:border-emerald-500/70 hover:-translate-y-0.5'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            {isRecommended && (
-                              <span className="inline-flex items-center gap-1 text-amber-200 text-xs font-semibold uppercase tracking-wide">
-                                <Star size={14} className="fill-amber-200 text-amber-200" />
-                                Pick
-                              </span>
-                            )}
-                            <span className="text-sm font-semibold text-gray-100 truncate">
-                              {ingredient}
-                            </span>
-                          </div>
-                          {isSelected && (
-                            <span className="flex items-center gap-1 text-xs font-bold text-emerald-200 bg-emerald-500/20 border border-emerald-400/50 px-2 py-0.5 rounded-full">
-                              <Check size={14} />
-                              Added
-                            </span>
-                          )}
-                        </div>
-                        {topNutrients.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {topNutrients.map((nutrient, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-orange-200 bg-orange-400/10 border border-orange-300/30 px-2 py-1 rounded-full"
-                              >
-                                <ArrowUp size={12} className="text-orange-300" />
-                                {nutrient.name}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </button>
-                    );
-                  });
-                })()}
-              </div>
+                        ingredient={ingredient}
+                        isSelected={currentSelectionSet.has(ingredient)}
+                        isRecommended={recommendedSet.has(ingredient)}
+                        onToggle={handleSelect}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

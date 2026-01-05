@@ -1,18 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
-import type { Recipe, CustomMeal } from '@/lib/types';
+import type { Pet, Recipe, CustomMeal } from '@/lib/types';
 
-import { getProductPrice } from '@/lib/data/product-prices';
-import { VETTED_PRODUCTS, getVettedProduct, getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
-import { getCustomMeals } from '@/lib/utils/customMealStorage';
-import { getPets } from '@/lib/utils/petStorage'; // Import async storage
-import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
+import { deleteCustomMeal, getCustomMeals } from '@/lib/utils/customMealStorage';
+import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
+import AlphabetText from '@/components/AlphabetText';
+
 import MealPlanBanner from '@/public/images/Site Banners/MealPlan.png';
 
 // Format price for display
@@ -25,49 +25,9 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 interface PetProfile {
   id: string;
   name: string;
+  type?: string;
   savedRecipes: string[];
 }
-
-const buildEvenPlan = (meals: Recipe[]) => {
-  const totalSlots = DAYS.length * 2;
-  const rotation: Recipe[] = [];
-  while (rotation.length < totalSlots) {
-    rotation.push(...meals);
-  }
-  return rotation.slice(0, totalSlots);
-};
-
-const shuffleMealsNoRepeats = (meals: Recipe[], totalSlots: number) => {
-  if (meals.length === 0) return [];
-  const poolBase = [...meals];
-  const rotation: Recipe[] = [];
-
-  const shuffle = (arr: Recipe[]) => {
-    for (let i = arr.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  };
-
-  let pool = shuffle([...poolBase]);
-
-  while (rotation.length < totalSlots) {
-    if (pool.length === 0) {
-      pool = shuffle([...poolBase]);
-    }
-    const next = pool.pop() as Recipe;
-    // Avoid duplicate within the same day (pair of two)
-    if (rotation.length % 2 === 1 && rotation[rotation.length - 1].id === next.id) {
-      // Put it back to the front and try another
-      pool.unshift(next);
-      continue;
-    }
-    rotation.push(next);
-  }
-
-  return rotation;
-};
 
 export default function MealPlanPage() {
   const params = useParams();
@@ -76,11 +36,13 @@ export default function MealPlanPage() {
   const { userId, isLoaded } = useAuth();
 
   const [pet, setPet] = useState<PetProfile | null>(null);
+  const [petRecord, setPetRecord] = useState<Pet | null>(null);
   const [savedMeals, setSavedMeals] = useState<Recipe[]>([]);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
-  const [weeklyPlan, setWeeklyPlan] = useState<{ day: string; meals: Recipe[] }[]>([]);
+  const [mealPlanSchedule, setMealPlanSchedule] = useState<(string | null)[]>(Array(DAYS.length * 2).fill(null));
   const [loading, setLoading] = useState(true);
-  const [swapTarget, setSwapTarget] = useState<{ dayIdx: number; mealIdx: number } | null>(null);
+  const [dragPayload, setDragPayload] = useState<{ mealId: string; from: 'pool' | 'slot'; fromIndex?: number } | null>(null);
+  const [isSavingPlan, setIsSavingPlan] = useState(false);
 
   // Convert custom meal to Recipe format for meal plan
   const convertCustomMealToRecipe = (customMeal: CustomMeal): Recipe => {
@@ -129,32 +91,46 @@ export default function MealPlanPage() {
       if (!isLoaded) return;
       if (!userId) {
         setPet(null);
+        setPetRecord(null);
         setSavedMeals([]);
         setCustomMeals([]);
-        setWeeklyPlan([]);
+        setMealPlanSchedule(Array(DAYS.length * 2).fill(null));
         setLoading(false);
         return;
       }
       try {
         const pets = await getPets(userId);
-        const foundPet = pets.find((p: any) => p.id === petId) || null;
+        const foundPet = (pets.find((p: any) => p.id === petId) as Pet | undefined) || null;
         
         if (foundPet) {
+          setPetRecord(foundPet);
           // Normalize pet profile
           setPet({
             id: foundPet.id,
             name: foundPet.name || foundPet.names?.[0] || 'Pet',
+            type: foundPet.type,
             savedRecipes: foundPet.savedRecipes || [],
           });
 
-          // Saved recipes are no longer stored statically
-          setSavedMeals([]);
+          const scheduleRaw = (foundPet as any)?.mealPlanSchedule;
+          const schedule = Array.isArray(scheduleRaw)
+            ? scheduleRaw.map((x: any) => {
+                const s = x === null || x === undefined ? null : String(x || '').trim();
+                return s ? s : null;
+              })
+            : [];
+          const normalizedSchedule = Array(DAYS.length * 2)
+            .fill(null)
+            .map((_, idx) => (idx < schedule.length ? (schedule[idx] as any) : null));
+          setMealPlanSchedule(normalizedSchedule);
           
           // Load custom meals
           const customMealsList = await getCustomMeals(userId, petId);
           setCustomMeals(customMealsList);
         } else {
           setPet(null);
+          setPetRecord(null);
+          setMealPlanSchedule(Array(DAYS.length * 2).fill(null));
         }
       } catch (error) {
         console.error('Error loading meal plan data:', error);
@@ -164,63 +140,214 @@ export default function MealPlanPage() {
     loadData();
   }, [isLoaded, petId, userId]);
 
-  const generatePlan = (meals: Recipe[]) => {
-    const rotation = buildEvenPlan(meals);
-    const plan: { day: string; meals: Recipe[] }[] = [];
-    for (let i = 0; i < DAYS.length; i += 1) {
-      const breakfastIndex = i * 2;
-      const dinnerIndex = breakfastIndex + 1;
-      const breakfast = rotation[breakfastIndex];
-      let dinner = rotation[dinnerIndex];
-      if (dinner.id === breakfast.id) {
-        const swapIndex = rotation.findIndex(
-          (entry, idx) => idx > dinnerIndex && entry.id !== breakfast.id
-        );
-        if (swapIndex !== -1) {
-          [rotation[dinnerIndex], rotation[swapIndex]] = [
-            rotation[swapIndex],
-            rotation[dinnerIndex],
-          ];
-          dinner = rotation[dinnerIndex];
-        } else {
-          dinner = meals.find((meal) => meal.id !== breakfast.id) || dinner;
-        }
-      }
-      plan.push({ day: DAYS[i], meals: [breakfast, dinner] });
-    }
-    return plan;
-  };
-
-  const allMeals = useMemo<Recipe[]>(() => {
-    return [
-      ...savedMeals,
-      ...customMeals.map(convertCustomMealToRecipe),
-    ];
-  }, [savedMeals, customMeals]);
-
   useEffect(() => {
-    if (allMeals.length > 0) {
-      setWeeklyPlan(generatePlan(allMeals));
-    }
-  }, [allMeals]);
+    const loadSavedRecipes = async () => {
+      if (!userId || !petRecord) {
+        setSavedMeals([]);
+        return;
+      }
 
-  const handleRegenerate = () => {
-    setWeeklyPlan(generatePlan(allMeals));
-  };
+      const ids = Array.from(new Set((petRecord.savedRecipes || []).map((x) => String(x || '').trim()).filter(Boolean)))
+        .filter((id) => !id.startsWith('custom_'));
+      if (ids.length === 0) {
+        setSavedMeals([]);
+        return;
+      }
 
-  const handleRandomize = () => {
-    const totalSlots = DAYS.length * 2;
-    const rotation = shuffleMealsNoRepeats(allMeals, totalSlots);
-    const plan: { day: string; meals: Recipe[] }[] = [];
-    for (let i = 0; i < DAYS.length; i += 1) {
-      const breakfastIndex = i * 2;
-      const dinnerIndex = breakfastIndex + 1;
-      const breakfast = rotation[breakfastIndex];
-      const dinner = rotation[dinnerIndex];
-      plan.push({ day: DAYS[i], meals: [breakfast, dinner] });
-    }
-    setWeeklyPlan(plan);
-  };
+      const results = await Promise.allSettled(
+        ids.map(async (id) => {
+          const res = await fetch(`/api/recipes/generated/${encodeURIComponent(id)}`);
+          if (!res.ok) throw new Error('not-found');
+          const data = await res.json();
+          if (!data?.recipe) throw new Error('not-found');
+          return data.recipe as Recipe;
+        })
+      );
+
+      const loaded = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
+      setSavedMeals(loaded);
+    };
+
+    void loadSavedRecipes();
+  }, [userId, petRecord]);
+
+  const poolMeals = useMemo(() => {
+    const list: Recipe[] = [];
+
+    const byId = new Map<string, Recipe>();
+    savedMeals.forEach((m) => {
+      if (m?.id) byId.set(m.id, m);
+    });
+    customMeals.forEach((m) => {
+      const r = convertCustomMealToRecipe(m);
+      if (r?.id) byId.set(r.id, r);
+    });
+
+    const ids = Array.from(
+      new Set(
+        (petRecord?.savedRecipes || [])
+          .map((x) => String(x || '').trim())
+          .filter(Boolean)
+      )
+    );
+    ids.forEach((id) => {
+      const recipe = byId.get(id) || null;
+      if (recipe) list.push(recipe);
+      else list.push({
+        id,
+        name: id,
+        category: 'unknown',
+        ageGroup: ['adult'],
+        healthConcerns: [],
+        ingredients: [],
+        instructions: [],
+      } as Recipe);
+    });
+
+    return list;
+  }, [petRecord, savedMeals, customMeals]);
+
+  const mealsById = useMemo(() => {
+    const map: Record<string, Recipe> = {};
+    poolMeals.forEach((m) => {
+      if (m?.id) map[m.id] = m;
+    });
+    return map;
+  }, [poolMeals]);
+
+  const weekSlots = useMemo(() => {
+    return DAYS.map((day, dayIdx) => {
+      const start = dayIdx * 2;
+      return {
+        day,
+        slots: [
+          { label: 'Breakfast', index: start, mealId: mealPlanSchedule[start] || null },
+          { label: 'Dinner', index: start + 1, mealId: mealPlanSchedule[start + 1] || null },
+        ],
+      };
+    });
+  }, [mealPlanSchedule]);
+
+  const persistSchedule = useCallback(
+    async (nextSchedule: (string | null)[]) => {
+      if (!userId || !petRecord) return;
+
+      const normalizedSchedule = Array(DAYS.length * 2)
+        .fill(null)
+        .map((_, idx) => {
+          const v = idx < nextSchedule.length ? nextSchedule[idx] : null;
+          const s = v === null || v === undefined ? null : String(v || '').trim();
+          return s ? s : null;
+        });
+
+      const nextMealPlanIds = Array.from(new Set(normalizedSchedule.filter(Boolean) as string[]));
+      const updatedPet: any = {
+        ...petRecord,
+        mealPlanSchedule: normalizedSchedule,
+        mealPlan: nextMealPlanIds,
+      };
+
+      setIsSavingPlan(true);
+      try {
+        await savePet(userId, updatedPet as Pet);
+        setPetRecord(updatedPet as Pet);
+        setMealPlanSchedule(normalizedSchedule);
+      } finally {
+        setIsSavingPlan(false);
+      }
+    },
+    [userId, petRecord]
+  );
+
+  const handleClearSlot = useCallback(
+    async (slotIndex: number) => {
+      const next = [...mealPlanSchedule];
+      next[slotIndex] = null;
+      await persistSchedule(next);
+    },
+    [mealPlanSchedule, persistSchedule]
+  );
+
+  const handleDeleteMealFromPool = useCallback(
+    async (mealId: string) => {
+      if (!userId || !petRecord) return;
+      const ok = typeof window !== 'undefined' ? window.confirm('Delete this meal? This also removes it from any day slots.') : false;
+      if (!ok) return;
+
+      const nextScheduleRaw = mealPlanSchedule.map((id) => (id === mealId ? null : id));
+      const normalizedSchedule = Array(DAYS.length * 2)
+        .fill(null)
+        .map((_, idx) => {
+          const v = idx < nextScheduleRaw.length ? nextScheduleRaw[idx] : null;
+          const s = v === null || v === undefined ? null : String(v || '').trim();
+          return s ? s : null;
+        });
+
+      const nextMealPlanIds = Array.from(new Set(normalizedSchedule.filter(Boolean) as string[]));
+      const nextSaved = (petRecord.savedRecipes || []).filter((id) => String(id || '').trim() !== mealId);
+
+      if (mealId.startsWith('custom_')) {
+        try {
+          await deleteCustomMeal(userId, petRecord.id, mealId);
+        } catch {
+          // ignore
+        }
+        setCustomMeals((prev) => prev.filter((m) => m.id !== mealId));
+      }
+
+      const updatedPet: any = {
+        ...petRecord,
+        savedRecipes: nextSaved,
+        mealPlanSchedule: normalizedSchedule,
+        mealPlan: nextMealPlanIds,
+      };
+
+      setIsSavingPlan(true);
+      try {
+        await savePet(userId, updatedPet as Pet);
+        setPetRecord(updatedPet as Pet);
+        setPet((prev) => (prev ? { ...prev, savedRecipes: nextSaved } : prev));
+        setMealPlanSchedule(normalizedSchedule);
+      } finally {
+        setIsSavingPlan(false);
+      }
+    },
+    [userId, petRecord, mealPlanSchedule]
+  );
+
+  const onDragStartPool = useCallback((mealId: string) => {
+    setDragPayload({ mealId, from: 'pool' });
+  }, []);
+
+  const onDragStartSlot = useCallback((mealId: string, fromIndex: number) => {
+    setDragPayload({ mealId, from: 'slot', fromIndex });
+  }, []);
+
+  const onDropToSlot = useCallback(
+    async (slotIndex: number) => {
+      if (!dragPayload) return;
+      const mealId = dragPayload.mealId;
+      if (!mealId) return;
+
+      const next = [...mealPlanSchedule];
+      const targetExisting = next[slotIndex];
+
+      if (dragPayload.from === 'slot' && typeof dragPayload.fromIndex === 'number') {
+        const fromIndex = dragPayload.fromIndex;
+        if (fromIndex === slotIndex) return;
+
+        // Swap if dropping onto a filled slot
+        next[fromIndex] = targetExisting || null;
+        next[slotIndex] = mealId;
+      } else {
+        next[slotIndex] = mealId;
+      }
+
+      setDragPayload(null);
+      await persistSchedule(next);
+    },
+    [dragPayload, mealPlanSchedule, persistSchedule]
+  );
 
   if (loading) {
     return (
@@ -232,18 +359,21 @@ export default function MealPlanPage() {
 
   if (!pet) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="bg-surface p-8 rounded-xl shadow text-center space-y-4 border border-surface-highlight">
-          <p className="text-xl font-semibold text-gray-800">Pet not found.</p>
-          <Link href="/profile" className="text-green-800 font-semibold">
-            Back to Profiles
-          </Link>
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="max-w-lg bg-surface rounded-xl shadow p-8 text-center space-y-4 border border-surface-highlight">
+          <h1 className="text-2xl font-bold text-gray-900">Pet not found</h1>
+          <button
+            onClick={() => router.push('/profile')}
+            className="bg-green-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-900 transition-colors"
+          >
+            Back to pets
+          </button>
         </div>
       </div>
     );
   }
 
-  const allMealsCount = savedMeals.length + customMeals.length;
+  const allMealsCount = poolMeals.length;
   
   if (allMealsCount < 1) {
     return (
@@ -300,178 +430,180 @@ export default function MealPlanPage() {
               Weekly Meal Prep
             </p>
             <h1 className="text-3xl font-bold text-gray-900">
-              7-Day Meal Plan for {pet.name}
+              <span className="mr-2">7-Day Meal Plan for</span>
+              <AlphabetText text={pet.name} size={28} />
             </h1>
             <p className="text-gray-600 mt-1">
-              Two meals per day. No repeats on the same day. Each saved meal gets equal play.
+              Drag meals from the pool into empty slots.
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-7 gap-2">
-          {weeklyPlan.map((dayPlan, index) => (
-            <div key={dayPlan.day} className="bg-surface rounded-lg shadow p-2 border border-surface-highlight">
-              <div className="text-center mb-2">
-                <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">
-                  {dayPlan.day.slice(0, 3)}
-                </p>
-              </div>
-              <div className="space-y-2">
-                {dayPlan.meals.map((meal, mealIndex) => (
-                  <div key={meal.id + mealIndex} className="text-center">
-                    <Link
-                      href={`/recipe/${meal.id}?petId=${petId}`}
-                      className="block hover:text-primary-600 transition-colors mb-1"
-                    >
-                      <p className="font-medium text-gray-900 text-xs leading-tight">
-                        {meal.name}
-                        {meal.category === 'custom' && (
-                          <span className="ml-1 text-xs text-green-800">(Custom)</span>
-                        )}
-                      </p>
-                    </Link>
-                    <div className="flex flex-col items-center gap-1">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          const cartItems = meal.ingredients
-                            .map((ing, index) => {
-                              const genericName = ing.name.toLowerCase().trim();
-                              const vettedProduct = VETTED_PRODUCTS[genericName];
-                              const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
-                              if (link) {
-                                // Extract ASIN from /dp/ASIN format
-                                const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
-                                if (asinMatch) {
-                                  return `ASIN.${index + 1}=${asinMatch[1]}&Quantity.${index + 1}=1`;
-                                }
-                              }
-                              return null;
-                            })
-                            .filter(Boolean);
-
-                          if (cartItems.length > 0) {
-                            const cartUrl = ensureCartUrlSellerId(`https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`);
-                            window.open(cartUrl, '_blank');
-                          } else {
-                            alert('No ingredient links available for this recipe.');
-                          }
-                        }}
-                        className="inline-flex items-center gap-1 text-xs bg-green-600 text-black px-1 py-0.5 rounded hover:bg-green-700 transition-colors"
-                        title="Add all vetted ingredients to your Amazon cart"
-                      >
-                        <ShoppingCart size={8} />
-                        Buy
-                      </button>
-                      {/* Price Display */}
-                      {(() => {
-                        const mealTotalPrice = meal.ingredients?.reduce((sum, ing) => {
-                          const price = getProductPrice(ing.name);
-                          if (typeof price === 'number') return sum + price;
-                          return sum;
-                        }, 0) || 0;
-                        return mealTotalPrice > 0 ? (
-                          <span className="text-[10px] text-green-700 font-semibold">
-                            {formatPrice(mealTotalPrice)}
-                          </span>
-                        ) : null;
-                      })()}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
-                      }}
-                      className="mt-2 w-full inline-flex items-center justify-center gap-1 text-xs px-2 py-1 rounded border border-primary-500 text-primary-700 bg-surface hover:bg-surface-highlight transition-colors"
-                      title="Edit this slot"
-                    >
-                      Edit
-                    </button>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+          <div className="bg-surface rounded-xl shadow p-4 border border-surface-highlight">
+            <div className="grid grid-cols-7 gap-2">
+              {weekSlots.map((dayPlan) => (
+                <div key={dayPlan.day} className="bg-surface rounded-lg p-2 border border-surface-highlight">
+                  <div className="text-center mb-2">
+                    <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">{dayPlan.day.slice(0, 3)}</p>
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+                  <div className="space-y-2">
+                    {dayPlan.slots.map((slot) => {
+                      const mealId = slot.mealId;
+                      const meal = mealId ? mealsById[mealId] : null;
+                      const mealName = meal?.name || (mealId || 'Empty');
 
-        {swapTarget && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
-            <div className="bg-surface rounded-xl shadow-2xl max-w-lg w-full p-5 border border-surface-highlight">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-gray-900">Swap Meal</h3>
-                <button
-                  onClick={() => setSwapTarget(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                  aria-label="Close swap dialog"
-                >
-                  ✕
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">Choose a saved meal to place into this slot.</p>
-              <div className="max-h-72 overflow-y-auto space-y-2">
-                {allMeals.map((meal) => (
-                  <button
-                    key={meal.id}
-                    onClick={() => {
-                      if (!swapTarget) return;
-                      const planCopy = weeklyPlan.map((d) => ({ ...d, meals: [...d.meals] }));
-                      planCopy[swapTarget.dayIdx].meals[swapTarget.mealIdx] = meal;
-                      setWeeklyPlan(planCopy);
-                      setSwapTarget(null);
-                    }}
-                    className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-green-600 hover:bg-green-50 transition-colors"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-900">{meal.name}</span>
-                      {meal.category === 'custom' && (
-                        <span className="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Custom</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-                {allMeals.length === 0 && (
-                  <p className="text-sm text-gray-500">No saved meals available.</p>
-                )}
-              </div>
-              <div className="mt-4 flex justify-end gap-2">
-                <button
-                  onClick={() => setSwapTarget(null)}
-                  className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-              </div>
+                      return (
+                        <div
+                          key={`${dayPlan.day}-${slot.label}`}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                          }}
+                          onDrop={async (e) => {
+                            e.preventDefault();
+                            await onDropToSlot(slot.index);
+                          }}
+                          className="rounded-lg border border-surface-highlight bg-surface-lighter p-2 min-h-[74px]"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[10px] uppercase tracking-wide text-gray-400 font-semibold">
+                              {slot.label}
+                            </div>
+                            {mealId ? (
+                              <button
+                                type="button"
+                                onClick={() => handleClearSlot(slot.index)}
+                                className="text-gray-400 hover:text-gray-200"
+                                title="Remove from day"
+                                aria-label="Remove from day"
+                                disabled={isSavingPlan}
+                              >
+                                <X size={14} />
+                              </button>
+                            ) : null}
+                          </div>
+
+                          {mealId && meal ? (
+                            <div
+                              draggable
+                              onDragStart={() => onDragStartSlot(mealId, slot.index)}
+                              className="mt-1 rounded-lg border border-orange-400/30 bg-surface px-2 py-1"
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <Link
+                                  href={`/recipe/${mealId}?petId=${petId}`}
+                                  className="text-xs font-semibold text-gray-100 hover:text-orange-200 transition-colors"
+                                >
+                                  {mealName}
+                                </Link>
+                                <Link
+                                  href={`/recipe/${mealId}?petId=${petId}&checkout=open`}
+                                  className="inline-flex items-center gap-1 text-[10px] bg-green-600 text-black px-1.5 py-0.5 rounded hover:bg-green-700 transition-colors"
+                                  title="Buy all ingredients for this recipe"
+                                >
+                                  <ShoppingBag size={10} />
+                                  Buy
+                                </Link>
+                              </div>
+
+                              {(() => {
+                                const mealTotalPrice = meal.ingredients?.reduce((sum, ing) => {
+                                  const pricing = getIngredientDisplayPricing(ing.name);
+                                  const price = pricing?.packagePrice;
+                                  if (typeof price === 'number' && Number.isFinite(price) && price > 0) return sum + price;
+                                  return sum;
+                                }, 0) || 0;
+                                return mealTotalPrice > 0 ? (
+                                  <div className="mt-1 text-[10px] text-green-200 font-semibold">{formatPrice(mealTotalPrice)}</div>
+                                ) : null;
+                              })()}
+                            </div>
+                          ) : (
+                            <div
+                              className="mt-2 text-xs text-gray-500 italic"
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                              }}
+                            >
+                              Empty
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        )}
+
+          <div className="bg-surface rounded-xl shadow p-4 border border-surface-highlight">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-bold text-gray-100">Meal Pool</div>
+              <div className="text-xs text-gray-400">Drag into slots</div>
+            </div>
+            <div className="max-h-[640px] overflow-y-auto space-y-2 pr-1">
+              {poolMeals.map((meal) => {
+                const mealId = meal.id;
+                return (
+                  <div
+                    key={mealId}
+                    draggable
+                    onDragStart={() => onDragStartPool(mealId)}
+                    className="rounded-lg border border-surface-highlight bg-surface-lighter px-3 py-2 flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-gray-100 truncate">{meal.name}</div>
+                      <div className="mt-1 flex items-center gap-2">
+                        <Link
+                          href={`/recipe/${mealId}?petId=${petId}`}
+                          className="text-xs text-orange-200 hover:text-orange-100"
+                        >
+                          View
+                        </Link>
+                        <Link
+                          href={`/recipe/${mealId}?petId=${petId}&checkout=open`}
+                          className="text-xs text-green-200 hover:text-green-100"
+                        >
+                          Buy
+                        </Link>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteMealFromPool(mealId)}
+                      className="text-gray-400 hover:text-red-300"
+                      title="Delete meal"
+                      aria-label="Delete meal"
+                      disabled={isSavingPlan}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                );
+              })}
+              {poolMeals.length === 0 ? (
+                <div className="text-sm text-gray-400">No saved meals yet.</div>
+              ) : null}
+            </div>
+          </div>
+        </div>
 
         <div className="bg-surface rounded-xl shadow p-6 border border-surface-highlight">
           <h3 className="text-lg font-bold text-gray-900 mb-2">How rotation works</h3>
           <p className="text-gray-600 text-sm mb-2">
-            We loop through every saved meal (recipes and custom meals) equally, then shuffle lightly to keep variety.
-            Each day uses two different meals so {pet.name} never sees a repeat on the same day.
+            Your meal plan is saved per-slot. Drag meals from the pool into the week whenever you want.
           </p>
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <p className="text-xs text-gray-500">
-              <strong>Meals included:</strong> {savedMeals.length} saved recipe{savedMeals.length !== 1 ? 's' : ''} 
-              {customMeals.length > 0 && ` + ${customMeals.length} custom meal${customMeals.length !== 1 ? 's' : ''}`}
-            </p>
-          </div>
+          <p className="text-xs text-gray-500">
+            <strong>Meals included:</strong> {savedMeals.length} saved recipe{savedMeals.length !== 1 ? 's' : ''} 
+            {customMeals.length > 0 && ` + ${customMeals.length} custom meal${customMeals.length !== 1 ? 's' : ''}`}
+          </p>
         </div>
+      </div>
 
-        <div className="flex flex-wrap gap-2 mt-4">
-          <button
-            onClick={handleRandomize}
-            className="btn btn-success btn-sm"
-          >
-            Randomize Week
-          </button>
-          <Link
-            href={`/pets/${petId}/nutrition`}
-            className="btn btn-success btn-sm"
-          >
-            View Nutrition Dashboard
-          </Link>
-        </div>
+      <div className="flex flex-wrap gap-2 mt-4">
+        <Link href={`/pets/${petId}/nutrition`} className="btn btn-success btn-sm">
+          View Nutrition Dashboard
+        </Link>
       </div>
     </div>
   );

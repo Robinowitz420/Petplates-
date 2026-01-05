@@ -184,7 +184,9 @@ export const modifierRules: ModifierRule[] = [
         {
           name: 'Pumpkin Puree',
           amountPer10kg: '50g',
-          amazonLink: ensureSellerId('https://www.amazon.com/s?k=organic+pumpkin+puree+dog'),
+          amazonLink: ensureSellerId(
+            'https://www.amazon.com/Farmers-Market-Foods-Organic-Pumpkin/dp/B000VK5VQW/ref=sr_1_4?crid=YUHA845OOGSX&dib=eyJ2IjoiMSJ9.n2tyl7SjXkoTYPhYVIbTsrs2tOLnL8VdSLkve1iK_hLwIwmle0D61SEVRkUj3k0TBfFwF4PdIAgcNa7pVEuG9tQRdRNS1FIGhNbCUrZfrJ6sWrXPcHWh3MWrBH8XhkKxBI5D_sNQzfONNv0Iff1eVLtBdkMyrXxfnogCofEaqNprrSjdSBPUjW9HdyzNECeWDLrtzuWu0iXMgNYhuDDNvzoLMyXkrrlj4uzdZsKlQREVGDjBWFQVC0iAnNO6sbtgBKJSlVA2mRbH2Bi-hSgoT3BjubVAdL_cKGiB3Qn2Jvg.rCZue5Akc9LcjU5HDOhjmM78ajwGuZbvYqt2JIxeBA4&dib_tag=se&keywords=Farmer%27s%2BMarket%2BFoods%2BCanned%2BOrganic%2BPumpkin%2BPuree%2C%2B15%2BOunce&nsdOptOutParam=true&qid=1767460100&s=grocery&sprefix=farmer%27s%2Bmarket%2Bfoods%2Bcanned%2Borganic%2Bpumpkin%2Bpuree%2C%2B15%2Bounce%2Cgrocery%2C128&sr=1-4&th=1'
+          ),
           notes: 'Adds fiber & beta carotene for gut healing.',
         },
         {

@@ -10,5 +10,11 @@ export default clerkMiddleware((auth, req) => {
 })
 
 export const config = {
-  matcher: ['/profile(.*)', '/api/pets(.*)', '/api/custom-meals(.*)'],
+  matcher: [
+    // Match all routes except static files and Next internals
+    '/((?!.*\\..*|_next).*)',
+    '/',
+    // Match API routes
+    '/(api|trpc)(.*)',
+  ],
 }

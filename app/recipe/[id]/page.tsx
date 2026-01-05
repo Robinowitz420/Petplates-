@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  startTransition,
+} from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,9 +41,11 @@ import OneClickCheckoutModal from '@/components/OneClickCheckoutModal';
 import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
+import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
 import { getCustomMeal } from '@/lib/utils/customMealStorage';
 import { convertCustomMealToRecipe } from '@/lib/utils/convertCustomMealToRecipe';
 import { getPets as getPersistedPets, savePet as savePersistedPet } from '@/lib/utils/petStorage';
+import AlphabetText from '@/components/AlphabetText';
 import {
   getRecommendationsForRecipe,
   type RecommendedSupplement,
@@ -44,18 +53,23 @@ import {
 
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
-import { getProductPrice } from '@/lib/data/product-prices';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
+import { saveRecipeSnapshotForPet } from '@/lib/utils/recipeSnapshotStorage';
 import { normalizePetType } from '@/lib/utils/petType';
 import { formatPercent } from '@/lib/utils/formatPercent';
 import { getPortionPlan } from '@/lib/portionCalc';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import PetCompatibilityBlock from '@/components/PetCompatibilityBlock';
 import CustomMadeForLine from '@/components/CustomMadeForLine';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
+import { getPackageSize } from '@/lib/data/packageSizes';
 import ShoppingListBanner from '@/public/images/Site Banners/ShoppingList.png';
 import IngredientsTabImage from '@/public/images/Buttons/ingredients.png';
-import SupplementsTabImage from '@/public/images/Buttons/Supplements.jpg';
+import SupplementsTabImage from '@/public/images/Buttons/Supplements.png';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
+import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
+import StorageServingBanner from '@/public/images/Site Banners/unnamed.jpg';
+import CostComparisonBanner from '@/public/images/Site Banners/CostComparison.png';
 
 // =================================================================
 // 1. CONSTANTS
@@ -296,7 +310,7 @@ export default function RecipeDetailPage() {
   const [modifiedRecipe, setModifiedRecipe] = useState<Recipe | null>(null);
   const [recommendedSupplements, setRecommendedSupplements] = useState<RecommendedSupplement[]>([]);
   const [hopAddedLabel, setHopAddedLabel] = useState<string | null>(null);
-  const [modifiedScore, setModifiedScore] = useState<number | null>(null);
+  const [currentScore, setCurrentScore] = useState<ReturnType<typeof scoreWithSpeciesEngine> | null>(null);
   const [animatedScore, setAnimatedScore] = useState<number | null>(null);
 
   const userId = clerkUserId || '';
@@ -430,6 +444,22 @@ export default function RecipeDetailPage() {
       return null;
     }
   }, [recipe, activePetId, pets, userId]);
+
+  useEffect(() => {
+    if (scoreForQueryPet) {
+      setCurrentScore(scoreForQueryPet);
+      setAnimatedScore(scoreForQueryPet.overallScore);
+    } else {
+      setCurrentScore(null);
+      setAnimatedScore(null);
+    }
+  }, [scoreForQueryPet]);
+
+  const effectiveScore = currentScore || scoreForQueryPet;
+  const compatibilityScoreValue =
+    typeof animatedScore === 'number'
+      ? animatedScore
+      : effectiveScore?.overallScore ?? null;
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -567,8 +597,9 @@ export default function RecipeDetailPage() {
     }
   }, [selectedPetId, queryPetId, pets, recipe]);
 
-  useEffect(() => {
-    if (!selectedPetId || !recipe) {
+    useEffect(() => {
+    const currentPetId = selectedPetId || queryPetId;
+    if (!currentPetId || !recipe) {
       setPetWeight('');
       setPetAllergies('');
       setModifierResult(null);
@@ -579,8 +610,11 @@ export default function RecipeDetailPage() {
       return;
     }
 
-    const pet = pets.find((p) => p.id === selectedPetId);
-    if (!pet) return;
+    const pet = pets.find((p) => p.id === currentPetId);
+    if (!pet) {
+      setIsMealAdded(false);
+      return;
+    }
     setPetWeight(pet.weight || '');
     setPetAllergies(pet.allergies?.join(', ') || '');
     setModifierResult(null);
@@ -592,7 +626,7 @@ export default function RecipeDetailPage() {
     const { modifiedRecipe } = applyModifiers(recipe, pet);
     const vetted = vetRecipeIngredients(modifiedRecipe);
     setVettedRecipe(vetted);
-  }, [selectedPetId, pets, recipe]);
+  }, [selectedPetId, queryPetId, pets, recipe]);
 
   // Score animation function
   const animateScoreChange = useCallback((from: number, to: number) => {
@@ -649,7 +683,8 @@ export default function RecipeDetailPage() {
     }
 
     // Recalculate score
-    if (activePetId && scoreForQueryPet) {
+    const baselineScore = currentScore || scoreForQueryPet;
+    if (activePetId && baselineScore) {
       const pet = pets.find((p) => p.id === activePetId);
       if (pet) {
         const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
@@ -669,7 +704,7 @@ export default function RecipeDetailPage() {
 
         try {
           const newScored = scoreWithSpeciesEngine(newRecipe, scoringPet);
-          const oldScore = scoreForQueryPet.overallScore;
+          const oldScore = baselineScore.overallScore;
           const scoreDiff = newScored.overallScore - oldScore;
 
           if (scoreDiff > 0) {
@@ -677,7 +712,8 @@ export default function RecipeDetailPage() {
             animateScoreChange(oldScore, newScored.overallScore);
           }
 
-          setModifiedScore(newScored.overallScore);
+          setCurrentScore(newScored);
+          setAnimatedScore(newScored.overallScore);
           setMessage(`${supplement.name} added! Score improved by ${scoreDiff > 0 ? '+' : ''}${scoreDiff.toFixed(0)} points.`);
           setTimeout(() => setMessage(null), 5000);
         } catch (error) {
@@ -743,26 +779,28 @@ export default function RecipeDetailPage() {
   );
 
   useEffect(() => {
-    if (!activePet || !scoreForQueryPet) {
+    if (!activePet || !effectiveScore) {
       setRecommendedSupplements([]);
       return;
     }
 
     const petType = normalizePetType(activePet.type, 'recipe/[id].supplementRecommendations');
-    const overallScoreRaw = (scoreForQueryPet as any)?.overallScore;
+    const overallScoreRaw = effectiveScore?.overallScore;
     const overallScore = typeof overallScoreRaw === 'number' && Number.isFinite(overallScoreRaw) ? overallScoreRaw : null;
 
-    if (overallScore == null || overallScore >= 80) {
+    if (overallScore == null || overallScore >= 85) {
       setRecommendedSupplements([]);
       return;
     }
 
-    const gaps = Array.isArray((scoreForQueryPet as any)?.nutritionalGaps) ? ((scoreForQueryPet as any).nutritionalGaps as string[]) : [];
+    const gaps = Array.isArray((effectiveScore as any)?.nutritionalGaps)
+      ? ((effectiveScore as any).nutritionalGaps as string[])
+      : [];
     const healthConcerns = Array.isArray((activePet as any)?.healthConcerns) ? ((activePet as any).healthConcerns as string[]) : [];
 
     const recs = getRecommendationsForRecipe(gaps, petType, healthConcerns).filter((r) => !r.isIngredient);
     setRecommendedSupplements(recs);
-  }, [activePet, scoreForQueryPet]);
+  }, [activePet, effectiveScore]);
 
   const handleAddToMealPlan = useCallback(async () => {
     if (!recipe || !userId) {
@@ -791,28 +829,52 @@ export default function RecipeDetailPage() {
       return;
     }
 
-    setIsAddingMeal(true);
-    
-    // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const updatedPets = pets.map((pet) => {
-      if (pet.id !== currentPetId) return pet;
-      const nextSavedRecipes = Array.isArray(pet.savedRecipes) ? [...pet.savedRecipes] : [];
-      if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
-      return { ...pet, savedRecipes: nextSavedRecipes };
-    });
-
-    const updatedPet = updatedPets.find((p) => p.id === currentPetId) || null;
-    if (updatedPet) {
-      await savePersistedPet(userId, updatedPet as any);
-      setIsMealAdded(true);
-      // Dispatch event to notify other components
-      window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: currentPetId } }));
+    try {
+      const recipeToSnapshot: any = modifiedRecipe || vettedRecipe || recipe;
+      saveRecipeSnapshotForPet(userId, currentPetId, recipeToSnapshot);
+    } catch {
+      // ignore
     }
 
-    setPets(updatedPets);
-    setIsAddingMeal(false);
+    setIsAddingMeal(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const updatedPets = pets.map((pet) => {
+        if (pet.id !== currentPetId) return pet;
+        const nextSavedRecipes = Array.isArray(pet.savedRecipes) ? [...pet.savedRecipes] : [];
+        if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
+        return { ...pet, savedRecipes: nextSavedRecipes };
+      });
+
+      const updatedPet = updatedPets.find((p) => p.id === currentPetId) || null;
+      if (updatedPet) {
+        await savePersistedPet(userId, updatedPet as any);
+        setIsMealAdded(true);
+        window.dispatchEvent(new CustomEvent('petsUpdated', { detail: { userId, petId: currentPetId } }));
+      }
+
+      setPets(updatedPets);
+    } catch (err: any) {
+      let friendly = 'Unable to save this meal.';
+      const raw = err instanceof Error ? err.message : String(err);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && typeof parsed.message === 'string') {
+            friendly = parsed.message;
+          } else {
+            friendly = raw;
+          }
+        } catch {
+          friendly = raw;
+        }
+      }
+      setMessage(friendly);
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setIsAddingMeal(false);
+    }
   }, [recipe, selectedPetId, queryPetId, pets, userId]);
 
   const handlePersonalizeRecipe = async () => {
@@ -880,7 +942,12 @@ export default function RecipeDetailPage() {
   };
 
   // Calculate all shopping items and meal estimate for sidebar (MUST be before early returns)
-  const { ingredientShoppingItems, supplementShoppingItems, allShoppingItems, mealEstimate } = useMemo(() => {
+  const {
+    ingredientShoppingItems,
+    supplementShoppingItems,
+    allShoppingItems,
+    mealEstimate,
+  } = useMemo(() => {
     const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
     if (!baseRecipe) {
       return { ingredientShoppingItems: [], supplementShoppingItems: [], allShoppingItems: [], mealEstimate: null };
@@ -923,7 +990,7 @@ export default function RecipeDetailPage() {
     };
 
     const isSupplementLike = (ing: any) => {
-      if (isUserAddedSupplement(ing)) return false;
+      if (isUserAddedSupplement(ing)) return true;
       const cat = typeof ing?.__productCategory === 'string' ? ing.__productCategory : '';
       return supplementCategories.has(cat);
     };
@@ -951,13 +1018,7 @@ export default function RecipeDetailPage() {
         ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'supplement')),
     }));
 
-    const shoppingItems = [...ingredientItems];
-
-    const totalCost = ingredientItems.reduce((sum: number, item: any) => {
-      const price = getProductPrice(item.name);
-      if (typeof price === 'number') return sum + price;
-      return sum;
-    }, 0);
+    const shoppingItems = [...ingredientItems, ...supplementItems];
 
     let estimate = null;
     if (ingredientItems.length > 0) {
@@ -992,17 +1053,18 @@ export default function RecipeDetailPage() {
           servings
         );
 
-        const roundedTotalCost = Math.round(totalCost * 100) / 100;
-        const meals = rawEstimate?.estimatedMeals || 0;
-        const costPerMeal = meals > 0 ? Math.round((roundedTotalCost / meals) * 100) / 100 : 0;
+        if (rawEstimate) {
+          const roundedTotalCost = Math.round((rawEstimate.totalCost ?? 0) * 100) / 100;
+          const roundedCostPerMeal = Math.round((rawEstimate.costPerMeal ?? 0) * 100) / 100;
 
-        estimate = rawEstimate
-          ? {
-              ...rawEstimate,
-              totalCost: roundedTotalCost,
-              costPerMeal,
-            }
-          : null;
+          estimate = {
+            ...rawEstimate,
+            totalCost: roundedTotalCost,
+            costPerMeal: roundedCostPerMeal,
+          };
+        } else {
+          estimate = null;
+        }
       } catch {
         estimate = null;
       }
@@ -1015,6 +1077,95 @@ export default function RecipeDetailPage() {
       mealEstimate: estimate,
     };
   }, [vettedRecipe, recipe, modifiedRecipe]);
+
+  const supplementTotalCost = useMemo(() => {
+    if (!Array.isArray(supplementShoppingItems) || supplementShoppingItems.length === 0) return 0;
+
+    return supplementShoppingItems.reduce((sum, item: any) => {
+      const rawName = typeof item?.name === 'string' ? item.name : '';
+      if (!rawName) return sum;
+
+      const normalizedName = getGenericIngredientName(rawName);
+      const pricing = getIngredientDisplayPricing(normalizedName);
+      const packageEstimate = getPackageSize(normalizedName);
+
+      const estimatedPrice = Number(packageEstimate?.estimatedCost) || 0;
+      const isEstimatedPrice =
+        pricing?.priceSource === 'none' ||
+        pricing?.priceSource === 'package' ||
+        !(pricing?.packagePrice && pricing.packagePrice > 0);
+      const bestPackagePrice = isEstimatedPrice ? estimatedPrice : (pricing.packagePrice as number);
+
+      return sum + (Number.isFinite(bestPackagePrice) ? bestPackagePrice : 0);
+    }, 0);
+  }, [supplementShoppingItems]);
+
+  const costComparisonEstimate = useMemo(() => {
+    if (!mealEstimate || mealEstimate.estimatedMeals <= 0) return null;
+    const totalCost = (mealEstimate.totalCost || 0) + supplementTotalCost;
+    const estimatedMeals = mealEstimate.estimatedMeals;
+    const costPerMeal = estimatedMeals > 0 ? totalCost / estimatedMeals : 0;
+
+    if (!Number.isFinite(costPerMeal) || costPerMeal <= 0) return null;
+
+    return {
+      costPerMeal,
+      totalCost,
+      estimatedMeals,
+      exceedsBudget: mealEstimate.exceedsBudget || false,
+    };
+  }, [mealEstimate, supplementTotalCost]);
+
+  const recipeForPricing = useMemo(() => {
+    const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
+    if (!baseRecipe) return null;
+
+    const servingsRaw = (baseRecipe as any)?.servings;
+    const servingsParsed =
+      typeof servingsRaw === 'number'
+        ? servingsRaw
+        : typeof servingsRaw === 'string'
+          ? parseFloat(servingsRaw)
+          : NaN;
+    const servings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
+
+    return {
+      ...baseRecipe,
+      servings,
+    } as any;
+  }, [modifiedRecipe, recipe, vettedRecipe]);
+
+  const { pricingByRecipeId: apiPricingById } = useRecipePricing(recipeForPricing ? [recipeForPricing as any] : null);
+  const apiPricing = recipeForPricing ? apiPricingById?.[String((recipeForPricing as any)?.id || '')] : null;
+  const apiCostPerMeal = apiPricing?.costPerMealUsd ?? null;
+  const canonicalCostPerMeal =
+    typeof apiCostPerMeal === 'number' && Number.isFinite(apiCostPerMeal) && apiCostPerMeal > 0 ? apiCostPerMeal : null;
+
+  const supplementCostPerMealAddon = useMemo(() => {
+    if (!supplementTotalCost || !Number.isFinite(supplementTotalCost) || supplementTotalCost <= 0) return 0;
+
+    const estimateMealsRaw = mealEstimate?.estimatedMeals;
+    const servingsRaw = (recipeForPricing as any)?.servings;
+
+    const baseDenom =
+      typeof estimateMealsRaw === 'number' && Number.isFinite(estimateMealsRaw) && estimateMealsRaw > 0
+        ? estimateMealsRaw
+        : typeof servingsRaw === 'number' && Number.isFinite(servingsRaw) && servingsRaw > 0
+          ? servingsRaw
+          : 1;
+
+    const denom = Math.max(1, Math.floor(baseDenom));
+    return supplementTotalCost / denom;
+  }, [mealEstimate?.estimatedMeals, recipeForPricing, supplementTotalCost]);
+
+  const effectiveCostPerMeal = useMemo(() => {
+    if (!canonicalCostPerMeal) return null;
+    const addon = Number.isFinite(supplementCostPerMealAddon) && supplementCostPerMealAddon > 0 ? supplementCostPerMealAddon : 0;
+    const combined = canonicalCostPerMeal + addon;
+    return Number.isFinite(combined) && combined > 0 ? combined : canonicalCostPerMeal;
+  }, [canonicalCostPerMeal, supplementCostPerMealAddon]);
+
+  const shouldUsePackageEstimateForCostComparison = !canonicalCostPerMeal;
 
   if (isLoading) {
     return (
@@ -1065,7 +1216,7 @@ export default function RecipeDetailPage() {
               <div className="min-w-0 lg:pr-[260px]">
                 <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight leading-tight break-words">
                   <div className="flex items-center gap-3 flex-wrap break-words">
-                    <span className="break-words">{recipe.name}</span>
+                    <AlphabetText text={recipe.name} size={40} />
                     {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
                         Experimental / Topper Only
@@ -1092,7 +1243,7 @@ export default function RecipeDetailPage() {
                 </div>
               </div>
 
-              {scoreForQueryPet && activePet && (
+              {effectiveScore && activePet && (
                 <PetCompatibilityBlock
                   avatarSrc={getProfilePictureForPetType(activePet.type)}
                   avatarAlt={`${getRandomName(activePet.names)} profile`}
@@ -1100,11 +1251,23 @@ export default function RecipeDetailPage() {
                   right={
                     <button
                       type="button"
-                      onClick={() => setIsScoreModalOpen(true)}
+                      onClick={() => {
+                        if (userId && activePetId) {
+                          checkAllBadges(userId, activePetId, { action: 'score_details_viewed' }).catch(() => {
+                            // ignore
+                          });
+                        }
+                        setIsScoreModalOpen(true);
+                      }}
                       className="rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
                     >
                       <div className="flex items-center gap-5">
-                        <CompatibilityRadial score={scoreForQueryPet.overallScore} size={118} strokeWidth={10} label="" />
+                        <CompatibilityRadial
+                          score={compatibilityScoreValue ?? effectiveScore.overallScore}
+                          size={118}
+                          strokeWidth={10}
+                          label=""
+                        />
                         <div className="text-left">
                           <div className="text-sm font-semibold text-gray-200">Compatibility</div>
                           <div className="text-xs text-gray-400 mt-1">Tap for details</div>
@@ -1320,28 +1483,68 @@ export default function RecipeDetailPage() {
 
             {/* Cost Comparison */}
             {allShoppingItems.length > 0 &&
-              mealEstimate &&
-              mealEstimate.estimatedMeals > 0 &&
-              mealEstimate.costPerMeal > 0 && (
+              (canonicalCostPerMeal || (costComparisonEstimate && costComparisonEstimate.costPerMeal > 0)) && (
                 <div className="bg-surface rounded-2xl shadow-lg p-6 mb-8 border border-surface-highlight">
-                  <CostComparison
-                    costPerMeal={mealEstimate.costPerMeal}
-                    totalCost={mealEstimate.totalCost}
-                    estimatedMeals={mealEstimate.estimatedMeals}
-                    exceedsBudget={mealEstimate.exceedsBudget || false}
-                  />
+                  <div className="mb-4 flex justify-center">
+                    <Image
+                      src={CostComparisonBanner}
+                      alt="Cost comparison"
+                      className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
+                      unoptimized
+                    />
+                  </div>
+                  {shouldUsePackageEstimateForCostComparison && costComparisonEstimate ? (
+                    <CostComparison
+                      costPerMeal={costComparisonEstimate.costPerMeal}
+                      totalCost={costComparisonEstimate.totalCost}
+                      estimatedMeals={costComparisonEstimate.estimatedMeals}
+                      exceedsBudget={costComparisonEstimate.exceedsBudget}
+                    />
+                  ) : effectiveCostPerMeal ? (
+                    <CostComparison
+                      costPerMeal={effectiveCostPerMeal}
+                      pricingSource={apiPricing?.pricingSource}
+                      asOf={apiPricing?.asOf}
+                      missingIngredientCount={
+                        Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0
+                      }
+                      isComplete={apiPricing?.isComplete}
+                    />
+                  ) : canonicalCostPerMeal ? (
+                    <CostComparison
+                      costPerMeal={canonicalCostPerMeal}
+                      pricingSource={apiPricing?.pricingSource}
+                      asOf={apiPricing?.asOf}
+                      missingIngredientCount={
+                        Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0
+                      }
+                      isComplete={apiPricing?.isComplete}
+                    />
+                  ) : costComparisonEstimate ? (
+                    <CostComparison
+                      costPerMeal={costComparisonEstimate.costPerMeal}
+                      totalCost={costComparisonEstimate.totalCost}
+                      estimatedMeals={costComparisonEstimate.estimatedMeals}
+                      exceedsBudget={costComparisonEstimate.exceedsBudget}
+                    />
+                  ) : null}
                 </div>
               )}
           </main>
 
           <aside className="lg:col-span-2 space-y-8">
             {/* Health Breakdown Panel */}
-            {scoreForQueryPet && (
+            {effectiveScore && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
-                <h4 className="text-lg font-bold mb-4 flex items-center justify-center text-gray-200">
-                  <span className="text-2xl mr-2">🏥</span>
-                  Health Analysis
-                </h4>
+                <div className="mb-4 flex justify-center">
+                  <Image
+                    src={HealthAnalysisBanner}
+                    alt="Health analysis"
+                    className="h-auto w-full max-w-xs border border-surface-highlight rounded-lg"
+                    unoptimized
+                  />
+                </div>
+                <span className="sr-only">Health Analysis</span>
                 <div className="mb-4 flex justify-center">
                   <Image
                     src="/images/emojis/Mascots/Proffessor Purfessor/PUrfessorDesk.jpg"
@@ -1356,7 +1559,7 @@ export default function RecipeDetailPage() {
                   Professor Purfessor is here to break it down for you!
                 </p>
                 <div className="space-y-3">
-                  {Object.entries(scoreForQueryPet.breakdown)
+                  {Object.entries(effectiveScore.breakdown)
                     .filter(([key]) => {
                       const k = String(key || '').toLowerCase();
                       if (k.includes('life') && k.includes('stage') && k.includes('fit')) return false;
@@ -1428,9 +1631,15 @@ export default function RecipeDetailPage() {
             )}
 
             <div className="bg-surface rounded-2xl shadow-lg p-6 border border-surface-highlight">
-              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3">
-                🧊 Storage & Serving
-              </h3>
+              <div className="mb-4 flex justify-center">
+                <Image
+                  src={StorageServingBanner}
+                  alt="Storage and serving"
+                  className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
+                  unoptimized
+                />
+              </div>
+              <span className="sr-only">Storage and Serving</span>
               <div className="space-y-4 text-sm text-gray-300">
                 <div>
                   <div className="font-semibold text-gray-200">Storage</div>
@@ -1489,13 +1698,13 @@ export default function RecipeDetailPage() {
                 type="button"
                 onClick={handleAddToMealPlan}
                 disabled={!userId || !activePetId || isAddingMeal || isMealAdded}
-                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+                className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isMealAdded ? 'Meal Harvested' : 'Harvest Meal'}
               >
                 <span className="relative h-32 w-full overflow-hidden rounded-2xl">
                   <Image
                     src={isMealAdded ? "/images/Buttons/MealSaved.png" : "/images/Buttons/SaveMeal.png"}
-                    alt={isMealAdded ? "Meal Saved" : "Save Meal"}
+                    alt={isMealAdded ? "Meal Harvested" : "Harvest Meal"}
                     fill
                     sizes="100vw"
                     className="object-contain"
@@ -1503,7 +1712,7 @@ export default function RecipeDetailPage() {
                     unoptimized
                   />
                 </span>
-                <span className="sr-only">{isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}</span>
+                <span className="sr-only">{isMealAdded ? 'Meal Harvested' : 'Harvest Meal'}</span>
               </button>
               {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
               {userId && !activePetId && <div className="mt-2 text-xs text-gray-400">Select a pet to add</div>}
@@ -1515,10 +1724,11 @@ export default function RecipeDetailPage() {
       </div>
 
       {/* Recipe Score Modal */}
-      {isScoreModalOpen && scoreForQueryPet && (
+      {isScoreModalOpen && effectiveScore && (
         <RecipeScoreModal
           recipe={recipe}
           pet={modalPet}
+          score={effectiveScore}
           onClose={() => setIsScoreModalOpen(false)}
         />
       )}

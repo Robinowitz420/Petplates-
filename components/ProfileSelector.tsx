@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, User, Dog, Cat, Bird, Fish, Rabbit, X } from 'lucide-react';
+import AlphabetText from '@/components/AlphabetText';
 
 const petIcons = {
   dogs: Dog,
@@ -143,7 +144,9 @@ export default function ProfileSelector() {
                     <Icon size={24} className={selectedPet === pet.id ? 'text-orange-400' : 'text-gray-600'} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-gray-900">{pet.name}</h3>
+                    <h3 className="font-bold text-gray-900">
+                      <AlphabetText text={pet.name} size={22} />
+                    </h3>
                     <p className="text-sm text-gray-600 capitalize">{pet.breed.replace('-', ' ')}</p>
                     <p className="text-xs text-gray-500 mt-1 capitalize">{pet.age}</p>
                   </div>
@@ -154,7 +157,9 @@ export default function ProfileSelector() {
                       href={`/species/${pet.type}`}
                       className="text-sm text-orange-600 hover:text-orange-700 font-medium"
                     >
-                      View {pet.name}'s Recipes →
+                      <span className="mr-1">View</span>
+                      <AlphabetText text={pet.name} size={18} className="mx-1" />
+                      <span className="ml-1">'s Recipes →</span>
                     </a>
                   </div>
                 )}

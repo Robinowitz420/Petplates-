@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -124,12 +125,15 @@ export default function RootLayout({
           <meta name="google-site-verification" content={googleSiteVerification} />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
-          />
         </head>
         <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
+          <Script
+            id="website-jsonld"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(webSiteJsonLd),
+            }}
+          />
           <PWARegister />
           <ErrorBoundaryWrapper>
             <Navigation />

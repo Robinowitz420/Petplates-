@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Search, X } from 'lucide-react';
 
 interface Ingredient {
@@ -21,7 +21,7 @@ interface IngredientPickerProps {
   disabled?: boolean;
 }
 
-export default function IngredientPicker({
+export default memo(function IngredientPicker({
   ingredients,
   categories,
   onSelect,
@@ -34,7 +34,7 @@ export default function IngredientPicker({
   // Filter ingredients by search and category
   const filteredIngredients = ingredients.filter(ing => {
     const matchesSearch = ing.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || 
+    const matchesCategory = !selectedCategory ||
       categories[selectedCategory]?.ingredients.includes(ing.name);
     return matchesSearch && matchesCategory;
   });
@@ -126,5 +126,5 @@ export default function IngredientPicker({
       )}
     </div>
   );
-}
+});
 

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outreach Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pet Plates Outreach Dashboard</h1>
+            <div class="header-controls">
+                <button id="refresh-btn">🔄 Refresh</button>
+                <span id="status-indicator">Loading...</span>
+            </div>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Status:</label>
+                <select id="status-filter">
+                    <option value="">All</option>
+                    <option value="not_contacted">Not Contacted</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="replied">Replied</option>
+                    <option value="follow_up">Follow Up</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="needs_manual_check">Needs Manual Check</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Platform:</label>
+                <select id="platform-filter">
+                    <option value="">All</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="x">X (Twitter)</option>
+                    <option value="threads">Threads</option>
+                    <option value="email">Email</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Search:</label>
+                <input type="text" id="search-input" placeholder="Name, handle, or tags...">
+            </div>
+
+            <div class="filter-group">
+                <label>Limit:</label>
+                <select id="limit-select">
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="250">250</option>
+                    <option value="1000">1000</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="influencers-table-container">
+                <table id="influencers-table">
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Name</th>
+                            <th>Handle</th>
+                            <th>Status</th>
+                            <th>Tags</th>
+                            <th>Last Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="influencers-tbody">
+                        <!-- Influencers will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="details-panel" id="details-panel">
+                <div class="details-header">
+                    <h2 id="details-name">Select an influencer</h2>
+                    <button id="close-details">×</button>
+                </div>
+
+                <div class="details-content">
+                    <div class="details-section">
+                        <h3>Basic Info</h3>
+                        <div class="form-group">
+                            <label>Status:</label>
+                            <select id="edit-status">
+                                <option value="not_contacted">Not Contacted</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="replied">Replied</option>
+                                <option value="follow_up">Follow Up</option>
+                                <option value="not_interested">Not Interested</option>
+                                <option value="needs_manual_check">Needs Manual Check</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notes:</label>
+                            <textarea id="edit-notes" rows="3" placeholder="Add notes about this influencer..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Recent Content Hook:</label>
+                            <input type="text" id="edit-recent-content" placeholder="e.g., 'dog training video'">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Personalization Notes:</label>
+                            <textarea id="edit-personalization" rows="2" placeholder="Key points about them..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="edit-email" placeholder="Optional email address">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Profile URL:</label>
+                            <input type="url" id="edit-profile-url" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <div class="details-section">
+                        <h3>Actions</h3>
+                        <div class="action-buttons">
+                            <button id="open-profile-btn" class="action-btn">🌐 Open Profile</button>
+                            <button id="generate-message-btn" class="action-btn primary">✨ Generate Message</button>
+                            <button id="mark-contacted-btn" class="action-btn">✅ Mark Contacted</button>
+                        </div>
+                    </div>
+
+                    <div class="details-section">
+                        <h3>Message</h3>
+                        <div class="message-controls">
+                            <div class="control-row">
+                                <div class="form-group">
+                                    <label>Template:</label>
+                                    <select id="template-select">
+                                        <option value="first_touch">First Touch</option>
+                                        <option value="follow_up">Follow Up</option>
+                                        <option value="affiliate_invite">Affiliate Invite</option>
+                                    </select>
+                                </div>
+
+                                <div class="checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="include-ps-toggle">
+                                        Include PS (free Pro offer)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-area">
+                            <textarea id="message-textarea" readonly placeholder="Click 'Generate Message' to create a personalized message..."></textarea>
+                            <div class="message-footer">
+                                <span id="char-counter">0 characters</span>
+                                <button id="copy-message-btn" class="copy-btn">📋 Copy Message</button>
+                            </div>
+                        </div>
+
+                        <div id="warnings" class="warnings"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

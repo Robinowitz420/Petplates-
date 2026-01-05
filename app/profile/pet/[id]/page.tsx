@@ -8,30 +8,26 @@ import { ArrowLeft, Plus } from 'lucide-react';
 import SherlockDetectingImg from '@/public/images/Buttons/SherlockShellsIsNowDetectingMealsFor.png';
 import { useAuth } from '@clerk/nextjs';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
+import { applyModifiers } from '@/lib/applyModifiers';
 import { getRandomName } from '@/lib/utils/petUtils';
 import EmojiIcon from '@/components/EmojiIcon';
 import { getPets, savePet } from '@/lib/utils/petStorage';
 import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
+import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
+
 import ScoringProgress from '@/components/ScoringProgress';
 
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
+import AlphabetText from '@/components/AlphabetText';
 import { normalizePetType } from '@/lib/utils/petType';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
-import { getProductPrice } from '@/lib/data/product-prices';
-import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
-import { getGenericIngredientName, getVettedProduct } from '@/lib/data/vetted-products';
 import { getPetBadges } from '@/lib/utils/badgeStorage';
+
 import { checkAllBadges } from '@/lib/utils/badgeChecker';
 import UserAgreementModal from '@/components/UserAgreementModal';
 import { USER_AGREEMENT_STORAGE_KEY } from '@/lib/userAgreementDisclaimer';
 import MealGenerationScene, { type SceneStatus } from '@/components/MealGenerationScene';
-
-type RecipeCardEstimate = {
-  costPerMeal: number;
-  estimatedMeals: number;
-  totalCost: number;
-};
 
 type PetCategory = 'dogs' | 'cats' | 'birds' | 'reptiles' | 'pocket-pets';
 type AgeGroup = 'baby' | 'young' | 'adult' | 'senior';
@@ -75,6 +71,12 @@ export default function RecommendedRecipesPage() {
   const [hasAgreedToDisclaimer, setHasAgreedToDisclaimer] = useState(false);
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
 
+  const formatActivityLevel = (level?: Pet['activityLevel']) => {
+    if (!level) return '';
+    const spaced = level.replace(/-/g, ' ');
+    return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+  };
+
   const sceneStatus: SceneStatus = useMemo(() => {
     if (engineError) return 'error';
     if (loadingMeals) return 'loading';
@@ -83,7 +85,7 @@ export default function RecommendedRecipesPage() {
   }, [engineError, engineMeals, loadingMeals]);
 
   const mealsCacheKey = useMemo(() => {
-    return `generated_meals_v2:${userId || 'anon'}:${petId}`;
+    return `generated_meals_v3:${userId || 'anon'}:${petId}:count18`;
   }, [petId, userId]);
 
   const forceRegenerate = searchParams.get('regenerate') === '1';
@@ -221,19 +223,17 @@ export default function RecommendedRecipesPage() {
 
     (async () => {
       try {
-        if (!userId) throw new Error('Missing Clerk userId');
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
           body: JSON.stringify({
-            userId,
             species: pet.type,
-            count: 9,
+            count: 18,
             petProfile: {
               name: petDisplayName,
               breed: pet.breed || undefined,
-              weight: pet.weight,
+              weight: pet.weight || undefined,
               weightKg: pet.weightKg,
               age: pet.age,
               activityLevel: pet.activityLevel,
@@ -251,20 +251,26 @@ export default function RecommendedRecipesPage() {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          let details = '';
+          let friendly = '';
           try {
             const contentType = response.headers.get('content-type') || '';
             if (contentType.includes('application/json')) {
               const errorJson = await response.json();
-              details = JSON.stringify(errorJson);
+              const code = typeof errorJson?.code === 'string' ? errorJson.code : '';
+              const message = typeof errorJson?.message === 'string' ? errorJson.message : '';
+              const details = typeof errorJson?.details === 'string' ? errorJson.details : '';
+              const errorText = typeof errorJson?.error === 'string' ? errorJson.error : '';
+
+              const core = message || details || errorText;
+              friendly = core ? `${code ? `${code}: ` : ''}${core}` : '';
             } else {
-              details = await response.text();
+              friendly = await response.text();
             }
           } catch {
           }
 
           throw new Error(
-            `Recipe generation failed (${response.status})${details ? `: ${details}` : ''}`
+            friendly || `Recipe generation failed (${response.status})`
           );
         }
 
@@ -344,41 +350,11 @@ export default function RecommendedRecipesPage() {
     return hasAnyFromAPI ? engineMeals : [];
   }, [engineMeals]);
 
-  const pricingByRecipeId = useMemo(() => {
-    const next: Record<string, RecipeCardEstimate> = {};
-
-    for (const m of mealsToRender as any[]) {
-      const recipe = m?.recipe as any;
-      const recipeId = recipe?.id;
-      if (!recipeId) continue;
-
-      const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-      const ingredientItems = ingredients.map((ing: any) => ({
-        id: ing.id,
-        name: ing.name,
-        amount: ing.amount || '',
-      }));
-
-      const totalCost = ingredientItems.reduce((sum: number, item: any) => {
-        const price = getProductPrice(item.name);
-        if (typeof price === 'number') return sum + price;
-        return sum;
-      }, 0);
-
-      const roundedTotalCost = Math.round(totalCost * 100) / 100;
-
-      let estimatedMeals = 0;
-      try {
-        const shoppingListItems = ingredientItems.map((item: any) => {
-          const genericName = getGenericIngredientName(item.name) || item.name.toLowerCase();
-          const vettedProduct = getVettedProduct(genericName, recipe?.category);
-          return {
-            id: item.id,
-            name: item.name,
-            amount: item.amount,
-            category: vettedProduct?.category || 'other',
-          };
-        });
+  const recipesForPricing = useMemo(() => {
+    return mealsToRender
+      .map((m: any) => {
+        const recipe = m?.recipe;
+        if (!recipe) return null;
 
         const servingsRaw = (recipe as any)?.servings;
         const servingsParsed =
@@ -388,20 +364,23 @@ export default function RecommendedRecipesPage() {
               ? parseFloat(servingsRaw)
               : NaN;
         const servings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
-        const rawEstimate = calculateMealsFromGroceryList(shoppingListItems, undefined, recipe?.category, true, servings);
-        estimatedMeals = rawEstimate?.estimatedMeals || 0;
-      } catch {
-        estimatedMeals = 0;
-      }
 
-      const costPerMeal = estimatedMeals > 0 ? Math.round((roundedTotalCost / estimatedMeals) * 100) / 100 : 0;
-      if (costPerMeal > 0 && estimatedMeals > 0) {
-        next[recipeId] = { costPerMeal, estimatedMeals, totalCost: roundedTotalCost };
-      }
-    }
+        const normalized = {
+          ...recipe,
+          servings,
+        } as any;
 
-    return next;
-  }, [mealsToRender]);
+        const modified = pet ? applyModifiers(normalized as any, pet as any).modifiedRecipe : normalized;
+
+        return {
+          ...modified,
+          servings,
+        } as any;
+      })
+      .filter(Boolean) as Recipe[];
+  }, [mealsToRender, pet]);
+
+  const { pricingByRecipeId: apiPricingById } = useRecipePricing(recipesForPricing.length > 0 ? recipesForPricing : null);
 
   const handleRegenerate = () => {
     if (!hasAgreedToDisclaimer) return;
@@ -474,7 +453,6 @@ export default function RecommendedRecipesPage() {
         ...pet,
         savedRecipes: [...(pet.savedRecipes || []), recipeId]
       };
-
       await savePet(userId, updatedPet);
 
       setPet(updatedPet);
@@ -482,22 +460,34 @@ export default function RecommendedRecipesPage() {
       setCardMessage({ id: recipeId, text: `${recipeName} added to ${petDisplayName}'s meals.` });
       setTimeout(() => setCardMessage(null), 2500);
     } catch (error) {
-      console.error('Failed to save recipe:', error);
-      // Optionally, revert state or show an error message
+      const raw = error instanceof Error ? error.message : String(error || '');
+      let friendly = raw || 'Unable to save this meal.';
+      let isExpectedError = false;
+
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && typeof (parsed as any).message === 'string') {
+            friendly = String((parsed as any).message);
+            isExpectedError = parsed.code === 'LIMIT_REACHED';
+          }
+        } catch {
+          // Check for expected errors in raw text
+          isExpectedError = raw.includes('LIMIT_REACHED') || raw.includes('limit');
+        }
+      }
+
+      setCardMessage({ id: recipeId, text: friendly });
+      setTimeout(() => setCardMessage(null), 5000);
+
+      // Only log unexpected errors to console
+      if (!isExpectedError) {
+        console.error('Failed to save recipe:', error);
+      }
     } finally {
       setIsSaving(null);
     }
   };
-
-  if (!pet) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  const usingEngine = Boolean(engineMeals && engineMeals.length > 0);
 
   const getPetEmoji = (type: PetCategory) => {
     const emojis = {
@@ -548,6 +538,14 @@ export default function RecommendedRecipesPage() {
     return Array.from({ length: 5 }, (_, i) => i < fullStars);
   };
 
+  if (!pet) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground py-4">
       {disclaimerChecked && !hasAgreedToDisclaimer ? (
@@ -562,7 +560,7 @@ export default function RecommendedRecipesPage() {
           Back to Profile
         </Link>
 
-        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex gap-6">
+        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex gap-6 relative">
           <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1">
             <span className="relative block w-40 md:w-48 lg:w-56 h-full overflow-hidden rounded-md">
               <MealGenerationScene
@@ -581,15 +579,15 @@ export default function RecommendedRecipesPage() {
           </span>
           <div className="flex-1 flex flex-col gap-6 min-w-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0">
+              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 md:translate-x-[200px]">
                 <Image
                   src={SherlockDetectingImg}
                   alt="Sherlock Shells is detecting meals for:"
                   className="h-8 w-auto"
                   priority
                 />
-                <span className="inline-flex items-center gap-3">
-                  <span className="font-semibold text-2xl">{petDisplayName}</span>
+                <span className="inline-flex items-center gap-3 relative" style={{ top: '11px' }}>
+                  <AlphabetText text={petDisplayName} size={36} />
                 </span>
               </div>
             </div>
@@ -610,7 +608,8 @@ export default function RecommendedRecipesPage() {
                 <button
                   onClick={handleRegenerate}
                   disabled={loadingMeals}
-                  className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative inline-flex focus:outline-none focus-visible:outline-none focus-visible:ring-0 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ outline: 'none', boxShadow: 'none' }}
                   aria-label={loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
                 >
                   <span className="relative h-16 w-[360px] sm:w-[420px] max-w-full overflow-hidden rounded-2xl">
@@ -629,11 +628,13 @@ export default function RecommendedRecipesPage() {
 
               <div
                 className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1 lg:-translate-y-[60px] pb-10"
-                style={{ marginLeft: '-65px' }}
+                style={{ marginLeft: '-115px' }}
               >
 
                 <div className="flex-shrink-0 min-w-[200px]">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">Bio</h3>
+                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">
+                    <AlphabetText text="Bio" size={30} />
+                  </h3>
                   <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
                     {pet.breed && (
                       <div className="flex items-start gap-1.5">
@@ -656,26 +657,34 @@ export default function RecommendedRecipesPage() {
                     {pet.activityLevel && (
                       <div className="flex items-start gap-1.5">
                         <span className="text-orange-400 mt-0.5">•</span>
-                        <span><strong className="text-gray-200">Activity Level:</strong> {pet.activityLevel}</span>
+                        <span>
+                          <strong className="text-gray-200">Activity Level:</strong> {formatActivityLevel(pet.activityLevel)}
+                        </span>
                       </div>
                     )}
                     {(pet.dietaryRestrictions || []).length > 0 && (
                       <div className="flex items-start gap-1.5">
                         <span className="text-orange-400 mt-0.5">•</span>
-                        <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}</span>
+                        <span>
+                          <strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}
+                        </span>
                       </div>
                     )}
                     {(pet.dislikes || []).length > 0 && (
                       <div className="flex items-start gap-1.5">
                         <span className="text-orange-400 mt-0.5">•</span>
-                        <span><strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}</span>
+                        <span>
+                          <strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}
+                        </span>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="flex-shrink-0 min-w-[160px]">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Health Concerns</h3>
+                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
+                    <AlphabetText text="Health concerns" size={30} />
+                  </h3>
                   <div className="flex flex-col gap-1.5">
                     {(pet.healthConcerns || []).length > 0 ? (
                       (pet.healthConcerns || []).map((concern) => (
@@ -687,15 +696,15 @@ export default function RecommendedRecipesPage() {
                         </div>
                       ))
                     ) : (
-                      <div className="px-2 py-1 text-gray-500 text-xs italic">
-                        None
-                      </div>
+                      <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
                     )}
                   </div>
                 </div>
 
                 <div className="flex-shrink-0 min-w-[160px]">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">Allergies</h3>
+                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
+                    <AlphabetText text="Allergies" size={30} />
+                  </h3>
                   <div className="flex flex-col gap-1.5">
                     {(pet.allergies || []).length > 0 ? (
                       (pet.allergies || []).map((allergy) => (
@@ -707,13 +716,17 @@ export default function RecommendedRecipesPage() {
                         </div>
                       ))
                     ) : (
-                      <div className="px-2 py-1 text-gray-500 text-xs italic">
-                        None
-                      </div>
+                      <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
                     )}
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="hidden md:flex absolute bottom-3 right-4 pointer-events-none select-none">
+            <div className="max-w-[420px]">
+              <AlphabetText text="Click on Meal Cards for Details" size={26} className="justify-end" />
             </div>
           </div>
         </div>
@@ -723,23 +736,34 @@ export default function RecommendedRecipesPage() {
             .sort((a: any, b: any) => {
               const aScore = ('score' in a && typeof a.score === 'number') ? a.score : 0;
               const bScore = ('score' in b && typeof b.score === 'number') ? b.score : 0;
-              return bScore - aScore;
+              const scoreDiff = bScore - aScore;
+              if (Math.abs(scoreDiff) > 0.001) {
+                return scoreDiff;
+              }
+              const aId = a.recipe?.id || '';
+              const bId = b.recipe?.id || '';
+              return aId.localeCompare(bId);
             })
-            .slice(0, 9)
+            .slice(0, 18)
             .map((meal) => {
               const recipe = (meal as any).recipe;
               const recipeId = recipe?.id;
               if (!recipeId) return null;
 
-              const pricing = pricingByRecipeId[recipeId];
+              const pricing = apiPricingById?.[recipeId];
               const costText =
-                typeof pricing?.costPerMeal === 'number' && Number.isFinite(pricing.costPerMeal)
-                  ? `$${pricing.costPerMeal.toFixed(2)}`
+                typeof pricing?.costPerMealUsd === 'number' && Number.isFinite(pricing.costPerMealUsd)
+                  ? `$${pricing.costPerMealUsd.toFixed(2)} Per Meal`
                   : null;
-              const mealsText =
-                typeof pricing?.estimatedMeals === 'number' && Number.isFinite(pricing.estimatedMeals) && pricing.estimatedMeals > 0
-                  ? `${Math.round(pricing.estimatedMeals)}`
-                  : null;
+              const mealsText = null;
+
+              const provenanceLabel = (() => {
+                const source = pricing?.pricingSource;
+                if (!source || source === 'none') return null;
+                if (source === 'snapshot') return 'Snapshot';
+                if (source === 'estimate') return null;
+                return 'Mixed';
+              })();
 
               return (
                 <Link
@@ -755,12 +779,16 @@ export default function RecommendedRecipesPage() {
                     <div className="bg-surface rounded-lg shadow-md border-2 border-orange-500/40 overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/60 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
                       <div className="p-6 flex-1 flex flex-col">
                         <div className="mb-3">
-                          <h3 className="text-xl font-bold text-foreground text-center">{recipe.name}</h3>
+                          <h3 className="text-xl font-bold text-foreground text-center">
+                            <AlphabetText text={recipe.name} size={28} className="justify-center" />
+                          </h3>
                           <div className="mt-3 flex justify-center">
                             {costText ? (
                               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
-                                <span>Cost per meal:</span>
                                 <span className="text-white">{costText}</span>
+                                {provenanceLabel ? (
+                                  <span className="text-gray-300">• {provenanceLabel}</span>
+                                ) : null}
                                 {mealsText ? (
                                   <span className="text-gray-300">• Est. meals: {mealsText}</span>
                                 ) : null}
@@ -797,18 +825,18 @@ export default function RecommendedRecipesPage() {
                               e.stopPropagation();
                               handleSaveRecipe(recipeId, recipe.name);
                             }}
-                            disabled={isSaving === recipeId}
-                            className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50"
-                            aria-label={savedRecipeIds.has(recipeId) ? 'Meal Saved' : 'Save Meal'}
+                            disabled={savedRecipeIds.has(recipeId) || isSaving === recipeId}
+                            className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
+                            aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
                           >
                             <span className="relative h-12 w-full overflow-hidden rounded-2xl">
                               <Image
                                 src={
-                                  isSaving === recipeId || savedRecipeIds.has(recipeId)
+                                  savedRecipeIds.has(recipeId)
                                     ? '/images/Buttons/MealSaved.png'
                                     : '/images/Buttons/SaveMeal.png'
                                 }
-                                alt={savedRecipeIds.has(recipeId) ? 'Meal Saved' : 'Save Meal'}
+                                alt={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
                                 fill
                                 sizes="100vw"
                                 className="object-contain"
@@ -816,11 +844,7 @@ export default function RecommendedRecipesPage() {
                               />
                             </span>
                             <span className="sr-only">
-                              {isSaving === recipeId
-                                ? 'Saving...'
-                                : savedRecipeIds.has(recipeId)
-                                  ? 'Meal Saved'
-                                  : 'Save Meal'}
+                              {savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
                             </span>
                           </button>
                         </div>

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { X } from 'lucide-react';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import type { Recipe } from '@/lib/types';
 import { actionNeededBeep } from '@/lib/utils/beep';
 import { normalizePetType } from '@/lib/utils/petType';
+import AlphabetText from '@/components/AlphabetText';
 
 type ModalPet = {
   id: string;
@@ -147,6 +149,8 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
   const aiWeight = useMemo(() => String(aiExplain?.weight || '').trim(), [aiExplain]);
   const aiAge = useMemo(() => String(aiExplain?.age || '').trim(), [aiExplain]);
 
+  const stripTripleHashes = (value: string): string => value.replace(/^\s*###\s*/gm, '');
+
   const healthConcernNotes = useMemo(() => {
     if (!pet) return [] as Array<{ concern: string; note: string }>;
     const petConcerns = Array.isArray((pet as any).healthConcerns)
@@ -172,7 +176,7 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4 sm:px-6 bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-3xl bg-surface rounded-xl shadow-2xl overflow-hidden border border-surface-highlight">
+      <div className="w-full max-w-6xl bg-surface rounded-xl shadow-2xl overflow-hidden border border-surface-highlight">
         <div className="flex items-start justify-between p-5 border-b border-surface-highlight bg-surface">
           <div />
           <button onClick={onClose} className="p-2 rounded text-gray-400 hover:bg-surface-highlight hover:text-white">
@@ -180,47 +184,65 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
           </button>
         </div>
 
-        <div className="p-6 bg-surface">
+        <div className="p-6 bg-surface max-h-[75vh]">
           {aiLoading ? (
             <div className="mt-3 text-sm text-gray-400">Generating explanation…</div>
           ) : aiError ? (
             <div className="mt-3 text-sm text-red-300/80">Unable to generate explanation right now.</div>
           ) : (aiSummary || aiWeight || aiAge || healthConcernNotes.length > 0) ? (
-            <div className="space-y-5 text-sm text-gray-300">
-              {aiSummary ? (
-                <div>
-                  <div className="text-gray-200 font-semibold mb-2">Summary</div>
-                  <div className="whitespace-pre-wrap">{aiSummary}</div>
-                </div>
-              ) : null}
+            <div className="space-y-6">
+              <div className="flex justify-center">
+                <AlphabetText text="Summary" size={48} className="mb-2" />
+              </div>
 
-              {healthConcernNotes.length > 0 ? (
-                <div>
-                  <div className="text-gray-200 font-semibold mb-2">Health concerns</div>
-                  <div className="space-y-3">
-                    {healthConcernNotes.map((item) => (
-                      <div key={item.concern} className="rounded-lg border border-surface-highlight bg-surface-lighter p-3">
-                        <div className="text-gray-200 font-semibold capitalize">{item.concern}</div>
-                        <div className="mt-1 text-gray-300 whitespace-pre-wrap">{item.note}</div>
+              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6">
+                <div className="flex justify-center lg:justify-start">
+                  <Image
+                    src="/images/emojis/Mascots/Proffessor Purfessor/ProfessorPurfessorClassroom.png"
+                    alt="Professor Purfessor in classroom"
+                    width={200}
+                    height={200}
+                    className="rounded-lg object-contain"
+                    unoptimized
+                  />
+                </div>
+
+                <div className="overflow-y-auto pr-2 max-h-[70vh] space-y-5 text-sm text-gray-300">
+                  {aiSummary ? (
+                    <div>
+                      <div className="whitespace-pre-wrap">{stripTripleHashes(aiSummary)}</div>
+                    </div>
+                  ) : null}
+
+                  {healthConcernNotes.length > 0 ? (
+                    <div>
+                      <div className="text-gray-200 font-semibold mb-2">Health concerns</div>
+                      <div className="space-y-3">
+                        {healthConcernNotes.map((item) => (
+                          <div key={item.concern} className="rounded-lg border border-surface-highlight bg-surface-lighter p-3">
+                            <div className="text-gray-200 font-semibold capitalize">{item.concern}</div>
+                            <div className="mt-1 text-gray-300 whitespace-pre-wrap">{stripTripleHashes(item.note)}</div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+                    </div>
+                  ) : null}
 
-              {aiWeight ? (
-                <div>
-                  <div className="text-gray-200 font-semibold mb-2">Weight</div>
-                  <div className="whitespace-pre-wrap">{aiWeight}</div>
-                </div>
-              ) : null}
+                  {aiWeight ? (
+                    <div>
+                      <div className="text-gray-200 font-semibold mb-2">Weight</div>
+                      <div className="whitespace-pre-wrap">{stripTripleHashes(aiWeight)}</div>
+                    </div>
+                  ) : null}
 
-              {aiAge ? (
-                <div>
-                  <div className="text-gray-200 font-semibold mb-2">Age</div>
-                  <div className="whitespace-pre-wrap">{aiAge}</div>
+                  {aiAge ? (
+                    <div>
+                      <div className="text-gray-200 font-semibold mb-2">Age</div>
+                      <div className="whitespace-pre-wrap">{stripTripleHashes(aiAge)}</div>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
+              </div>
             </div>
           ) : (
             <div className="mt-3 text-sm text-gray-500">No explanation available.</div>

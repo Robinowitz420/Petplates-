@@ -36,6 +36,7 @@ export interface AllIngredients {
     whole_prey: string[]; // Added for snakes
     vegetables: string[];
     fruits: string[];
+    supplements?: string[];
   };
   'pocket-pets': {
     hay: string[];
@@ -44,6 +45,7 @@ export interface AllIngredients {
     fruits: string[];
     hamster_additions: string[];
     sugar_glider_special: string[]; // Added for gliders
+    supplements?: string[];
   };
 }
 
@@ -148,7 +150,8 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Flaxseeds', 'Sesame Seeds', 'Chia Seeds', 'quinoa', 'Rapeseed',
       'Sunflower Seeds (small amounts)', 'Pumpkin Seeds', 'Safflower Seeds', 'Nyjer Seeds',
       'Amaranth Seeds', 'Buckwheat (hulled)', 'Barley (hulled)', 'Wheat (hulled)',
-      'Rice (hulled)', 'Corn (cracked)', 'Poppy Seeds', 'Teff Seeds', 'Wild Bird Mix'
+      'Rice (hulled)', 'Corn (cracked)', 'Poppy Seeds', 'Teff Seeds', 'Wild Bird Mix',
+      'Sprouted Seed Mix', 'Soaked Seed Blend', 'Parrot Foraging Blend'
     ],
     nuts: [
       'Walnuts (in shell)', 'Almonds', 'Brazil Nuts', 'Pecans', 'Macadamia Nuts', 
@@ -160,27 +163,33 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Escarole', 'arugula', 'Dandelion Greens', 'Collard Greens',
       'Turnip Greens', 'Beet Greens', 'Swiss Chard', 'bok choy', 'Napa Cabbage',
       'Cauliflower', 'Romanesco Broccoli', 'Snow Peas', 'Sugar Snap Peas', 'asparagus',
-      'celery', 'Fennel', 'parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme'
+      'celery', 'Fennel', 'parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme', 'Mustard Greens',
+      'Tat Soi', 'Okra', 'Broccolini'
     ],
     fruits: [
       'Apples (no seeds)', 'blueberries', 'Strawberries', 'Mango', 'bananas',
       'Grapes (chopped)', 'Papaya', 'Melon', 'Pineapple (small amounts)', 'Kiwi',
       'Raspberries', 'Blackberries', 'Cranberries', 'Cherries (pitted)', 'Pears (no seeds)',
       'Peaches (pitted)', 'Plums (pitted)', 'Apricots (pitted)', 'Figs', 'Dates (pitted)',
-      'Raisins (unsweetened)', 'Currants', 'Goji Berries', 'Mulberries'
+      'Raisins (unsweetened)', 'Currants', 'Goji Berries', 'Mulberries', 'Pomegranate Arils',
+      'Dragon Fruit', 'Starfruit'
     ],
     supplements: [
       'eggs', 'Pellets (fortified)', 'Cuttlebone', 'Honey (tiny amounts)',
       'Peanut Butter (unsalted, tiny amounts)', 'Brewer\'s Yeast', 'Spirulina Powder',
       'Kelp Powder', 'Probiotic Powder', 'Vitamin D3 Drops', 'calcium carbonate',
-      'Electrolyte Powder', 'Amino Acid Supplement', 'Fish Oil', 'Joint Health Powder'
+      'Electrolyte Powder', 'Amino Acid Supplement', 'Fish Oil', 'Joint Health Powder',
+      'Avian Calcium Powder with D3', 'Avian Calcium Powder without D3', 'Avian Mineral Block',
+      'Avian Electrolyte Solution', 'Feather Conditioning Oil', 'Omega 3 Bird Supplement',
+      'Avian Probiotic Blend'
     ]
   },
   reptiles: {
     insects: [
       'Dubia Roaches', 'Crickets', 'Mealworms', 'Superworms', 'Black Soldier Fly Larvae', 'Hornworms',
       'Silkworms', 'Waxworms', 'Butterworms', 'Phoenix Worms', 'Earthworms', 'Grasshoppers',
-      'Locusts', 'Mantids', 'Fruit Flies', 'Pinhead Crickets', 'Small Dubia Roaches'
+      'Locusts', 'Mantids', 'Fruit Flies', 'Pinhead Crickets', 'Small Dubia Roaches',
+      'Calcium Dusted Crickets', 'Canned Grasshoppers', 'Canned Silkworm Pupae'
     ],
     whole_prey: [
       'Pinkie Mice (frozen/thawed)', 'Fuzzy Mice', 'Hopper Mice', 'Adult Mice',
@@ -193,21 +202,27 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Napa Cabbage', 'Romaine Lettuce', 'Iceberg Lettuce', 'Red Leaf Lettuce', 'Butter Lettuce',
       'Cauliflower', 'broccoli', 'Romanesco Broccoli', 'asparagus', 'celery', 'Fennel',
       'parsley', 'Cilantro', 'Basil', 'Mint', 'Thyme', 'Oregano', 'Sage', 'Rosemary',
-      'sweet potato', 'pumpkin', 'Squash (various)', 'cucumber', 'Eggplant'
+      'sweet potato', 'pumpkin', 'Squash (various)', 'cucumber', 'Eggplant', 'Mustard Greens',
+      'Prickly Pear Pads', 'Grape Leaves', 'Mulberry Leaves'
     ],
     fruits: [
       'blueberries', 'Mango', 'Papaya', 'Strawberries', 'Figs', 'Apples (no seeds)',
       'Pears (no seeds)', 'bananas', 'Melon', 'Cantaloupe', 'Honeydew', 'Watermelon',
       'Pineapple', 'Kiwi', 'Raspberries', 'Blackberries', 'Cranberries', 'Cherries (pitted)',
       'Peaches (pitted)', 'Plums (pitted)', 'Apricots (pitted)', 'Grapes (seedless)',
-      'Raisins (unsweetened)', 'Dates (pitted)', 'Prunes', 'Goji Berries', 'Mulberries'
+      'Raisins (unsweetened)', 'Dates (pitted)', 'Prunes', 'Goji Berries', 'Mulberries',
+      'Prickly Pear Fruit', 'Guava'
+    ],
+    supplements: [
+      'Reptile Calcium Powder with D3', 'Reptile Calcium Powder without D3', 'Reptile Multivitamin Powder',
+      'Reptile Electrolyte Soak', 'Bee Pollen Granules', 'Herbivore Critical Care Powder'
     ]
   },
   'pocket-pets': {
     hay: [
       'Timothy Hay', 'Meadow Hay', 'Orchard Grass Hay', 'Alfalfa Hay (babies/pregnant only)',
       'Bermuda Hay', 'Bluegrass Hay', 'Fescue Hay', 'Ryegrass Hay', 'Wheat Hay',
-      'Oat Hay', 'Barley Hay', 'Straw (wheat/pine)', 'Dried Grass'
+      'Oat Hay', 'Barley Hay', 'Straw (wheat/pine)', 'Dried Grass', 'Botanical Hay Blend'
     ],
     vegetables: [
       'lettuce (romaine)', 'Bell Peppers (high vitamin C)', 'carrots', 'cucumber', 'zucchini',
@@ -217,30 +232,40 @@ export const ALL_INGREDIENTS: AllIngredients = {
       'Green Cabbage', 'Cauliflower', 'asparagus', 'Fennel', 'Leeks', 'Shallots',
       'Garlic Chives', 'Radicchio', 'Frisee', 'Mache', 'Watercress', 'Purslane',
       'Miner\'s Lettuce', 'Lamb\'s Quarters', 'Amaranth Leaves', 'Malabar Spinach',
-      'New Zealand Spinach', 'sweet potato', 'pumpkin', 'Squash (cooked)'
+      'New Zealand Spinach', 'sweet potato', 'pumpkin', 'Squash (cooked)', 'Mustard Greens',
+      'Herb Blend Forage', 'Dried Rose Hips'
     ],
     pellets: [
       'Guinea Pig Pellets (with vitamin C)', 'Rabbit Pellets (high fiber)', 'Hamster Pellets (higher protein)',
       'Gerbil Pellets', 'Mouse/Rat Pellets', 'Chinchilla Pellets', 'Degus Pellets',
-      'Fortified Pellets (vitamin C)', 'Timothy-Based Pellets', 'Alfalfa-Based Pellets'
+      'Fortified Pellets (vitamin C)', 'Timothy-Based Pellets', 'Alfalfa-Based Pellets',
+      'Oxbow Essentials Adult Rabbit Pellets', 'Oxbow Essentials Guinea Pig Pellets',
+      'Science Selective Rat Pellets', 'Science Selective Hamster Pellets', 'Mazuri Hedgehog Diet',
+      'Mazuri Insectivore Diet'
     ],
     fruits: [
       'Apples (no seeds)', 'Strawberries', 'blueberries', 'bananas', 'Melon', 'Grapes', 'Papaya',
       'Pears (no seeds)', 'Peaches (pitted)', 'Plums (pitted)', 'Apricots (pitted)', 'Cherries (pitted)',
       'Raspberries', 'Blackberries', 'Cranberries', 'Kiwi', 'Pineapple (small amounts)',
       'Mango (small amounts)', 'Papaya (small amounts)', 'Figs', 'Dates (pitted)', 'Raisins (unsweetened)',
-      'Goji Berries', 'Mulberries', 'Currants', 'Elderberries'
+      'Goji Berries', 'Mulberries', 'Currants', 'Elderberries', 'Dried Apple Chips (unsweetened)',
+      'Dried Cranberry Pieces', 'Papaya Tablets', 'Dried Rose Petals'
     ],
     hamster_additions: [
       'Mealworms (freeze-dried)', 'eggs', 'Whole Grain Cheerios',
       'Sunflower Seeds (unsalted)', 'Pumpkin Seeds (unsalted)', 'Flaxseeds', 'Chia Seeds',
       'Hemp Seeds', 'Sesame Seeds', 'Popcorn (plain)', 'Whole Wheat Pasta (cooked)',
       'brown rice', 'quinoa', 'Amaranth (cooked)', 'Buckwheat (cooked)',
-      'Millet (cooked)', 'Barley (cooked)', 'oats', 'Corn (cooked)', 'Peas (cooked)'
+      'Millet (cooked)', 'Barley (cooked)', 'oats', 'Corn (cooked)', 'Peas (cooked)',
+      'Dried Mealworm Mix', 'Herbal Forage Blend'
     ],
     sugar_glider_special: [
       'Nectar Mix (commercial)', 'Gum Arabic', 'Eucalyptus Leaves', 'Acacia Gum', 
-      'Bee Pollen', 'Manuka Honey', 'calcium carbonate'
+      'Bee Pollen', 'Manuka Honey', 'calcium carbonate', 'Leadbeater Smoothie Mix'
+    ],
+    supplements: [
+      'Small Animal Vitamin C Drops', 'Small Animal Probiotic Powder', 'Joint Support Chews',
+      'Electrolyte Support Solution', 'Oxbow Critical Care Herbivore', 'Oxbow Critical Care Carnivore'
     ]
   }
 };

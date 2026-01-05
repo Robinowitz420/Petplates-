@@ -6,12 +6,43 @@ import { CustomMeal } from '@/lib/types';
 import { MealAnalysis, IngredientSelection } from '@/lib/analyzeCustomMeal';
 import { getPets, savePet } from './petStorage';
 import { checkAllBadges } from './badgeChecker';
+import { saveRecipeSnapshotForPet } from './recipeSnapshotStorage';
 
 async function fetchJsonOrThrow<T>(res: Response): Promise<T> {
   const text = await res.text();
   if (!res.ok) {
+    // Check if the response is HTML (indicating a redirect to sign-in page)
+    if (text.trim().startsWith('<!DOCTYPE html>') || text.includes('<html')) {
+      if (res.status === 404) {
+        throw new Error('Please sign in to access your custom meals');
+      }
+      throw new Error('Authentication required. Please sign in.');
+    }
+
     if (res.status === 401) throw new Error('Please sign in');
-    throw new Error(text || `Request failed (${res.status})`);
+    if (text) {
+      try {
+        const parsed = JSON.parse(text) as any;
+        const message =
+          (typeof parsed?.message === 'string' && parsed.message) ||
+          (typeof parsed?.error === 'string' && parsed.error) ||
+          '';
+        const error = new Error(message || text);
+        // Don't log auth errors to console
+        if (!message.includes('Please sign in') && !message.includes('Authentication required')) {
+          console.error('API Error:', error);
+        }
+        throw error;
+      } catch {
+        const error = new Error(text);
+        // Don't log auth errors to console
+        if (!text.includes('Please sign in') && !text.includes('Authentication required')) {
+          console.error('API Error:', error);
+        }
+        throw error;
+      }
+    }
+    throw new Error(`Request failed (${res.status})`);
   }
   return text ? (JSON.parse(text) as T) : ({} as T);
 }
@@ -26,13 +57,80 @@ async function fetchJsonOrThrow<T>(res: Response): Promise<T> {
 export async function getCustomMeals(userId: string, petId: string): Promise<CustomMeal[]> {
   if (!userId || !petId) return [];
 
-  const res = await fetch(`/api/custom-meals?petId=${encodeURIComponent(petId)}`, {
-    method: 'GET',
-    credentials: 'include',
-  });
+  let res: Response;
+  try {
+    res = await fetch(`/api/custom-meals?petId=${encodeURIComponent(petId)}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+  } catch (networkError) {
+    // Only log actual network errors, not auth errors
+    if (!networkError?.message?.includes('Please sign in') && !networkError?.message?.includes('Authentication required')) {
+      console.error('Network error:', networkError);
+    }
+    throw new Error('Network error: Unable to connect to server. Please check your connection.');
+  }
 
   const data = await fetchJsonOrThrow<{ customMeals?: CustomMeal[] }>(res);
   return Array.isArray(data.customMeals) ? data.customMeals : [];
+}
+
+export async function getCustomMealsPaged(
+  userId: string,
+  petId: string,
+  options?: { limit?: number; cursor?: string | null }
+): Promise<{ customMeals: CustomMeal[]; nextCursor: string | null }> {
+  if (!userId || !petId) return { customMeals: [], nextCursor: null };
+
+  const limit = typeof options?.limit === 'number' && options.limit > 0 ? Math.floor(options.limit) : 50;
+  const cursor = options?.cursor ? String(options.cursor) : '';
+
+  const params = new URLSearchParams();
+  params.set('petId', petId);
+  params.set('limit', String(limit));
+  if (cursor) params.set('cursor', cursor);
+
+  let res: Response;
+  try {
+    res = await fetch(`/api/custom-meals?${params.toString()}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+  } catch (networkError) {
+    // Only log actual network errors, not auth errors
+    if (!networkError?.message?.includes('Please sign in') && !networkError?.message?.includes('Authentication required')) {
+      console.error('Network error:', networkError);
+    }
+    throw new Error('Network error: Unable to connect to server. Please check your connection.');
+  }
+
+  const data = await fetchJsonOrThrow<{ customMeals?: CustomMeal[]; nextCursor?: string | null }>(res);
+  return {
+    customMeals: Array.isArray(data.customMeals) ? data.customMeals : [],
+    nextCursor: typeof data.nextCursor === 'string' ? data.nextCursor : null,
+  };
+}
+
+export async function getCustomMealById(userId: string, mealId: string): Promise<CustomMeal | null> {
+  if (!userId || !mealId) return null;
+
+  let res: Response;
+  try {
+    res = await fetch(`/api/custom-meals/${encodeURIComponent(mealId)}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+  } catch (networkError) {
+    // Only log network errors, not auth errors
+    if (!networkError?.message?.includes('Please sign in')) {
+      console.error('Network error fetching custom meal:', networkError);
+    }
+    throw new Error('Network error: Unable to connect to server. Please check your connection.');
+  }
+
+  if (!res.ok) return null;
+  const data = await fetchJsonOrThrow<{ customMeal?: CustomMeal | null }>(res);
+  return (data?.customMeal as any) || null;
 }
 
 /**
@@ -93,15 +191,37 @@ export async function saveCustomMeal(
     },
   };
 
-  const res = await fetch('/api/custom-meals', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({ customMeal }),
-  });
+  let res: Response;
+  try {
+    res = await fetch('/api/custom-meals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ customMeal }),
+    });
+  } catch (networkError) {
+    // Only log network errors, not auth errors
+    if (!networkError?.message?.includes('Please sign in')) {
+      console.error('Network error saving custom meal:', networkError);
+    }
+    throw new Error('Network error: Unable to connect to server. Please check your connection.');
+  }
 
   const data = await fetchJsonOrThrow<{ customMeal?: CustomMeal }>(res);
   const saved = data.customMeal || customMeal;
+
+  try {
+    saveRecipeSnapshotForPet(userId, petId, {
+      id: saved.id,
+      name: saved.name,
+      category: 'custom',
+      ingredients: (ingredients || []).map((ing) => ({
+        name: String(ing.key || ''),
+      })),
+    });
+  } catch {
+    // ignore
+  }
   
   // Also add the custom meal ID to the pet's savedRecipes array
   // We need to fetch the pet, update it, and save it back
@@ -125,6 +245,16 @@ export async function saveCustomMeal(
     }));
   }
 
+  try {
+    const allCustomMeals = await getCustomMeals(userId, petId);
+    await checkAllBadges(userId, petId, {
+      action: 'custom_meal_saved',
+      customMealCount: allCustomMeals.length,
+    });
+  } catch {
+    // ignore
+  }
+
   return saved;
 }
 
@@ -138,10 +268,19 @@ export async function saveCustomMeal(
  */
 export async function deleteCustomMeal(userId: string, petId: string, mealId: string): Promise<void> {
 
-  const res = await fetch(`/api/custom-meals/${encodeURIComponent(mealId)}`, {
-    method: 'DELETE',
-    credentials: 'include',
-  });
+  let res: Response;
+  try {
+    res = await fetch(`/api/custom-meals/${encodeURIComponent(mealId)}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+  } catch (networkError) {
+    // Only log network errors, not auth errors
+    if (!networkError?.message?.includes('Please sign in')) {
+      console.error('Network error deleting custom meal:', networkError);
+    }
+    throw new Error('Network error: Unable to connect to server. Please check your connection.');
+  }
   await fetchJsonOrThrow<{ ok?: boolean }>(res);
   
   // Also remove from pet's savedRecipes
@@ -191,12 +330,21 @@ export async function updateCustomMealName(
     meal.name = newName;
     meal.updatedAt = new Date().toISOString();
 
-    const res = await fetch('/api/custom-meals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ customMeal: meal }),
-    });
+    let res: Response;
+    try {
+      res = await fetch('/api/custom-meals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ customMeal: meal }),
+      });
+    } catch (networkError) {
+      // Only log network errors, not auth errors
+      if (!networkError?.message?.includes('Please sign in')) {
+        console.error('Network error updating custom meal:', networkError);
+      }
+      throw new Error('Network error: Unable to connect to server. Please check your connection.');
+    }
 
     await fetchJsonOrThrow<{ customMeal?: CustomMeal }>(res);
   }

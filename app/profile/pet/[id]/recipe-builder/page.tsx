@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -68,6 +68,7 @@ interface Pet {
   image?: string;
   savedRecipes?: string[];
   weightKg?: number;
+  bannedIngredients?: string[];
 }
 
 // Species-appropriate ingredient categories
@@ -390,6 +391,15 @@ const getCategorizedIngredients = (availableIngredients: string[], species: stri
     }
   });
 
+  // Species-specific removals for irrelevant categories
+  if (normalizedSpecies === 'reptiles') {
+    categories.grains.ingredients = [];
+  }
+
+  if (normalizedSpecies === 'cats') {
+    categories.fruits.ingredients = [];
+  }
+
   return categories;
 };
 
@@ -409,38 +419,51 @@ export default function RecipeBuilderPage() {
   const [hasAppliedRecommended, setHasAppliedRecommended] = useState(false);
   const [isFirstCreation, setIsFirstCreation] = useState(false); // Track if this is the first creation
   const [recommendedMeals, setRecommendedMeals] = useState<any[]>([]); // Store recommended meals
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get species-appropriate ingredients and categories
   const normalizedSpeciesType = pet ? normalizeSpecies(pet.type) : null;
   const speciesCoverageLevel = normalizedSpeciesType ? getSpeciesCoverageLevel(normalizedSpeciesType as any) : 'limited';
   const blacklist = normalizedSpeciesType ? getBlacklistForSpecies(normalizedSpeciesType as any) : [];
+
+  const whitelist = useMemo(() => {
+    return normalizedSpeciesType ? getWhitelistForSpecies(normalizedSpeciesType as any) : [];
+  }, [normalizedSpeciesType]);
   
-  // Filter available ingredients through whitelist
-  const allAvailableIngredients = pet ? getAvailableIngredients(pet.type, (pet as any).bannedIngredients) : [];
-  const whitelist = normalizedSpeciesType ? getWhitelistForSpecies(normalizedSpeciesType as any) : [];
-  const availableIngredients = whitelist.length > 0 
-    ? allAvailableIngredients.filter(ing => isWhitelisted(ing, normalizedSpeciesType as any))
-    : allAvailableIngredients; // Fallback to all if no whitelist data
+  // Memoize available ingredients filtering
+  const availableIngredients = useMemo(() => {
+    if (!pet) return [];
+    const allAvailableIngredients = getAvailableIngredients(pet.type, pet.bannedIngredients);
+    return whitelist.length > 0
+      ? allAvailableIngredients.filter(ing => isWhitelisted(ing, normalizedSpeciesType as any))
+      : allAvailableIngredients;
+  }, [pet?.type, pet?.bannedIngredients, normalizedSpeciesType, whitelist]);
   
-  const categorizedIngredients = pet ? getCategorizedIngredients(availableIngredients, pet.type) : null;
+  const categorizedIngredients = useMemo(() => {
+    if (!pet || !availableIngredients.length) return null;
+    return getCategorizedIngredients(availableIngredients, pet.type);
+  }, [pet?.type, availableIngredients]);
   
   // Generate base suggestions from static rules
-  const baseSuggestedIngredients = pet ? generateIngredientSuggestions({
-    type: pet.type,
-    age: pet.age,
-    healthConcerns: pet.healthConcerns || [],
-    breed: pet.breed
-  }) : [];
+  const baseSuggestedIngredients = useMemo(() => {
+    if (!pet) return [];
+    return generateIngredientSuggestions({
+      type: pet.type,
+      age: pet.age,
+      healthConcerns: pet.healthConcerns || [],
+      breed: pet.breed
+    });
+  }, [pet?.type, pet?.age, pet?.healthConcerns, pet?.breed]);
   
-  // Extract ingredients from recommended meals and merge with base suggestions
-  const suggestedIngredients = (() => {
+  // Memoize the complex suggestedIngredients calculation
+  const suggestedIngredients = useMemo(() => {
     if (!pet || recommendedMeals.length === 0) {
       return baseSuggestedIngredients;
     }
-    
+
     // Extract unique ingredients from top 5 recommended meals
     const ingredientsFromMeals = new Map<string, { name: string; reason: string; category: string; fromMeal: boolean }>();
-    
+
     recommendedMeals.slice(0, 5).forEach((meal: any) => {
       const mealIngredients = meal.recipe?.ingredients || meal.adjustedIngredients || [];
       mealIngredients.forEach((ing: any) => {
@@ -449,7 +472,7 @@ export default function RecipeBuilderPage() {
           // Try to categorize the ingredient
           const nameLower = ingName.toLowerCase();
           let category = 'Other';
-          if (nameLower.includes('liver') || nameLower.includes('heart') || nameLower.includes('chicken') || 
+          if (nameLower.includes('liver') || nameLower.includes('heart') || nameLower.includes('chicken') ||
               nameLower.includes('turkey') || nameLower.includes('duck') || nameLower.includes('salmon') ||
               nameLower.includes('beef') || nameLower.includes('fish') || nameLower.includes('meat')) {
             category = 'Proteins';
@@ -467,7 +490,7 @@ export default function RecipeBuilderPage() {
                      nameLower.includes('fruit')) {
             category = 'Fruits';
           }
-          
+
           ingredientsFromMeals.set(ingName, {
             name: ingName,
             reason: `Found in your top recommended meals - ${meal.recipe?.name || 'recommended meal'}`,
@@ -477,27 +500,91 @@ export default function RecipeBuilderPage() {
         }
       });
     });
-    
+
     // Merge with base suggestions, prioritizing ingredients from meals
     const merged = new Map<string, { name: string; reason: string; category: string }>();
-    
+
     // First add ingredients from recommended meals (higher priority)
     ingredientsFromMeals.forEach((ing) => {
       merged.set(ing.name, { name: ing.name, reason: ing.reason, category: ing.category });
     });
-    
+
     // Then add base suggestions (if not already present)
     baseSuggestedIngredients.forEach((ing) => {
       if (!merged.has(ing.name)) {
         merged.set(ing.name, ing);
       }
     });
-    
+
     return Array.from(merged.values()).slice(0, 12); // Limit to 12 total suggestions
-  })();
+  }, [pet, recommendedMeals, baseSuggestedIngredients]);
   
+  // Memoize the complex suggestedIngredients calculation
+  const memoizedSuggestedIngredients = useMemo(() => {
+    if (!pet || recommendedMeals.length === 0) {
+      return baseSuggestedIngredients;
+    }
+
+    // Extract unique ingredients from top 5 recommended meals
+    const ingredientsFromMeals = new Map<string, { name: string; reason: string; category: string; fromMeal: boolean }>();
+
+    recommendedMeals.slice(0, 5).forEach((meal: any) => {
+      const mealIngredients = meal.recipe?.ingredients || meal.adjustedIngredients || [];
+      mealIngredients.forEach((ing: any) => {
+        const ingName = ing.name || ing.productName || '';
+        if (ingName && !ingredientsFromMeals.has(ingName)) {
+          // Try to categorize the ingredient
+          const nameLower = ingName.toLowerCase();
+          let category = 'Other';
+          if (nameLower.includes('liver') || nameLower.includes('heart') || nameLower.includes('chicken') ||
+              nameLower.includes('turkey') || nameLower.includes('duck') || nameLower.includes('salmon') ||
+              nameLower.includes('beef') || nameLower.includes('fish') || nameLower.includes('meat')) {
+            category = 'Proteins';
+          } else if (nameLower.includes('squash') || nameLower.includes('greens') || nameLower.includes('kale') ||
+                     nameLower.includes('spinach') || nameLower.includes('carrot') || nameLower.includes('broccoli') ||
+                     nameLower.includes('dandelion') || nameLower.includes('vegetable')) {
+            category = 'Greens & Veggies';
+          } else if (nameLower.includes('rice') || nameLower.includes('quinoa') || nameLower.includes('oats') ||
+                     nameLower.includes('grain') || nameLower.includes('carb')) {
+            category = 'Grains & Carbs';
+          } else if (nameLower.includes('oil') || nameLower.includes('supplement') || nameLower.includes('powder') ||
+                     nameLower.includes('currant') || nameLower.includes('vitamin')) {
+            category = 'Supplements';
+          } else if (nameLower.includes('berry') || nameLower.includes('apple') || nameLower.includes('banana') ||
+                     nameLower.includes('fruit')) {
+            category = 'Fruits';
+          }
+
+          ingredientsFromMeals.set(ingName, {
+            name: ingName,
+            reason: `Found in your top recommended meals - ${meal.recipe?.name || 'recommended meal'}`,
+            category,
+            fromMeal: true
+          });
+        }
+      });
+    });
+
+    // Merge with base suggestions, prioritizing ingredients from meals
+    const merged = new Map<string, { name: string; reason: string; category: string }>();
+
+    // First add ingredients from recommended meals (higher priority)
+    ingredientsFromMeals.forEach((ing) => {
+      merged.set(ing.name, { name: ing.name, reason: ing.reason, category: ing.category });
+    });
+
+    // Then add base suggestions (if not already present)
+    baseSuggestedIngredients.forEach((ing) => {
+      if (!merged.has(ing.name)) {
+        merged.set(ing.name, ing);
+      }
+    });
+
+    return Array.from(merged.values()).slice(0, 12); // Limit to 12 total suggestions
+  }, [pet, recommendedMeals, baseSuggestedIngredients]);
+
   // Extract recommended ingredient names for wizard
-  const recommendedIngredientNames = suggestedIngredients.map(s => s.name);
+  const recommendedIngredientNames = memoizedSuggestedIngredients.map(s => s.name);
   
   // Debug logging (remove in production)
   useEffect(() => {
@@ -642,10 +729,10 @@ export default function RecipeBuilderPage() {
               grams: sel.grams
             };
           });
-          
+
           const result = generateCustomMealAnalysis(petProfile, mappedIngredients);
           setAnalysis(result);
-          
+
           // After first analysis from wizard, auto-apply recommended amounts once
           if (result.recommendedServingGrams > 0 && selectedIngredients.length > 0 && wizardCompleted && !hasAppliedRecommended) {
             const currentTotal = selectedIngredients.reduce((sum, s) => sum + s.grams, 0);
@@ -672,39 +759,47 @@ export default function RecipeBuilderPage() {
       }
     };
 
-    const debounceTimer = setTimeout(analyzeRecipe, 500);
+    const debounceTimer = setTimeout(analyzeRecipe, 800);
     return () => clearTimeout(debounceTimer);
   }, [selectedIngredients, pet]);
 
-  const addIngredient = (ingredientKey: string) => {
-    // Check if ingredient is whitelisted for this species
-    if (normalizedSpeciesType && whitelist.length > 0) {
-      // ingredientKey might be a display name already, try both
-      const displayName = ingredientKey; // Assume it's already a display name from the picker
-      if (!isWhitelisted(displayName, normalizedSpeciesType as any)) {
-        // Show warning but allow (user can override with vet approval)
-        const confirmed = window.confirm(
-          `${displayName} is not in the recommended whitelist for ${pet?.type}.\n\n` +
-          `This ingredient may not be safe for this species. Please check with your vet before using.\n\n` +
-          `Do you want to add it anyway?`
-        );
-        if (!confirmed) return;
+  const addIngredient = useCallback((ingredientKey: string) => {
+    // Clear any existing debounce timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Set a new debounce timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      // Check if ingredient is whitelisted for this species
+      if (normalizedSpeciesType && whitelist.length > 0) {
+        // ingredientKey might be a display name already, try both
+        const displayName = ingredientKey; // Assume it's already a display name from the picker
+        if (!isWhitelisted(displayName, normalizedSpeciesType as any)) {
+          // Show warning but allow (user can override with vet approval)
+          const confirmed = window.confirm(
+            `${displayName} is not in the recommended whitelist for ${pet?.type}.\n\n` +
+            `This ingredient may not be safe for this species. Please check with your vet before using.\n\n` +
+            `Do you want to add it anyway?`
+          );
+          if (!confirmed) return;
+        }
       }
-    }
-    
-    const existing = selectedIngredients.find(s => s.key === ingredientKey);
-    if (existing) {
-      setSelectedIngredients(prev =>
-        prev.map(s =>
-          s.key === ingredientKey
-            ? { ...s, grams: s.grams + 50 }
-            : s
-        )
-      );
-    } else {
-      setSelectedIngredients(prev => [...prev, { key: ingredientKey, grams: 50 }]);
-    }
-  };
+
+      const existing = selectedIngredients.find(s => s.key === ingredientKey);
+      if (existing) {
+        setSelectedIngredients(prev =>
+          prev.map(s =>
+            s.key === ingredientKey
+              ? { ...s, grams: s.grams + 50 }
+              : s
+          )
+        );
+      } else {
+        setSelectedIngredients(prev => [...prev, { key: ingredientKey, grams: 50 }]);
+      }
+    }, 300); // 300ms debounce
+  }, [normalizedSpeciesType, whitelist, pet?.type, selectedIngredients]);
 
   const removeIngredient = (ingredientKey: string) => {
     setSelectedIngredients(prev => prev.filter(s => s.key !== ingredientKey));

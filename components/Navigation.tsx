@@ -3,57 +3,87 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import AlphabetText from '@/components/AlphabetText';
+import UpperLeftLogo from '@/public/images/emojis/Mascots/HeroPics/LogoFinal.jpg';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   return (
     <nav className="bg-surface border-b border-surface-highlight sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-10 w-10 relative">
+        <div className="flex justify-between items-center py-0.5">
+          <Link href="/" className="flex items-center">
+            <div className="relative flex-shrink-0 w-[80px] h-[80px] sm:w-[96px] sm:h-[96px] overflow-visible">
               <Image
-                src="/images/emojis/GREENPAW.jpeg"
-                alt="Paws & Plates logo"
+                src={UpperLeftLogo}
+                alt="Paws and Plates logo"
                 fill
-                className="object-contain rounded-md"
-                sizes="40px"
+                className="object-contain rounded-md scale-[2] origin-left"
+                sizes="(min-width: 640px) 192px, 160px"
               />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold text-foreground">Paws & Plates</span>
-              <span className="text-xs text-gray-400 -mt-1 leading-tight">Meal prep for ALL your pets!</span>
             </div>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/about" className="text-gray-300 hover:text-orange-400 transition-colors">
-              About
+            <Link
+              href="/about"
+              className="group flex items-center border-2 border-orange-400 rounded-full px-4 py-1 transition-colors hover:bg-orange-500/10"
+              aria-label="About"
+            >
+              <AlphabetText text="About" size={32} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
             </Link>
-            <Link href="/blog" className="text-gray-300 hover:text-orange-400 transition-colors">
-              Blog
+            <Link
+              href="/creators"
+              className="group flex items-center border-2 border-orange-400 rounded-full px-4 py-1 transition-colors hover:bg-orange-500/10"
+              aria-label="Creators"
+            >
+              <AlphabetText text="Creators" size={32} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
             </Link>
-            <Link href="/forum" className="text-gray-300 hover:text-orange-400 transition-colors">
-              Community
+            <Link
+              href="/blog"
+              className="group flex items-center border-2 border-orange-400 rounded-full px-4 py-1 transition-colors hover:bg-orange-500/10"
+              aria-label="Blog"
+            >
+              <AlphabetText text="Blog" size={32} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
+            </Link>
+            <Link
+              href="/forum"
+              className="group flex items-center border-2 border-orange-400 rounded-full px-4 py-1 transition-colors hover:bg-orange-500/10"
+              aria-label="Community"
+            >
+              <AlphabetText text="Community" size={32} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
             </Link>
 
-            <SignedIn>
-              <Link href="/profile" className="text-gray-300 hover:text-orange-400 transition-colors">
-                My Pets
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-            <SignedOut>
-              <Link
-                href="/sign-in"
-                className="btn btn-primary btn-md btn-ripple"
-              >
-                Sign In
-              </Link>
-            </SignedOut>
+            {hasMounted ? (
+              <SignedIn>
+                <Link
+                  href="/profile"
+                  className="group flex items-center border-2 border-orange-400 rounded-full px-4 py-1 transition-colors hover:bg-orange-500/10"
+                  aria-label="My Pets"
+                >
+                  <AlphabetText text="My Pets" size={32} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+            ) : null}
+            {hasMounted ? (
+              <SignedOut>
+                <Link
+                  href="/sign-in"
+                  className="btn btn-primary btn-md btn-ripple border-2 border-orange-400 rounded-full px-4 py-1 transition-colors hover:bg-orange-500/10"
+                >
+                  Sign In
+                </Link>
+              </SignedOut>
+            ) : null}
           </div>
 
           <div className="md:hidden">
@@ -72,32 +102,59 @@ export default function Navigation() {
         {isOpen && (
           <div className="md:hidden pb-4">
             <div className="flex flex-col space-y-4">
-              <Link href="/about" className="text-gray-300 hover:text-orange-400">
-                About
+              <Link
+                href="/about"
+                className="text-gray-300 hover:text-orange-400 border-2 border-orange-400 rounded-full px-4 py-2"
+                aria-label="About"
+              >
+                <AlphabetText text="About" size={32} />
               </Link>
-              <Link href="/blog" className="text-gray-300 hover:text-orange-400">
-                Blog
+              <Link
+                href="/creators"
+                className="text-gray-300 hover:text-orange-400 border-2 border-orange-400 rounded-full px-4 py-2"
+                aria-label="Creators"
+              >
+                <AlphabetText text="Creators" size={32} />
               </Link>
-              <Link href="/forum" className="text-gray-300 hover:text-orange-400">
-                Community
+              <Link
+                href="/blog"
+                className="text-gray-300 hover:text-orange-400 border-2 border-orange-400 rounded-full px-4 py-2"
+                aria-label="Blog"
+              >
+                <AlphabetText text="Blog" size={32} />
+              </Link>
+              <Link
+                href="/forum"
+                className="text-gray-300 hover:text-orange-400 border-2 border-orange-400 rounded-full px-4 py-2"
+                aria-label="Community"
+              >
+                <AlphabetText text="Community" size={32} />
               </Link>
 
-              <SignedIn>
-                <Link href="/profile" className="text-gray-300 hover:text-orange-400">
-                  My Pets
-                </Link>
-                <div className="mt-2">
-                  <UserButton afterSignOutUrl="/" />
-                </div>
-              </SignedIn>
-              <SignedOut>
-                <Link
-                  href="/sign-in"
-                  className="btn btn-primary btn-md btn-ripple"
-                >
-                  Sign In
-                </Link>
-              </SignedOut>
+              {hasMounted ? (
+                <SignedIn>
+                  <Link
+                    href="/profile"
+                    className="text-gray-300 hover:text-orange-400 border-2 border-orange-400 rounded-full px-4 py-2"
+                    aria-label="My Pets"
+                  >
+                    <AlphabetText text="My Pets" size={32} />
+                  </Link>
+                  <div className="mt-2">
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
+                </SignedIn>
+              ) : null}
+              {hasMounted ? (
+                <SignedOut>
+                  <Link
+                    href="/sign-in"
+                    className="btn btn-primary btn-md btn-ripple border-2 border-orange-400 rounded-full px-4 py-2"
+                  >
+                    Sign In
+                  </Link>
+                </SignedOut>
+              ) : null}
             </div>
           </div>
         )}

@@ -12,7 +12,7 @@ export function CompatibilityRadial({
   score,
   size = 120,
   strokeWidth = 10,
-  label = 'Compatibility',
+  label = '',
   textClassName,
 }: CompatibilityRadialProps) {
   const radius = (size - strokeWidth) / 2;

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
+import { validateSpeciesLanguageDetailed } from '@/lib/utils/speciesValidation';
 
 export const runtime = 'nodejs';
 
@@ -37,6 +39,16 @@ type ExplainResponse = {
   age: string;
   modelUsed: string;
 };
+
+function normalizeSpeciesForCopy(value: string | undefined | null): string {
+  const raw = String(value || '').toLowerCase().trim();
+  if (raw === 'dogs' || raw === 'dog') return 'dog';
+  if (raw === 'cats' || raw === 'cat') return 'cat';
+  if (raw === 'birds' || raw === 'bird') return 'bird';
+  if (raw === 'reptiles' || raw === 'reptile') return 'reptile';
+  if (raw === 'pocket pets' || raw === 'pocket-pets' || raw === 'pocket pet' || raw === 'pocket-pet') return 'pocket-pet';
+  return raw || 'pet';
+}
 
 function cleanJSON(text: string): string {
   if (!text) return '';
@@ -107,6 +119,27 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Missing recipe or pet' }, { status: 400 });
   }
 
+  const nutrition = calculateRecipeNutrition(
+    {
+      id: recipe?.id || 'recipe',
+      name: recipe?.name || 'Recipe',
+      ingredients: Array.isArray(recipe.ingredients)
+        ? recipe.ingredients.map((i) => ({ name: i?.name || '', amount: i?.amount || '' }))
+        : [],
+    } as any,
+    { includeBreakdown: false }
+  );
+
+  const nutritionalBreakdown = {
+    calories: nutrition.calories,
+    protein: nutrition.protein,
+    fat: nutrition.fat,
+    fiber: nutrition.fiber,
+    calcium: nutrition.calcium,
+    phosphorus: nutrition.phosphorus,
+    source: nutrition.source,
+  };
+
   const models = [
     (process.env.GEMINI_API_MODEL || '').trim(),
     'gemini-2.0-flash',
@@ -114,25 +147,77 @@ export async function POST(req: Request): Promise<NextResponse> {
     'gemini-1.5-flash-lite',
   ].filter(Boolean);
 
+  const species = normalizeSpeciesForCopy(pet.type);
+  const petName = String(pet?.name || 'Pet');
+  const age = String(pet?.age ?? '');
+  const weight = String(pet?.weightKg ?? pet?.weight ?? '');
+  const breed = String(pet?.breed || '');
+  const activityLevel = String(pet?.activityLevel || '');
+  const healthConcerns = Array.isArray(pet?.healthConcerns) ? pet!.healthConcerns!.map((c) => String(c || '')).filter(Boolean) : [];
+  const dietaryRestrictions = Array.isArray(pet?.dietaryRestrictions)
+    ? pet!.dietaryRestrictions!.map((d) => String(d || '')).filter(Boolean)
+    : [];
+  const allergies = Array.isArray(pet?.allergies) ? pet!.allergies!.map((a) => String(a || '')).filter(Boolean) : [];
+
+  const ingredientList = Array.isArray(recipe.ingredients)
+    ? recipe.ingredients
+        .map((i) => {
+          const name = String(i?.name || '').trim();
+          const amount = String(i?.amount || '').trim();
+          return name ? `${name}${amount ? ` ${amount}` : ''}` : '';
+        })
+        .filter(Boolean)
+        .join(', ')
+    : '';
+
   const prompt =
-    'You are a veterinary nutritionist. Return ONLY valid JSON. No markdown. No extra keys.\n\n' +
-    'Task: Explain why this recipe is or is not a good fit for this specific pet.\n' +
-    'You MUST address: (1) health concerns fit, (2) weight appropriateness, (3) age suitability.\n\n' +
-    'Use all available inputs, including pet allergies/dietaryRestrictions and score.warnings/score.strengths, to ground your reasoning.\n\n' +
-    'Important: For EVERY item in pet.healthConcerns, you must return one note in healthConcernNotes.\n' +
-    'If a concern cannot be evaluated from the provided data, say that explicitly and provide a safe, practical suggestion.\n\n' +
+    'You are a positive, encouraging pet nutrition advisor. Your job is to explain how this specific recipe supports the pet\'s individual health profile.\n' +
+    'Return ONLY valid JSON. Do NOT wrap in markdown backticks. Do NOT add extra keys.\n\n' +
+    'CONTEXT:\n' +
+    `- Pet Name: ${petName}\n` +
+    `- Species: ${species}\n` +
+    `- Type/Breed: ${breed}\n` +
+    `- Age: ${age}\n` +
+    `- Weight: ${weight}\n` +
+    `- Activity Level: ${activityLevel}\n` +
+    `- Health Concerns: ${(healthConcerns || []).join(', ')}\n` +
+    `- Dietary Restrictions: ${(dietaryRestrictions || []).join(', ')}\n` +
+    `- Allergies: ${(allergies || []).join(', ')}\n\n` +
+    'RECIPE:\n' +
+    `${String(recipe?.name || 'Recipe')}\n` +
+    `Ingredients: ${ingredientList}\n` +
+    `Nutritional Profile: ${JSON.stringify(nutritionalBreakdown)}\n\n` +
+    'INSTRUCTIONS:\n' +
+    `Write a positive, personalized health analysis that shows how this recipe supports ${petName}\'s specific needs. ` +
+    'For EACH health concern, age consideration, and weight goal, identify 2-3 ingredients or nutrients that actively support that aspect of health, and explain the benefit in simple, species-appropriate terms.\n\n' +
+    'FORMAT REQUIREMENTS (write content as plain text using these headings; emojis only in the headings):\n' +
+    `- summary: MUST be a markdown-style section starting with: "## 🎯 Why This Recipe Works for ${petName}" and include upbeat tone. Use ${petName} 8-10 times across the entire response.\n` +
+    '- healthConcernNotes: For EACH item in pet.healthConcerns, return one entry where:\n' +
+    '  - concern: exactly the provided string\n' +
+    '  - note: a section beginning with "### ✨ <that concern>" and 2-3 bullet points with bold ingredient names and benefits.\n' +
+    '- age: MUST be a section beginning with "### 🎂 Perfect for <petName>\'s Life Stage" and include 2-3 bullets.\n' +
+    '- weight: MUST be a section beginning with "### ⚖️ Ideal for Maintaining <weight>" and include 2-3 bullets.\n\n' +
+    'TONE:\n' +
+    '- Enthusiastic and encouraging\n' +
+    '- Focus on benefits, not deficiencies\n' +
+    '- Explain science simply\n' +
+    '- NEVER mention specific nutrient ratios (like Ca:P)\n' +
+    '- NEVER use these words: "appears to be", "may be", "should", "must", "monitor", "insufficient", "concern", "risk", "deficient"\n' +
+    '- Do not add warnings or caveats\n' +
+    '- If something could be better, phrase it as: "could be enhanced with <supplement>"\n\n' +
+    'Species language guidelines:\n' +
+    '- DOGS: paws, coat, joints, mobility, active, playful; walks, fetch\n' +
+    '- CATS: coat, whiskers, agility, hunting instincts; climbing, jumping\n' +
+    '- BIRDS: feathers, plumage, beak, flight muscles; perching, singing\n' +
+    '- REPTILES: scales, shell (turtles), basking, shedding, metabolism\n' +
+    '- POCKET PETS: fur, teeth (always growing), whiskers, burrowing, foraging\n\n' +
     'Output JSON schema:\n' +
     JSON.stringify(
       {
-        summary: 'string (1-2 sentences)',
-        healthConcernNotes: [
-          {
-            concern: 'string (exactly as provided in pet.healthConcerns)',
-            note: 'string (1-3 sentences, specific to this concern)',
-          },
-        ],
-        weight: 'string (2-4 sentences)',
-        age: 'string (2-4 sentences)',
+        summary: 'string',
+        healthConcernNotes: [{ concern: 'string', note: 'string' }],
+        weight: 'string',
+        age: 'string',
       },
       null,
       2
@@ -150,9 +235,10 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   let lastErr: Error | null = null;
   for (const model of models) {
-    try {
-      const text = await generateWithModel({ apiKey, model, prompt });
-      const parsed = JSON.parse(cleanJSON(text));
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const text = await generateWithModel({ apiKey, model, prompt });
+        const parsed = JSON.parse(cleanJSON(text));
 
       const petConcerns = Array.isArray(pet.healthConcerns)
         ? pet.healthConcerns.map((c) => String(c || '').trim()).filter(Boolean)
@@ -188,10 +274,31 @@ export async function POST(req: Request): Promise<NextResponse> {
         modelUsed: model,
       };
 
-      return NextResponse.json(response);
-    } catch (err) {
-      lastErr = err instanceof Error ? err : new Error(String(err));
-      continue;
+        const combinedText = [
+          response.summary,
+          response.age,
+          response.weight,
+          ...response.healthConcernNotes.map((n) => `${n.concern}: ${n.note}`),
+        ]
+          .filter(Boolean)
+          .join('\n');
+
+        const validation = validateSpeciesLanguageDetailed(combinedText, species);
+        if (!validation.isValid) {
+          const err = new Error(`Species-language validation failed: ${validation.errors.join('; ')}`);
+          lastErr = err;
+          if (attempt < 2) {
+            continue;
+          }
+        }
+
+        return NextResponse.json(response);
+      } catch (err) {
+        lastErr = err instanceof Error ? err : new Error(String(err));
+        if (attempt < 2) {
+          continue;
+        }
+      }
     }
   }
 

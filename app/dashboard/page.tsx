@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { Settings, Plus, Utensils, Heart, ArrowRight } from 'lucide-react';
 
 import { getPets } from '@/lib/utils/petStorage';
+import AlphabetText from '@/components/AlphabetText';
 
 // --- Data Structures (Based on your other files) ---
 interface SavedRecipe {
@@ -106,7 +107,9 @@ export default function DashboardPage() {
                         pets.map((pet) => (
                             <div key={pet.petId} className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
                                 <div className="p-6 bg-primary-50 border-b border-primary-100 flex justify-between items-center">
-                                    <h2 className="text-2xl font-bold text-primary-800">{pet.name}</h2>
+                                    <h2 className="text-2xl font-bold text-primary-800">
+                                        <AlphabetText text={pet.name} size={28} />
+                                    </h2>
                                     <div className="text-sm text-primary-600 font-medium">
                                         {pet.breed} • {pet.age}
                                     </div>

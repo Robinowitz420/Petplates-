@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react';
 import type { PetBadges as PetBadgesType, BadgeType } from '@/lib/types/badges';
 import { getPetBadges } from '@/lib/utils/badgeStorage';
-import { getBadgeDefinition, getTierDefinition } from '@/lib/data/badgeDefinitions';
+import { BADGE_DEFINITIONS, getBadgeDefinition, getTierDefinition } from '@/lib/data/badgeDefinitions';
 import Image from 'next/image';
 import Tooltip from './Tooltip';
 
@@ -35,81 +35,93 @@ export default function PetBadges({ petId, userId, className = '' }: PetBadgesPr
     return () => window.removeEventListener('badgesUpdated', handleBadgeUpdate);
   }, [petId, userId]);
 
-  if (!badges.badges || badges.badges.length === 0) {
-    return null;
+  const unlockedByType = new Map<BadgeType, (typeof badges.badges)[number]>();
+  for (const b of badges.badges || []) {
+    unlockedByType.set(b.type, b);
   }
 
-  const sortedBadges = [...badges.badges].sort((a, b) => {
-    const aTime = a.unlockedAt ? new Date(a.unlockedAt).getTime() : 0;
-    const bTime = b.unlockedAt ? new Date(b.unlockedAt).getTime() : 0;
-    return aTime - bTime;
-  });
+  const badgeDefinitions = Object.values(BADGE_DEFINITIONS);
+  const topRowBadges = badgeDefinitions.slice(0, 8);
+  const bottomRowBadges = badgeDefinitions.slice(8);
 
-  return (
-    <div className={`flex flex-wrap justify-start gap-3 px-2 ${className}`}>
-      {sortedBadges.map((badge) => {
-        const definition = getBadgeDefinition(badge.type);
-        if (!definition) return null;
+  const renderBadge = (definition: any) => {
+    const unlockedBadge = unlockedByType.get(definition.type) || null;
+    const isUnlocked = Boolean(unlockedBadge);
 
-        // Get icon path (use tier-specific for progressive badges)
-        let iconPath = definition.iconPath;
-        if (definition.isProgressive && badge.tier) {
-          const tierDef = getTierDefinition(badge.type, badge.tier);
-          if (tierDef) {
-            iconPath = tierDef.iconPath;
-          }
+    const baseTier = definition.isProgressive ? definition.tiers?.[0]?.tier : undefined;
+    const effectiveTier = (unlockedBadge?.tier || baseTier) as any;
+
+    const tierDef =
+      definition.isProgressive && effectiveTier
+        ? getTierDefinition(definition.type, effectiveTier)
+        : null;
+
+    const iconPath = tierDef?.iconPath || definition.iconPath;
+    const displayName = tierDef?.name || definition.name;
+
+    let tooltipContent = `${displayName}\n\n${definition.description}`;
+    if (isUnlocked) {
+      if (definition.isProgressive && unlockedBadge?.progress !== undefined) {
+        tooltipContent += `\n\nProgress: ${unlockedBadge.progress}`;
+        if (unlockedBadge.nextTierThreshold) {
+          tooltipContent += ` / ${unlockedBadge.nextTierThreshold}`;
         }
+      }
+    } else {
+      tooltipContent += `\n\nLocked`;
+    }
 
-        // Get display name
-        let displayName = definition.name;
-        if (definition.isProgressive && badge.tier) {
-          const tierDef = getTierDefinition(badge.type, badge.tier);
-          if (tierDef) {
-            displayName = tierDef.name;
-          }
-        }
+    const key = `${definition.type}-${tierDef?.tier || 'base'}-${isUnlocked ? 'unlocked' : 'locked'}`;
 
-        // Build tooltip content
-        let tooltipContent = `${displayName}\n\n${definition.description}`;
-        if (definition.isProgressive && badge.progress !== undefined) {
-          tooltipContent += `\n\nProgress: ${badge.progress}`;
-          if (badge.nextTierThreshold) {
-            tooltipContent += ` / ${badge.nextTierThreshold}`;
-          }
-        }
+    return (
+      <Tooltip key={key} content={tooltipContent} wide={true}>
+        <div className="relative group">
+          <div
+            className={`w-12 h-12 rounded-full bg-surface-highlight border flex items-center justify-center transition-transform cursor-help ${
+              isUnlocked
+                ? 'border-emerald-200 hover:scale-105'
+                : 'border-gray-600 opacity-60'
+            }`}
+          >
+            <Image
+              src={iconPath}
+              alt={displayName}
+              width={28}
+              height={28}
+              className={`object-contain no-invert-badge ${isUnlocked ? '' : 'grayscale opacity-60'}`}
+              unoptimized
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/badges/placeholder.png';
+              }}
+            />
+          </div>
 
-        return (
-          <Tooltip key={`${badge.type}-${badge.tier || 'single'}`} content={tooltipContent} wide={true}>
-            <div className="relative group">
-              <div className="w-12 h-12 rounded-full bg-surface-highlight border border-emerald-200 flex items-center justify-center hover:scale-105 transition-transform cursor-help">
-                <Image
-                  src={iconPath}
-                  alt={displayName}
-                  width={28}
-                  height={28}
-                  className="object-contain no-invert-badge"
-                  unoptimized
-                  onError={(e) => {
-                    // Fallback to placeholder if image doesn't exist
-                    (e.target as HTMLImageElement).src = '/images/badges/placeholder.png';
+          {isUnlocked &&
+            definition.isProgressive &&
+            unlockedBadge?.progress !== undefined &&
+            unlockedBadge?.nextTierThreshold && (
+              <div className="absolute -bottom-2 left-1 right-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-orange-400 transition-all"
+                  style={{
+                    width: `${Math.min(100, (unlockedBadge.progress / unlockedBadge.nextTierThreshold) * 100)}%`,
                   }}
                 />
               </div>
-              {/* Progress indicator for progressive badges */}
-              {definition.isProgressive && badge.progress !== undefined && badge.nextTierThreshold && (
-                <div className="absolute -bottom-2 left-1 right-1 h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-orange-400 transition-all"
-                    style={{
-                      width: `${Math.min(100, (badge.progress / badge.nextTierThreshold) * 100)}%`,
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </Tooltip>
-        );
-      })}
+            )}
+        </div>
+      </Tooltip>
+    );
+  };
+
+  return (
+    <div className={`flex flex-col gap-3 px-2 ${className}`}>
+      <div className="flex flex-wrap justify-start gap-3">
+        {topRowBadges.map(renderBadge)}
+      </div>
+      <div className="flex flex-wrap justify-start gap-3" style={{ marginLeft: '31px' }}>
+        {bottomRowBadges.map(renderBadge)}
+      </div>
     </div>
   );
 }

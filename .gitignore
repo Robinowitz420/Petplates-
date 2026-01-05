@@ -62,5 +62,7 @@ next-env.d.ts
 # PHASE_*_MANUAL_REVIEW.csv - NOT ignored, these are tracked
 # AUTO_CLASSIFICATION_REPORT.md - NOT ignored, these are tracked
 
+/public/images/Buttons/Alphabet/__backup__/
+
 # Vercel local metadata
 .vercel

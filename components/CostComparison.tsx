@@ -1,17 +1,62 @@
 'use client';
 
+import type { RecipePricingSource } from '@/lib/hooks/useRecipePricing';
+
 interface CostComparisonProps {
   costPerMeal: number;
   totalCost?: number;
   estimatedMeals?: number;
   className?: string;
   exceedsBudget?: boolean; // True if costPerMeal > 4.50
+  pricingSource?: RecipePricingSource;
+  asOf?: string | null;
+  missingIngredientCount?: number;
+  isComplete?: boolean;
 }
 
-export function CostComparison({ costPerMeal, totalCost, estimatedMeals, className = '', exceedsBudget: _exceedsBudget = false }: CostComparisonProps) {
+export function CostComparison({
+  costPerMeal,
+  totalCost,
+  estimatedMeals,
+  className = '',
+  exceedsBudget: _exceedsBudget = false,
+  pricingSource,
+  asOf,
+  missingIngredientCount,
+  isComplete,
+}: CostComparisonProps) {
   const commercialCost = 4.50; // Average commercial pet food per meal
   const savings = commercialCost - costPerMeal;
   const savingsPercent = savings > 0 ? Math.round((savings / commercialCost) * 100) : 0;
+
+  const provenance = (() => {
+    if (!pricingSource || pricingSource === 'none') return null;
+    if (pricingSource === 'estimate') return null;
+
+    const label =
+      pricingSource === 'snapshot'
+        ? 'Snapshot'
+        : pricingSource === 'mixed'
+          ? 'Mixed'
+          : 'Pricing';
+
+    const badgeClass =
+      pricingSource === 'snapshot'
+        ? 'bg-green-900/40 text-green-200 border border-green-700/50'
+        : 'bg-blue-900/40 text-blue-200 border border-blue-700/50';
+
+    const asOfText = (() => {
+      if (!asOf) return null;
+      const d = new Date(asOf);
+      if (!Number.isFinite(d.getTime())) return null;
+      return d.toLocaleDateString();
+    })();
+
+    const missingCount = typeof missingIngredientCount === 'number' && Number.isFinite(missingIngredientCount) ? missingIngredientCount : 0;
+    const completeFlag = typeof isComplete === 'boolean' ? isComplete : null;
+
+    return { label, badgeClass, asOfText, missingCount, completeFlag };
+  })();
   
   // Don't render if invalid data
   if (!costPerMeal || costPerMeal <= 0) {
@@ -20,7 +65,22 @@ export function CostComparison({ costPerMeal, totalCost, estimatedMeals, classNa
   
   return (
     <div className={`bg-gradient-to-r from-green-700/35 to-emerald-700/35 rounded-xl p-6 border-2 border-green-500/65 ${className}`}>
-      <h4 className="font-bold text-lg text-green-200 mb-4">💰 Cost Comparison</h4>
+      <h4 className="sr-only">Cost Comparison</h4>
+
+      {provenance ? (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${provenance.badgeClass}`}>{provenance.label}</span>
+          {provenance.asOfText ? (
+            <span className="text-xs text-gray-300">As of {provenance.asOfText}</span>
+          ) : null}
+          {provenance.completeFlag === false ? (
+            <span className="text-xs text-gray-300">Incomplete</span>
+          ) : null}
+          {provenance.missingCount > 0 ? (
+            <span className="text-xs text-gray-300">Missing {provenance.missingCount}</span>
+          ) : null}
+        </div>
+      ) : null}
       
       <div className="grid md:grid-cols-2 gap-4">
         {/* Homemade */}

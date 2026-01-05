@@ -1,7 +1,7 @@
 // lib/data/product-prices.ts
 // SINGLE SOURCE OF TRUTH for all product data
 
-import PRODUCT_PRICES from '../../data/product-prices.json';
+import PRODUCT_PRICES from '../../data/product-prices-UPDATED.json';
 import { getAmazonBuyLink } from '@/lib/utils/getAmazonBuyLink';
 import { getPackageSize } from '@/lib/data/packageSizes';
 
@@ -414,33 +414,11 @@ export function getIngredientDisplayPricing(ingredientName: string): {
 }
 
 /**
- * Get price for an ingredient (normalized to cost per pound)
+ * Get price per pound for an ingredient.
  */
-export function getProductPrice(ingredientName: string): number | null {
-  const product = getProductByIngredient(ingredientName);
-  if (!product?.price.amount) return null;
-  
-  // Normalize to cost per pound
-  const quantity = product.quantity?.toLowerCase() || '';
-  const totalPrice = product.price.amount;
-  
-  // Extract weight in pounds from quantity string
-  let pounds = 1; // default
-  
-  if (quantity.includes('lb')) {
-    const match = quantity.match(/(\d+(?:\.\d+)?)\s*lbs?/);
-    if (match) pounds = parseFloat(match[1]);
-  } else if (quantity.includes('oz')) {
-    const match = quantity.match(/(\d+(?:\.\d+)?)\s*oz/);
-    if (match) pounds = parseFloat(match[1]) / 16;
-  } else if (quantity.includes('count')) {
-    // For items sold by count (eggs, etc), estimate ~2 oz per unit
-    const match = quantity.match(/(\d+)\s*count/);
-    if (match) pounds = (parseFloat(match[1]) * 2) / 16;
-  }
-  
-  // Return cost per pound
-  return pounds > 0 ? totalPrice / pounds : totalPrice;
+export function getIngredientPricePerPound(ingredientName: string): number | null {
+  const pricing = getIngredientDisplayPricing(ingredientName);
+  return typeof pricing.pricePerPound === 'number' ? pricing.pricePerPound : null;
 }
 
 /**

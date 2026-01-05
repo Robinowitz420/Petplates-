@@ -13,6 +13,7 @@ import RecipeScoreModal from './RecipeScoreModal';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
 import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
+import AlphabetText from '@/components/AlphabetText';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -30,17 +31,18 @@ function gradeToCompatibility(grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' 
 export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddingMeal, setIsAddingMeal] = useState(false);
-  const [isMealAdded, setIsMealAdded] = useState(false);
+  const [localMealSaved, setLocalMealSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const { userId } = useAuth();
 
   useEffect(() => {
-    if (!pet) {
-      setIsMealAdded(false);
-      return;
-    }
-    const inSavedRecipes = Array.isArray(pet.savedRecipes) ? pet.savedRecipes.includes(recipe.id) : false;
-    setIsMealAdded(inSavedRecipes);
-  }, [pet, recipe.id]);
+    setLocalMealSaved(false);
+    setSaveError(null);
+  }, [pet?.id, recipe.id]);
+
+  const isMealSaved =
+    localMealSaved ||
+    (Array.isArray(pet?.savedRecipes) ? pet!.savedRecipes.includes(recipe.id) : false);
 
   // Calculate compatibility rating if pet is provided
   const speciesScore = pet
@@ -91,7 +93,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
         </div>
         <div className="p-4">
           <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary-400 transition-colors">
-            {recipe.name}
+            <AlphabetText text={recipe.name} size={24} />
           </h3>
           <p className="text-gray-400 text-sm mb-4 line-clamp-2">
             {recipe.description}
@@ -118,14 +120,26 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
             </div>
           )}
 
-          {(recipe as any).meta?.estimatedCost && (
-            <div className="mb-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
-                <span>Cost per meal:</span>
-                <span className="text-white">{String((recipe as any).meta.estimatedCost)}</span>
+          {(() => {
+            const rawCost = (recipe as any).meta?.estimatedCost;
+            const numericCost = (() => {
+              if (typeof rawCost === 'number') return rawCost;
+              if (typeof rawCost === 'string') {
+                const cleaned = rawCost.replace(/[^0-9.]/g, '');
+                if (cleaned.length === 0) return NaN;
+                return Number(cleaned);
+              }
+              return Number(rawCost);
+            })();
+            if (!Number.isFinite(numericCost)) return null;
+            return (
+              <div className="mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
+                  <span className="text-white">{`$${numericCost.toFixed(2)} Per Meal`}</span>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Meta Information */}
           {(recipe as any).meta && (
@@ -173,35 +187,42 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                   e.stopPropagation();
 
                   if (!userId) return;
-                  if (isMealAdded || isAddingMeal) return;
+                  if (isMealSaved || isAddingMeal) return;
 
+                  setSaveError(null);
                   setIsAddingMeal(true);
                   try {
                     const nextSavedRecipes = Array.isArray(pet.savedRecipes) ? [...pet.savedRecipes] : [];
                     if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
                     await savePersistedPet(userId, { ...pet, savedRecipes: nextSavedRecipes } as any);
-                    setIsMealAdded(true);
-                  } catch {
-                    // ignore
+                    setLocalMealSaved(true);
+                  } catch (err) {
+                    const raw = err instanceof Error ? err.message : String(err || '');
+                    const friendly = raw || 'Unable to save this meal.';
+                    setSaveError(friendly);
+                    setTimeout(() => setSaveError(null), 5000);
                   } finally {
                     setIsAddingMeal(false);
                   }
                 }}
-                disabled={!userId || isAddingMeal || isMealAdded}
-                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}
+                disabled={!userId || isAddingMeal || isMealSaved}
+                className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isMealSaved ? 'Meal Harvested' : 'Harvest Meal'}
               >
                 <span className="relative h-12 w-full overflow-hidden rounded-2xl">
                   <Image
-                    src="/images/Buttons/SaveMeal.png"
-                    alt=""
+                    src={isMealSaved ? '/images/Buttons/MealSaved.png' : '/images/Buttons/SaveMeal.png'}
+                    alt={isMealSaved ? 'Meal Harvested' : 'Harvest Meal'}
                     fill
                     sizes="100vw"
                     className="object-contain"
                   />
                 </span>
-                <span className="sr-only">{isMealAdded ? 'Saved' : isAddingMeal ? 'Saving…' : 'Save Meal'}</span>
+                <span className="sr-only">{isMealSaved ? 'Meal Harvested' : 'Harvest Meal'}</span>
               </button>
+              {saveError ? (
+                <div className="mt-2 text-xs text-red-300">{saveError}</div>
+              ) : null}
             </div>
           ) : null}
         </div>

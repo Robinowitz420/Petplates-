@@ -29,7 +29,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
   [BadgeType.PERFECT_MATCH]: {
     type: BadgeType.PERFECT_MATCH,
     name: "Cats Cunning Circles",
-    description: 'Perfect Match — earned when you hit a 100% compatibility score.',
+    description: 'Perfect Match — earned when you hit a 95% compatibility score or higher.',
     category: 'Core Achievements',
     iconPath: '/images/Badges/Glasses.png',
     designDescription: 'Cat glasses accessory (cunning).',
@@ -48,89 +48,72 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
 
   [BadgeType.WEEK_WHISKER]: {
     type: BadgeType.WEEK_WHISKER,
-    name: "Week Whisker",
-    description: 'Week Whisker — progressive badge for completed weekly plans.',
-    category: 'Week Whisker (Progressive Plans)',
+    name: "Cats Chronicle Card",
+    description: 'Week Whisker — earned when you start building a meal plan.',
+    category: 'Plans & Routines',
     iconPath: '/images/Badges/Clipboard.png',
-    designDescription: 'Planning progress accessories.',
-    isProgressive: true,
-    tiers: [
-      {
-        tier: 'bronze',
-        name: "Cats Chronicle Card",
-        threshold: 1,
-        iconPath: '/images/Badges/Clipboard.png',
-        designDescription: 'Cat clipboard accessory (first plan).',
-      },
-      {
-        tier: 'silver',
-        name: "Cat's Cloak Of Curiosity",
-        threshold: 10,
-        iconPath: '/images/Badges/LabCoat.png',
-        designDescription: 'Cat coat/cloak accessory (10 plans).',
-      },
-      {
-        tier: 'gold',
-        name: 'The Turtles Tracking Cap',
-        threshold: 50,
-        iconPath: '/images/Badges/SherlockHat.png',
-        designDescription: 'Turtle tracking cap accessory (50 plans).',
-      },
-    ],
+    designDescription: 'Cat clipboard accessory.',
+    isProgressive: false,
   },
 
   [BadgeType.PURCHASE_CHAMPION]: {
     type: BadgeType.PURCHASE_CHAMPION,
-    name: 'Purchase Champion',
-    description: 'Purchase Champion — progressive badge for confirmed purchases.',
-    category: 'Purchase Champion (Progressive Tiers)',
+    name: 'Birds Bag Of Clear Skies',
+    description: 'Purchase Champion — earned when you confirm your first purchase.',
+    category: 'Shopping & Savings',
     iconPath: '/images/Badges/MessengerBag.png',
-    designDescription: 'Purchase progress accessories.',
-    isProgressive: true,
-    tiers: [
-      {
-        tier: 'bronze',
-        name: 'Birds Bag Of Clear Skies',
-        threshold: 1,
-        iconPath: '/images/Badges/MessengerBag.png',
-        designDescription: 'Bird bag accessory (first purchase).',
-      },
-      {
-        tier: 'silver',
-        name: 'Hamsters Basket Of Bounty',
-        threshold: 10,
-        iconPath: '/images/Badges/Basket.png',
-        designDescription: 'Hamster basket accessory (10 purchases).',
-      },
-      {
-        tier: 'gold',
-        name: 'Hoe Of Harvests',
-        threshold: 20,
-        iconPath: '/images/Badges/GardenHoe.png',
-        designDescription: 'Hamster hoe accessory (20 purchases).',
-      },
-      {
-        tier: 'platinum',
-        name: "The Dog's Bowl Of Bounty",
-        threshold: 30,
-        iconPath: '/images/Badges/bowl.png',
-        designDescription: 'Dog bowl accessory (30 purchases).',
-      },
-      {
-        tier: 'diamond',
-        name: 'Birds Goggles Of Google‑Ing',
-        threshold: 40,
-        iconPath: '/images/Badges/goggles.png',
-        designDescription: 'Bird goggles accessory (40 purchases).',
-      },
-      {
-        tier: 'sultan',
-        name: 'Turtles Monocle Of Mystery',
-        threshold: 50,
-        iconPath: '/images/Badges/Monocle.png',
-        designDescription: 'Turtle monocle accessory (50+ purchases).',
-      },
-    ],
+    designDescription: 'Bird bag accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.PURCHASE_BASKET]: {
+    type: BadgeType.PURCHASE_BASKET,
+    name: 'Hamsters Basket Of Bounty',
+    description: 'Unlocked after confirming 5 purchases for this pet.',
+    category: 'Shopping & Savings',
+    iconPath: '/images/Badges/Basket.png',
+    designDescription: 'Hamster basket accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.PURCHASE_HOE]: {
+    type: BadgeType.PURCHASE_HOE,
+    name: 'Hoe Of Harvests',
+    description: 'Unlocked after confirming 10 purchases for this pet.',
+    category: 'Shopping & Savings',
+    iconPath: '/images/Badges/GardenHoe.png',
+    designDescription: 'Garden hoe accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.PURCHASE_BOWL]: {
+    type: BadgeType.PURCHASE_BOWL,
+    name: "The Dog's Bowl Of Bounty",
+    description: 'Unlocked after confirming 15 purchases for this pet.',
+    category: 'Shopping & Savings',
+    iconPath: '/images/Badges/bowl.png',
+    designDescription: 'Dog bowl accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.PURCHASE_GOGGLES]: {
+    type: BadgeType.PURCHASE_GOGGLES,
+    name: 'Birds Goggles Of Google‑Ing',
+    description: 'Unlocked after confirming 20 purchases for this pet.',
+    category: 'Shopping & Savings',
+    iconPath: '/images/Badges/goggles.png',
+    designDescription: 'Bird goggles accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.PURCHASE_MONOCLE]: {
+    type: BadgeType.PURCHASE_MONOCLE,
+    name: 'Turtles Monocle Of Mystery',
+    description: 'Unlocked after confirming 30 purchases for this pet.',
+    category: 'Shopping & Savings',
+    iconPath: '/images/Badges/Monocle.png',
+    designDescription: 'Turtle monocle accessory.',
+    isProgressive: false,
   },
 
   [BadgeType.SEARCH_DISCOVERY]: {
@@ -143,10 +126,10 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
     isProgressive: false,
   },
 
-  [BadgeType.DAILY_LOGIN]: {
-    type: BadgeType.DAILY_LOGIN,
+  [BadgeType.BIRD_HAT]: {
+    type: BadgeType.BIRD_HAT,
     name: 'Birds Cap Of Clear Skies',
-    description: 'Daily Login — earned by logging in and returning to the app.',
+    description: 'Unlocked after viewing 5 recipe pages for this pet.',
     category: 'Utility & Exploration',
     iconPath: '/images/Badges/BirdHat.png',
     designDescription: 'Bird hat accessory.',
@@ -156,7 +139,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
   [BadgeType.PROFILE_SETUP]: {
     type: BadgeType.PROFILE_SETUP,
     name: 'Hamsters Suspenders Of Suspense',
-    description: 'Profile Setup — earned by creating your pet profile.',
+    description: 'Profile Setup — earned by uploading your pet’s first photo.',
     category: 'Utility & Exploration',
     iconPath: '/images/Badges/Suspenders.png',
     designDescription: 'Hamster suspenders accessory.',
@@ -170,6 +153,26 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
     category: 'Utility & Exploration',
     iconPath: '/images/Badges/Spoon.png',
     designDescription: 'Dog spoon accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.LAB_COAT]: {
+    type: BadgeType.LAB_COAT,
+    name: "Cat's Cloak Of Curiosity",
+    description: 'Unlocked after opening score details 3 times for this pet.',
+    category: 'Core Achievements',
+    iconPath: '/images/Badges/LabCoat.png',
+    designDescription: 'Cat lab coat accessory.',
+    isProgressive: false,
+  },
+
+  [BadgeType.SHERLOCK_HAT]: {
+    type: BadgeType.SHERLOCK_HAT,
+    name: 'The Turtles Tracking Cap',
+    description: 'Unlocked after saving 3 custom meals for this pet.',
+    category: 'Core Achievements',
+    iconPath: '/images/Badges/SherlockHat.png',
+    designDescription: 'Turtle tracking cap accessory.',
     isProgressive: false,
   },
 };

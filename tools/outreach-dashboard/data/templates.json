@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "brandName": "Paws & Plates",
+    "siteUrl": "https://paws-and-plates.vercel.app/",
+    "valuePropShort": "free personalized meal plans + shoppable ingredient lists for dogs, cats, birds, reptiles (and more)",
+    "proOfferPS": "P.S. If you’re interested, I’d love to offer you a free Pro account — just DM me.",
+    "maxCharsByPlatform": {
+      "instagram": 450,
+      "tiktok": 450,
+      "threads": 450,
+      "x": 280,
+      "youtube": 650,
+      "email": 1200,
+      "other": 450
+    }
+  },
+  "style": {
+    "voice": "casual, direct, a little punchy",
+    "format": "short lines / short sentences; ellipses ok; max 1 emoji (prefer 0)",
+    "rules": [
+      "Use their name naturally 0-2 times.",
+      "No corporate-speak. No hype. No exclamation spam.",
+      "Do not claim you watched/read specific content unless recentContentHook is provided.",
+      "End with a low-pressure question/CTA.",
+      "Always include the siteUrl.",
+      "Always include the Pro PS (unless includeProOffer=false)."
+    ]
+  },
+  "placeholders": {
+    "displayName": "e.g. Rodney",
+    "handle": "e.g. rodneyhabib (no @)",
+    "platform": "instagram|tiktok|youtube|x|threads|email|other",
+    "tags": "comma-separated niche tags",
+    "personalizationNotes": "1-3 bullets about them; must be non-fabricated",
+    "recentContentHook": "optional; only if real",
+    "customAngle": "optional extra angle (budget, multi-species, rescue, raw, etc.)"
+  },
+  "fallbackTemplates": {
+    "first_touch": {
+      "instagram": "hey {name} — quick one.\n\ni built {brandName} — {valueProp}.\n\nopen to checking it out?\n{siteUrl}\n\n{psLine}",
+      "tiktok": "hey {name} — quick one.\n\n{brandName} = {valueProp}.\n\nopen to a look?\n{siteUrl}\n\n{psLine}",
+      "youtube": "hey {name} — quick one.\n\ni built {brandName} — {valueProp}.\n\nopen to checking it out?\n{siteUrl}\n\n{psLine}",
+      "x": "hey {name} — i built {brandName} ({valueProp}). open to a look? {siteUrl} {psLine}",
+      "threads": "hey {name} — quick one.\n\n{brandName} = {valueProp}.\n\nopen to a look?\n{siteUrl}\n\n{psLine}",
+      "email": "Hi {name},\n\nQuick note — I built {brandName}: {valueProp}.\n\nIf you're open to it, I'd love your take:\n{siteUrl}\n\n{psLine}\n\nBest,\n[Your Name]",
+      "other": "hey {name} — quick one.\n\n{brandName} = {valueProp}.\n\nopen to a look?\n{siteUrl}\n\n{psLine}"
+    }
+  },
+  "templates": {
+    "first_touch": {
+      "description": "Warm intro + fit + value prop + permission CTA + link + Pro PS",
+      "includeProOffer": true,
+      "variants": [
+        {
+          "id": "first_touch_1",
+          "llmInstruction": [
+            "Write a first-touch message to {{displayName}} (@{{handle}}) on {{platform}}.",
+            "Use the user's voice/style rules.",
+            "Personalize ONLY using personalizationNotes and recentContentHook (if provided).",
+            "Never invent specific content references.",
+            "Keep under the platform max chars.",
+            "Must include {{siteUrl}} and a Pro offer PS."
+          ],
+          "structure": {
+            "openers": [
+              "hey {{displayName}} — quick one.",
+              "hey {{displayName}} — been following your stuff for a while.",
+              "hey {{displayName}} — i really like how you approach {{customAngle}}."
+            ],
+            "fitLines": [
+              "you’re already teaching the “why”… i’m trying to make the “how” dead simple.",
+              "the way you talk about it is basically the gap i’m trying to solve."
+            ],
+            "productLine": [
+              "i built Paws & Plates — {{valuePropShort}}."
+            ],
+            "credLine": [
+              "it’s free. no subscription pitch. just a tool people can actually use."
+            ],
+            "ctaLines": [
+              "would you be open to checking it out?",
+              "want me to send a quick rundown + a custom link if it fits?"
+            ],
+            "closers": [
+              "no pressure either way.",
+              "totally cool if it’s not your thing."
+            ]
+          }
+        }
+      ]
+    },
+    "affiliate_invite": {
+      "description": "Affiliate/collab framing (custom link), still low pressure",
+      "includeProOffer": true,
+      "variants": [
+        {
+          "id": "affiliate_1",
+          "llmInstruction": [
+            "Write a collab/affiliate invite message to {{displayName}} on {{platform}}.",
+            "Mention a custom link (and optionally referrals) without sounding spammy.",
+            "Permission-based, low pressure.",
+            "Keep under max chars. Include {{siteUrl}} + Pro PS."
+          ],
+          "structure": {
+            "openers": [
+              "hey {{displayName}} — quick collab thought.",
+              "hey {{displayName}} — had a collab idea that fits your audience."
+            ],
+            "productLine": [
+              "Paws & Plates is {{valuePropShort}}."
+            ],
+            "affiliateLines": [
+              "if it’s a fit, i can set you up with a custom link for your followers.",
+              "if you ever wanted a clean link to share, i can make one for you."
+            ],
+            "ctaLines": [
+              "open to checking it out and telling me what you think?",
+              "want me to send details + the link?"
+            ],
+            "closers": [
+              "no pressure — just thought it aligned."
+            ]
+          }
+        }
+      ]
+    },
+    "follow_up": {
+      "description": "Short follow-up after no reply",
+      "includeProOffer": true,
+      "variants": [
+        {
+          "id": "follow_up_1",
+          "llmInstruction": [
+            "Write a follow-up message to {{displayName}} referencing you reached out before.",
+            "No guilt. Very short.",
+            "Keep under max chars. Include {{siteUrl}} + Pro PS."
+          ],
+          "structure": {
+            "openers": [
+              "hey {{displayName}} — quick follow-up from my last message.",
+              "hey {{displayName}} — circling back real quick."
+            ],
+            "bodyLines": [
+              "if you’re open to it, i’d still love your take on Paws & Plates.",
+              "no rush — just didn’t want it to get buried."
+            ],
+            "ctaLines": [
+              "want me to send the link again?",
+              "open to a quick look?"
+            ],## Error Type
+            Console Error
+            
+            ## Error Message
+            Encountered two children with the same key, `3`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+            
+            
+                at div (<anonymous>:null:null)
+                at <unknown> (components/outreach-dashboard/OutreachDashboardDebug.tsx:263:15)
+                at Array.map (<anonymous>:null:null)
+                at OutreachDashboard (components/outreach-dashboard/OutreachDashboardDebug.tsx:262:34)
+                at OutreachDashboardPage (app\tools\outreach-dashboard\page.tsx:7:7)
+            
+            ## Code Frame
+              261 |           <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+              262 |             {filteredInfluencers.map(inf => (
+            > 263 |               <div
+                  |               ^
+              264 |                 key={inf.id}
+              265 |                 onClick={() => setSelectedInfluencer(inf)}
+              266 |                 style={{
+            
+            Next.js version: 16.0.7 (Turbopack)
+            
+            "closers": [
+              "all good either way."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

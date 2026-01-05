@@ -5,12 +5,17 @@ import Image from 'next/image';
 
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { HeartOff, ArrowLeft, Utensils, Clock, Trash2 } from 'lucide-react';
+import { HeartOff, ArrowLeft, Utensils, Clock, Trash2, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
 import SavedMealsBanner from '@/public/images/Site Banners/SavedMeals.png';
+import AlphabetText from '@/components/AlphabetText';
+import { getVettedProductByAnyIdentifier } from '@/lib/data/vetted-products';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
+import { getProductUrl } from '@/lib/data/product-prices';
 
 export default function SavedRecipesPage() {
   const { id: petId } = useParams();
@@ -21,6 +26,8 @@ export default function SavedRecipesPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
   const [savedGeneratedMeals, setSavedGeneratedMeals] = useState<Array<{ id: string; name: string; dateAdded?: number }>>([]);
+  const [isBuyingId, setIsBuyingId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(30);
 
   // Load pet and custom meals - async function
   const loadData = async () => {
@@ -183,6 +190,63 @@ export default function SavedRecipesPage() {
     }
   };
 
+  const handleBuyMeal = async (mealId: string, isCustom: boolean) => {
+    if (!pet) return;
+
+    try {
+      setIsBuyingId(mealId);
+
+      const petSpecies = String((pet as any)?.type || '').trim() || undefined;
+
+      let ingredients: Array<{ id?: string; name?: string; amount?: string; asinLink?: string; amazonLink?: string }> = [];
+
+      if (isCustom) {
+        const cm = customMeals.find((m) => m.id === mealId) || null;
+        ingredients = (cm?.ingredients || []).map((ing, idx) => ({
+          id: String(idx + 1),
+          name: String(ing.key || '').replace(/_/g, ' '),
+          amount: `${ing.grams}g`,
+        }));
+      } else {
+        const res = await fetch(`/api/recipes/generated/${encodeURIComponent(mealId)}`);
+        if (!res.ok) {
+          alert('Meal could not be loaded for purchase.');
+          return;
+        }
+        const data = await res.json();
+        const recipe = data?.recipe;
+        ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
+      }
+
+      const urls = (ingredients || [])
+        .map((ing: any) => {
+          const name = String(ing?.name || '').trim();
+          const existing = String(ing?.asinLink || ing?.amazonLink || '').trim();
+          const vetted = getVettedProductByAnyIdentifier(existing || name, petSpecies);
+          const vettedLink = vetted?.asinLink || vetted?.purchaseLink || '';
+          const pricedUrl = getProductUrl(name) || '';
+          const fallbackSearch = buildAmazonSearchUrl(name);
+          const resolved = ensureSellerId(vettedLink || existing || pricedUrl || fallbackSearch);
+          return resolved || null;
+        })
+        .filter(Boolean) as string[];
+
+      if (urls.length === 0) {
+        alert('No ingredient links available for this meal.');
+        return;
+      }
+
+      // Match recipe detail “Buy All” behavior: open links in tabs.
+      window.open(urls[0], '_blank');
+      for (let i = 1; i < urls.length; i += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        window.open(urls[i], '_blank');
+      }
+    } finally {
+      setIsBuyingId(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -211,6 +275,8 @@ export default function SavedRecipesPage() {
   }
 
   const hasSaved = savedRecipeDetails.length > 0;
+  const visibleMeals = hasSaved ? savedRecipeDetails.slice(0, visibleCount) : [];
+  const hasMore = hasSaved && savedRecipeDetails.length > visibleCount;
 
   // Get random name from pet's names array
   const petNames = Array.isArray((pet as any).names) ? (pet as any).names.filter((n: string) => n && n.trim() !== '') : [];
@@ -234,7 +300,8 @@ export default function SavedRecipesPage() {
         <header className="mb-4 p-3 bg-surface rounded-lg shadow border-l-4 border-primary-600">
           <h1 className="text-xl font-bold text-gray-900 flex items-center">
             <Utensils className="w-5 h-5 mr-2 text-primary-600" />
-            Saved Meals for {petDisplayName}
+            <span className="mr-2">Saved Meals for</span>
+            <AlphabetText text={petDisplayName} size={24} />
           </h1>
           <p className="text-sm text-gray-600 mt-1">
             A curated collection for your <span className="capitalize font-medium">{pet.type}</span>, the {pet.breed}.
@@ -262,7 +329,7 @@ export default function SavedRecipesPage() {
 
         <div className="space-y-4">
           {hasSaved ? (
-            savedRecipeDetails.map((recipe) => (
+            visibleMeals.map((recipe) => (
               <div
                 key={recipe.id}
                 className="flex items-center p-4 bg-surface rounded-xl shadow hover:shadow-md transition-shadow justify-between border border-surface-highlight"
@@ -274,7 +341,7 @@ export default function SavedRecipesPage() {
                   <div className="ml-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-lg font-semibold text-gray-800 group-hover:text-primary-600 transition-colors">
-                        {recipe.name}
+                        <AlphabetText text={recipe.name} size={22} />
                       </p>
                       {recipe.isCustom && (
                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">
@@ -307,13 +374,36 @@ export default function SavedRecipesPage() {
                   </div>
                 </Link>
 
-                <button
-                  onClick={() => handleRemoveRecipe(recipe.id, recipe.isCustom)}
-                  className="ml-4 p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                  aria-label={`Remove ${recipe.name}`}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
+                <div className="ml-4 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void handleBuyMeal(recipe.id, !!recipe.isCustom);
+                    }}
+                    disabled={isBuyingId === recipe.id}
+                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-colors border ${
+                      isBuyingId === recipe.id
+                        ? 'bg-gray-200 text-gray-500 border-gray-300 cursor-wait'
+                        : 'bg-[#FF9900] hover:bg-[#E07704] text-black border-orange-400/60'
+                    }`}
+                    aria-label={`Buy ingredients for ${recipe.name}`}
+                    title="Buy ingredients"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    Buy
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRecipe(recipe.id, recipe.isCustom)}
+                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                    aria-label={`Remove ${recipe.name}`}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             ))
           ) : (
@@ -325,8 +415,8 @@ export default function SavedRecipesPage() {
               </p>
               <Link
                 href={`/profile/pet/${pet.id}`}
-                className="mt-4 group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl"
-                aria-label="Find Meals"
+                className="mt-4 group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl"
+                aria-label="Detect meals"
               >
                 <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-2xl">
                   <Image
@@ -346,11 +436,23 @@ export default function SavedRecipesPage() {
                     priority
                   />
                 </span>
-                <span className="sr-only">Find Meals</span>
+                <span className="sr-only">Detect meals</span>
               </Link>
             </div>
           )}
         </div>
+
+        {hasMore && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((v) => v + 30)}
+              className="px-5 py-3 rounded-lg font-semibold bg-surface border border-surface-highlight hover:bg-surface-highlight transition-colors"
+            >
+              Load more
+            </button>
+          </div>
+        )}
       </div>
 
       <p className="fixed bottom-4 right-4 text-xs text-gray-400">

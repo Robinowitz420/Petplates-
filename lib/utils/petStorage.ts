@@ -8,7 +8,35 @@ async function fetchJsonOrThrow<T>(res: Response): Promise<T> {
   const text = await res.text();
   if (!res.ok) {
     if (res.status === 401) throw new Error('Please sign in');
-    throw new Error(text || `Request failed (${res.status})`);
+    if (text) {
+      const trimmed = String(text).trim();
+      if (trimmed.startsWith('<!DOCTYPE html') || trimmed.startsWith('<html')) {
+        throw new Error(`Server returned an HTML error page (${res.status}). Check your dev server logs.`);
+      }
+      try {
+        const parsed = JSON.parse(text) as any;
+        const message =
+          (typeof parsed?.message === 'string' && parsed.message) ||
+          (typeof parsed?.error === 'string' && parsed.error) ||
+          '';
+        const error = new Error(message || text);
+        // Don't log expected business logic errors to console
+        const isBusinessLogicError = text.includes('LIMIT_REACHED') || text.includes('UNAUTHORIZED');
+        if (!isBusinessLogicError) {
+          console.error('API Error:', error);
+        }
+        throw error;
+      } catch {
+        const error = new Error(text);
+        // Don't log expected business logic errors to console
+        const isBusinessLogicError = text.includes('LIMIT_REACHED') || text.includes('UNAUTHORIZED');
+        if (!isBusinessLogicError) {
+          console.error('API Error:', error);
+        }
+        throw error;
+      }
+    }
+    throw new Error(`Request failed (${res.status})`);
   }
   return text ? (JSON.parse(text) as T) : ({} as T);
 }

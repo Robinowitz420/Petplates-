@@ -2,11 +2,12 @@
 
 import Image from 'next/image';
 import { useCallback } from 'react';
-import AddPetButtonUnclicked from '@/public/images/Buttons/AddPetButtonUnClicked.png';
-import AddPetButtonClicked from '@/public/images/Buttons/AddPetButtonClicked.png';
+import AddPetButtonUnclicked from '@/public/images/Buttons/PetShopImage.png';
+import AddPetButtonClicked from '@/public/images/Buttons/addpetclicked.png';
 
 interface AddPetImageButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
+  interactive?: boolean;
   size?: 'sm' | 'md';
   width?: number;
   height?: number;
@@ -20,6 +21,7 @@ const SIZE_MAP: Record<'sm' | 'md', { width: number; height: number }> = {
 
 export default function AddPetImageButton({
   onClick,
+  interactive = true,
   size = 'sm',
   width,
   height,
@@ -30,17 +32,14 @@ export default function AddPetImageButton({
   const buttonHeight = height ?? targetSize.height;
 
   const handleClick = useCallback(() => {
-    onClick();
-  }, [onClick]);
+    if (!interactive) return;
+    onClick?.();
+  }, [interactive, onClick]);
 
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={`group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl ${className}`}
-      style={{ width: buttonWidth, height: buttonHeight }}
-      aria-label="Add Pet"
-    >
+  const containerClassName = `group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl border-[4px] border-green-800/80 shadow-lg ${className}`;
+
+  const content = (
+    <>
       <Image
         src={AddPetButtonUnclicked}
         alt="+ Add Pet"
@@ -58,6 +57,26 @@ export default function AddPetImageButton({
         sizes={`${buttonWidth}px`}
       />
       <span className="sr-only">Add Pet</span>
+    </>
+  );
+
+  if (!interactive) {
+    return (
+      <div className={containerClassName} style={{ width: buttonWidth, height: buttonHeight }} aria-hidden="true">
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={containerClassName}
+      style={{ width: buttonWidth, height: buttonHeight }}
+      aria-label="Add Pet"
+    >
+      {content}
     </button>
   );
 }

@@ -6,10 +6,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Trash2, Edit, Calendar, ChefHat } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
-import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
+import { getCustomMealsPaged, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
+import AlphabetText from '@/components/AlphabetText';
 
 export default function CustomMealsHistoryPage() {
   const params = useParams();
@@ -20,6 +21,43 @@ export default function CustomMealsHistoryPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+
+  const loadPage = async (mode: 'initial' | 'more') => {
+    if (!isLoaded) return;
+    if (!userId) return;
+    if (!petId) return;
+
+    if (mode === 'initial') {
+      setLoading(true);
+      setNextCursor(null);
+      setHasMore(false);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const result = await getCustomMealsPaged(userId, petId, {
+        limit: 30,
+        cursor: mode === 'more' ? nextCursor : null,
+      });
+      const meals = result.customMeals || [];
+      const merged = mode === 'more' ? [...customMeals, ...meals] : meals;
+      merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setCustomMeals(merged);
+      setNextCursor(result.nextCursor);
+      setHasMore(Boolean(result.nextCursor) && meals.length > 0);
+    } catch (error) {
+      console.error('Error loading custom meals:', error);
+      if (mode === 'initial') setCustomMeals([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -34,12 +72,8 @@ export default function CustomMealsHistoryPage() {
         const pets = await getPets(userId);
         const foundPet = pets.find(p => p.id === petId) || null;
         setPet(foundPet);
-        
         if (foundPet) {
-          const meals = await getCustomMeals(userId, petId);
-          // Sort by most recent first
-          meals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-          setCustomMeals(meals);
+          await loadPage('initial');
         }
       } catch (error) {
         console.error('Error loading custom meals:', error);
@@ -55,11 +89,7 @@ export default function CustomMealsHistoryPage() {
     if (!isLoaded || !userId) return;
 
     await deleteCustomMeal(userId, petId, mealId);
-    
-    // Refresh the list
-    const meals = await getCustomMeals(userId, petId);
-    meals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    setCustomMeals(meals);
+    await loadPage('initial');
   };
 
   const formatDate = (dateString: string) => {
@@ -126,7 +156,8 @@ export default function CustomMealsHistoryPage() {
               </Link>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">
-                  Custom Meals for {petDisplayName}
+                  <span className="mr-2">Custom Meals for</span>
+                  <AlphabetText text={petDisplayName} size={22} />
                 </h1>
                 <p className="text-xs text-gray-600 mt-0.5">
                   {pet.breed} • {pet.age} • {pet.weight}
@@ -135,10 +166,10 @@ export default function CustomMealsHistoryPage() {
             </div>
             <Link
               href={`/profile/pet/${petId}/recipe-builder`}
-              className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl"
+              className="group relative top-[2px] inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl"
               aria-label="Create Meal"
             >
-              <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-2xl">
+              <span className="relative h-[45px] w-[252px] sm:w-[291px] overflow-hidden rounded-2xl">
                 <Image
                   src="/images/Buttons/CreateMealUnclicked.png"
                   alt=""
@@ -172,10 +203,10 @@ export default function CustomMealsHistoryPage() {
             </p>
             <Link
               href={`/profile/pet/${petId}/recipe-builder`}
-              className="group relative inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl"
+              className="group relative top-[2px] inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl"
               aria-label="Create Meal"
             >
-              <span className="relative h-12 w-[260px] sm:w-[300px] overflow-hidden rounded-2xl">
+              <span className="relative h-[45px] w-[252px] sm:w-[291px] overflow-hidden rounded-2xl">
                 <Image
                   src="/images/Buttons/CreateMealUnclicked.png"
                   alt=""
@@ -207,7 +238,7 @@ export default function CustomMealsHistoryPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                      {meal.name}
+                      <AlphabetText text={meal.name} size={22} />
                     </h3>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Calendar size={14} />
@@ -294,6 +325,19 @@ export default function CustomMealsHistoryPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={() => loadPage('more')}
+              disabled={loadingMore}
+              className="px-5 py-3 rounded-lg font-semibold bg-surface border border-surface-highlight hover:bg-surface-highlight transition-colors disabled:opacity-50"
+            >
+              {loadingMore ? 'Loading…' : 'Load more'}
+            </button>
           </div>
         )}
       </div>

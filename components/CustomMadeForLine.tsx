@@ -1,5 +1,7 @@
 'use client';
 
+import AlphabetText from '@/components/AlphabetText';
+
 interface CustomMadeForLineProps {
   petName: string;
 }
@@ -11,9 +13,7 @@ export default function CustomMadeForLine({ petName }: CustomMadeForLineProps) {
         <span className="uppercase tracking-wide text-sm sm:text-base text-orange-200/90">
           Custom made for
         </span>
-        <span className="text-foreground text-2xl sm:text-3xl font-bold break-words">
-          {petName}
-        </span>
+        <AlphabetText text={petName} size={36} className="text-foreground" />
       </div>
     </div>
   );

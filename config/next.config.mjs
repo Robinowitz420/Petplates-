@@ -16,6 +16,7 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(__dirname, '..'),
   },
+  experimental: process.platform === 'win32' ? { cpus: 4 } : {},
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -39,10 +40,37 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'source.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'unavatar.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatar.vercel.sh',
+      },
     ],
   },
   async headers() {
     const isPreview = process.env.VERCEL_ENV === 'preview';
+
+    const corsHeaders = [
+      {
+        key: 'Access-Control-Allow-Origin',
+        value: 'http://localhost:3000',
+      },
+      {
+        key: 'Access-Control-Allow-Credentials',
+        value: 'true',
+      },
+      {
+        key: 'Access-Control-Allow-Methods',
+        value: 'GET, POST, PUT, DELETE, OPTIONS',
+      },
+      {
+        key: 'Access-Control-Allow-Headers',
+        value: 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version',
+      },
+    ];
 
     const swHeaders = [
       {
@@ -69,6 +97,10 @@ const nextConfig = {
           headers: swHeaders,
         },
         {
+          source: '/api/:path*',
+          headers: corsHeaders,
+        },
+        {
           source: '/:path*',
           headers: noindexHeaders,
         },
@@ -79,6 +111,10 @@ const nextConfig = {
       {
         source: '/sw.js',
         headers: swHeaders,
+      },
+      {
+        source: '/api/:path*',
+        headers: [...corsHeaders, ...noindexHeaders],
       },
       {
         source: '/profile/:path*',
@@ -110,10 +146,6 @@ const nextConfig = {
       },
       {
         source: '/sign-up/:path*',
-        headers: noindexHeaders,
-      },
-      {
-        source: '/api/:path*',
         headers: noindexHeaders,
       },
       {

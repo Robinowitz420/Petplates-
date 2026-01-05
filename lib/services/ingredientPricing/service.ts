@@ -2,7 +2,7 @@ import type { IngredientPriceSnapshot } from './types';
 import { normalizeIngredientKey, normalizeIngredientQuery } from './normalize';
 import { mapWithConcurrency } from './concurrency';
 import { searchAmazonItems, getItemPriceUsd, hasAmazonPAApiConfig } from './amazonPAClient';
-import { candidateFromAmazon, chooseCheapestPerGram } from './selector';
+import { candidateFromAmazon, chooseBestCandidate } from './selector';
 import { getSnapshotsByIngredientKeys, upsertSnapshot } from './firestore';
 
 async function fetchFreshSnapshotForIngredientKey(ingredientKey: string): Promise<IngredientPriceSnapshot | null> {
@@ -19,18 +19,18 @@ async function fetchFreshSnapshotForIngredientKey(ingredientKey: string): Promis
     )
     .filter(Boolean) as any[];
 
-  const cheapest = chooseCheapestPerGram(candidates);
-  if (!cheapest) return null;
+  const best = chooseBestCandidate(candidates, ingredientKey);
+  if (!best) return null;
 
   const snapshot: IngredientPriceSnapshot = {
     ingredientKey,
     query,
-    asin: cheapest.asin,
-    title: cheapest.title,
-    url: cheapest.url,
-    priceUsd: cheapest.priceUsd,
-    weightGrams: cheapest.weightGrams,
-    unitPriceUsdPerGram: cheapest.unitPriceUsdPerGram,
+    asin: best.asin,
+    title: best.title,
+    url: best.url,
+    priceUsd: best.priceUsd,
+    weightGrams: best.weightGrams,
+    unitPriceUsdPerGram: best.unitPriceUsdPerGram,
     capturedAt: new Date().toISOString(),
   };
 

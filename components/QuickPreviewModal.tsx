@@ -33,6 +33,7 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   // A/B Testing: Get assigned button copy
   const [buttonCopy, setButtonCopy] = useState<ButtonCopyVariant | null>(null);
@@ -47,6 +48,7 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
     
     const fetchRecipes = async () => {
       setIsLoading(true);
+      setErrorMessage(null);
       try {
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
@@ -61,10 +63,32 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
           const data = await response.json();
           setRecipes(data.recipes || []);
         } else {
+          let friendly = '';
+          try {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              const errorJson = await response.json();
+              const message =
+                (typeof errorJson?.message === 'string' && errorJson.message) ||
+                (typeof errorJson?.error === 'string' && errorJson.error) ||
+                '';
+              friendly = message || '';
+            } else {
+              friendly = await response.text();
+            }
+          } catch {
+          }
+
+          if (response.status === 401) {
+            setErrorMessage('Sign in to preview meals.');
+          } else {
+            setErrorMessage(friendly || 'Unable to preview meals right now.');
+          }
           setRecipes([]);
         }
       } catch (error) {
         console.error('Failed to fetch recipes:', error);
+        setErrorMessage('Unable to preview meals right now.');
         setRecipes([]);
       } finally {
         setIsLoading(false);
@@ -133,6 +157,20 @@ export default function QuickPreviewModal({ isOpen, onClose }: QuickPreviewModal
               <p className="text-gray-300">
                 Creating personalized recipes for your {selectedType.replace('-', ' ')}
               </p>
+            </div>
+          ) : errorMessage ? (
+            <div className="text-center py-12">
+              <Sparkles className="text-orange-400 mx-auto mb-4" size={48} />
+              <h3 className="text-xl font-bold text-white mb-2">Meals are ready when you are</h3>
+              <p className="text-gray-300 mb-6">{errorMessage}</p>
+              <div className="flex justify-center">
+                <Link
+                  href="/sign-in"
+                  className="inline-flex items-center justify-center rounded-xl border border-orange-400/50 bg-orange-500/20 px-5 py-3 text-sm font-semibold text-orange-100 hover:bg-orange-500/25"
+                >
+                  Sign in
+                </Link>
+              </div>
             </div>
           ) : recipes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

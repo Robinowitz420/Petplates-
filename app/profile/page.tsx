@@ -11,9 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 import HealthConcernsDropdown from '@/components/HealthConcernsDropdown';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { getMascotFaceForPetType, getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
-import AddPetImageButton from '@/components/AddPetImageButton';
+ 
 import AddPetModal from '@/components/CreatePetModal';
-import { getCustomMeals } from '@/lib/utils/customMealStorage';
+import { getCustomMealById, getCustomMeals, getCustomMealsPaged } from '@/lib/utils/customMealStorage';
 import { getPets, savePet, deletePet } from '@/lib/utils/petStorage'; // Import from storage util
 import type { CustomMeal } from '@/lib/types';
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
@@ -21,6 +21,7 @@ import Image, { type StaticImageData } from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
 import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
+import { getRecipeSnapshotForPet } from '@/lib/utils/recipeSnapshotStorage';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
 import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
@@ -32,6 +33,7 @@ import { normalizePetCategory, normalizePetType } from '@/lib/utils/petType';
 import { formatPercent } from '@/lib/utils/formatPercent';
 import { getBreedNamesForSpecies } from '@/lib/data/speciesBreeds';
 import BioBanner from '@/public/images/Site Banners/BIO.png';
+import PetsBanner from '@/public/images/Site Banners/PETS.png';
 import SavedMealsBanner from '@/public/images/Site Banners/SavedMeals.png';
 import MealPlanBanner from '@/public/images/Site Banners/MealPlan.png';
 import BadgesBanner from '@/public/images/Site Banners/Badges.png';
@@ -39,6 +41,9 @@ import FindMealsUnclickedButton from '@/public/images/Buttons/FindMealsUnclicked
 import FindMealsClickedButton from '@/public/images/Buttons/FindMealsClicked.png';
 import CreateMealUnclickedButton from '@/public/images/Buttons/CreateMealUnclicked.png';
 import CreateMealClickedButton from '@/public/images/Buttons/CreateMealClicked.png';
+import AddPetButton from '@/public/images/Buttons/ADDPET.png';
+import AddPetButtonClicked from '@/public/images/Buttons/addpetclicked.png';
+import PetShopImage from '@/public/images/Buttons/PetShopImage.png';
 import EditButton from '@/public/images/Buttons/Edit.png';
 import EditClickedButton from '@/public/images/Buttons/EditClicked.png';
 import DeleteButton from '@/public/images/Buttons/Delete.png';
@@ -565,12 +570,39 @@ export default function MyPetsPage() {
   const { setUserId: setVillageUserId } = useVillageStore();
   const router = useRouter();
 
+  const [planTier, setPlanTier] = useState<'free' | 'pro'>('free');
+  const [profileNotice, setProfileNotice] = useState<string | null>(null);
+
   const [pets, setPets] = useState<ProfilePet[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [customMeals, setCustomMeals] = useState<CustomMeal[]>([]);
+  const [customMealsCursor, setCustomMealsCursor] = useState<string | null>(null);
+  const [customMealsHasMore, setCustomMealsHasMore] = useState(false);
+  const [customMealsLoadingMore, setCustomMealsLoadingMore] = useState(false);
+  const [savedVisibleCount, setSavedVisibleCount] = useState(40);
   const [isClient, setIsClient] = useState(false);
   const [petsLoaded, setPetsLoaded] = useState(false);
+
+  const formatActivityLevel = (level?: Pet['activityLevel']) => {
+    if (!level) return '';
+    const spaced = level.replace(/-/g, ' ');
+    return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+  };
+
+  const getFriendlyErrorMessage = (err: unknown, fallback: string) => {
+    const raw = err instanceof Error ? err.message : String(err || '');
+    if (!raw) return fallback;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && typeof (parsed as any).message === 'string') {
+        return String((parsed as any).message);
+      }
+      return raw;
+    } catch {
+      return raw;
+    }
+  };
   const [activePetId, setActivePetId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'bio' | 'saved' | 'plan'>('bio');
   const [planOffset, setPlanOffset] = useState(0);
@@ -697,6 +729,23 @@ const buildWeeklyPlan = useCallback(
   }, [isLoaded, user?.id, setVillageUserId]);
 
   useEffect(() => {
+    if (!userId) {
+      setPlanTier('free');
+      return;
+    }
+
+    fetch('/api/plan', { method: 'GET', credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const tier = data?.planTier;
+        if (tier === 'pro' || tier === 'free') {
+          setPlanTier(tier);
+        }
+      })
+      .catch(() => {});
+  }, [userId]);
+
+  useEffect(() => {
     setIsClient(true);
   }, []);
 
@@ -717,19 +766,61 @@ const buildWeeklyPlan = useCallback(
     setPetsLoaded(true);
   }, [userId]);
 
+  const loadCustomMealsPage = useCallback(
+    async (mode: 'initial' | 'more') => {
+      if (!activePetId || !userId) return;
+
+      if (mode === 'more') {
+        if (!customMealsHasMore || customMealsLoadingMore) return;
+        setCustomMealsLoadingMore(true);
+      } else {
+        setCustomMealsCursor(null);
+        setCustomMealsHasMore(false);
+      }
+
+      try {
+        const result = await getCustomMealsPaged(userId, activePetId, {
+          limit: 50,
+          cursor: mode === 'more' ? customMealsCursor : null,
+        });
+        const meals = Array.isArray(result.customMeals) ? result.customMeals : [];
+        const merged = mode === 'more' ? [...customMeals, ...meals] : meals;
+        startTransition(() => {
+          setCustomMeals(merged);
+          setCustomMealsCursor(result.nextCursor);
+          setCustomMealsHasMore(Boolean(result.nextCursor) && meals.length > 0);
+        });
+      } catch (err) {
+        const msg = getFriendlyErrorMessage(err, 'Failed to load custom meals.');
+        setProfileNotice(msg || 'Failed to load custom meals.');
+        setTimeout(() => setProfileNotice(null), 5000);
+        console.error('Failed to load custom meals:', err);
+        if (mode !== 'more') {
+          startTransition(() => {
+            setCustomMeals([]);
+            setCustomMealsCursor(null);
+            setCustomMealsHasMore(false);
+          });
+        }
+      } finally {
+        if (mode === 'more') setCustomMealsLoadingMore(false);
+      }
+    },
+    [activePetId, userId, customMealsCursor, customMealsHasMore, customMealsLoadingMore, customMeals]
+  );
+
   // Load custom meals for the active pet
   const loadCustomMeals = useCallback(async () => {
     if (activePetId && userId) {
-      const meals = await getCustomMeals(userId, activePetId);
-      startTransition(() => {
-        setCustomMeals(meals);
-      });
+      await loadCustomMealsPage('initial');
     } else {
       startTransition(() => {
         setCustomMeals([]);
+        setCustomMealsCursor(null);
+        setCustomMealsHasMore(false);
       });
     }
-  }, [activePetId, userId]);
+  }, [activePetId, userId, loadCustomMealsPage]);
 
   // Load custom meals when active pet changes - deferred until pet is actually selected
   // Don't load on initial mount if no pet is active (saves initial load time)
@@ -741,7 +832,7 @@ const buildWeeklyPlan = useCallback(
       // Clear custom meals if no pet is selected
       setCustomMeals([]);
     }
-  }, [activePetId, loadCustomMeals]);
+  }, [activePetId]); // Removed loadCustomMeals from dependencies to prevent infinite loop
 
   // Load saved active pet ID from localStorage on mount (before pets load)
   useEffect(() => {
@@ -809,11 +900,18 @@ const buildWeeklyPlan = useCallback(
         // Use the current activePetId from closure, don't include loadCustomMeals in deps
         if (e.detail?.petId === activePetId && activePetId) {
           // Call getCustomMeals directly - use startTransition for non-critical updates
-          getCustomMeals(userId, activePetId).then(meals => {
-            startTransition(() => {
-              setCustomMeals(meals);
+          getCustomMeals(userId, activePetId)
+            .then((meals) => {
+              startTransition(() => {
+                setCustomMeals(meals);
+              });
+            })
+            .catch((err) => {
+              const msg = getFriendlyErrorMessage(err, 'Failed to load custom meals.');
+              setProfileNotice(msg || 'Failed to load custom meals.');
+              setTimeout(() => setProfileNotice(null), 5000);
+              console.error('Failed to load custom meals:', err);
             });
-          });
         }
       }
     };
@@ -892,7 +990,7 @@ const buildWeeklyPlan = useCallback(
       // Clear custom meals if no pet is selected
       setCustomMeals([]);
     }
-  }, [activePetId, loadCustomMeals]);
+  }, [activePetId]); // Removed loadCustomMeals to prevent infinite loop
 
   // Listen for custom meal updates
   useEffect(() => {
@@ -901,26 +999,14 @@ const buildWeeklyPlan = useCallback(
     const handleCustomMealsUpdated = (e: CustomEvent) => {
       // Refresh if custom meals were updated for the active pet
       if (e.detail?.userId === userId && e.detail?.petId === activePetId && activePetId) {
-        // Call getCustomMeals directly to avoid dependency on loadCustomMeals callback
-        // Use startTransition for non-critical updates
-        getCustomMeals(userId, activePetId).then(meals => {
-          startTransition(() => {
-            setCustomMeals(meals);
-          });
-        });
+        void loadCustomMealsPage('initial');
       }
     };
 
     const handleStorageChange = (e: StorageEvent) => {
       // Refresh if custom meals storage was modified (cross-tab/window)
       if (activePetId && e.key === `custom_meals_${userId}_${activePetId}`) {
-        // Call getCustomMeals directly to avoid dependency on loadCustomMeals callback
-        // Use startTransition for non-critical updates
-        getCustomMeals(userId, activePetId).then(meals => {
-          startTransition(() => {
-            setCustomMeals(meals);
-          });
-        });
+        void loadCustomMealsPage('initial');
       }
     };
 
@@ -931,7 +1017,41 @@ const buildWeeklyPlan = useCallback(
       window.removeEventListener('customMealsUpdated', handleCustomMealsUpdated as EventListener);
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [userId, activePetId]);
+  }, [userId, activePetId, loadCustomMealsPage]);
+
+  useEffect(() => {
+    if (!userId || !activePet) return;
+
+    const savedIds = Array.isArray(activePet.savedRecipes) ? activePet.savedRecipes : [];
+    const planIds = Array.isArray((activePet as any).mealPlan) ? ((activePet as any).mealPlan as string[]) : [];
+    const visibleIds = Array.from(new Set([...savedIds, ...planIds])).filter(Boolean).slice(0, savedVisibleCount);
+    const neededCustomIds = visibleIds.filter((id) => String(id).startsWith('custom_'));
+    if (neededCustomIds.length === 0) return;
+
+    const existing = new Set(customMeals.map((m) => m.id));
+    const missing = neededCustomIds.filter((id) => !existing.has(id));
+    if (missing.length === 0) return;
+
+    Promise.allSettled(missing.slice(0, 30).map((id) => getCustomMealById(userId, id)))
+      .then((results) => {
+        const additions = results.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []));
+        if (additions.length === 0) return;
+        startTransition(() => {
+          setCustomMeals((prev) => {
+            const prevIds = new Set(prev.map((m) => m.id));
+            const next = [...prev];
+            for (const meal of additions) {
+              if (!prevIds.has(meal.id) && (meal as any).petId === activePet.id) {
+                next.push(meal);
+                prevIds.add(meal.id);
+              }
+            }
+            return next;
+          });
+        });
+      })
+      .catch(() => {});
+  }, [userId, activePet, savedVisibleCount, customMeals]);
 
   // -----------------------------------------------------------------
   // Fetch generated recipe docs when savedRecipes / mealPlan change
@@ -941,7 +1061,8 @@ const buildWeeklyPlan = useCallback(
     const savedIds = Array.isArray(activePet.savedRecipes) ? activePet.savedRecipes : [];
     const planIds = Array.isArray((activePet as any).mealPlan) ? ((activePet as any).mealPlan as string[]) : [];
     const ids = Array.from(new Set([...savedIds, ...planIds])).filter(Boolean);
-    const missing = ids.filter(
+    const capped = ids.slice(0, Math.max(120, activeTab === 'saved' ? savedVisibleCount : 0));
+    const missing = capped.filter(
       (id) => !genRecipesById[id] && !customMeals.some((m) => m.id === id)
     );
     if (missing.length === 0) return;
@@ -980,7 +1101,7 @@ const buildWeeklyPlan = useCallback(
         setFailedGenRecipeIds((prev) => ({ ...prev, ...failures }));
       }
     });
-  }, [activePet, genRecipesById, customMeals]);
+  }, [activePet, genRecipesById, customMeals, activeTab, savedVisibleCount]);
 
   // -----------------------------------------------------------------
   // Batch price recipes whenever cache/customMeals change
@@ -988,9 +1109,10 @@ const buildWeeklyPlan = useCallback(
   useEffect(() => {
     if (!activePet) return;
     const ids = Array.isArray(activePet.savedRecipes) ? activePet.savedRecipes : [];
+    const cappedIds = ids.slice(0, Math.max(60, activeTab === 'saved' ? savedVisibleCount : 0));
     const recipesForPricing: Recipe[] = [];
 
-    ids.forEach((id) => {
+    cappedIds.forEach((id) => {
       const m = customMeals.find((cm) => cm.id === id) || null;
       if (m) {
         recipesForPricing.push(convertCustomMealToRecipe(m));
@@ -1015,7 +1137,7 @@ const buildWeeklyPlan = useCallback(
         setCostPerMealMap((prev) => ({ ...prev, ...map }));
       })
       .catch(() => {});
-  }, [activePet, genRecipesById, customMeals]);
+  }, [activePet, genRecipesById, customMeals, activeTab, savedVisibleCount]);
 
   // Build weekly plan for Plan tab (mealPlan only)
   const allMealsForPlan = useMemo(() => {
@@ -1122,8 +1244,13 @@ const buildWeeklyPlan = useCallback(
         }
 
         // Save each pet async
-        updatedPets.forEach(pet => {
-          savePet(userId, pet).catch(err => console.error('Failed to save pet:', err));
+        updatedPets.forEach((pet) => {
+          savePet(userId, pet).catch((err: any) => {
+            const msg = getFriendlyErrorMessage(err, 'Unable to save changes.');
+            setProfileNotice(msg || 'Unable to save changes.');
+            setTimeout(() => setProfileNotice(null), 5000);
+            console.error('Failed to save pet:', err);
+          });
         });
 
         // If this was a brand new pet, auto-select it and navigate to its profile/meal context
@@ -1226,15 +1353,19 @@ const buildWeeklyPlan = useCallback(
         savedRecipes: (petToUpdate.savedRecipes || []).filter(id => id !== recipeId),
         mealPlan: (petToUpdate as any).mealPlan ? ((petToUpdate as any).mealPlan || []).filter((id: string) => id !== recipeId) : (petToUpdate as any).mealPlan,
       };
-      
-      await savePet(userId, updatedPet);
 
-      // Server-authoritative refresh after write
-      await loadPets();
-      
-      setPets(prevPets => prevPets.map(p => 
-        p.id === activePetId ? updatedPet : p
-      ));
+      try {
+        await savePet(userId, updatedPet);
+        await loadPets();
+        setPets(prevPets => prevPets.map(p => 
+          p.id === activePetId ? updatedPet : p
+        ));
+      } catch (err: any) {
+        const msg = getFriendlyErrorMessage(err, 'Unable to remove meal.');
+        setProfileNotice(msg || 'Unable to remove meal.');
+        setTimeout(() => setProfileNotice(null), 5000);
+        console.error('Failed to remove saved meal:', err);
+      }
       
       // Badge system no longer evaluates on removal.
     }
@@ -1309,6 +1440,22 @@ const buildWeeklyPlan = useCallback(
           <div className="hidden lg:block" />
         </header>
 
+        <div className="flex flex-col gap-2">
+          <div className="rounded-2xl border border-orange-400/40 bg-orange-500/10 px-5 py-3 text-sm text-orange-100">
+            {planTier === 'pro' ? (
+              <div className="font-semibold">Pro: Unlimited (fair use)</div>
+            ) : (
+              <div className="font-semibold">Free plan: Limits apply</div>
+            )}
+          </div>
+
+          {profileNotice && (
+            <div className="rounded-2xl border border-orange-400/40 bg-orange-500/10 px-5 py-3 text-sm text-orange-100">
+              {profileNotice}
+            </div>
+          )}
+        </div>
+
         {pets.length === 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
             <div className="text-center py-14 px-6 bg-surface rounded-2xl border border-surface-highlight shadow-lg">
@@ -1330,273 +1477,316 @@ const buildWeeklyPlan = useCallback(
             </div>
 
             <div className="hidden lg:flex justify-end sticky top-24">
-              <AddPetImageButton
-                width={440}
-                height={300}
-                onClick={() => {
-                  setEditingPet(null);
-                  setIsModalOpen(true);
-                }}
-              />
+              <div className="flex flex-col items-center gap-3 w-[440px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingPet(null);
+                    setIsModalOpen(true);
+                  }}
+                  className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg"
+                  style={{ width: 220, height: 48 }}
+                  aria-label="Add Pet"
+                >
+                  <Image
+                    src={AddPetButton}
+                    alt=""
+                    fill
+                    sizes="220px"
+                    className="object-contain rounded-2xl transition-opacity duration-75 group-active:opacity-0"
+                  />
+                  <Image
+                    src={AddPetButtonClicked}
+                    alt=""
+                    fill
+                    sizes="220px"
+                    className="object-contain rounded-2xl opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                  />
+                </button>
+
+                <div
+                  className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
+                  style={{ width: 440, height: 300 }}
+                  aria-hidden="true"
+                >
+                  <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
+                </div>
+              </div>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
             <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 lg:gap-6 items-start">
-              <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Pets</h3>
-                  <span className="text-xs text-gray-400">{pets.length} total</span>
-                </div>
-                <div className="space-y-2">
+              <div className="flex flex-col gap-3">
+                <span className="relative block h-24 w-full overflow-hidden">
+                  <Image src={PetsBanner} alt="Pets" fill sizes="260px" className="object-contain" />
+                </span>
+
+                <div className="bg-surface border-[3px] border-green-800/80 rounded-2xl shadow-lg p-4 space-y-2">
                   {pets.map((pet) => {
                     if (!pet?.id) return null;
                     const name = getPrimaryName(pet.names || []) || 'Unnamed Pet';
-                  return (
-                    <button
-                      key={pet.id}
-                      onClick={() => {
-                        setActivePetId(pet.id);
-                        setActiveTab('bio');
-                        // Persist selection to localStorage
-                        if (typeof window !== 'undefined') {
-                          localStorage.setItem(`active_pet_id_${userId}`, pet.id);
-                        }
-                      }}
-                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left transition-all duration-200 ease-out ${
-                        activePetId === pet.id
-                          ? 'bg-green-900/20 text-white'
-                          : 'bg-surface-highlight/60 text-foreground hover:bg-surface-highlight hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg'
-                      }`}
-                      style={{
-                        border: activePetId === pet.id ? '3px solid #f97316' : '3px solid rgba(249, 115, 22, 0.5)'
-                      }}
-                    >
-                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-green-800 bg-surface flex items-center justify-center flex-shrink-0">
-                        <Image
-                          src={getMascotFaceForPetType(pet.type as PetCategory)}
-                          alt={`${name} mascot`}
-                          width={40}
-                          height={40}
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold truncate">{name}</div>
-                        <div className="text-xs text-gray-400 capitalize truncate">
-                          {pet.type}
-                          {pet.age ? ` • ${pet.age}` : ''}
+                    return (
+                      <button
+                        key={pet.id}
+                        onClick={() => {
+                          setActivePetId(pet.id);
+                          setActiveTab('bio');
+                          if (typeof window !== 'undefined') {
+                            localStorage.setItem(`active_pet_id_${userId}`, pet.id);
+                          }
+                        }}
+                        className={`w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left transition-all duration-200 ease-out ${
+                          activePetId === pet.id
+                            ? 'bg-green-900/20 text-white'
+                            : 'bg-surface-highlight/60 text-foreground hover:bg-surface-highlight hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg'
+                        }`}
+                        style={{
+                          border: activePetId === pet.id ? '3px solid #f97316' : '3px solid rgba(249, 115, 22, 0.5)'
+                        }}
+                      >
+                        <div className="w-10 h-10 rounded-full overflow-hidden border-[3px] border-green-800 bg-surface flex items-center justify-center flex-shrink-0">
+                          <Image
+                            src={getMascotFaceForPetType(pet.type as PetCategory)}
+                            alt={`${name} mascot`}
+                            width={40}
+                            height={40}
+                            className="object-cover"
+                            unoptimized
+                          />
                         </div>
-                      </div>
-                    </button>
-                  );
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-semibold truncate">{name}</div>
+                          <div className="text-xs text-gray-400 capitalize truncate">
+                            {pet.type}
+                            {pet.age ? ` • ${pet.age}` : ''}
+                          </div>
+                          {pet.activityLevel && (
+                            <div className="text-[11px] text-gray-400 truncate">
+                              Activity: {formatActivityLevel(pet.activityLevel)}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
                   })}
                 </div>
               </div>
 
-            {activePet ? (
-              <div className="bg-surface border border-surface-highlight rounded-2xl shadow-xl p-5 pb-[80px] flex flex-col relative">
-                <div className="absolute bottom-2 left-2 flex gap-2">
-                  <Link
-                    href={`/profile/pet/${activePet.id}`}
-                    className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
-                    aria-label="Find Meals"
-                  >
-                    <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
-                      <Image
-                        src={FindMealsUnclickedButton}
-                        alt=""
-                        fill
-                        sizes="300px"
-                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                        priority
-                      />
-                      <Image
-                        src={FindMealsClickedButton}
-                        alt=""
-                        fill
-                        sizes="300px"
-                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                        priority
-                      />
-                    </span>
-                    <span className="sr-only">Find Meals</span>
-                  </Link>
+              {activePet ? (
+                <div className="bg-surface border-[3px] border-green-800/80 rounded-2xl shadow-xl p-5 pb-[80px] flex flex-col relative">
+                  <div className="absolute bottom-2 left-2 flex gap-2">
+                    <Link
+                      href={`/profile/pet/${activePet.id}`}
+                      className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
+                      aria-label="Detect meals"
+                    >
+                      <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
+                        <Image
+                          src={FindMealsUnclickedButton}
+                          alt=""
+                          fill
+                          sizes="300px"
+                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                          priority
+                        />
+                        <Image
+                          src={FindMealsClickedButton}
+                          alt=""
+                          fill
+                          sizes="300px"
+                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                          priority
+                        />
+                      </span>
+                      <span className="sr-only">Detect meals</span>
+                    </Link>
 
-                  <Link
-                    href={`/profile/pet/${activePet.id}/recipe-builder`}
-                    className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
-                    aria-label="Create Meal"
-                  >
-                    <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
-                      <Image
-                        src={CreateMealUnclickedButton}
-                        alt=""
-                        fill
-                        sizes="300px"
-                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                        priority
-                      />
-                      <Image
-                        src={CreateMealClickedButton}
-                        alt=""
-                        fill
-                        sizes="300px"
-                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                        priority
-                      />
-                    </span>
-                    <span className="sr-only">Create Meal</span>
-                  </Link>
-                </div>
+                    <Link
+                      href={`/profile/pet/${activePet.id}/recipe-builder`}
+                      className="group relative top-[2px] inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
+                      aria-label="Create Meal"
+                    >
+                      <span className="relative h-[64px] w-[176px] sm:w-[204px] overflow-hidden rounded-xl">
+                        <Image
+                          src={CreateMealUnclickedButton}
+                          alt=""
+                          fill
+                          sizes="300px"
+                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                          priority
+                        />
+                        <Image
+                          src={CreateMealClickedButton}
+                          alt=""
+                          fill
+                          sizes="300px"
+                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                          priority
+                        />
+                      </span>
+                      <span className="sr-only">Create Meal</span>
+                    </Link>
+                  </div>
 
-                <div className="absolute bottom-[3px] right-2 flex gap-2">
-                  <button
-                    onClick={() => handleEditPet(activePet)}
-                    className="group inline-flex focus:outline-none rounded-md"
-                    aria-label="Edit Pet"
-                  >
-                    <span className="relative h-[80px] w-[120px] overflow-hidden">
-                      <Image
-                        src={EditButton}
-                        alt=""
-                        fill
-                        sizes="150px"
-                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                        priority
-                      />
-                      <Image
-                        src={EditClickedButton}
-                        alt=""
-                        fill
-                        sizes="150px"
-                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                        priority
-                      />
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => handleDeletePet(activePet.id)}
-                    className="group inline-flex focus:outline-none rounded-md"
-                    aria-label="Delete Pet"
-                  >
-                    <span className="relative h-[80px] w-[120px] overflow-hidden">
-                      <Image
-                        src={DeleteButton}
-                        alt=""
-                        fill
-                        sizes="150px"
-                        className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                        priority
-                      />
-                      <Image
-                        src={DeleteClickedButton}
-                        alt=""
-                        fill
-                        sizes="150px"
-                        className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                        priority
-                      />
-                    </span>
-                  </button>
-                </div>
-                      <div className="flex-1">
-                      <div className="flex items-start justify-between gap-3 flex-wrap">
-                        <div className="flex-1 min-w-0">
-                          <div className="relative float-left mr-4 mb-2 flex flex-col items-center" style={{ shapeOutside: 'circle(50%)', width: '168px', height: '260px' }}>
-                            <h2
-                              className="text-xl font-bold text-center text-gray-100 whitespace-nowrap leading-tight translate-y-[8px]"
-                              style={{ margin: 0 }}
-                            >
-                              {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
-                            </h2>
-                            <label className="w-42 h-42 rounded-full overflow-hidden border-2 border-green-800 bg-surface-highlight flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity group translate-y-10" style={{ width: '168px', height: '168px' }}>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => {
-                                      const imageDataUrl = reader.result as string;
-                                      const updatedPet = { ...activePet, image: imageDataUrl };
-                                      savePet(userId, updatedPet);
-                                      setPets(prevPets => prevPets.map(p => p.id === activePet.id ? updatedPet : p));
-                                    };
-                                    reader.readAsDataURL(file);
-                                  }
-                                }}
+                  <div className="absolute bottom-[3px] right-2 flex gap-2">
+                    <button
+                      onClick={() => handleEditPet(activePet)}
+                      className="group inline-flex focus:outline-none rounded-md"
+                      aria-label="Edit Pet"
+                    >
+                      <span className="relative h-[80px] w-[120px] overflow-hidden">
+                        <Image
+                          src={EditButton}
+                          alt=""
+                          fill
+                          sizes="150px"
+                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                          priority
+                        />
+                        <Image
+                          src={EditClickedButton}
+                          alt=""
+                          fill
+                          sizes="150px"
+                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                          priority
+                        />
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => handleDeletePet(activePet.id)}
+                      className="group inline-flex focus:outline-none rounded-md"
+                      aria-label="Delete Pet"
+                    >
+                      <span className="relative h-[80px] w-[120px] overflow-hidden">
+                        <Image
+                          src={DeleteButton}
+                          alt=""
+                          fill
+                          sizes="150px"
+                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                          priority
+                        />
+                        <Image
+                          src={DeleteClickedButton}
+                          alt=""
+                          fill
+                          sizes="150px"
+                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                          priority
+                        />
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className="relative float-left mr-4 mb-2 flex flex-col items-center"
+                          style={{ shapeOutside: 'circle(50%)', width: '168px', height: '260px' }}
+                        >
+                          <h2
+                            className="text-xl font-bold text-center text-gray-100 whitespace-nowrap leading-tight translate-y-[8px]"
+                            style={{ margin: 0 }}
+                          >
+                            {getPrimaryName(activePet.names || []) || 'Unnamed Pet'}
+                          </h2>
+                          <label
+                            className="w-42 h-42 rounded-full overflow-hidden border-2 border-green-800 bg-surface-highlight flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity group translate-y-10"
+                            style={{ width: '168px', height: '168px' }}
+                          >
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    const imageDataUrl = reader.result as string;
+                                    const updatedPet = { ...activePet, image: imageDataUrl };
+                                    savePet(userId, updatedPet).catch((err: any) => {
+                                      const msg = getFriendlyErrorMessage(err, 'Unable to save changes.');
+                                      setProfileNotice(msg || 'Unable to save changes.');
+                                      setTimeout(() => setProfileNotice(null), 5000);
+                                      console.error('Failed to save pet:', err);
+                                    });
+                                    setPets((prevPets) => prevPets.map((p) => (p.id === activePet.id ? updatedPet : p)));
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                            {activePet.image ? (
+                              <img
+                                src={activePet.image}
+                                alt={getPrimaryName(activePet.names || []) || 'Pet'}
+                                className="w-full h-full object-cover"
                               />
-                              {activePet.image ? (
-                                <img
-                                  src={activePet.image}
-                                  alt={getPrimaryName(activePet.names || []) || 'Pet'}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <Image
-                                  src={getProfilePictureForPetType(activePet.type as PetCategory)}
-                                  alt={`${getPrimaryName(activePet.names || []) || 'Pet'} mascot`}
-                                  width={168}
-                                  height={168}
-                                  className="object-cover"
-                                  unoptimized
-                                  style={normalizePetCategory(activePet.type, 'profile.page.avatar') === 'cats' ? { transform: 'scale(1.5)', transformOrigin: 'center', objectPosition: 'center' } : undefined}
-                                />
-                              )}
-                            </label>
-                            <svg className="absolute left-0 pointer-events-none" width="168" height="40" style={{ overflow: 'visible', top: '255px' }}>
-                              <defs>
-                                <path id={`textPath-${activePet.id}`} d="M 10,5 Q 84,-15 158,5" fill="none" />
-                              </defs>
-                              <text className="text-xs" fill="#9ca3af" fontSize="12">
-                                <textPath href={`#textPath-${activePet.id}`} startOffset="50%">
-                                  <tspan textAnchor="middle">Click to upload photo</tspan>
-                                </textPath>
-                              </text>
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-3 mt-9">
-                          {/* Badges Section - moved to far right, maintaining current height */}
-                          <div className="flex justify-center">
-                            <Tooltip content={BADGE_SUMMARY_TEXT} wide>
+                            ) : (
                               <Image
-                                src={BadgesBanner}
-                                alt="Badges"
-                                className="h-auto w-[220px] cursor-help border-2 border-orange-400 rounded-md"
-                                priority
+                                src={getProfilePictureForPetType(activePet.type as PetCategory)}
+                                alt={`${getPrimaryName(activePet.names || []) || 'Pet'} mascot`}
+                                width={168}
+                                height={168}
+                                className="object-cover"
+                                unoptimized
+                                style={
+                                  normalizePetCategory(activePet.type, 'profile.page.avatar') === 'cats'
+                                    ? { transform: 'scale(1.5)', transformOrigin: 'center', objectPosition: 'center' }
+                                    : undefined
+                                }
                               />
-                            </Tooltip>
-                          </div>
-                          <div className="p-4 border border-orange-400 rounded-lg bg-surface-highlight/30 min-h-[140px] w-[520px] max-w-full">
-                            <PetBadges key={badgeRefreshKey} petId={activePet.id} userId={userId} />
-                          </div>
+                            )}
+                          </label>
+                          <svg className="absolute left-0 pointer-events-none" width="168" height="40" style={{ overflow: 'visible', top: '255px' }}>
+                            <defs>
+                              <path id={`textPath-${activePet.id}`} d="M 10,5 Q 84,-15 158,5" fill="none" />
+                            </defs>
+                            <text className="text-xs" fill="#9ca3af" fontSize="12">
+                              <textPath href={`#textPath-${activePet.id}`} startOffset="50%">
+                                <tspan textAnchor="middle">Click to upload photo</tspan>
+                              </textPath>
+                            </text>
+                          </svg>
                         </div>
                       </div>
+                      <div className="flex flex-col gap-3 mt-9">
+                        <div className="flex justify-center">
+                          <Tooltip content={BADGE_SUMMARY_TEXT} wide>
+                            <Image
+                              src={BadgesBanner}
+                              alt="Badges"
+                              className="h-auto w-[220px] cursor-help border-2 border-orange-400 rounded-md"
+                              priority
+                            />
+                          </Tooltip>
+                        </div>
+                        <div className="p-4 border border-orange-400 rounded-lg bg-surface-highlight/30 min-h-[140px] w-[520px] max-w-full">
+                          <PetBadges key={badgeRefreshKey} petId={activePet.id} userId={userId} />
+                        </div>
+                      </div>
+                    </div>
 
                     <div className="mt-4">
                       <div className="flex gap-0 border-b-2 border-surface-highlight">
-                        {(["bio", "saved", "plan"] as const).map((tab) => {
+                        {(['bio', 'saved', 'plan'] as const).map((tab) => {
                           const isActive = activeTab === tab;
                           const banner = PROFILE_TAB_BANNERS[tab];
                           return (
                             <button
                               key={tab}
                               onClick={() => {
-                                setActiveTab(tab as any);
-                                // Refresh pets when switching to saved tab to ensure latest data
+                                setActiveTab(tab);
                                 if (tab === 'saved') {
                                   loadPets();
                                 }
                               }}
-                              className={`group relative px-4 py-2 transition-all duration-200 ${
-                                isActive
-                                  ? 'border-b-3 border-orange-400'
-                                  : 'border-b-3 border-transparent'
+                              className={`group relative px-[1.2rem] py-[0.6rem] transition-all duration-200 ${
+                                isActive ? 'border-b-3 border-orange-400' : 'border-b-3 border-transparent'
                               }`}
                               style={{ borderBottomWidth: '3px' }}
                               aria-selected={isActive}
@@ -1605,7 +1795,7 @@ const buildWeeklyPlan = useCallback(
                               <Image
                                 src={banner.image}
                                 alt={banner.alt}
-                                className="h-8 w-auto transition-opacity duration-200 group-hover:opacity-100 border-2 rounded-md"
+                                className="h-[2.4rem] w-auto transition-opacity duration-200 group-hover:opacity-100 border-2 rounded-md"
                                 style={{
                                   opacity: isActive ? 1 : 0.65,
                                   borderColor: '#fb923c',
@@ -1620,80 +1810,91 @@ const buildWeeklyPlan = useCallback(
                       <div className="mt-3 min-h-[70px]">
                         {activeTab === 'bio' && (
                           <div className="flex gap-6">
-                            {/* Bio Column */}
                             <div className="flex-1 min-w-0">
                               <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
                                 {activePet.breed && (
                                   <div className="flex items-start gap-1.5">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span><strong className="text-gray-200">Breed:</strong> {activePet.breed}</span>
+                                    <span>
+                                      <strong className="text-gray-200">Breed:</strong> {activePet.breed}
+                                    </span>
                                   </div>
                                 )}
                                 {activePet.age && (
                                   <div className="flex items-start gap-1.5">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span><strong className="text-gray-200">Age:</strong> {activePet.age}</span>
+                                    <span>
+                                      <strong className="text-gray-200">Age:</strong> {activePet.age}
+                                    </span>
                                   </div>
                                 )}
                                 {(activePet.weight || activePet.weightKg) && (
                                   <div className="flex items-start gap-1.5">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span><strong className="text-gray-200">Weight:</strong> {activePet.weightKg ? `${activePet.weightKg}kg` : activePet.weight}</span>
+                                    <span>
+                                      <strong className="text-gray-200">Weight:</strong>{' '}
+                                      {activePet.weightKg ? `${activePet.weightKg}kg` : activePet.weight}
+                                    </span>
+                                  </div>
+                                )}
+                                {activePet.activityLevel && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Activity Level:</strong>{' '}
+                                      {formatActivityLevel(activePet.activityLevel)}
+                                    </span>
                                   </div>
                                 )}
                                 {(activePet.dietaryRestrictions || []).length > 0 && (
                                   <div className="flex items-start gap-1.5">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span><strong className="text-gray-200">Dietary Restrictions:</strong> {(activePet.dietaryRestrictions || []).join(', ')}</span>
+                                    <span>
+                                      <strong className="text-gray-200">Dietary Restrictions:</strong>{' '}
+                                      {(activePet.dietaryRestrictions || []).join(', ')}
+                                    </span>
                                   </div>
                                 )}
                                 {(activePet.dislikes || []).length > 0 && (
                                   <div className="flex items-start gap-1.5">
                                     <span className="text-orange-400 mt-0.5">•</span>
-                                    <span><strong className="text-gray-200">Dislikes:</strong> {(activePet.dislikes || []).join(', ')}</span>
+                                    <span>
+                                      <strong className="text-gray-200">Dislikes:</strong>{' '}
+                                      {(activePet.dislikes || []).join(', ')}
+                                    </span>
                                   </div>
                                 )}
                               </div>
                             </div>
 
-                            {/* Health Concerns Column - Always rendered for consistent layout */}
                             <div className="flex-shrink-0 min-w-[180px]">
                               <h3 className="text-sm font-semibold text-gray-300 mb-2">Health Concerns</h3>
                               <div className="flex flex-col gap-1.5">
                                 {(activePet.healthConcerns || []).length > 0 ? (
                                   (activePet.healthConcerns || []).map((concern) => (
-                                    <div
-                                      key={concern}
-                                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                                    >
-                                      {concern.replace(/-/g, ' ')}
+                                    <div key={concern} className="flex items-start gap-1.5 text-sm text-gray-300">
+                                      <span className="text-orange-400 mt-0.5">•</span>
+                                      <span>{concern.replace(/-/g, ' ')}</span>
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="px-2 py-1 text-gray-500 text-xs italic">
-                                    None
-                                  </div>
+                                  <div className="text-gray-500 text-sm italic">None</div>
                                 )}
                               </div>
                             </div>
 
-                            {/* Allergies Column - Always rendered for consistent layout */}
                             <div className="flex-shrink-0 min-w-[180px]">
                               <h3 className="text-sm font-semibold text-gray-300 mb-2">Allergies</h3>
                               <div className="flex flex-col gap-1.5">
                                 {(activePet.allergies || []).length > 0 ? (
                                   (activePet.allergies || []).map((allergy) => (
-                                    <div
-                                      key={allergy}
-                                      className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                                    >
-                                      {allergy.replace(/-/g, ' ')}
+                                    <div key={allergy} className="flex items-start gap-1.5 text-sm text-gray-300">
+                                      <span className="text-orange-400 mt-0.5">•</span>
+                                      <span>{allergy.replace(/-/g, ' ')}</span>
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="px-2 py-1 text-gray-500 text-xs italic">
-                                    None
-                                  </div>
+                                  <div className="text-gray-500 text-sm italic">None</div>
                                 )}
                               </div>
                             </div>
@@ -1706,6 +1907,8 @@ const buildWeeklyPlan = useCallback(
                               const savedIds = Array.isArray(activePet.savedRecipes) ? activePet.savedRecipes : [];
                               const customIds = customMeals.map((m) => m.id);
                               const combinedIds = Array.from(new Set([...savedIds, ...customIds]));
+                              const visibleCombinedIds = combinedIds.slice(0, savedVisibleCount);
+                              const hasMoreCombined = combinedIds.length > savedVisibleCount || customMealsHasMore;
 
                               if (combinedIds.length === 0) {
                                 return (
@@ -1717,7 +1920,7 @@ const buildWeeklyPlan = useCallback(
 
                               return (
                                 <div className="max-h-[480px] overflow-y-auto pr-2 space-y-2">
-                                  {combinedIds.map((rid) => {
+                                  {visibleCombinedIds.map((rid) => {
                                     const customMeal = customMeals.find((m) => m.id === rid) || null;
                                     const isCustomMeal = !!customMeal;
                                     const recipeObj: Recipe | null = isCustomMeal
@@ -1730,9 +1933,7 @@ const buildWeeklyPlan = useCallback(
                                             key={rid}
                                             className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4"
                                           >
-                                            <div className="min-w-0 text-sm text-gray-400 break-words">
-                                              Not found
-                                            </div>
+                                            <div className="min-w-0 text-sm text-gray-400 break-words">Not found</div>
                                             <div className="flex items-center gap-2 flex-shrink-0">
                                               <button
                                                 onClick={(e) => {
@@ -1764,7 +1965,10 @@ const buildWeeklyPlan = useCallback(
                                     const compatibilityScore = getCompatibilityScoreForMeal(recipeObj);
 
                                     return (
-                                      <div key={rid} className="p-3 rounded border border-white/5 flex items-center justify-between gap-4 min-h-[90px]">
+                                      <div
+                                        key={rid}
+                                        className="p-3 rounded border border-white/5 flex items-center justify-between gap-4 min-h-[90px]"
+                                      >
                                         <div className="min-w-0 flex flex-col gap-1">
                                           <button
                                             onClick={() => {
@@ -1787,28 +1991,41 @@ const buildWeeklyPlan = useCallback(
                                               if (!userId || !activePet) return;
 
                                               void (async () => {
-                                                const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
-                                                if (!petToUpdate) return;
+                                                try {
+                                                  const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
+                                                  if (!petToUpdate) return;
 
-                                                const nextMealPlan = Array.isArray((petToUpdate as any).mealPlan)
-                                                  ? ([...(petToUpdate as any).mealPlan] as string[])
-                                                  : ([] as string[]);
-                                                if (!nextMealPlan.includes(rid)) nextMealPlan.push(rid);
+                                                  const nextMealPlan = Array.isArray((petToUpdate as any).mealPlan)
+                                                    ? ([...(petToUpdate as any).mealPlan] as string[])
+                                                    : ([] as string[]);
+                                                  if (!nextMealPlan.includes(rid)) nextMealPlan.push(rid);
 
-                                                const updatedPet = {
-                                                  ...petToUpdate,
-                                                  mealPlan: nextMealPlan,
-                                                };
+                                                  const updatedPet = {
+                                                    ...petToUpdate,
+                                                    mealPlan: nextMealPlan,
+                                                  };
 
-                                                await savePet(userId, updatedPet as any);
-                                                await loadPets();
+                                                  await savePet(userId, updatedPet as any);
+                                                  await loadPets();
+                                                } catch (err: any) {
+                                                  const msg = getFriendlyErrorMessage(err, 'Unable to add to plan.');
+                                                  setProfileNotice(msg || 'Unable to add to plan.');
+                                                  setTimeout(() => setProfileNotice(null), 5000);
+                                                  console.error('Failed to add to meal plan:', err);
+                                                }
                                               })();
                                             }}
-                                            disabled={!userId || !activePet || (Array.isArray((activePet as any).mealPlan) && ((activePet as any).mealPlan as string[]).includes(rid))}
+                                            disabled={
+                                              !userId ||
+                                              !activePet ||
+                                              (Array.isArray((activePet as any).mealPlan) &&
+                                                ((activePet as any).mealPlan as string[]).includes(rid))
+                                            }
                                             className="btn btn-success btn-sm"
                                             title="Add to meal plan"
                                           >
-                                            {Array.isArray((activePet as any).mealPlan) && ((activePet as any).mealPlan as string[]).includes(rid)
+                                            {Array.isArray((activePet as any).mealPlan) &&
+                                            ((activePet as any).mealPlan as string[]).includes(rid)
                                               ? 'In Plan'
                                               : 'Add to Plan'}
                                           </button>
@@ -1835,17 +2052,33 @@ const buildWeeklyPlan = useCallback(
                                             <button
                                               onClick={(e) => {
                                                 e.preventDefault();
-                                                const cartItems = (((recipeObj as any).ingredients || []) as any[])
+                                                const snapshot = userId && activePet
+                                                  ? getRecipeSnapshotForPet(userId, activePet.id, rid)
+                                                  : null;
+                                                const ingredientsToUse =
+                                                  snapshot && Array.isArray(snapshot.ingredients) && snapshot.ingredients.length > 0
+                                                    ? snapshot.ingredients
+                                                    : (((recipeObj as any).ingredients || []) as any[]);
+                                                const cartItems = (ingredientsToUse as any[])
                                                   .map((ing: any, idx: number) => {
-                                                    const genericName = (ing.name || '').toLowerCase().trim();
-                                                    const vettedProduct = VETTED_PRODUCTS[genericName];
-                                                    const link = vettedProduct ? vettedProduct.purchaseLink : (ing.asinLink || ing.amazonLink);
-                                                    if (link) {
-                                                      const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
+                                                    const directLink = ing.asinLink || ing.amazonLink;
+                                                    if (directLink) {
+                                                      const asinMatch = String(directLink).match(/\/dp\/([A-Z0-9]{10})/);
                                                       if (asinMatch) {
                                                         return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
                                                       }
                                                     }
+
+                                                    const genericName = (ing.name || '').toLowerCase().trim();
+                                                    const vettedProduct = VETTED_PRODUCTS[genericName];
+                                                    const vettedLink = vettedProduct?.purchaseLink || vettedProduct?.asinLink;
+                                                    if (vettedLink) {
+                                                      const asinMatch = String(vettedLink).match(/\/dp\/([A-Z0-9]{10})/);
+                                                      if (asinMatch) {
+                                                        return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
+                                                      }
+                                                    }
+
                                                     return null;
                                                   })
                                                   .filter(Boolean);
@@ -1854,9 +2087,10 @@ const buildWeeklyPlan = useCallback(
                                                     `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`
                                                   );
                                                   window.open(cartUrl, '_blank');
-                                                } else {
-                                                  alert('No ingredient links available for this recipe.');
+                                                  return;
                                                 }
+
+                                                alert('No ingredient links available for this recipe.');
                                               }}
                                               className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
                                               title="Buy ingredients"
@@ -1883,6 +2117,24 @@ const buildWeeklyPlan = useCallback(
                                       </div>
                                     );
                                   })}
+
+                                  {hasMoreCombined && (
+                                    <div className="pt-2 flex justify-center">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSavedVisibleCount((v) => v + 40);
+                                          if (customMealsHasMore) {
+                                            void loadCustomMealsPage('more');
+                                          }
+                                        }}
+                                        disabled={customMealsLoadingMore}
+                                        className="btn btn-success btn-sm"
+                                      >
+                                        {customMealsLoadingMore ? 'Loading…' : 'Load more'}
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })()}
@@ -1893,7 +2145,6 @@ const buildWeeklyPlan = useCallback(
                           <div className="space-y-4 text-sm">
                             {planWeekly.length > 0 ? (
                               <>
-                                {/* Weekly compatibility average */}
                                 {(() => {
                                   if (!activePet) return null;
                                   const allScores = planWeekly
@@ -1927,9 +2178,9 @@ const buildWeeklyPlan = useCallback(
                                       if (scores.length === 0) return null;
                                       return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
                                     };
-                                    
+
                                     const dayScore = calculateDayScore(dayPlan.meals);
-                                    
+
                                     return (
                                       <div key={dayPlan.day} className="rounded-lg border border-orange-400 px-3 py-2">
                                         <div className="text-white font-semibold mb-2 flex items-center justify-between gap-3">
@@ -1948,7 +2199,10 @@ const buildWeeklyPlan = useCallback(
                                         </div>
                                         <div className="space-y-2">
                                           {dayPlan.meals.map((meal, mealIndex) => (
-                                            <div key={meal.id + mealIndex} className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4">
+                                            <div
+                                              key={meal.id + mealIndex}
+                                              className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4"
+                                            >
                                               <button
                                                 onClick={() => {
                                                   window.location.href = `/recipe/${meal.id}?petId=${activePet.id}`;
@@ -1958,56 +2212,75 @@ const buildWeeklyPlan = useCallback(
                                                 {meal.name}
                                               </button>
                                               <div className="flex items-center gap-2 flex-shrink-0">
-                                            <button
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                const cartItems = (meal.ingredients || [])
-                                                  .map((ing: any, idx: number) => {
-                                                    const genericName = (ing.name || '').toLowerCase().trim();
-                                                    const vettedProduct = VETTED_PRODUCTS[genericName];
-                                                    const link = vettedProduct ? vettedProduct.purchaseLink : ing.asinLink;
-                                                    if (link) {
-                                                      const asinMatch = link.match(/\/dp\/([A-Z0-9]{10})/);
-                                                      if (asinMatch) {
-                                                        return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
-                                                      }
+                                                <button
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    const snapshot = userId && activePet
+                                                      ? getRecipeSnapshotForPet(userId, activePet.id, meal.id)
+                                                      : null;
+                                                    const ingredientsToUse =
+                                                      snapshot && Array.isArray(snapshot.ingredients) && snapshot.ingredients.length > 0
+                                                        ? snapshot.ingredients
+                                                        : (meal.ingredients || []);
+                                                    const cartItems = (ingredientsToUse as any[])
+                                                      .map((ing: any, idx: number) => {
+                                                        const directLink = ing.asinLink || ing.amazonLink;
+                                                        if (directLink) {
+                                                          const asinMatch = String(directLink).match(/\/dp\/([A-Z0-9]{10})/);
+                                                          if (asinMatch) {
+                                                            return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
+                                                          }
+                                                        }
+
+                                                        const genericName = (ing.name || '').toLowerCase().trim();
+                                                        const vettedProduct = VETTED_PRODUCTS[genericName];
+                                                        const vettedLink = vettedProduct?.purchaseLink || vettedProduct?.asinLink;
+                                                        if (vettedLink) {
+                                                          const asinMatch = String(vettedLink).match(/\/dp\/([A-Z0-9]{10})/);
+                                                          if (asinMatch) {
+                                                            return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
+                                                          }
+                                                        }
+
+                                                        return null;
+                                                      })
+                                                      .filter(Boolean);
+                                                    if (cartItems.length > 0) {
+                                                      const cartUrl = ensureCartUrlSellerId(
+                                                        `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`
+                                                      );
+                                                      window.open(cartUrl, '_blank');
+                                                      return;
                                                     }
-                                                    return null;
-                                                  })
-                                                  .filter(Boolean);
-                                                if (cartItems.length > 0) {
-                                                  const cartUrl = ensureCartUrlSellerId(`https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`);
-                                                  window.open(cartUrl, '_blank');
-                                                } else {
-                                                  alert('No ingredient links available for this recipe.');
-                                                }
-                                              }}
-                                              className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
-                                              title="Buy ingredients"
-                                            >
-                                              <ShoppingCart size={14} />
-                                              Buy
-                                            </button>
-                                            <button
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
-                                              }}
-                                              className="btn btn-success btn-sm"
-                                              title="Edit this slot"
-                                            >
-                                              Edit
-                                            </button>
+
+                                                    alert('No ingredient links available for this recipe.');
+                                                  }}
+                                                  className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
+                                                  title="Buy ingredients"
+                                                >
+                                                  <ShoppingCart size={14} />
+                                                  Buy
+                                                </button>
+                                                <button
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
+                                                  }}
+                                                  className="btn btn-success btn-sm"
+                                                  title="Edit this slot"
+                                                >
+                                                  Edit
+                                                </button>
+                                              </div>
                                             </div>
-                                          </div>
-                                        ))}
+                                          ))}
                                         </div>
                                       </div>
                                     );
                                   })}
                                 </div>
                                 {swapTarget && (
-                                  <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
+                                  <div className="fixed inset-0 z-50 bg-black/60 flex items center justify-center px-4">
                                     <div className="bg-surface rounded-xl border border-surface-highlight shadow-2xl max-w-lg w-full p-5">
                                       <div className="flex items-center justify-between mb-3">
                                         <h2 className="text-3xl font-bold text-foreground">Edit Meal Slot</h2>
@@ -2026,8 +2299,8 @@ const buildWeeklyPlan = useCallback(
                                             key={meal.id}
                                             onClick={() => {
                                               if (!swapTarget) return;
-                                              setPlanWeekly(prev => {
-                                                const copy = prev.map(d => ({ ...d, meals: [...d.meals] }));
+                                              setPlanWeekly((prev) => {
+                                                const copy = prev.map((d) => ({ ...d, meals: [...d.meals] }));
                                                 copy[swapTarget.dayIdx].meals[swapTarget.mealIdx] = meal;
                                                 return copy;
                                               });
@@ -2070,30 +2343,55 @@ const buildWeeklyPlan = useCallback(
                           </div>
                         )}
                       </div>
-                      </div>
-
-                      </div>
-              </div>
-            ) : (
-              <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-6 flex items-center justify-center text-center min-h-[280px]">
-                <div>
-                  <div className="text-3xl mb-2">🐾</div>
-                  <div className="text-gray-400">Select a pet to see details.</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
-
+              ) : (
+                <div className="bg-surface border border-surface-highlight rounded-2xl shadow-lg p-6 flex items-center justify-center text-center min-h-[280px]">
+                  <div>
+                    <div className="text-3xl mb-2">🐾</div>
+                    <div className="text-gray-400">Select a pet to see details.</div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="hidden lg:flex justify-end sticky top-24">
-              <AddPetImageButton
-                width={440}
-                height={300}
-                onClick={() => {
-                  setEditingPet(null);
-                  setIsModalOpen(true);
-                }}
-              />
+              <div className="flex flex-col items-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingPet(null);
+                    setIsModalOpen(true);
+                  }}
+                  className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg"
+                  style={{ width: 220, height: 48 }}
+                  aria-label="Add Pet"
+                >
+                  <Image
+                    src={AddPetButton}
+                    alt=""
+                    fill
+                    sizes="220px"
+                    className="object-contain rounded-2xl transition-opacity duration-75 group-active:opacity-0"
+                  />
+                  <Image
+                    src={AddPetButtonClicked}
+                    alt=""
+                    fill
+                    sizes="220px"
+                    className="object-contain rounded-2xl opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                  />
+                </button>
+
+                <div
+                  className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
+                  style={{ width: 440, height: 300 }}
+                  aria-hidden="true"
+                >
+                  <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
+                </div>
+              </div>
             </div>
           </div>
         )}

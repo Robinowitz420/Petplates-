@@ -5,7 +5,7 @@ import { X, ShoppingCart, Check, Loader2 } from 'lucide-react';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { ensureCartUrlSellerId, ensureSellerId } from '@/lib/utils/affiliateLinks';
-import { getProductPrice } from '@/lib/data/product-prices';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
 import { calculateMealsFromShoppingList } from '@/lib/utils/mealCalculator';
 
 // Format price for display
@@ -198,8 +198,9 @@ export default function OneClickCheckoutModal({
   // Calculate total price
   const totalPrice = useMemo(() => {
     return items.reduce((sum, item) => {
-      const price = getProductPrice(item.name);
-      if (typeof price === 'number') return sum + price;
+      const pricing = getIngredientDisplayPricing(item.name);
+      const price = pricing?.packagePrice;
+      if (typeof price === 'number' && Number.isFinite(price) && price > 0) return sum + price;
       return sum;
     }, 0);
   }, [items]);
@@ -313,8 +314,9 @@ export default function OneClickCheckoutModal({
                 </div>
                 {/* Price Display */}
                 {(() => {
-                  const price = getProductPrice(item.name);
-                  return price ? (
+                  const pricing = getIngredientDisplayPricing(item.name);
+                  const price = pricing?.packagePrice;
+                  return typeof price === 'number' && Number.isFinite(price) && price > 0 ? (
                     <div className="text-right mr-3">
                       <div className="text-lg font-bold text-orange-400">{formatPrice(price)}</div>
                     </div>

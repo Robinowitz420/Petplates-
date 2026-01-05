@@ -108,6 +108,9 @@ export default function HomePage() {
               Custom, species-specific nutrition plans that keep dogs, cats, birds,
               reptiles, and pocket pets thriving—without the overwhelm.
             </p>
+            <p className="text-base text-orange-200 font-semibold tracking-wide">
+              Get custom meal plans → Shop ingredients in one click.
+            </p>
           </div>
         </div>
       </header>

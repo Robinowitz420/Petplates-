@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 // Import recipe generator and templates
 import { generateBestRecipeForPet, TEMPLATE_LIBRARY } from '../lib/recipe-generator.js';
-import { getProductPrice } from '../lib/data/product-prices.js';
+import { getIngredientDisplayPricing } from '../lib/data/product-prices.js';
 
 const SPECIES_LIST = ['dogs', 'cats', 'birds', 'reptiles', 'pocket-pets'];
 const RECIPES_PER_SPECIES = 50;
@@ -65,10 +65,9 @@ async function regenerateRecipes() {
           // Calculate estimated cost for this recipe
           let estimatedCost = 0;
           for (const ing of recipe.ingredients) {
-            const price = getProductPrice(ing.name.toLowerCase());
-            if (typeof price === 'number') {
-              estimatedCost += price;
-            }
+            const pricing = getIngredientDisplayPricing(ing.name.toLowerCase());
+            const price = pricing?.packagePrice;
+            if (typeof price === 'number' && Number.isFinite(price) && price > 0) estimatedCost += price;
           }
 
           // Add cost info to recipe

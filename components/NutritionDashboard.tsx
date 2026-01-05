@@ -4,6 +4,7 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Activity, Target, TrendingUp } from 'lucide-react';
 import { DailyNutrition, NutritionTargets } from '@/lib/nutrition/nutritionHistory';
+import AlphabetText from '@/components/AlphabetText';
 
 interface NutritionDashboardProps {
   daily: DailyNutrition[];
@@ -36,7 +37,10 @@ export function NutritionDashboard({ daily, targets, petName }: NutritionDashboa
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Nutrition Dashboard</h1>
-        <p className="text-lg text-gray-600">Weekly nutrition overview for {petName}</p>
+        <p className="text-lg text-gray-600">
+          <span className="mr-2">Weekly nutrition overview for</span>
+          <AlphabetText text={petName} size={22} />
+        </p>
       </div>
 
       {/* Summary Cards */}

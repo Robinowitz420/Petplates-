@@ -4,7 +4,7 @@
  */
 
 import { getPackageSize } from '@/lib/data/packageSizes';
-import { getProductPrice, getProductQuantity, getProductByIngredient } from '@/lib/data/product-prices';
+import { getProductQuantity, getProductByIngredient } from '@/lib/data/product-prices';
 
 export interface MealEstimate {
   estimatedMeals: number;
@@ -209,7 +209,7 @@ export function calculateMealsFromGroceryList(
   console.log('[calculateMealsFromGroceryList] ========== Starting calculation ==========');
   console.log('[calculateMealsFromGroceryList] Input shoppingList:', shoppingList);
   console.log('[calculateMealsFromGroceryList] shoppingList.length:', shoppingList?.length);
-  console.log('[calculateMealsFromGroceryList] getProductPrice available:', typeof getProductPrice !== 'undefined');
+  console.log('[calculateMealsFromGroceryList] getProductByIngredient available:', typeof getProductByIngredient !== 'undefined');
   
   const breakdown: MealEstimate['breakdown'] = [];
   const notes: string[] = [];

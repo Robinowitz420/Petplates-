@@ -363,7 +363,7 @@ export default function MealCompleteView({
         ? (scored.raw?.detailedBreakdown?.recommendations as any[])
         : [];
       const fallbackRecommendations =
-        scored.overallScore < 80
+        scored.overallScore < 85
           ? getRecommendationsForRecipe(
               fallbackNutritionalGaps,
               (scoringPet as any).type,
@@ -899,64 +899,86 @@ export default function MealCompleteView({
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-        <main className="lg:col-span-3">
-          {/* Ingredients & Supplements Tabs */}
-          <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
-            <div className="mb-6 flex justify-center">
-              <Image
-                src={ShoppingListBanner}
-                alt="Shopping list"
-                className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
-                unoptimized
-              />
-            </div>
-            {/* Tab Navigation */}
-            <div className="flex border-b border-surface-highlight mb-6">
-              <button
-                onClick={() => setActiveTab('ingredients')}
-                className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
-                  activeTab === 'ingredients'
-                    ? 'border-orange-500 text-orange-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                <span className="sr-only">Ingredients</span>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+          <main className="lg:col-span-3">
+            {/* Ingredients & Supplements Tabs */}
+            <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
+              <div className="mb-6 flex justify-center">
                 <Image
-                  src={IngredientsTabImage}
-                  alt="Ingredients"
-                  className={`h-8 w-auto ${activeTab === 'ingredients' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                  src={ShoppingListBanner}
+                  alt="Shopping list"
+                  className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
                   unoptimized
                 />
-              </button>
-              <button
-                onClick={() => setActiveTab('supplements')}
-                className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
-                  activeTab === 'supplements'
-                    ? 'border-orange-500 text-orange-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                <span className="sr-only">Supplements</span>
-                <Image
-                  src={SupplementsTabImage}
-                  alt="Supplements"
-                  className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
-                  unoptimized
-                />
-              </button>
-            </div>
+              </div>
+              {/* Tab Navigation */}
+              <div className="flex border-b border-surface-highlight mb-6">
+                <button
+                  onClick={() => setActiveTab('ingredients')}
+                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                    activeTab === 'ingredients'
+                      ? 'border-orange-500 text-orange-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  <span className="sr-only">Ingredients</span>
+                  <Image
+                    src={IngredientsTabImage}
+                    alt="Ingredients"
+                    className={`h-8 w-auto ${activeTab === 'ingredients' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
+                </button>
+                <button
+                  onClick={() => setActiveTab('supplements')}
+                  className={`group px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                    activeTab === 'supplements'
+                      ? 'border-orange-500 text-orange-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  <span className="sr-only">Supplements</span>
+                  <Image
+                    src={SupplementsTabImage}
+                    alt="Supplements"
+                    className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
+                </button>
+              </div>
 
-            {/* Tab Content */}
-            {activeTab === 'ingredients' && (
-              <div className="relative">
-                <div className="space-y-6">
-                  {/* Ingredients with ASIN links */}
-                  {ingredientsWithASINs.length > 0 && (
+              {/* Tab Content */}
+              {activeTab === 'ingredients' && (
+                <div className="relative">
+                  <div className="space-y-6">
+                    {/* Ingredients with ASIN links */}
+                    {ingredientsWithASINs.length > 0 && (
+                      <ShoppingList
+                        ingredients={ingredientsWithASINs}
+                        recipeName={mealName || 'Custom Meal'}
+                        userId={userId}
+                        selectedIngredients={selectedIngredients}
+                        totalGrams={totalGrams}
+                        recommendedServingGrams={analysis?.recommendedServingGrams}
+                        showHeader={false}
+                      />
+                    )}
+
+                    {selectedIngredients.length === 0 && (
+                      <div className="text-center py-8 text-gray-400 text-sm">
+                        No ingredients added yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'supplements' && (
+                <div className="relative space-y-6">
+                  {allSupplementShoppingItems.length > 0 ? (
                     <ShoppingList
-                      ingredients={ingredientsWithASINs}
+                      ingredients={allSupplementShoppingItems}
                       recipeName={mealName || 'Custom Meal'}
                       userId={userId}
                       selectedIngredients={selectedIngredients}
@@ -964,111 +986,88 @@ export default function MealCompleteView({
                       recommendedServingGrams={analysis?.recommendedServingGrams}
                       showHeader={false}
                     />
+                  ) : (
+                    <div className="text-center py-6 text-gray-400 text-sm">
+                      No supplements added yet.
+                    </div>
                   )}
 
-                  {selectedIngredients.length === 0 && (
-                    <div className="text-center py-8 text-gray-400 text-sm">
-                      No ingredients added yet.
+                  {/* Recommended Supplements */}
+                  {recommendedSupplements.length > 0 && (
+                    <div className={`${recommendedPanelClass} rounded-lg p-6`}>
+                      <h3 className={`text-lg font-semibold ${recommendedHeadingClass} mb-4 flex items-center gap-2`}>
+                        <span>💊</span>
+                        Recommended Supplements
+                      </h3>
+                      {healthScore !== null && healthScore < 70 ? (
+                        <p className="text-sm text-red-200 mb-4">
+                          This meal still needs support — add the supplements below or adjust ingredients before serving.
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-400 mb-4">
+                          These supplements can help address nutritional deficiencies in this meal:
+                        </p>
+                      )}
+                      <div className="space-y-3">
+                        {recommendedSupplements.map((supplement: any, index: number) => (
+                          <div key={index} className="bg-surface rounded-lg p-4 border border-surface-highlight">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <h5 className="font-semibold text-gray-200">{supplement.productName || supplement.name}</h5>
+                                <p className="text-sm text-gray-400 mt-1">{supplement.description}</p>
+                                <p className="text-xs text-orange-300 mt-2">
+                                  Addresses: {supplement.addressesDeficiency}
+                                </p>
+                                <p className="text-sm text-gray-300 mt-2">
+                                  <strong>Benefits:</strong> {supplement.benefits}
+                                </p>
+                                <p className="text-sm text-gray-400 mt-1">
+                                  <strong>Amount:</strong> {supplement.defaultAmount}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {recommendedSupplements.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No supplements recommended for this meal.</p>
+                      <p className="text-sm mt-2">Check the ingredients tab for all components.</p>
                     </div>
                   )}
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'supplements' && (
-              <div className="relative space-y-6">
-                {allSupplementShoppingItems.length > 0 ? (
-                  <ShoppingList
-                    ingredients={allSupplementShoppingItems}
-                    recipeName={mealName || 'Custom Meal'}
-                    userId={userId}
-                    selectedIngredients={selectedIngredients}
-                    totalGrams={totalGrams}
-                    recommendedServingGrams={analysis?.recommendedServingGrams}
-                    showHeader={false}
-                  />
-                ) : (
-                  <div className="text-center py-6 text-gray-400 text-sm">
-                    No supplements added yet.
-                  </div>
-                )}
-
-                {/* Recommended Supplements */}
-                {recommendedSupplements.length > 0 && (
-                  <div className={`${recommendedPanelClass} rounded-lg p-6`}>
-                    <h3 className={`text-lg font-semibold ${recommendedHeadingClass} mb-4 flex items-center gap-2`}>
-                      <span>💊</span>
-                      Recommended Supplements
-                    </h3>
-                    {healthScore !== null && healthScore < 70 ? (
-                      <p className="text-sm text-red-200 mb-4">
-                        This meal still needs support — add the supplements below or adjust ingredients before serving.
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-400 mb-4">
-                        These supplements can help address nutritional deficiencies in this meal:
-                      </p>
-                    )}
-                    <div className="space-y-3">
-                      {recommendedSupplements.map((supplement: any, index: number) => (
-                        <div key={index} className="bg-surface rounded-lg p-4 border border-surface-highlight">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <h5 className="font-semibold text-gray-200">{supplement.productName || supplement.name}</h5>
-                              <p className="text-sm text-gray-400 mt-1">{supplement.description}</p>
-                              <p className="text-xs text-orange-300 mt-2">
-                                Addresses: {supplement.addressesDeficiency}
-                              </p>
-                              <p className="text-sm text-gray-300 mt-2">
-                                <strong>Benefits:</strong> {supplement.benefits}
-                              </p>
-                              <p className="text-sm text-gray-400 mt-1">
-                                <strong>Amount:</strong> {supplement.defaultAmount}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {recommendedSupplements.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>No supplements recommended for this meal.</p>
-                    <p className="text-sm mt-2">Check the ingredients tab for all components.</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Cost Comparison */}
-          {ingredientsWithASINs.length > 0 && costPerMealForDisplay && costPerMealForDisplay > 0 && (
-            <div className="mb-8">
-              {canonicalCostPerMeal ? (
-                <CostComparison
-                  costPerMeal={canonicalCostPerMeal}
-                  pricingSource={apiPricing?.pricingSource}
-                  asOf={apiPricing?.asOf}
-                  missingIngredientCount={Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0}
-                  isComplete={apiPricing?.isComplete}
-                />
-              ) : (
-                mealEstimateForCost && mealEstimateForCost.costPerMeal > 0 && (
-                  <CostComparison
-                    costPerMeal={mealEstimateForCost.costPerMeal}
-                    totalCost={mealEstimateForCost.totalCost}
-                    estimatedMeals={mealEstimateForCost.estimatedMeals}
-                    exceedsBudget={mealEstimateForCost.exceedsBudget || false}
-                  />
-                )
               )}
             </div>
-          )}
-        </main>
 
-        <aside className="lg:col-span-2 space-y-8">
+            {/* Cost Comparison */}
+            {ingredientsWithASINs.length > 0 && costPerMealForDisplay && costPerMealForDisplay > 0 && (
+              <div className="mb-8">
+                {canonicalCostPerMeal ? (
+                  <CostComparison
+                    costPerMeal={canonicalCostPerMeal}
+                    pricingSource={apiPricing?.pricingSource}
+                    asOf={apiPricing?.asOf}
+                    missingIngredientCount={Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0}
+                    isComplete={apiPricing?.isComplete}
+                  />
+                ) : (
+                  mealEstimateForCost && mealEstimateForCost.costPerMeal > 0 && (
+                    <CostComparison
+                      costPerMeal={mealEstimateForCost.costPerMeal}
+                      totalCost={mealEstimateForCost.totalCost}
+                      estimatedMeals={mealEstimateForCost.estimatedMeals}
+                      exceedsBudget={mealEstimateForCost.exceedsBudget || false}
+                    />
+                  )
+                )}
+              </div>
+            )}
+          </main>
+
+          <aside className="lg:col-span-2 space-y-8">
             {/* Health Analysis Panel */}
             {healthAnalysis && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
@@ -1211,13 +1210,13 @@ export default function MealCompleteView({
                 type="button"
                 onClick={handleSaveMeal}
                 disabled={!userId || !analysis || !mealName.trim() || isSaving || isSaved}
-                className="group relative w-full inline-flex focus:outline-none focus:ring-4 focus:ring-orange-500/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}
+                className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={isSaved ? 'Meal Harvested' : 'Harvest Meal'}
               >
                 <span className="relative h-32 w-full overflow-hidden rounded-2xl">
                   <Image
                     src={isSaved ? '/images/Buttons/MealSaved.png' : '/images/Buttons/SaveMeal.png'}
-                    alt={isSaved ? 'Meal Saved' : 'Save Meal'}
+                    alt={isSaved ? 'Meal Harvested' : 'Harvest Meal'}
                     fill
                     sizes="100vw"
                     className="object-contain"
@@ -1225,20 +1224,21 @@ export default function MealCompleteView({
                     unoptimized
                   />
                 </span>
-                <span className="sr-only">{isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save Meal'}</span>
+                <span className="sr-only">{isSaved ? 'Meal Harvested' : 'Harvest Meal'}</span>
               </button>
               {!userId && <div className="mt-2 text-xs text-gray-400">Sign in to save</div>}
             </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
 
-      {isScoreModalOpen && scoreContext && (
-        <RecipeScoreModal
-          recipe={scoreContext.recipe}
-          pet={scoreContext.pet}
-          onClose={() => setIsScoreModalOpen(false)}
-        />
-      )}
+        {isScoreModalOpen && scoreContext && (
+          <RecipeScoreModal
+            recipe={scoreContext.recipe}
+            pet={scoreContext.pet}
+            onClose={() => setIsScoreModalOpen(false)}
+          />
+        )}
+      </div>
     </div>
   );
 }

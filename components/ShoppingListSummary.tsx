@@ -2,7 +2,7 @@
 
 import { calculateMealsFromGroceryList, type MealEstimate, type ShoppingListItem } from '@/lib/utils/mealEstimation';
 import { debugEnabled, debugLog } from '@/lib/utils/debugLog';
-import { getProductPrice } from '@/lib/data/product-prices';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
 import { Info } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
@@ -30,8 +30,9 @@ export function ShoppingListSummary({ shoppingList, recipeServings, species, cla
     }
     
     return filteredShoppingList.reduce((sum, item) => {
-      const price = getProductPrice(item.name);
-      if (typeof price === 'number') return sum + price;
+      const pricing = getIngredientDisplayPricing(item.name);
+      const price = pricing?.packagePrice;
+      if (typeof price === 'number' && Number.isFinite(price) && price > 0) return sum + price;
       return sum;
     }, 0);
   }, [filteredShoppingList]);

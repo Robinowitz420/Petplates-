@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import type { Recipe } from '@/lib/types';
 import { getIngredientsForSpecies } from '@/lib/data/ingredients';
 import { HEALTH_CONTRAINDICATIONS, normalizeConcernKey } from '@/lib/data/healthBenefitMap';
@@ -15,6 +16,13 @@ import { getTargetScoreThresholdForSpecies } from '@/lib/services/speciesMealGen
 import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendations';
 import { getFirebaseAdminDb, getGeneratedRecipesCollectionPath } from '@/lib/services/firebaseAdmin';
 import { type PetType } from '@/lib/utils/petType';
+import { jsonError } from '@/lib/utils/apiResponse';
+import { getUsageLimitsForPlan } from '@/lib/utils/usageLimits';
+import { getUserPlanTier } from '@/lib/utils/userPlan';
+import {
+  enforceAndIncrementRecipeGenerationMonthly,
+  enforceRecipeGenerationRateLimit,
+} from '@/lib/utils/recipeGenerationGuards';
 
 export const runtime = 'nodejs';
 
@@ -63,7 +71,7 @@ interface RecipeRequest {
   };
 }
 
-const MIN_COMPATIBILITY_SCORE = 65;
+const MIN_COMPATIBILITY_SCORE = 60;
 const COMPATIBILITY_SPECIES: PetType[] = ['dog', 'cat', 'bird', 'reptile', 'pocket-pet'];
 
 type ScoringPet = {
@@ -404,10 +412,34 @@ function validateAndNormalizeRecipes(params: {
  */
 export async function POST(request: NextRequest) {
   try {
+    const { userId: authedUserId } = await auth();
+    if (!authedUserId) {
+      return jsonError({ code: 'UNAUTHORIZED', message: 'Please sign in to generate meals.', status: 401 });
+    }
+
     const body: RecipeRequest = await request.json();
     const species = normalizeRequestSpecies(body.species);
     const { petProfile } = body;
-    const userId = typeof body.userId === 'string' && body.userId.trim() ? body.userId.trim() : 'anonymous';
+    const userId = authedUserId;
+
+    const db = getFirebaseAdminDb();
+    const planTier = await getUserPlanTier(db as any, userId);
+    const limits = getUsageLimitsForPlan(planTier);
+    const nowMs = Date.now();
+
+    const rl = await enforceRecipeGenerationRateLimit(db as any, userId, nowMs);
+    if (rl.ok === false) {
+      return jsonError({ code: 'RATE_LIMITED', message: rl.message, status: rl.status });
+    }
+
+    const monthly = await enforceAndIncrementRecipeGenerationMonthly(db as any, userId, nowMs, limits.recipeGenMonthly);
+    if (monthly.ok === false) {
+      const msg =
+        planTier === 'pro'
+          ? 'You’ve hit the Pro fair-use cap for meal generations this month. Please try again later.'
+          : monthly.message;
+      return jsonError({ code: 'LIMIT_REACHED', message: msg, status: monthly.status });
+    }
 
     const debug = request.nextUrl.searchParams.get('debug') === '1';
     const debugEnabled =
@@ -418,9 +450,9 @@ export async function POST(request: NextRequest) {
     const requestedByClient =
       typeof body.count === 'number' && Number.isFinite(body.count) && body.count > 0
         ? Math.floor(body.count)
-        : 9;
-    const targetCount = Math.max(9, requestedByClient);
-    const requestedCount = Math.max(12, targetCount * 2);
+        : 18;
+    const targetCount = Math.max(18, requestedByClient);
+    const requestedCount = Math.max(24, targetCount * 2);
     const maxAttempts = 6;
 
     if (debugEnabled) {
@@ -462,10 +494,7 @@ export async function POST(request: NextRequest) {
       bannedIngredients.length === 0 &&
       dietaryRestrictionsFromProfile.length === 0;
 
-    const threshold = Math.max(
-      MIN_COMPATIBILITY_SCORE,
-      getTargetScoreThresholdForSpecies(species, perfectPet)
-    );
+    const threshold = MIN_COMPATIBILITY_SCORE;
 
     const compatibilityPet = buildCompatibilityPet(species, petProfile);
 
@@ -649,7 +678,6 @@ export async function POST(request: NextRequest) {
 
     let persistFailed = false;
     try {
-      const db = getFirebaseAdminDb();
       const collectionRef = db.collection(getGeneratedRecipesCollectionPath());
 
       const persisted = await Promise.all(
@@ -770,10 +798,14 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Recipe generation error:', error);
+    const details =
+      error instanceof Error
+        ? String(error.message || error.stack || '')
+        : String(error);
     return NextResponse.json(
       {
         error: 'Failed to generate recipes',
-        details: error instanceof Error ? error.message : String(error),
+        details,
       },
       { status: 500 }
     );

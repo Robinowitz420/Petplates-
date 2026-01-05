@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Bookmark } from 'lucide-react';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 import { blogIndex } from '@/lib/blog/blogIndex';
 
@@ -23,6 +25,12 @@ interface BlogPost {
   category: string;
   image: string;
   tags: string[];
+}
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return blogIndex.map((entry) => ({ slug: entry.slug.replace('/blog/', '') }));
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -49,6 +57,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const slug = `/blog/${params.slug}`;
   const entry = blogIndex.find((p) => p.slug === slug);
+
+  if (!entry) {
+    notFound();
+  }
 
   // Mock blog post data - in real app, this would come from a CMS or database
   const blogPost: BlogPost = {

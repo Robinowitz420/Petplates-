@@ -1,19 +1,22 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { getFirebaseAdminDb } from '@/lib/services/firebaseAdmin';
 import type { Pet } from '@/lib/types';
 import { validatePet } from '@/lib/validation/petSchema';
+import { jsonError } from '@/lib/utils/apiResponse';
+import { getUsageLimitsForPlan } from '@/lib/utils/usageLimits';
+import { getUserPlanTier } from '@/lib/utils/userPlan';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
-    const adminDb = getAdminDb();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const adminDb = getFirebaseAdminDb();
     const snapshot = await adminDb
       .collection('users')
       .doc(userId)
@@ -33,39 +36,101 @@ export async function GET() {
     return NextResponse.json({ pets }, { status: 200 });
   } catch (err) {
     console.error('GET /api/pets failed:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: 'Internal Server Error', message }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
-    const adminDb = getAdminDb();
+    const { userId } = await auth();
+    if (!userId) {
+      return jsonError({ code: 'UNAUTHORIZED', message: 'Unauthorized', status: 401 });
+    }
+
+    const adminDb = getFirebaseAdminDb();
+    const planTier = await getUserPlanTier(adminDb as any, userId);
+    const limits = getUsageLimitsForPlan(planTier);
+
     const body = await req.json().catch(() => null);
     const rawPet = body?.pet;
     if (!rawPet || typeof rawPet !== 'object') {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+      return jsonError({ code: 'INVALID_REQUEST', message: 'Invalid request body', status: 400 });
     }
 
     const petId = rawPet.id || crypto.randomUUID();
     const validatedPet = validatePet({ ...rawPet, id: petId }) as Pet;
 
-    await adminDb
-      .collection('users')
-      .doc(userId)
-      .collection('pets')
-      .doc(petId)
-      .set(JSON.parse(JSON.stringify(validatedPet)), { merge: true });
+    const normalizeIds = (value: unknown): string[] => {
+      const arr = Array.isArray(value) ? value : [];
+      const out: string[] = [];
+      const seen = new Set<string>();
+      for (const v of arr) {
+        const s = String(v || '').trim();
+        if (!s) continue;
+        if (seen.has(s)) continue;
+        seen.add(s);
+        out.push(s);
+      }
+      return out;
+    };
+
+    const savedRecipesNormalized = normalizeIds((validatedPet as any).savedRecipes);
+    const savedSet = new Set(savedRecipesNormalized);
+    const mealPlanNormalized = normalizeIds((validatedPet as any).mealPlan).filter((id) => savedSet.has(id));
+
+    (validatedPet as any).savedRecipes = savedRecipesNormalized;
+    (validatedPet as any).mealPlan = mealPlanNormalized;
+
+    const petsCol = adminDb.collection('users').doc(userId).collection('pets');
+    const petDoc = petsCol.doc(petId);
+
+    await adminDb.runTransaction(async (tx) => {
+      const existingPet = await tx.get(petDoc);
+      const creating = !existingPet.exists;
+
+      const petsSnap = await tx.get(petsCol);
+
+      if (creating && petsSnap.size >= limits.pets) {
+        const msg =
+          planTier === 'pro'
+            ? 'You’ve reached the maximum number of pets for Pro (fair use).'
+            : 'You’ve reached the Free plan pet limit. Upgrade to Pro for Unlimited (fair use).';
+        const err = new Error(msg) as any;
+        err.code = 'LIMIT_REACHED';
+        throw err;
+      }
+
+      const previousSavedThisPet = existingPet.exists
+        ? normalizeIds((existingPet.data() as any)?.savedRecipes)
+        : [];
+
+      const nextSavedThisPet = normalizeIds((validatedPet as any).savedRecipes);
+      const increasesSavedCount = nextSavedThisPet.length > previousSavedThisPet.length;
+
+      if (nextSavedThisPet.length > limits.savedMeals && increasesSavedCount) {
+        const msg =
+          planTier === 'pro'
+            ? 'You’ve reached the saved meals cap for Pro (fair use).'
+            : 'You’ve reached the Free plan saved meals limit. Upgrade to Pro for Unlimited (fair use).';
+        const err = new Error(msg) as any;
+        err.message = `${msg} (saved: ${nextSavedThisPet.length}, limit: ${limits.savedMeals})`;
+        err.code = 'LIMIT_REACHED';
+        throw err;
+      }
+
+      tx.set(petDoc, JSON.parse(JSON.stringify(validatedPet)), { merge: true });
+    });
 
     return NextResponse.json({ pet: validatedPet }, { status: 200 });
   } catch (err: any) {
     console.error('POST /api/pets failed:', err);
+    if (err?.code === 'LIMIT_REACHED') {
+      return jsonError({ code: 'LIMIT_REACHED', message: String(err.message || 'Limit reached'), status: 403 });
+    }
     const message = err?.message ? String(err.message) : 'Validation failed';
     const status = message.toLowerCase().includes('invalid') || message.toLowerCase().includes('required') ? 400 : 500;
-    return NextResponse.json({ error: message }, { status });
+    const code = status === 400 ? 'INVALID_REQUEST' : 'INTERNAL_ERROR';
+    return jsonError({ code, message, status });
   }
 }

@@ -11,6 +11,7 @@ import RecipeCard from '@/components/RecipeCard';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { normalizePetType } from '@/lib/utils/petType';
 import { getPets } from '@/lib/utils/petStorage';
+import AlphabetText from '@/components/AlphabetText';
 
 export default function RecommendedRecipesPage() {
   const params = useParams();
@@ -145,7 +146,8 @@ export default function RecommendedRecipesPage() {
 
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-100 mb-2">
-            Best Matches for {petDisplayName}
+            <span className="mr-2">Best Matches for</span>
+            <AlphabetText text={petDisplayName} size={36} />
           </h1>
           <p className="text-gray-400 mb-4">
             Recipes ranked by how well they match {petDisplayName}'s nutritional needs, breed, age, and health concerns.

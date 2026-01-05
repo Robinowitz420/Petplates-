@@ -2,21 +2,21 @@
 // Badge checking logic for pet achievements
 
 import { BadgeType, BadgeCheckContext } from '@/lib/types/badges';
-import { getPetBadges, unlockBadge, updateBadgeProgress, hasBadge } from './badgeStorage';
-import { getTierForProgress, getNextTierThreshold } from '@/lib/data/badgeDefinitions';
+import { getPetBadges, unlockBadge, hasBadge } from './badgeStorage';
 import { getPetPurchaseCount } from './petPurchaseTracking';
 import { getPets } from './petStorage';
 import { logger } from './logger';
+import { safeGetItem, safeSetItem, safeParseJSON } from './localStorageSafe';
 
 /**
- * Check The Nutrient Navigator badge (100% compatibility score)
+ * Check The Nutrient Navigator badge (>=95% compatibility score)
  */
 export async function checkPerfectMatchBadge(
   userId: string,
   petId: string,
   compatibilityScore: number
 ): Promise<boolean> {
-  if (compatibilityScore !== 100) {
+  if (compatibilityScore < 95) {
     return false;
   }
 
@@ -46,96 +46,17 @@ export async function checkFeastArchitectBadge(
   return unlockBadge(userId, petId, BadgeType.FEAST_ARCHITECT);
 }
 
-/**
- * Check Planning Volume badge (progressive: 1, 10, 50)
- */
-export async function checkWeekWhiskerBadge(
-  userId: string,
-  petId: string,
-  completionCount: number
-): Promise<boolean> {
-  if (completionCount < 1) {
-    return false;
-  }
-
-  const tier = getTierForProgress(BadgeType.WEEK_WHISKER, completionCount);
-  if (!tier) {
-    return false;
-  }
-
-  const nextThreshold = getNextTierThreshold(BadgeType.WEEK_WHISKER, tier);
-  
-  updateBadgeProgress(
-    userId,
-    petId,
-    BadgeType.WEEK_WHISKER,
-    completionCount,
-    tier
-  );
-
-  // Also unlock if this is a new tier
-  const badges = getPetBadges(userId, petId);
-  const existingBadge = badges.badges.find(b => b.type === BadgeType.WEEK_WHISKER);
-  
-  if (!existingBadge || existingBadge.tier !== tier) {
-    // New tier unlocked
-    unlockBadge(userId, petId, BadgeType.WEEK_WHISKER, tier);
-    return true;
-  }
-
-  // Update progress
-  if (existingBadge) {
-    existingBadge.progress = completionCount;
-    existingBadge.nextTierThreshold = nextThreshold || undefined;
-  }
-
-  return false; // No new unlock, just progress update
+function getMetricKey(userId: string, petId: string, metric: string): string {
+  return `pet_badge_metric_${metric}_${userId}_${petId}`;
 }
 
-/**
- * Check Purchase Commitment badge (progressive: 1, 10, 20, 30, 40, 50+)
- */
-export async function checkPurchaseChampionBadge(
-  userId: string,
-  petId: string,
-  purchaseCount: number
-): Promise<boolean> {
-  if (purchaseCount < 1) {
-    return false;
-  }
-
-  const tier = getTierForProgress(BadgeType.PURCHASE_CHAMPION, purchaseCount);
-  if (!tier) {
-    return false;
-  }
-
-  const nextThreshold = getNextTierThreshold(BadgeType.PURCHASE_CHAMPION, tier);
-  
-  updateBadgeProgress(
-    userId,
-    petId,
-    BadgeType.PURCHASE_CHAMPION,
-    purchaseCount,
-    tier
-  );
-
-  // Also unlock if this is a new tier
-  const badges = getPetBadges(userId, petId);
-  const existingBadge = badges.badges.find(b => b.type === BadgeType.PURCHASE_CHAMPION);
-  
-  if (!existingBadge || existingBadge.tier !== tier) {
-    // New tier unlocked
-    unlockBadge(userId, petId, BadgeType.PURCHASE_CHAMPION, tier);
-    return true;
-  }
-
-  // Update progress
-  if (existingBadge) {
-    existingBadge.progress = purchaseCount;
-    existingBadge.nextTierThreshold = nextThreshold || undefined;
-  }
-
-  return false; // No new unlock, just progress update
+function incrementMetric(userId: string, petId: string, metric: string, delta: number = 1): number {
+  if (!userId || !petId) return 0;
+  const key = getMetricKey(userId, petId, metric);
+  const current = safeParseJSON<number>(safeGetItem(key), 0);
+  const next = (Number(current) || 0) + delta;
+  safeSetItem(key, JSON.stringify(next));
+  return next;
 }
 
 /**
@@ -159,8 +80,8 @@ export async function checkAllBadges(
       return { unlocked, updated };
     }
 
-    // Perfect Match (100% compatibility)
-    if (context.compatibilityScore === 100) {
+    // Perfect Match (>=95% compatibility)
+    if (typeof context.compatibilityScore === 'number' && context.compatibilityScore >= 95) {
       const wasUnlocked = await checkPerfectMatchBadge(userId, petId, context.compatibilityScore);
       if (wasUnlocked) unlocked.push(BadgeType.PERFECT_MATCH);
     }
@@ -171,6 +92,15 @@ export async function checkAllBadges(
       if (wasUnlocked) unlocked.push(BadgeType.PREPARATION);
     }
 
+    // Sherlock Hat (3 custom meals saved)
+    if (context.action === 'custom_meal_saved') {
+      const count = typeof context.customMealCount === 'number' ? context.customMealCount : 0;
+      if (count >= 3) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.SHERLOCK_HAT);
+        if (wasUnlocked) unlocked.push(BadgeType.SHERLOCK_HAT);
+      }
+    }
+
     // Feast Architect (weekly plan completion)
     if (context.action === 'meal_plan_completed') {
       const weeklyPlanCompleted = context.weeklyPlanCompleted ?? false;
@@ -178,24 +108,42 @@ export async function checkAllBadges(
       if (wasUnlocked) unlocked.push(BadgeType.FEAST_ARCHITECT);
     }
 
-    // Week Whisker (progressive)
-    if (context.action === 'meal_plan_completed' && context.completionCount !== undefined) {
-      const wasUnlocked = await checkWeekWhiskerBadge(userId, petId, context.completionCount);
-      if (wasUnlocked) {
-        unlocked.push(BadgeType.WEEK_WHISKER);
-      } else {
-        updated.push(BadgeType.WEEK_WHISKER);
+    // Week Whisker (start building a plan)
+    if (context.action === 'meal_plan_updated') {
+      const mealPlanCount = typeof context.mealPlanCount === 'number' ? context.mealPlanCount : 0;
+      if (mealPlanCount >= 1) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.WEEK_WHISKER);
+        if (wasUnlocked) unlocked.push(BadgeType.WEEK_WHISKER);
       }
     }
 
-    // Purchase Champion (progressive)
+    // Purchases (standalone tiers)
     if (context.action === 'purchase_confirmed') {
       const purchaseCount = context.purchaseCount ?? getPetPurchaseCount(userId, petId);
-      const wasUnlocked = await checkPurchaseChampionBadge(userId, petId, purchaseCount);
-      if (wasUnlocked) {
-        unlocked.push(BadgeType.PURCHASE_CHAMPION);
-      } else {
-        updated.push(BadgeType.PURCHASE_CHAMPION);
+
+      if (purchaseCount >= 1) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.PURCHASE_CHAMPION);
+        if (wasUnlocked) unlocked.push(BadgeType.PURCHASE_CHAMPION);
+      }
+      if (purchaseCount >= 5) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.PURCHASE_BASKET);
+        if (wasUnlocked) unlocked.push(BadgeType.PURCHASE_BASKET);
+      }
+      if (purchaseCount >= 10) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.PURCHASE_HOE);
+        if (wasUnlocked) unlocked.push(BadgeType.PURCHASE_HOE);
+      }
+      if (purchaseCount >= 15) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.PURCHASE_BOWL);
+        if (wasUnlocked) unlocked.push(BadgeType.PURCHASE_BOWL);
+      }
+      if (purchaseCount >= 20) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.PURCHASE_GOGGLES);
+        if (wasUnlocked) unlocked.push(BadgeType.PURCHASE_GOGGLES);
+      }
+      if (purchaseCount >= 30) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.PURCHASE_MONOCLE);
+        if (wasUnlocked) unlocked.push(BadgeType.PURCHASE_MONOCLE);
       }
     }
 
@@ -204,13 +152,27 @@ export async function checkAllBadges(
       const wasUnlocked = unlockBadge(userId, petId, BadgeType.SEARCH_DISCOVERY);
       if (wasUnlocked) unlocked.push(BadgeType.SEARCH_DISCOVERY);
     }
-    if (context.action === 'daily_login') {
-      const wasUnlocked = unlockBadge(userId, petId, BadgeType.DAILY_LOGIN);
-      if (wasUnlocked) unlocked.push(BadgeType.DAILY_LOGIN);
-    }
-    if (context.action === 'profile_setup') {
+    if (context.action === 'pet_photo_uploaded') {
       const wasUnlocked = unlockBadge(userId, petId, BadgeType.PROFILE_SETUP);
       if (wasUnlocked) unlocked.push(BadgeType.PROFILE_SETUP);
+    }
+
+    // Lab Coat (score details opened 3 times)
+    if (context.action === 'score_details_viewed') {
+      const total = incrementMetric(userId, petId, 'score_details_views', 1);
+      if (total >= 3) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.LAB_COAT);
+        if (wasUnlocked) unlocked.push(BadgeType.LAB_COAT);
+      }
+    }
+
+    // Bird Hat (view 5 recipe pages)
+    if (context.action === 'recipe_viewed') {
+      const total = incrementMetric(userId, petId, 'recipe_views', 1);
+      if (total >= 5) {
+        const wasUnlocked = unlockBadge(userId, petId, BadgeType.BIRD_HAT);
+        if (wasUnlocked) unlocked.push(BadgeType.BIRD_HAT);
+      }
     }
 
   } catch (error) {
