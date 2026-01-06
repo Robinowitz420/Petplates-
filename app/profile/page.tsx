@@ -19,9 +19,10 @@ import type { CustomMeal } from '@/lib/types';
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
 import Image, { type StaticImageData } from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
-import { ensureCartUrlSellerId } from '@/lib/utils/affiliateLinks';
+import { ensureCartUrlSellerId, ensureSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
 import { getRecipeSnapshotForPet } from '@/lib/utils/recipeSnapshotStorage';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import { nutritionalGuidelines } from '@/lib/data/nutritional-guidelines';
 import { calculateRecipeNutrition } from '@/lib/utils/recipeNutrition';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
@@ -1426,7 +1427,7 @@ const buildWeeklyPlan = useCallback(
     <div className="min-h-screen bg-background text-foreground py-6">
       <div className="max-w-screen-2xl mx-auto px-4 space-y-6">
         <header className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] items-center">
-          <div className="flex justify-center lg:translate-x-[130px]">
+          <div className={`flex justify-center ${pets.length === 0 ? 'translate-x-[215px]' : 'lg:translate-x-[130px]'}`}>
             <Image
               src="/images/Site Banners/MyPets.png"
               alt="My Pets"
@@ -1437,7 +1438,7 @@ const buildWeeklyPlan = useCallback(
               unoptimized
             />
           </div>
-          <div className="hidden lg:block" />
+          {pets.length === 0 ? <div /> : <div className="hidden lg:block" />}
         </header>
 
         {profileNotice && (
@@ -1447,60 +1448,40 @@ const buildWeeklyPlan = useCallback(
         )}
 
         {pets.length === 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
-            <div className="text-center py-14 px-6 bg-surface rounded-2xl border border-surface-highlight shadow-lg">
-              <div className="text-4xl mb-3">🐾</div>
-              <h2 className="text-2xl font-bold mb-2">No Pets Yet</h2>
-              <p className="text-gray-400 mb-6">
-                Add your first pet to start building personalized meals and plans.
-              </p>
+          <div className="flex flex-col items-center justify-center py-10 px-6 bg-surface rounded-2xl border border-surface-highlight shadow-lg">
+            <div className="flex flex-col items-center gap-4">
               <button
+                type="button"
                 onClick={() => {
                   setEditingPet(null);
                   setIsModalOpen(true);
                 }}
-                className="btn btn-success btn-md btn-ripple"
+                className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg"
+                style={{ width: 220, height: 48, transform: 'translateX(-15px)' }}
+                aria-label="Add Pet"
               >
-                <Plus size={18} className="mr-2" />
-                Add Your First Pet
+                <Image
+                  src={AddPetButton}
+                  alt=""
+                  fill
+                  sizes="220px"
+                  className="object-contain rounded-2xl transition-opacity duration-75 group-active:opacity-0"
+                />
+                <Image
+                  src={AddPetButtonClicked}
+                  alt=""
+                  fill
+                  sizes="220px"
+                  className="object-contain rounded-2xl opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                />
               </button>
-            </div>
 
-            <div className="hidden lg:flex justify-end sticky top-24">
-              <div className="flex flex-col items-center gap-3 w-[440px]">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingPet(null);
-                    setIsModalOpen(true);
-                  }}
-                  className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg"
-                  style={{ width: 220, height: 48 }}
-                  aria-label="Add Pet"
-                >
-                  <Image
-                    src={AddPetButton}
-                    alt=""
-                    fill
-                    sizes="220px"
-                    className="object-contain rounded-2xl transition-opacity duration-75 group-active:opacity-0"
-                  />
-                  <Image
-                    src={AddPetButtonClicked}
-                    alt=""
-                    fill
-                    sizes="220px"
-                    className="object-contain rounded-2xl opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                  />
-                </button>
-
-                <div
-                  className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
-                  style={{ width: 440, height: 300 }}
-                  aria-hidden="true"
-                >
-                  <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
-                </div>
+              <div
+                className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
+                style={{ width: 440, height: 300, transform: 'translateX(-15px)' }}
+                aria-hidden="true"
+              >
+                <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
               </div>
             </div>
           </div>
@@ -2049,38 +2030,26 @@ const buildWeeklyPlan = useCallback(
                                                   snapshot && Array.isArray(snapshot.ingredients) && snapshot.ingredients.length > 0
                                                     ? snapshot.ingredients
                                                     : (((recipeObj as any).ingredients || []) as any[]);
-                                                const cartItems = (ingredientsToUse as any[])
-                                                  .map((ing: any, idx: number) => {
-                                                    const directLink = ing.asinLink || ing.amazonLink;
-                                                    if (directLink) {
-                                                      const asinMatch = String(directLink).match(/\/dp\/([A-Z0-9]{10})/);
-                                                      if (asinMatch) {
-                                                        return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
-                                                      }
-                                                    }
-
-                                                    const genericName = (ing.name || '').toLowerCase().trim();
-                                                    const vettedProduct = VETTED_PRODUCTS[genericName];
-                                                    const vettedLink = vettedProduct?.purchaseLink || vettedProduct?.asinLink;
-                                                    if (vettedLink) {
-                                                      const asinMatch = String(vettedLink).match(/\/dp\/([A-Z0-9]{10})/);
-                                                      if (asinMatch) {
-                                                        return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
-                                                      }
-                                                    }
-
-                                                    return null;
+                                                const links = (ingredientsToUse as any[])
+                                                  .map((ing: any) => {
+                                                    const name = typeof ing?.name === 'string' ? ing.name : '';
+                                                    const candidate =
+                                                      (typeof ing?.amazonSearchUrl === 'string' && ing.amazonSearchUrl) ||
+                                                      (name ? buildAmazonSearchUrl(name) : '');
+                                                    return candidate ? ensureSellerId(candidate) : '';
                                                   })
-                                                  .filter(Boolean);
-                                                if (cartItems.length > 0) {
-                                                  const cartUrl = ensureCartUrlSellerId(
-                                                    `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`
-                                                  );
-                                                  window.open(cartUrl, '_blank');
+                                                  .filter((u: string) => !!u);
+
+                                                if (links.length === 0) {
+                                                  alert('No ingredient links available for this recipe.');
                                                   return;
                                                 }
 
-                                                alert('No ingredient links available for this recipe.');
+                                                links.forEach((url: string, idx: number) => {
+                                                  setTimeout(() => {
+                                                    window.open(url, '_blank');
+                                                  }, idx * 150);
+                                                });
                                               }}
                                               className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
                                               title="Buy ingredients"

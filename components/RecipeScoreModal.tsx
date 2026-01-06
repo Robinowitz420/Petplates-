@@ -149,10 +149,14 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
   const aiWeight = useMemo(() => String(aiExplain?.weight || '').trim(), [aiExplain]);
   const aiAge = useMemo(() => String(aiExplain?.age || '').trim(), [aiExplain]);
 
-  const stripTripleHashes = (value: string): string => value.replace(/^\s*###\s*/gm, '');
+  const cleanMarkdownArtifacts = (value: string): string =>
+    String(value || '')
+      .replace(/^\s*#+\s*/gm, '')
+      .replace(/\*\*/g, '');
 
   const healthConcernNotes = useMemo(() => {
     if (!pet) return [] as Array<{ concern: string; note: string }>;
+
     const petConcerns = Array.isArray((pet as any).healthConcerns)
       ? ((pet as any).healthConcerns as string[]).map((c) => String(c || '').trim()).filter(Boolean)
       : [];
@@ -174,34 +178,56 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
     });
   }, [aiExplain, pet]);
 
+  const contentWrapperClass = aiLoading ? 'p-6 bg-surface' : 'p-6 bg-surface max-h-[75vh]';
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4 sm:px-6 bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-6xl bg-surface rounded-xl shadow-2xl overflow-hidden border border-surface-highlight">
-        <div className="flex items-start justify-between p-5 border-b border-surface-highlight bg-surface">
-          <div />
+        <div className="flex items-center justify-between p-5 border-b border-surface-highlight bg-surface">
+          <div className="flex flex-col">
+            <AlphabetText text="Summary" size={64} className="mb-1 leading-none" />
+            <span className="text-sm uppercase tracking-[0.2em] text-gray-400">Compatibility Details</span>
+          </div>
           <button onClick={onClose} className="p-2 rounded text-gray-400 hover:bg-surface-highlight hover:text-white">
             <X />
           </button>
         </div>
 
-        <div className="p-6 bg-surface max-h-[75vh]">
+        <div className={contentWrapperClass}>
+
           {aiLoading ? (
-            <div className="mt-3 text-sm text-gray-400">Generating explanation…</div>
+            <div className="flex flex-col items-center justify-center gap-6 py-12">
+              <video
+                src="/images/emojis/Mascots/Proffessor Purfessor/ClassAnimated.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                  width: '520px',
+                  height: '520px',
+                  maxWidth: '90vw',
+                  maxHeight: '90vh',
+                  display: 'block',
+                }}
+                className="rounded-2xl border-2 border-surface-highlight shadow-2xl object-contain"
+                aria-label="Professor Purfessor is analyzing this meal"
+              />
+
+              <div className="text-base text-gray-200 tracking-wide">Professor Purfessor is analyzing this meal…</div>
+            </div>
           ) : aiError ? (
             <div className="mt-3 text-sm text-red-300/80">Unable to generate explanation right now.</div>
           ) : (aiSummary || aiWeight || aiAge || healthConcernNotes.length > 0) ? (
             <div className="space-y-6">
-              <div className="flex justify-center">
-                <AlphabetText text="Summary" size={48} className="mb-2" />
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6">
+
                 <div className="flex justify-center lg:justify-start">
                   <Image
                     src="/images/emojis/Mascots/Proffessor Purfessor/ProfessorPurfessorClassroom.png"
                     alt="Professor Purfessor in classroom"
-                    width={200}
-                    height={200}
+                    width={280}
+                    height={280}
                     className="rounded-lg object-contain"
                     unoptimized
                   />
@@ -210,7 +236,7 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
                 <div className="overflow-y-auto pr-2 max-h-[70vh] space-y-5 text-sm text-gray-300">
                   {aiSummary ? (
                     <div>
-                      <div className="whitespace-pre-wrap">{stripTripleHashes(aiSummary)}</div>
+                      <div className="whitespace-pre-wrap">{cleanMarkdownArtifacts(aiSummary)}</div>
                     </div>
                   ) : null}
 
@@ -219,9 +245,9 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
                       <div className="text-gray-200 font-semibold mb-2">Health concerns</div>
                       <div className="space-y-3">
                         {healthConcernNotes.map((item) => (
-                          <div key={item.concern} className="rounded-lg border border-surface-highlight bg-surface-lighter p-3">
+                          <div key={item.concern} className="pl-4 border-l-2 border-surface-highlight/50">
                             <div className="text-gray-200 font-semibold capitalize">{item.concern}</div>
-                            <div className="mt-1 text-gray-300 whitespace-pre-wrap">{stripTripleHashes(item.note)}</div>
+                            <div className="mt-1 text-gray-300 whitespace-pre-wrap">{cleanMarkdownArtifacts(item.note)}</div>
                           </div>
                         ))}
                       </div>
@@ -231,14 +257,14 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
                   {aiWeight ? (
                     <div>
                       <div className="text-gray-200 font-semibold mb-2">Weight</div>
-                      <div className="whitespace-pre-wrap">{stripTripleHashes(aiWeight)}</div>
+                      <div className="whitespace-pre-wrap">{cleanMarkdownArtifacts(aiWeight)}</div>
                     </div>
                   ) : null}
 
                   {aiAge ? (
                     <div>
                       <div className="text-gray-200 font-semibold mb-2">Age</div>
-                      <div className="whitespace-pre-wrap">{stripTripleHashes(aiAge)}</div>
+                      <div className="whitespace-pre-wrap">{cleanMarkdownArtifacts(aiAge)}</div>
                     </div>
                   ) : null}
                 </div>

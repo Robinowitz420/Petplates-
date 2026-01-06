@@ -340,7 +340,7 @@ export default function SavedRecipesPage() {
                 >
                   <div className="ml-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-lg font-semibold text-gray-800 group-hover:text-primary-600 transition-colors">
+                      <p className="text-lg font-semibold text-gray-800 group-hover:text-primary-600 transition-colors px-3 py-2 bg-surface-highlight/50 rounded-lg border border-surface-highlight hover:bg-surface-highlight hover:border-primary-300 transition-all duration-200">
                         <AlphabetText text={recipe.name} size={22} />
                       </p>
                       {recipe.isCustom && (

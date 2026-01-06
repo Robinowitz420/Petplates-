@@ -1,0 +1,5 @@
+;/*FB_PKG_DELIM*/
+
+__d("KadabraNewVoicePromptRootQuery_abraRelayOperation",[],(function(t,n,r,o,a,i){a.exports="10010674415679776"}),null);
+__d("KadabraNewVoicePromptRootQuery$Parameters",["KadabraNewVoicePromptRootQuery_abraRelayOperation"],(function(t,n,r,o,a,i){"use strict";var e={kind:"PreloadableConcreteRequest",params:{id:n("KadabraNewVoicePromptRootQuery_abraRelayOperation"),metadata:{},name:"KadabraNewVoicePromptRootQuery",operationKind:"query",text:null}};a.exports=e}),null);
+__d("KadabraNewVoicePromptRoot.entrypoint",["JSResourceForInteraction","KadabraNewVoicePromptRootQuery$Parameters"],(function(t,n,r,o,a,i,l){"use strict";var e={getPreloadProps:function(t){return{queries:{queryRef:{parameters:r("KadabraNewVoicePromptRootQuery$Parameters"),variables:{}}}}},root:r("JSResourceForInteraction")("KadabraNewVoicePromptRoot.react").__setRef("KadabraNewVoicePromptRoot.entrypoint")};l.default=e}),98);

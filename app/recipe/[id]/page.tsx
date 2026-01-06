@@ -1045,13 +1045,11 @@ export default function RecipeDetailPage() {
       };
     });
 
-    const isUserAddedSupplement = (ing: any) => {
-      const id = typeof ing?.id === 'string' ? ing.id : '';
-      return id.startsWith('supplement-');
-    };
-
     const isSupplementLike = (ing: any) => {
-      if (isUserAddedSupplement(ing)) return true;
+      const id = typeof ing?.id === 'string' ? ing.id : '';
+      if (id.startsWith('supplement-')) {
+        return false;
+      }
       const cat = typeof ing?.__productCategory === 'string' ? ing.__productCategory : '';
       return supplementCategories.has(cat);
     };
@@ -1274,7 +1272,7 @@ export default function RecipeDetailPage() {
           {/* Full-width title card with compatibility score + Save Meal */}
           <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
             <div className="px-8 py-4 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-              <div className="min-w-0 lg:pr-[260px] mt-[75px]">
+              <div className="min-w-0 lg:pr-[260px] mt-[35px]">
                 <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight leading-tight break-words">
                   <div className="flex items-center justify-center gap-3 flex-wrap break-words">
                     <AlphabetText text={recipe.name} size={53} />
@@ -1320,7 +1318,7 @@ export default function RecipeDetailPage() {
                         }
                         setIsScoreModalOpen(true);
                       }}
-                      className="group w-full rounded-2xl border-2 border-orange-500/40 bg-surface-lighter px-[14px] pt-5 pb-[25px] shadow-md hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="group w-full rounded-2xl border-2 border-orange-500/40 bg-surface-lighter px-[14px] pt-5 pb-[25px] shadow-md hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background group-hover:shadow-orange-500/40 group-hover:ring-2 group-hover:ring-orange-400/80 group-hover:ring-offset-2 group-hover:ring-offset-background"
                     >
                       <div className="flex items-center justify-center relative">
                         <div className="relative">
