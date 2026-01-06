@@ -75,7 +75,6 @@ export function ShoppingList({
       isEstimatedPrice: boolean;
       asin: string | null;
       link: string;
-      backupLink?: string;
     }> = [];
 
     const unlinked: Ingredient[] = [];
@@ -97,11 +96,10 @@ export function ShoppingList({
       const searchQuery = pricing?.product?.ingredient || ing.name;
       const searchUrl = ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(searchQuery));
 
-      const backupLink = pricing?.product
-        ? (pricing.product.asin
-            ? ensureSellerId(`https://www.amazon.com/dp/${pricing.product.asin}`)
-            : ensureSellerId(pricing.product.url))
-        : (ing.asinLink ? ensureSellerId(ing.asinLink) : undefined);
+      if (!searchUrl) {
+        unlinked.push(ing);
+        continue;
+      }
 
       purchasable.push({
         id: ing.id,
@@ -113,7 +111,6 @@ export function ShoppingList({
         isEstimatedPrice,
         asin: pricing?.product?.asin || null,
         link: searchUrl,
-        backupLink,
       });
     }
 
@@ -228,37 +225,6 @@ export function ShoppingList({
                 <ShoppingCart size={16} />
                 {buttonCopy?.text || 'Buy'}
               </a>
-
-              {item.backupLink && item.backupLink !== item.link && (
-                <a
-                  href={item.backupLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gray-400 hover:text-gray-200 underline"
-                >
-                  Direct product link
-                </a>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {unlinkedIngredients.map((ingredient, index) => (
-          <div
-            key={`${ingredient.id || 'no-id'}-${ingredient.name || 'unnamed'}-${index}-unlinked`}
-            className="flex items-center justify-between gap-3 p-3 bg-surface-lighter rounded-lg border border-surface-highlight/50 opacity-75"
-          >
-            <div className="flex-1 min-w-0 pr-2">
-              <div className="font-medium text-gray-300 truncate">{ingredient.name}</div>
-              <div className="text-sm text-gray-500">{ingredient.amount || 'Amount not specified'}</div>
-            </div>
-            
-            <div className="text-right mr-3">
-              <div className="text-sm text-gray-500 italic">No purchase link available</div>
-            </div>
-            
-            <div className="px-4 py-2 bg-gray-700 text-gray-400 rounded-lg text-sm font-semibold whitespace-nowrap cursor-not-allowed">
-              Unavailable
             </div>
           </div>
         ))}

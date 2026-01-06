@@ -188,13 +188,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
             <div className="mt-1 text-sm text-white/70">{creator.niche}</div>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2 flex-shrink-0">
-          <FlagBadge flag={creator.flag} />
-          <div className="text-right">
-            <div className="text-xs text-white/60">Partnership potential</div>
-            <div className="text-xl font-extrabold text-orange-200">{creator.partnershipPotential}/10</div>
-          </div>
-        </div>
+        <FlagBadge flag={creator.flag} />
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -233,10 +227,6 @@ function CreatorCard({ creator }: { creator: Creator }) {
           <div className="mt-1 text-sm text-white/80">{creator.whatYouLearn}</div>
         </div>
 
-        <div>
-          <div className="text-xs font-semibold tracking-wide text-orange-300">Partnership note</div>
-          <div className="mt-1 text-sm text-white/80">{creator.partnershipNote}</div>
-        </div>
       </div>
 
       <div className="pt-2 flex flex-wrap gap-2">
@@ -331,141 +321,7 @@ export default function CreatorsClient() {
           </div>
         </header>
 
-        <section className="rounded-2xl border border-surface-highlight bg-surface p-5 shadow-lg">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-            <div className="lg:col-span-4">
-              <label className="block text-sm font-semibold text-white/80">Search</label>
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search creators, niches, tags, handles…"
-                className="mt-1 w-full rounded-xl border border-surface-highlight bg-background/30 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
-              />
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-white/80">View</label>
-              <select
-                value={viewMode}
-                onChange={(e) => setViewMode(e.target.value as ViewMode)}
-                className="mt-1 w-full rounded-xl border border-surface-highlight bg-background/30 px-3 py-2 text-white focus:outline-none"
-              >
-                <option value="grouped">Grouped</option>
-                <option value="all">All</option>
-              </select>
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-white/80">Platform</label>
-              <select
-                value={platformFilter}
-                onChange={(e) => setPlatformFilter(e.target.value as PlatformFilter)}
-                className="mt-1 w-full rounded-xl border border-surface-highlight bg-background/30 px-3 py-2 text-white focus:outline-none"
-              >
-                <option value="all">All platforms</option>
-                <option value="tiktok">TikTok</option>
-                <option value="instagram">Instagram</option>
-                <option value="youtube">YouTube</option>
-                <option value="pinterest">Pinterest</option>
-              </select>
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-white/80">Species / Niche</label>
-              <select
-                value={nicheFilter}
-                onChange={(e) => setNicheFilter(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-surface-highlight bg-background/30 px-3 py-2 text-white focus:outline-none"
-              >
-                <option value="">All niches</option>
-                {nicheOptions.map((niche) => (
-                  <option key={niche} value={niche}>
-                    {niche}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-white/80">Tag</label>
-              <select
-                value={tagFilter}
-                onChange={(e) => setTagFilter(e.target.value as Tag | '')}
-                className="mt-1 w-full rounded-xl border border-surface-highlight bg-background/30 px-3 py-2 text-white focus:outline-none"
-              >
-                <option value="">All tags</option>
-                {ALL_TAGS.map((tag) => (
-                  <option key={tag} value={tag}>
-                    {tag}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="lg:col-span-3">
-              <label className="block text-sm font-semibold text-white/80">
-                Min partnership score: <span className="text-orange-200 font-bold">{minPartnershipPotential}</span>
-              </label>
-              <input
-                type="range"
-                min={0}
-                max={10}
-                step={1}
-                value={minPartnershipPotential}
-                onChange={(e) => setMinPartnershipPotential(Number(e.target.value))}
-                className="mt-2 w-full"
-              />
-            </div>
-
-            <div className="lg:col-span-3">
-              <label className="block text-sm font-semibold text-white/80">Sorting</label>
-              <select
-                value={sortMode}
-                onChange={(e) => setSortMode(e.target.value as SortMode)}
-                className="mt-1 w-full rounded-xl border border-surface-highlight bg-background/30 px-3 py-2 text-white focus:outline-none"
-              >
-                <option value="recommended">Recommended</option>
-                <option value="partnership_desc">Partnership potential (high → low)</option>
-                <option value="name_asc">Name (A → Z)</option>
-              </select>
-            </div>
-
-            <div className="lg:col-span-3">
-              <div className="flex items-center justify-between gap-3">
-                <label className="text-sm font-semibold text-white/80">Hide competitors</label>
-                <button
-                  type="button"
-                  onClick={() => setHideCompetitors((v) => !v)}
-                  className={`px-3 py-2 rounded-xl border text-sm font-semibold transition-colors ${
-                    hideCompetitors
-                      ? 'border-orange-400/50 bg-orange-500/15 text-orange-100'
-                      : 'border-surface-highlight bg-background/30 text-white/70'
-                  }`}
-                >
-                  {hideCompetitors ? 'On' : 'Off'}
-                </button>
-              </div>
-              <div className="mt-2 flex items-center justify-between gap-3">
-                <label className="text-sm font-semibold text-white/80">Hide avoid/misinformation</label>
-                <button
-                  type="button"
-                  onClick={() => setHideAvoid((v) => !v)}
-                  className={`px-3 py-2 rounded-xl border text-sm font-semibold transition-colors ${
-                    hideAvoid
-                      ? 'border-orange-400/50 bg-orange-500/15 text-orange-100'
-                      : 'border-surface-highlight bg-background/30 text-white/70'
-                  }`}
-                >
-                  {hideAvoid ? 'On' : 'Off'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 text-sm text-white/60">
-            Showing <span className="text-white/80 font-semibold">{totalCount}</span> creator{totalCount === 1 ? '' : 's'}.
-          </div>
-        </section>
+        {/* Filter controls suppressed per request – logic retained for future use */}
 
         <main className="mt-8">
           {totalCount === 0 ? (

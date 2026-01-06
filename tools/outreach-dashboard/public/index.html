@@ -11,7 +11,7 @@
         <header>
             <h1>Pet Plates Outreach Dashboard</h1>
             <div class="header-controls">
-                <button id="refresh-btn">🔄 Refresh</button>
+                <button id="refresh-btn" style="background-color: #ff8c00; color: #1a2e1f; border: 1px solid #e67e00; padding: 6px 12px; border-radius: 4px; cursor: pointer;">🔄 Refresh</button>
                 <span id="status-indicator">Loading...</span>
             </div>
         </header>
@@ -100,25 +100,6 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label>Notes:</label>
-                            <textarea id="edit-notes" rows="3" placeholder="Add notes about this influencer..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Recent Content Hook:</label>
-                            <input type="text" id="edit-recent-content" placeholder="e.g., 'dog training video'">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Personalization Notes:</label>
-                            <textarea id="edit-personalization" rows="2" placeholder="Key points about them..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Email:</label>
-                            <input type="email" id="edit-email" placeholder="Optional email address">
-                        </div>
 
                         <div class="form-group">
                             <label>Profile URL:</label>
@@ -145,6 +126,15 @@
                                         <option value="first_touch">First Touch</option>
                                         <option value="follow_up">Follow Up</option>
                                         <option value="affiliate_invite">Affiliate Invite</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Source:</label>
+                                    <select id="source-select">
+                                        <option value="hybrid">Hybrid (Manual → AI)</option>
+                                        <option value="manual">Manual Only</option>
+                                        <option value="llm">AI Only</option>
                                     </select>
                                 </div>
 

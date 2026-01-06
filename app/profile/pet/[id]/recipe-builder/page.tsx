@@ -805,6 +805,18 @@ export default function RecipeBuilderPage() {
     setSelectedIngredients(prev => prev.filter(s => s.key !== ingredientKey));
   };
 
+  const addIngredientWithGrams = (ingredientKey: string, grams: number) => {
+    const nextGrams = Math.round(grams);
+    if (nextGrams <= 0) return;
+    setSelectedIngredients(prev => {
+      const existing = prev.find(s => s.key === ingredientKey);
+      if (existing) {
+        return prev.map(s => (s.key === ingredientKey ? { ...s, grams: s.grams + nextGrams } : s));
+      }
+      return [...prev, { key: ingredientKey, grams: nextGrams }];
+    });
+  };
+
   const updateIngredientGrams = (ingredientKey: string, grams: number) => {
     if (grams <= 0) {
       removeIngredient(ingredientKey);
@@ -914,6 +926,7 @@ export default function RecipeBuilderPage() {
           analysis={analysis}
           isAnalyzing={isAnalyzing}
           onUpdateAmount={updateIngredientGrams}
+          onAddIngredient={addIngredientWithGrams}
           onRemove={removeIngredient}
           onAddMore={handleAddMore}
           onStartOver={handleStartOver}

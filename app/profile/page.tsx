@@ -1440,21 +1440,11 @@ const buildWeeklyPlan = useCallback(
           <div className="hidden lg:block" />
         </header>
 
-        <div className="flex flex-col gap-2">
+        {profileNotice && (
           <div className="rounded-2xl border border-orange-400/40 bg-orange-500/10 px-5 py-3 text-sm text-orange-100">
-            {planTier === 'pro' ? (
-              <div className="font-semibold">Pro: Unlimited (fair use)</div>
-            ) : (
-              <div className="font-semibold">Free plan: Limits apply</div>
-            )}
+            {profileNotice}
           </div>
-
-          {profileNotice && (
-            <div className="rounded-2xl border border-orange-400/40 bg-orange-500/10 px-5 py-3 text-sm text-orange-100">
-              {profileNotice}
-            </div>
-          )}
-        </div>
+        )}
 
         {pets.length === 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
@@ -2413,6 +2403,15 @@ const buildWeeklyPlan = useCallback(
           cancelText="Cancel"
           isDeleteModal={true}
         />
+
+        {/* Free plan badge - bottom right corner */}
+        {planTier !== 'pro' && (
+          <div className="fixed bottom-4 right-4 z-50">
+            <div className="rounded-lg border border-orange-400/30 bg-orange-500/8 px-2 py-1 text-xs text-orange-200 font-medium shadow-sm">
+              Free plan: Limits apply
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

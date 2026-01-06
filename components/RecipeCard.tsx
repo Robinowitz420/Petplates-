@@ -74,7 +74,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
     <>
       <Link
         href={`/recipe/${recipe.id}${pet ? `?petId=${pet.id}` : ''}`}
-        className="group bg-surface rounded-md shadow-sm border border-orange-500/30 hover:border-orange-500/50 hover:shadow-md transition-shadow duration-200 overflow-hidden"
+        className="group block bg-surface rounded-2xl shadow-md border-2 border-orange-500/40 hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <div className="bg-surface-highlight/90 px-4 py-3 border-b border-surface-highlight flex items-center justify-between">
           <div className="flex items-center gap-2">

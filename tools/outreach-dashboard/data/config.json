@@ -1,9 +1,7 @@
 {
-  "brandName": "Paws & Plates",
   "siteUrl": "https://paws-and-plates.vercel.app/",
   "valueProp": "free personalized meal plans + shoppable ingredient lists for dogs, cats, birds, reptiles",
-  "psOffer": "P.S. If you want, I'll comp you a Pro account — just reply \"pro\" and I'll set it up.",
-  "utmTemplate": "{siteUrl}?utm_source={platform}&utm_medium=dm&utm_campaign=influencer_outreach&utm_content={handle}",
+  "psOffer": "PS — if you're interested, I can give you a free Pro account to try. Just DM me.",
   "charLimits": {
     "instagram": 450,
     "tiktok": 450,

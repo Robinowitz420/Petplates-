@@ -1,4 +1,38 @@
+import { readFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { loadTemplates, loadConfig } from './storage.mjs';
+import OpenAI from 'openai';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const DATA_DIR = join(__dirname, '..', 'data');
+
+function getManualMessage(manualMessages, influencer, templateType) {
+  const idKey = influencer?.id != null ? String(influencer.id) : '';
+  const platform = String(influencer?.platform || '').toLowerCase().trim();
+  const handle = String(influencer?.handle || '').toLowerCase().trim().replace(/^@/, '');
+  const platformHandleKey = platform && handle ? `${platform}_${handle}` : '';
+
+  const keysToTry = [platformHandleKey, idKey].filter(Boolean);
+  console.log('DEBUG: Looking for manual message with keys:', {
+    platformHandleKey,
+    idKey,
+    templateType,
+    manualCount: Object.keys(manualMessages || {}).length,
+  });
+  for (const key of keysToTry) {
+    const entry = manualMessages?.[key];
+    if (!entry || typeof entry !== 'object') continue;
+    const msg = entry?.[templateType];
+    if (typeof msg === 'string' && msg.trim().length > 0) {
+      console.log('DEBUG: Found manual message via key:', key);
+      return { message: msg, key };
+    }
+  }
+
+  return { message: null, key: platformHandleKey || idKey || '' };
+}
 
 /**
  * Generate a personalized message for an influencer
@@ -15,21 +49,94 @@ export async function generateMessage(influencer, options = {}) {
     templateType = 'first_touch',
     includePs = false,
     forceNoEmojis = false,
-    previewMode = false
+    previewMode = false,
+    source = 'hybrid' // 'manual', 'llm', or 'hybrid'
   } = options;
 
   const warnings = [];
   const templates = loadTemplates();
   const config = loadConfig();
+  const manualMessages = loadManualMessages();
+
+  const complexTemplates = templates?.templates && typeof templates.templates === 'object'
+    ? templates.templates
+    : templates;
+
+  const fallbackTemplates = templates?.fallbackTemplates && typeof templates.fallbackTemplates === 'object'
+    ? templates.fallbackTemplates
+    : templates?.fallbackTemplates;
+
+  console.log('DEBUG: Templates loaded keys:', Object.keys(templates));
+  console.log('DEBUG: Complex template exists:', !!complexTemplates?.[templateType]);
+  console.log('DEBUG: Fallback templates exist:', !!fallbackTemplates);
 
   // Get the appropriate template
   const platform = influencer.platform || 'other';
-  const template = templates[templateType]?.[platform] || templates[templateType]?.other;
+  console.log('DEBUG: Platform detected:', platform);
+  console.log('DEBUG: Source mode:', source);
+
+  // Check for manual messages first (if source allows)
+  const manual = getManualMessage(manualMessages, influencer, templateType);
+  if ((source === 'manual' || source === 'hybrid') && manual.message) {
+    const manualMessage = manual.message;
+
+    // Apply character limit and return
+    const charLimit = config.charLimits?.[platform] || 450;
+    const result = enforceCharLimit(manualMessage, charLimit, previewMode);
+    if (result.warnings) {
+      warnings.push(...result.warnings);
+    }
+    return {
+      message: result.message,
+      charCount: result.charCount || result.message.length,
+      warnings,
+      source: 'manual'
+    };
+  }
+
+  if (source === 'manual') {
+    // Manual-only mode but no manual message found
+    warnings.push(`No manual message found for ${manual.key || influencer.id} with template ${templateType}`);
+    return { message: '', charCount: 0, warnings, source: 'manual' };
+  }
+
+  let message;
+
+  // Try AI generation first if available
+  if (process.env.OPENAI_API_KEY && complexTemplates?.[templateType]) {
+    console.log('DEBUG: Attempting AI generation for:', templateType, platform);
+    console.log('DEBUG: OpenAI key exists:', !!process.env.OPENAI_API_KEY);
+    console.log('DEBUG: Complex template exists:', !!complexTemplates?.[templateType]);
+    try {
+      message = await generateAIMessage(influencer, templateType, platform, complexTemplates, config, includePs);
+      console.log('AI message generated successfully:', message.substring(0, 100) + '...');
+      // AI generation succeeded, return the message directly
+      const charLimit = config.charLimits?.[platform] || 450;
+      const result = enforceCharLimit(message, charLimit, previewMode);
+      if (result.warnings) {
+        warnings.push(...result.warnings);
+      }
+      return {
+        message: result.message,
+        charCount: result.charCount || result.message.length,
+        warnings
+      };
+    } catch (error) {
+      console.warn('AI generation failed, falling back to template:', error.message);
+      warnings.push(`AI generation failed: ${error.message}`);
+    }
+  }
+
+  // Fall back to simple templates if AI failed or isn't available
+  const template = fallbackTemplates?.[templateType]?.[platform] ||
+                   fallbackTemplates?.[templateType]?.other;
 
   if (!template) {
     warnings.push(`No template found for ${templateType} on ${platform}`);
     return { message: '', charCount: 0, warnings };
   }
+
+  message = template;
 
   // Prepare placeholder values
   const baseSiteUrl = config.siteUrl || 'https://example.com';
@@ -53,8 +160,8 @@ export async function generateMessage(influencer, options = {}) {
     psLine: includePs ? `\n\n${config.psOffer}` : ''
   };
 
-  // Generate base message
-  let message = template;
+  // Generate base message (use existing message variable)
+  message = template;
   Object.entries(placeholders).forEach(([key, value]) => {
     message = message.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
   });
@@ -188,6 +295,7 @@ async function enhanceWithOpenAI(message, options) {
   }
 
   try {
+    const model = process.env.OPENAI_ENHANCE_MODEL || process.env.OPENAI_MODEL || 'gpt-4o-mini';
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -195,7 +303,7 @@ async function enhanceWithOpenAI(message, options) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model,
         messages: [{
           role: 'user',
           content: `Rewrite this outreach message in a casual, punchy voice with short lines and ellipses. Keep it under ${charLimit} characters. Preserve the URL and any PS section exactly. ${forceNoEmojis ? 'Remove all emojis.' : 'Use at most 1 emoji.'}
@@ -228,5 +336,111 @@ Original: ${message}`
   } catch (error) {
     console.error('OpenAI enhancement error:', error);
     return null;
+  }
+}
+
+/**
+ * Load manual messages from JSON file
+ */
+function loadManualMessages() {
+  try {
+    const manualMessagesFile = join(DATA_DIR, 'manualMessages.json');
+    console.log('DEBUG: Loading manual messages from:', manualMessagesFile);
+    if (!existsSync(manualMessagesFile)) {
+      console.log('DEBUG: Manual messages file not found, will use templates');
+      return {};
+    }
+
+    const manualMessagesText = readFileSync(manualMessagesFile, 'utf8');
+    const manualMessages = JSON.parse(manualMessagesText);
+    console.log('DEBUG: Loaded manual messages for', Object.keys(manualMessages).length, 'influencers');
+    return manualMessages;
+  } catch (error) {
+    console.error('Error loading manual messages:', error);
+    return {};
+  }
+}
+
+/**
+ * Generate a fully AI-powered message using complex templates
+ */
+async function generateAIMessage(influencer, templateType, platform, templates, config, includePs) {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  // Get the complex template
+  const complexTemplate = templates[templateType];
+  if (!complexTemplate || !complexTemplate.variants || complexTemplate.variants.length === 0) {
+    throw new Error('No complex template variants available');
+  }
+
+  // Use the first variant (could randomize later)
+  const variant = complexTemplate.variants[0];
+
+  // Build AI prompt from the template structure
+  const prompt = `Write a personalized outreach message for a pet influencer.
+
+INFLUENCER DETAILS:
+- Name: ${influencer.displayName || 'Unknown'}
+- Handle: ${influencer.handle || 'Unknown'}
+- Platform: ${platform}
+- Tags: ${influencer.tags || 'Not specified'}
+- Personalization Notes: ${influencer.personalizationNotes || 'Not provided'}
+- Recent Content: ${influencer.recentContentHook || 'Not provided'}
+
+MESSAGE REQUIREMENTS:
+- Template Type: ${templateType.replace('_', ' ')}
+- Platform: ${platform}
+- Style: Casual, direct, punchy, short lines, ellipses ok, max 1 emoji
+- Include site URL: ${config.siteUrl}
+${includePs ? `- Include PS: ${config.psOffer}` : '- No PS section'}
+- Character limit: ${config.charLimits?.[platform] || 450}
+- Must be personalized to this specific influencer
+
+STRUCTURE TO FOLLOW:
+${variant.llmInstruction ? variant.llmInstruction.join('\n') : 'Write a compelling, personalized outreach message'}
+
+Generate the complete message now:`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert at writing personalized outreach messages for pet influencers. Write in a casual, direct, punchy style with short lines and ellipses. No corporate speak, no hype. Make it personal and genuine.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 600,
+      temperature: 0.8,
+    });
+
+    const aiMessage = completion.choices[0]?.message?.content?.trim();
+    if (!aiMessage) {
+      throw new Error('No response from AI');
+    }
+
+    // Apply UTM tracking to URLs
+    const baseSiteUrl = config.siteUrl || 'https://example.com';
+    let siteUrl = baseSiteUrl;
+    if (config.utmTemplate) {
+      siteUrl = config.utmTemplate
+        .replace(/\{siteUrl\}/g, baseSiteUrl)
+        .replace(/\{platform\}/g, platform)
+        .replace(/\{handle\}/g, influencer.handle || '');
+    }
+
+    // Replace any generic URLs with tracked ones
+    const urlRegex = new RegExp(config.siteUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    return aiMessage.replace(urlRegex, siteUrl);
+
+  } catch (error) {
+    console.error('AI generation error:', error);
+    throw new Error(`AI generation failed: ${error.message}`);
   }
 }

@@ -18,7 +18,7 @@ export default function PetCompatibilityBlock({
 }: PetCompatibilityBlockProps) {
   return (
     <div className="flex items-center gap-5">
-      <div className="-ml-44 w-[158px] h-[158px] rounded-2xl overflow-hidden border-2 border-green-800 bg-surface-highlight shrink-0">
+      <div className="-ml-[226px] w-[158px] h-[158px] rounded-2xl overflow-hidden border-2 border-green-800 bg-surface-highlight shrink-0">
         <Image
           src={avatarSrc}
           alt={avatarAlt}

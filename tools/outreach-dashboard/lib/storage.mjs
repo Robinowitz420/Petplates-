@@ -104,7 +104,8 @@ export function loadTemplates() {
     }
 
     const templatesText = readFileSync(templatesFile, 'utf8');
-    return JSON.parse(templatesText);
+    const templates = JSON.parse(templatesText);
+    return templates;
   } catch (error) {
     console.error('Error loading templates:', error);
     return {};

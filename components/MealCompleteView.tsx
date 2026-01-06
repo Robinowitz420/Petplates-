@@ -50,6 +50,7 @@ interface MealCompleteViewProps {
   analysis: MealAnalysis | null;
   isAnalyzing: boolean;
   onUpdateAmount: (key: string, grams: number) => void;
+  onAddIngredient: (key: string, grams: number) => void;
   onRemove: (key: string) => void;
   onAddMore: () => void;
   onStartOver: () => void;
@@ -103,6 +104,7 @@ export default function MealCompleteView({
   analysis,
   isAnalyzing,
   onUpdateAmount,
+  onAddIngredient,
   onRemove,
   onAddMore,
   onStartOver,
@@ -621,13 +623,46 @@ export default function MealCompleteView({
     return { ingredientSelections, supplementSelections };
   }, [selectedIngredients, getIngredientDisplayName]);
 
+  const toIngredientKey = useCallback((name: string) => {
+    return String(name || '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '');
+  }, []);
+
+  const parseSupplementAmountToGrams = useCallback((amount: unknown) => {
+    const raw = String(amount || '').toLowerCase();
+    const match = raw.match(/(\d+(?:\.\d+)?)\s*(mg|g)\b/);
+    if (match) {
+      const value = Number(match[1]);
+      const unit = match[2];
+      if (Number.isFinite(value) && value > 0) {
+        return unit === 'mg' ? value / 1000 : value;
+      }
+    }
+    return 10;
+  }, []);
+
+  const handleAddRecommendedSupplement = useCallback(
+    (supplement: any) => {
+      const displayName = String(supplement?.productName || supplement?.name || 'Supplement').trim();
+      if (!displayName) return;
+      const key = toIngredientKey(displayName) || displayName;
+      const grams = Math.max(1, Math.round(parseSupplementAmountToGrams(supplement?.defaultAmount)));
+      onAddIngredient(key, grams);
+      setActiveTab('ingredients');
+    },
+    [onAddIngredient, parseSupplementAmountToGrams, toIngredientKey]
+  );
+
   // Prepare ingredients for ShoppingList (memoized)
   const ingredientsWithASINs = useMemo(() => {
     if (debugEnabled) debugLog('[MealCompleteView] ========== ingredientsWithASINs Calculation ==========');
     if (debugEnabled) debugLog('[MealCompleteView] selectedIngredients:', selectedIngredients);
     if (debugEnabled) debugLog('[MealCompleteView] selectedIngredients.length:', selectedIngredients.length);
     
-    const result = ingredientSelections
+    const result = selectedIngredients
       .map((ing, index) => {
         if (debugEnabled) debugLog(`[MealCompleteView] Processing ingredient ${index + 1}:`, ing);
         const displayName = getIngredientDisplayName(ing.key);
@@ -652,10 +687,10 @@ export default function MealCompleteView({
     if (debugEnabled) debugLog('[MealCompleteView] ingredientsWithASINs.length:', result.length);
     if (debugEnabled) debugLog('[MealCompleteView] =====================================================');
     return result;
-  }, [debugEnabled, ingredientSelections, getIngredientDisplayName, selectedIngredients]);
+  }, [debugEnabled, getIngredientDisplayName, selectedIngredients]);
 
   const ingredientsWithoutASINs = useMemo(() => {
-    return ingredientSelections
+    return selectedIngredients
       .filter(ing => {
         const displayName = getIngredientDisplayName(ing.key);
         const link = getProductUrl(displayName);
@@ -666,48 +701,10 @@ export default function MealCompleteView({
         name: getIngredientDisplayName(ing.key),
         amount: `${ing.grams}g`,
       }));
-  }, [ingredientSelections, getIngredientDisplayName]);
-
-  const supplementItems = useMemo(() => {
-    return supplementSelections.map((ing) => {
-      const displayName = getIngredientDisplayName(ing.key);
-      const link = getProductUrl(displayName);
-      return {
-        id: ing.key,
-        name: displayName,
-        amount: `${ing.grams}g`,
-        ...(link ? { asinLink: ensureSellerId(link) } : {}),
-        amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
-      };
-    });
-  }, [supplementSelections, getIngredientDisplayName]);
+  }, [getIngredientDisplayName, selectedIngredients]);
 
   // Get recommended supplements
   const recommendedSupplements = healthAnalysis?.recommendations || [];
-  const recommendedSupplementShoppingItems = useMemo(() => {
-    return recommendedSupplements.map((supplement, index) => {
-      const baseId = (supplement.name || supplement.productName || `supplement-${index}`)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-');
-      const link = supplement.asinLink || supplement.amazonLink;
-      const fallbackName = supplement.productName || supplement.name || 'Recommended supplement';
-
-      return {
-        id: `recommended-${index}-${baseId}`,
-        name: fallbackName,
-        amount: supplement.defaultAmount || 'As directed',
-        ...(link ? { asinLink: ensureSellerId(link) } : {}),
-        amazonSearchUrl: ensureSellerId(
-          buildAmazonSearchUrl(supplement.name || supplement.productName || 'pet supplement'),
-        ),
-      };
-    });
-  }, [recommendedSupplements]);
-
-  const allSupplementShoppingItems = useMemo(
-    () => [...supplementItems, ...recommendedSupplementShoppingItems],
-    [supplementItems, recommendedSupplementShoppingItems],
-  );
 
   // Calculate meal estimate only for CostComparison component
   const mealEstimateForCost = useMemo(() => {
@@ -877,12 +874,14 @@ export default function MealCompleteView({
                       type="button"
                       onClick={handleOpenScoreModal}
                       disabled={!canShowScoreDetails}
-                      className={`rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 transition-colors ${
-                        canShowScoreDetails ? 'hover:border-orange-500/40' : 'opacity-60 cursor-not-allowed'
+                      className={`group w-full rounded-2xl border-2 border-orange-500/40 bg-surface-lighter px-6 py-5 shadow-md transition-all duration-200 ease-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                        canShowScoreDetails
+                          ? 'hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]'
+                          : 'opacity-60 cursor-not-allowed'
                       }`}
                       aria-label="View compatibility details"
                     >
-                      <div className="flex items-center gap-5">
+                      <div className="flex items-center justify-between gap-5">
                         <CompatibilityRadial score={displayScoreRounded} size={118} strokeWidth={10} label="" />
                         <div className="text-left">
                           <div className="text-sm font-semibold text-gray-200">Compatibility</div>
@@ -976,16 +975,30 @@ export default function MealCompleteView({
 
               {activeTab === 'supplements' && (
                 <div className="relative space-y-6">
-                  {allSupplementShoppingItems.length > 0 ? (
-                    <ShoppingList
-                      ingredients={allSupplementShoppingItems}
-                      recipeName={mealName || 'Custom Meal'}
-                      userId={userId}
-                      selectedIngredients={selectedIngredients}
-                      totalGrams={totalGrams}
-                      recommendedServingGrams={analysis?.recommendedServingGrams}
-                      showHeader={false}
-                    />
+                  {supplementSelections.length > 0 ? (
+                    <div className="space-y-3">
+                      {supplementSelections.map((s) => {
+                        const displayName = getIngredientDisplayName(s.key);
+                        return (
+                          <div
+                            key={s.key}
+                            className="flex items-center justify-between gap-4 rounded-lg border border-surface-highlight bg-surface-lighter p-4"
+                          >
+                            <div className="min-w-0">
+                              <div className="font-semibold text-gray-200 truncate">{displayName}</div>
+                              <div className="text-xs text-gray-400 mt-1">{Math.round(s.grams)}g</div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => onRemove(s.key)}
+                              className="inline-flex items-center justify-center px-3 py-2 rounded-lg text-xs font-semibold bg-surface border border-surface-highlight text-gray-200 hover:border-orange-500/50 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   ) : (
                     <div className="text-center py-6 text-gray-400 text-sm">
                       No supplements added yet.
@@ -1024,6 +1037,15 @@ export default function MealCompleteView({
                                 <p className="text-sm text-gray-400 mt-1">
                                   <strong>Amount:</strong> {supplement.defaultAmount}
                                 </p>
+                              </div>
+                              <div className="flex flex-col items-end gap-2 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddRecommendedSupplement(supplement)}
+                                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-green-800 text-white border border-green-900 hover:bg-green-900 transition-colors"
+                                >
+                                  Add to meal
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -1089,9 +1111,6 @@ export default function MealCompleteView({
                     unoptimized
                   />
                 </div>
-                <p className="text-xs text-gray-400 mb-4">
-                  Professor Purfessor is here to break it down for you!
-                </p>
                 <div className="space-y-3">
                   {HEALTH_BREAKDOWN_ORDER.map((factorKey) => {
                     const factor = (healthAnalysis.breakdown as any)?.[factorKey];

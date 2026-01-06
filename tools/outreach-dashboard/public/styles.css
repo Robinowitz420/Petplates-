@@ -8,8 +8,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: #1a2e1f;
+    color: #e8f5e8;
     line-height: 1.6;
 }
 
@@ -30,7 +30,7 @@ header {
 }
 
 h1 {
-    color: #2c5530;
+    color: #ff8c00;
 }
 
 .header-controls {
@@ -62,9 +62,10 @@ h1 {
     gap: 15px;
     margin-bottom: 20px;
     padding: 15px;
-    background: white;
+    background: #2d4a32;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 1px solid #3d5a42;
 }
 
 .filter-group {
@@ -81,9 +82,17 @@ h1 {
 .filter-group select,
 .filter-group input {
     padding: 6px 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #4a6a52;
     border-radius: 4px;
     font-size: 14px;
+    background-color: #3d5a42;
+    color: #e8f5e8;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    border-color: #ff8c00;
+    outline: none;
 }
 
 .filter-group input {
@@ -99,9 +108,10 @@ h1 {
 /* Table */
 .influencers-table-container {
     flex: 1;
-    background: white;
+    background: #2d4a32;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 1px solid #3d5a42;
     overflow: hidden;
 }
 
@@ -111,20 +121,22 @@ h1 {
 }
 
 #influencers-table th {
-    background-color: #2c5530;
-    color: white;
+    background-color: #1a2e1f;
+    color: #ff8c00;
     padding: 12px;
     text-align: left;
     font-weight: 600;
+    border-bottom: 1px solid #4a6a52;
 }
 
 #influencers-table td {
     padding: 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #3d5a42;
+    color: #e8f5e8;
 }
 
 .influencer-row:hover {
-    background-color: #f8f9fa;
+    background-color: #3d5a42;
     cursor: pointer;
 }
 
@@ -163,9 +175,10 @@ h1 {
 /* Details Panel */
 .details-panel {
     width: 400px;
-    background: white;
+    background: #2d4a32;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 1px solid #3d5a42;
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 40px);
@@ -185,9 +198,9 @@ h1 {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    border-bottom: 1px solid #eee;
-    background-color: #2c5530;
-    color: white;
+    border-bottom: 1px solid #4a6a52;
+    background-color: #1a2e1f;
+    color: #ff8c00;
     border-radius: 8px 8px 0 0;
 }
 
@@ -220,9 +233,9 @@ h1 {
 
 .details-section h3 {
     margin-bottom: 15px;
-    color: #2c5530;
+    color: #ff8c00;
     font-size: 16px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #4a6a52;
     padding-bottom: 5px;
 }
 
@@ -242,10 +255,19 @@ h1 {
 .form-group textarea {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #4a6a52;
     border-radius: 4px;
     font-size: 14px;
     font-family: inherit;
+    background-color: #3d5a42;
+    color: #e8f5e8;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #ff8c00;
+    outline: none;
 }
 
 .form-group textarea {
@@ -276,14 +298,18 @@ h1 {
 }
 
 .action-btn.primary {
-    background-color: #2c5530;
-    color: white;
+    background-color: #ff8c00;
+    color: #1a2e1f;
 }
 
 .action-btn:not(.primary) {
-    background-color: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: #3d5a42;
+    color: #e8f5e8;
+    border: 1px solid #4a6a52;
+}
+
+.action-btn:not(.primary):hover {
+    background-color: #4a6a52;
 }
 
 .action-btn:disabled {
@@ -322,12 +348,18 @@ h1 {
     width: 100%;
     min-height: 120px;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #4a6a52;
     border-radius: 4px;
     font-family: inherit;
     font-size: 14px;
     resize: vertical;
-    background-color: #fafafa;
+    background-color: #3d5a42;
+    color: #e8f5e8;
+}
+
+#message-textarea:focus {
+    border-color: #ff8c00;
+    outline: none;
 }
 
 .message-footer {
@@ -348,21 +380,23 @@ h1 {
 }
 
 .copy-btn {
-    background-color: #007bff;
-    color: white;
+    background-color: #ff8c00;
+    color: #1a2e1f;
     border: none;
     padding: 8px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
 }
 
 .copy-btn:hover {
-    background-color: #0056b3;
+    background-color: #e67e00;
 }
 
 .copy-btn.copied {
-    background-color: #28a745;
+    background-color: #2d4a32;
+    color: #ff8c00;
 }
 
 /* Warnings */
@@ -371,8 +405,9 @@ h1 {
 }
 
 .warning {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #4a3c28;
+    color: #ffcc80;
+    border: 1px solid #6b5a3a;
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 13px;

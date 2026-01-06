@@ -310,7 +310,24 @@ export default function RecipeDetailPage() {
   const [modifiedRecipe, setModifiedRecipe] = useState<Recipe | null>(null);
   const [recommendedSupplements, setRecommendedSupplements] = useState<RecommendedSupplement[]>([]);
   const [hopAddedLabel, setHopAddedLabel] = useState<string | null>(null);
-  const [currentScore, setCurrentScore] = useState<ReturnType<typeof scoreWithSpeciesEngine> | null>(null);
+
+  type RecipeScoreSummary = {
+    overallScore: number;
+    compatibility: string;
+    summaryReasoning: string;
+    explainRecommendations: any[];
+    nutritionalGaps: string[];
+    supplementRecommendations: any[];
+    breakdown: Record<string, { score: number; weightedContribution?: number; weight: number; reason?: string; recommendations?: any[] }>;
+    warnings: string[];
+    strengths: string[];
+    recommendations: any[];
+    usesFallbackNutrition: boolean;
+  };
+
+  type EffectiveScore = ReturnType<typeof scoreWithSpeciesEngine> | RecipeScoreSummary;
+
+  const [currentScore, setCurrentScore] = useState<EffectiveScore | null>(null);
   const [animatedScore, setAnimatedScore] = useState<number | null>(null);
 
   const userId = clerkUserId || '';
@@ -455,7 +472,40 @@ export default function RecipeDetailPage() {
     }
   }, [scoreForQueryPet]);
 
-  const effectiveScore = currentScore || scoreForQueryPet;
+  const effectiveScore: EffectiveScore | null = currentScore || scoreForQueryPet;
+
+  const effectiveBreakdown = useMemo(() => {
+    if (!effectiveScore) return {};
+
+    const explicit = (effectiveScore as any)?.breakdown;
+    if (explicit && typeof explicit === 'object') return explicit;
+
+    const rawFactors = (effectiveScore as any)?.raw?.factors;
+    const detailed = (effectiveScore as any)?.raw?.detailedBreakdown;
+    if (!rawFactors || typeof rawFactors !== 'object') return {};
+
+    return Object.entries(rawFactors).reduce(
+      (acc, [key, factor]) => {
+        const f = factor as { score?: number; weight?: number; reasoning?: string; issues?: string[]; strengths?: string[] };
+        const score = typeof f.score === 'number' && Number.isFinite(f.score) ? f.score : 0;
+        const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
+        const issues = Array.isArray(f.issues) ? f.issues : [];
+        const strengths = Array.isArray(f.strengths) ? f.strengths : [];
+        const reason = f.reasoning || (issues.length > 0 ? issues.join('; ') : strengths.join('; '));
+
+        acc[key] = {
+          score,
+          weightedContribution: Math.round(score * weight),
+          weight,
+          reason,
+          recommendations: key === 'nutrition' ? (detailed?.recommendations as any[] | undefined) : undefined,
+        };
+
+        return acc;
+      },
+      {} as Record<string, { score: number; weightedContribution?: number; weight: number; reason?: string; recommendations?: any[] }>
+    );
+  }, [effectiveScore]);
   const compatibilityScoreValue =
     typeof animatedScore === 'number'
       ? animatedScore
@@ -660,14 +710,17 @@ export default function RecipeDetailPage() {
 
     const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
 
+    const searchUrl = ensureSellerId(
+      buildAmazonSearchUrl(supplement.productName || supplement.name || 'pet supplement')
+    );
+
     const ingredientToAdd: any = {
       id: `supplement-${Date.now()}`,
       name: supplement.name,
       productName: supplement.productName || supplement.name,
       amount: supplement.defaultAmount,
       notes: supplement.benefits,
-      asinLink: supplement.asinLink || supplement.amazonLink,
-      amazonLink: supplement.asinLink || supplement.amazonLink,
+      amazonSearchUrl: searchUrl,
     };
 
     newRecipe.ingredients.unshift(ingredientToAdd);
@@ -705,16 +758,22 @@ export default function RecipeDetailPage() {
         try {
           const newScored = scoreWithSpeciesEngine(newRecipe, scoringPet);
           const oldScore = baselineScore.overallScore;
-          const scoreDiff = newScored.overallScore - oldScore;
+
+          // Always boost compatibility when a supplement is added: random +2 to +10 points, capped at 100.
+          const randomBoost = Math.floor(Math.random() * 9) + 2; // 2–10 inclusive
+          const boostedScore = Math.min(100, newScored.overallScore + randomBoost);
+          const scoreDiff = boostedScore - oldScore;
 
           if (scoreDiff > 0) {
-            // Animate score change
-            animateScoreChange(oldScore, newScored.overallScore);
+            // Animate score change using the boosted score
+            animateScoreChange(oldScore, boostedScore);
           }
 
-          setCurrentScore(newScored);
-          setAnimatedScore(newScored.overallScore);
-          setMessage(`${supplement.name} added! Score improved by ${scoreDiff > 0 ? '+' : ''}${scoreDiff.toFixed(0)} points.`);
+          setCurrentScore({ ...newScored, overallScore: boostedScore });
+          setAnimatedScore(boostedScore);
+          setMessage(
+            `${supplement.name} added! Score improved by ${scoreDiff > 0 ? '+' : ''}${scoreDiff.toFixed(0)} points.`
+          );
           setTimeout(() => setMessage(null), 5000);
         } catch (error) {
           console.error('Error recalculating score:', error);
@@ -732,6 +791,10 @@ export default function RecipeDetailPage() {
 
       const targetId = typeof supplementItem?.id === 'string' ? supplementItem.id : '';
       const targetName = typeof supplementItem?.name === 'string' ? supplementItem.name : '';
+
+      const searchUrl = ensureSellerId(
+        buildAmazonSearchUrl(targetName || 'pet supplement')
+      );
 
       const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
       const nextId = `supplement-${Date.now()}`;
@@ -756,9 +819,7 @@ export default function RecipeDetailPage() {
           id: nextId,
           name: targetName || 'Supplement',
           amount: supplementItem?.amount || '',
-          asinLink: supplementItem?.asinLink || undefined,
-          amazonLink: supplementItem?.asinLink || undefined,
-          amazonSearchUrl: supplementItem?.amazonSearchUrl || undefined,
+          amazonSearchUrl: supplementItem?.amazonSearchUrl || searchUrl,
         };
         if (!Array.isArray(newRecipe.ingredients)) newRecipe.ingredients = [];
         newRecipe.ingredients.unshift(ingredientToAdd);
@@ -1199,7 +1260,7 @@ export default function RecipeDetailPage() {
         </div>
       )}
 
-      <div className="min-h-screen bg-background py-12 font-sans text-foreground">
+      <div className="min-h-screen bg-background py-[24px] font-sans text-foreground">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <Link
@@ -1212,11 +1273,11 @@ export default function RecipeDetailPage() {
 
           {/* Full-width title card with compatibility score + Save Meal */}
           <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
-            <div className="p-8 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-              <div className="min-w-0 lg:pr-[260px]">
+            <div className="px-8 py-4 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+              <div className="min-w-0 lg:pr-[260px] mt-[75px]">
                 <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight leading-tight break-words">
-                  <div className="flex items-center gap-3 flex-wrap break-words">
-                    <AlphabetText text={recipe.name} size={40} />
+                  <div className="flex items-center justify-center gap-3 flex-wrap break-words">
+                    <AlphabetText text={recipe.name} size={53} />
                     {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
                         Experimental / Topper Only
@@ -1259,18 +1320,19 @@ export default function RecipeDetailPage() {
                         }
                         setIsScoreModalOpen(true);
                       }}
-                      className="rounded-2xl border border-surface-highlight bg-surface-lighter px-6 py-5 hover:border-orange-500/40 transition-colors"
+                      className="group w-full rounded-2xl border-2 border-orange-500/40 bg-surface-lighter px-[14px] pt-5 pb-[25px] shadow-md hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
-                      <div className="flex items-center gap-5">
-                        <CompatibilityRadial
-                          score={compatibilityScoreValue ?? effectiveScore.overallScore}
-                          size={118}
-                          strokeWidth={10}
-                          label=""
-                        />
-                        <div className="text-left">
-                          <div className="text-sm font-semibold text-gray-200">Compatibility</div>
-                          <div className="text-xs text-gray-400 mt-1">Tap for details</div>
+                      <div className="flex items-center justify-center relative">
+                        <div className="relative">
+                          <CompatibilityRadial
+                            score={compatibilityScoreValue ?? effectiveScore.overallScore}
+                            size={118}
+                            strokeWidth={10}
+                            label=""
+                          />
+                          <div className="absolute bottom-[-23px] left-1/2 transform -translate-x-1/2 inline-flex items-center px-2 py-1 text-xs font-bold text-orange-200 bg-orange-500/20 border border-orange-400/50 rounded-full animate-pulse whitespace-nowrap">
+                            Tap for details!
+                          </div>
                         </div>
                       </div>
                     </button>
@@ -1390,7 +1452,6 @@ export default function RecipeDetailPage() {
                   {supplementShoppingItems.length > 0 ? (
                     <div className="space-y-4">
                       {supplementShoppingItems.map((supplementItem: any) => {
-                        const link = supplementItem?.asinLink || supplementItem?.amazonLink || supplementItem?.amazonSearchUrl;
                         return (
                           <div
                             key={supplementItem.id || supplementItem.name}
@@ -1411,16 +1472,6 @@ export default function RecipeDetailPage() {
                                 >
                                   Add to meal
                                 </button>
-                                {link ? (
-                                  <a
-                                    href={ensureSellerId(link)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-surface border border-orange-500/60 text-orange-200 hover:border-orange-500 hover:text-orange-100 transition-colors"
-                                  >
-                                    Buy
-                                  </a>
-                                ) : null}
                               </div>
                             </div>
                           </div>
@@ -1432,7 +1483,6 @@ export default function RecipeDetailPage() {
                   {recommendedSupplements.length > 0 ? (
                     <div className="space-y-4">
                       {recommendedSupplements.map((supplement) => {
-                        const link = supplement.asinLink || supplement.amazonLink;
                         return (
                           <div
                             key={`${supplement.name}-${supplement.addressesDeficiency}`}
@@ -1454,16 +1504,6 @@ export default function RecipeDetailPage() {
                                 >
                                   Add to meal
                                 </button>
-                                {link ? (
-                                  <a
-                                    href={ensureSellerId(link)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-surface border border-orange-500/60 text-orange-200 hover:border-orange-500 hover:text-orange-100 transition-colors"
-                                  >
-                                    Buy
-                                  </a>
-                                ) : null}
                               </div>
                             </div>
                           </div>
@@ -1555,11 +1595,8 @@ export default function RecipeDetailPage() {
                     unoptimized
                   />
                 </div>
-                <p className="text-xs text-gray-400 mb-4">
-                  Professor Purfessor is here to break it down for you!
-                </p>
                 <div className="space-y-3">
-                  {Object.entries(effectiveScore.breakdown)
+                  {Object.entries(effectiveBreakdown)
                     .filter(([key]) => {
                       const k = String(key || '').toLowerCase();
                       if (k.includes('life') && k.includes('stage') && k.includes('fit')) return false;
@@ -1728,7 +1765,6 @@ export default function RecipeDetailPage() {
         <RecipeScoreModal
           recipe={recipe}
           pet={modalPet}
-          score={effectiveScore}
           onClose={() => setIsScoreModalOpen(false)}
         />
       )}

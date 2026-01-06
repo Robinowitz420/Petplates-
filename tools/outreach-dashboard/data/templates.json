@@ -147,30 +147,7 @@
             "ctaLines": [
               "want me to send the link again?",
               "open to a quick look?"
-            ],## Error Type
-            Console Error
-            
-            ## Error Message
-            Encountered two children with the same key, `3`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
-            
-            
-                at div (<anonymous>:null:null)
-                at <unknown> (components/outreach-dashboard/OutreachDashboardDebug.tsx:263:15)
-                at Array.map (<anonymous>:null:null)
-                at OutreachDashboard (components/outreach-dashboard/OutreachDashboardDebug.tsx:262:34)
-                at OutreachDashboardPage (app\tools\outreach-dashboard\page.tsx:7:7)
-            
-            ## Code Frame
-              261 |           <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-              262 |             {filteredInfluencers.map(inf => (
-            > 263 |               <div
-                  |               ^
-              264 |                 key={inf.id}
-              265 |                 onClick={() => setSelectedInfluencer(inf)}
-              266 |                 style={{
-            
-            Next.js version: 16.0.7 (Turbopack)
-            
+            ],
             "closers": [
               "all good either way."
             ]

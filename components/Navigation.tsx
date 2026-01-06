@@ -6,7 +6,8 @@ import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import AlphabetText from '@/components/AlphabetText';
-import UpperLeftLogo from '@/public/images/emojis/Mascots/HeroPics/LogoFinal.jpg';
+import LogoFinal2 from '@/public/images/emojis/Mascots/HeroPics/LogoFinal2.png';
+import MealPrepForAllYourPets from '@/public/images/emojis/Mascots/HeroPics/MealPrepForAllYourPets.png';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,14 +21,26 @@ export default function Navigation() {
     <nav className="bg-surface border-b border-surface-highlight sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-0.5">
-          <Link href="/" className="flex items-center">
-            <div className="relative flex-shrink-0 w-[80px] h-[80px] sm:w-[96px] sm:h-[96px] overflow-visible">
+          <Link href="/" className="flex items-center gap-3 sm:gap-4 -ml-[200px]">
+            <div className="relative flex-shrink-0 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] overflow-visible">
               <Image
-                src={UpperLeftLogo}
-                alt="Paws and Plates logo"
+                src={LogoFinal2}
+                alt="Paws & Plates mascot logo"
                 fill
-                className="object-contain rounded-md scale-[2] origin-left"
+                className="object-contain rounded-md scale-[1.6] origin-left"
                 sizes="(min-width: 640px) 192px, 160px"
+                priority
+              />
+            </div>
+
+            <div className="relative flex-shrink-0 w-[140px] h-[36px] sm:w-[182px] sm:h-[48px] translate-x-[100px] sm:translate-x-[100px]">
+              <Image
+                src={MealPrepForAllYourPets}
+                alt="Meal prep for all your pets"
+                fill
+                className="object-contain"
+                sizes="(min-width: 640px) 260px, 200px"
+                priority
               />
             </div>
           </Link>

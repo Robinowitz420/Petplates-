@@ -727,134 +727,233 @@ export default function RecommendedRecipesPage() {
           <div className="hidden md:flex absolute bottom-3 right-4 pointer-events-none select-none">
             <div className="max-w-[420px]">
               <AlphabetText text="Click on Meal Cards for Details" size={26} className="justify-end" />
+
+              <div className="flex-shrink-0 min-w-[200px]">
+                <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">
+                  <AlphabetText text="Bio" size={30} />
+                </h3>
+                <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
+                  {pet.breed && (
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
+                    </div>
+                  )}
+                  {pet.age && (
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
+                    </div>
+                  )}
+                  {(pet.weightKg || pet.weight) && (
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
+                    </div>
+                  )}
+                  {pet.activityLevel && (
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>
+                        <strong className="text-gray-200">Activity Level:</strong> {formatActivityLevel(pet.activityLevel)}
+                      </span>
+                    </div>
+                  )}
+                  {(pet.dietaryRestrictions || []).length > 0 && (
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>
+                        <strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}
+                      </span>
+                    </div>
+                  )}
+                  {(pet.dislikes || []).length > 0 && (
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>
+                        <strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-shrink-0 min-w-[160px]">
+                <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
+                  <AlphabetText text="Health concerns" size={30} />
+                </h3>
+                <div className="flex flex-col gap-1.5">
+                  {(pet.healthConcerns || []).length > 0 ? (
+                    (pet.healthConcerns || []).map((concern) => (
+                      <div
+                        key={concern}
+                        className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                      >
+                        {concern.replace(/-/g, ' ')}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-shrink-0 min-w-[160px]">
+                <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
+                  <AlphabetText text="Allergies" size={30} />
+                </h3>
+                <div className="flex flex-col gap-1.5">
+                  {(pet.allergies || []).length > 0 ? (
+                    (pet.allergies || []).map((allergy) => (
+                      <div
+                        key={allergy}
+                        className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                      >
+                        {allergy.replace(/-/g, ' ')}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...sortedMealsToRender]
-            .sort((a: any, b: any) => {
-              const aScore = ('score' in a && typeof a.score === 'number') ? a.score : 0;
-              const bScore = ('score' in b && typeof b.score === 'number') ? b.score : 0;
-              const scoreDiff = bScore - aScore;
-              if (Math.abs(scoreDiff) > 0.001) {
-                return scoreDiff;
-              }
-              const aId = a.recipe?.id || '';
-              const bId = b.recipe?.id || '';
-              return aId.localeCompare(bId);
-            })
-            .slice(0, 18)
-            .map((meal) => {
-              const recipe = (meal as any).recipe;
-              const recipeId = recipe?.id;
-              if (!recipeId) return null;
+        <div className="hidden md:flex absolute bottom-3 right-4 pointer-events-none select-none">
+          <div className="max-w-[420px]">
+            <AlphabetText text="Click on Meal Cards for Details" size={26} className="justify-end" />
+          </div>
+        </div>
+      </div>
 
-              const pricing = apiPricingById?.[recipeId];
-              const costText =
-                typeof pricing?.costPerMealUsd === 'number' && Number.isFinite(pricing.costPerMealUsd)
-                  ? `$${pricing.costPerMealUsd.toFixed(2)} Per Meal`
-                  : null;
-              const mealsText = null;
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...sortedMealsToRender]
+          .sort((a: any, b: any) => {
+            const aScore = 'score' in a && typeof a.score === 'number' ? a.score : 0;
+            const bScore = 'score' in b && typeof b.score === 'number' ? b.score : 0;
+            const scoreDiff = bScore - aScore;
+            if (Math.abs(scoreDiff) > 0.001) {
+              return scoreDiff;
+            }
+            const aId = a.recipe?.id || '';
+            const bId = b.recipe?.id || '';
+            return aId.localeCompare(bId);
+          })
+          .slice(0, 18)
+          .map((meal) => {
+            const recipe = (meal as any).recipe;
+            const recipeId = recipe?.id;
+            if (!recipeId) return null;
 
-              const provenanceLabel = (() => {
-                const source = pricing?.pricingSource;
-                if (!source || source === 'none') return null;
-                if (source === 'snapshot') return 'Snapshot';
-                if (source === 'estimate') return null;
-                return 'Mixed';
-              })();
+            const pricing = apiPricingById?.[recipeId];
+            const costText =
+              typeof pricing?.costPerMealUsd === 'number' && Number.isFinite(pricing.costPerMealUsd)
+                ? `$${pricing.costPerMealUsd.toFixed(2)} Per Meal`
+                : null;
+            const mealsText = null;
 
-              return (
-                <Link
-                  key={recipeId}
-                  href={`/recipe/${recipeId}?petId=${petId}`}
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipe));
-                    }
-                  }}
-                >
-                  <div className="relative group">
-                    <div className="bg-surface rounded-lg shadow-md border-2 border-orange-500/40 overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-500/60 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col">
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="mb-3">
-                          <h3 className="text-xl font-bold text-foreground text-center">
-                            <AlphabetText text={recipe.name} size={28} className="justify-center" />
-                          </h3>
-                          <div className="mt-3 flex justify-center">
-                            {costText ? (
-                              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
-                                <span className="text-white">{costText}</span>
-                                {provenanceLabel ? (
-                                  <span className="text-gray-300">• {provenanceLabel}</span>
-                                ) : null}
-                                {mealsText ? (
-                                  <span className="text-gray-300">• Est. meals: {mealsText}</span>
-                                ) : null}
-                              </div>
-                            ) : (
-                              <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-surface-highlight border border-white/10 text-xs font-semibold text-gray-300">
-                                Pricing unavailable
-                              </div>
-                            )}
-                          </div>
+            const provenanceLabel = (() => {
+              const source = pricing?.pricingSource;
+              if (!source || source === 'none') return null;
+              if (source === 'snapshot') return 'Snapshot';
+              if (source === 'estimate') return null;
+              return 'Mixed';
+            })();
 
-                          {scoringPet && (
-                            <div className="mt-4 flex flex-col items-center gap-2">
-                              {(() => {
-                                const score =
-                                  'score' in (meal as any) && typeof (meal as any).score === 'number'
-                                    ? ((meal as any).score as number)
-                                    : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
-                                return (
-                                  <div>
-                                    <CompatibilityRadial score={score} size={140} />
-                                  </div>
-                                );
-                              })()}
+            return (
+              <Link
+                key={recipeId}
+                href={`/recipe/${recipeId}?petId=${petId}`}
+                className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-2xl"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipe));
+                  }
+                }}
+              >
+                <div className="relative">
+                  <div
+                    className="bg-surface rounded-2xl shadow-md border-2 border-orange-500/40 overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-400/80 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col group-hover:shadow-orange-500/40 group-hover:ring-2 group-hover:ring-orange-400/80 group-hover:ring-offset-2 group-hover:ring-offset-background"
+                  >
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="mb-3">
+                        <h3 className="text-xl font-bold text-foreground text-center">
+                          <AlphabetText text={recipe.name} size={28} className="justify-center" />
+                        </h3>
+                        <div className="mt-3 flex justify-center">
+                          {costText ? (
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
+                              <span className="text-white">{costText}</span>
+                              {provenanceLabel ? (
+                                <span className="text-gray-300">• {provenanceLabel}</span>
+                              ) : null}
+                              {mealsText ? (
+                                <span className="text-gray-300">• Est. meals: {mealsText}</span>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-surface-highlight border border-white/10 text-xs font-semibold text-gray-300">
+                              Pricing unavailable
                             </div>
                           )}
                         </div>
 
-                        <div className="mt-auto pt-4">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSaveRecipe(recipeId, recipe.name);
-                            }}
-                            disabled={savedRecipeIds.has(recipeId) || isSaving === recipeId}
-                            className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
-                            aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
-                          >
-                            <span className="relative h-12 w-full overflow-hidden rounded-2xl">
-                              <Image
-                                src={
-                                  savedRecipeIds.has(recipeId)
-                                    ? '/images/Buttons/MealSaved.png'
-                                    : '/images/Buttons/SaveMeal.png'
-                                }
-                                alt={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
-                                fill
-                                sizes="100vw"
-                                className="object-contain"
-                                unoptimized
-                              />
-                            </span>
-                            <span className="sr-only">
-                              {savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
-                            </span>
-                          </button>
-                        </div>
+                        {scoringPet && (
+                          <div className="mt-4 flex flex-col items-center gap-2">
+                            {(() => {
+                              const score =
+                                'score' in (meal as any) && typeof (meal as any).score === 'number'
+                                  ? ((meal as any).score as number)
+                                  : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
+                              return (
+                                <div>
+                                  <CompatibilityRadial score={score} size={140} />
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-auto pt-4">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSaveRecipe(recipeId, recipe.name);
+                          }}
+                          disabled={savedRecipeIds.has(recipeId) || isSaving === recipeId}
+                          className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
+                          aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
+                        >
+                          <span className="relative h-12 w-full overflow-hidden rounded-2xl">
+                            <Image
+                              src={
+                                savedRecipeIds.has(recipeId)
+                                  ? '/images/Buttons/MealSaved.png'
+                                  : '/images/Buttons/SaveMeal.png'
+                              }
+                              alt={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
+                              fill
+                              sizes="100vw"
+                              className="object-contain"
+                              unoptimized
+                            />
+                          </span>
+                          <span className="sr-only">
+                            {savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
+                          </span>
+                        </button>
                       </div>
                     </div>
                   </div>
-                </Link>
-              );
-            })}
-        </div>
+                </div>
+              </Link>
+            );
+          })}
       </div>
     </div>
   );

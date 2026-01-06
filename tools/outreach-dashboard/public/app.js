@@ -74,6 +74,11 @@ function cacheElements() {
     elements.searchInput = document.getElementById('search-input');
     elements.limitSelect = document.getElementById('limit-select');
 
+    // Message controls
+    elements.templateSelect = document.getElementById('template-select');
+    elements.sourceSelect = document.getElementById('source-select');
+    elements.includePsToggle = document.getElementById('include-ps-toggle');
+
     // Details panel
     elements.detailsName = document.getElementById('details-name');
     elements.editStatus = document.getElementById('edit-status');
@@ -89,8 +94,6 @@ function cacheElements() {
     elements.markContactedBtn = document.getElementById('mark-contacted-btn');
 
     // Message area
-    elements.templateSelect = document.getElementById('template-select');
-    elements.includePsToggle = document.getElementById('include-ps-toggle');
     elements.messageTextarea = document.getElementById('message-textarea');
     elements.charCounter = document.getElementById('char-counter');
     elements.copyMessageBtn = document.getElementById('copy-message-btn');
@@ -114,6 +117,7 @@ function setupEventListeners() {
     // Edit fields (autosave)
     [elements.editStatus, elements.editNotes, elements.editRecentContent,
      elements.editPersonalization, elements.editEmail, elements.editProfileUrl]
+        .filter(Boolean)
         .forEach(el => el.addEventListener('input', () => scheduleAutosave()));
 
     // Action buttons
@@ -121,6 +125,9 @@ function setupEventListeners() {
     elements.generateMessageBtn.addEventListener('click', generateMessage);
     elements.markContactedBtn.addEventListener('click', markContacted);
     elements.copyMessageBtn.addEventListener('click', copyMessage);
+
+    // Message textarea
+    elements.messageTextarea.addEventListener('input', updateCharCounter);
 }
 
 // Load all data from API
@@ -248,12 +255,12 @@ function selectInfluencer(influencer) {
     elements.detailsName.textContent = influencer.displayName || influencer.handle || 'Unknown';
 
     // Populate form fields
-    elements.editStatus.value = influencer.status || 'not_contacted';
-    elements.editNotes.value = influencer.notes || '';
-    elements.editRecentContent.value = influencer.recentContentHook || '';
-    elements.editPersonalization.value = influencer.personalizationNotes || '';
-    elements.editEmail.value = influencer.email || '';
-    elements.editProfileUrl.value = influencer.profileUrl || '';
+    if (elements.editStatus) elements.editStatus.value = influencer.status || 'not_contacted';
+    if (elements.editNotes) elements.editNotes.value = influencer.notes || '';
+    if (elements.editRecentContent) elements.editRecentContent.value = influencer.recentContentHook || '';
+    if (elements.editPersonalization) elements.editPersonalization.value = influencer.personalizationNotes || '';
+    if (elements.editEmail) elements.editEmail.value = influencer.email || '';
+    if (elements.editProfileUrl) elements.editProfileUrl.value = influencer.profileUrl || '';
 
     // Clear message area
     elements.messageTextarea.value = '';
@@ -289,6 +296,7 @@ async function generateMessage() {
 
         const options = {
             templateType: elements.templateSelect.value,
+            source: elements.sourceSelect.value,
             includePs: elements.includePsToggle.checked,
             forceNoEmojis: false
         };
@@ -385,12 +393,12 @@ async function saveInfluencerChanges() {
     if (!selectedInfluencer) return;
 
     // Update influencer with form values
-    selectedInfluencer.status = elements.editStatus.value;
-    selectedInfluencer.notes = elements.editNotes.value;
-    selectedInfluencer.recentContentHook = elements.editRecentContent.value;
-    selectedInfluencer.personalizationNotes = elements.editPersonalization.value;
-    selectedInfluencer.email = elements.editEmail.value;
-    selectedInfluencer.profileUrl = elements.editProfileUrl.value;
+    if (elements.editStatus) selectedInfluencer.status = elements.editStatus.value;
+    if (elements.editNotes) selectedInfluencer.notes = elements.editNotes.value;
+    if (elements.editRecentContent) selectedInfluencer.recentContentHook = elements.editRecentContent.value;
+    if (elements.editPersonalization) selectedInfluencer.personalizationNotes = elements.editPersonalization.value;
+    if (elements.editEmail) selectedInfluencer.email = elements.editEmail.value;
+    if (elements.editProfileUrl) selectedInfluencer.profileUrl = elements.editProfileUrl.value;
 
     try {
         const response = await fetch('/api/influencers', {
@@ -462,5 +470,4 @@ function formatStatus(status) {
     ).join(' ');
 }
 
-// Listen for message textarea changes to update counter
-elements.messageTextarea.addEventListener('input', updateCharCounter);
+// Event listeners are now set up in setupEventListeners() function
