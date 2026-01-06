@@ -5,21 +5,21 @@ import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Plus } from 'lucide-react';
-import SherlockDetectingImg from '@/public/images/Buttons/SherlockShellsIsNowDetectingMealsFor.png';
 import { useAuth } from '@clerk/nextjs';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
 import { applyModifiers } from '@/lib/applyModifiers';
 import { getRandomName } from '@/lib/utils/petUtils';
 import EmojiIcon from '@/components/EmojiIcon';
+
 import { getPets, savePet } from '@/lib/utils/petStorage';
 import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
 import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
 
 import ScoringProgress from '@/components/ScoringProgress';
 
-import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
-import CompatibilityRadial from '@/components/CompatibilityRadial';
 import AlphabetText from '@/components/AlphabetText';
+import CompatibilityRadial from '@/components/CompatibilityRadial';
+import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
 import { normalizePetType } from '@/lib/utils/petType';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { getPetBadges } from '@/lib/utils/badgeStorage';
@@ -579,15 +579,16 @@ export default function RecommendedRecipesPage() {
           </span>
           <div className="flex-1 flex flex-col gap-6 min-w-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 md:translate-x-[200px]">
-                <Image
-                  src={SherlockDetectingImg}
-                  alt="Sherlock Shells is detecting meals for:"
-                  className="h-8 w-auto"
-                  priority
-                />
-                <span className="inline-flex items-center gap-3 relative" style={{ top: '11px' }}>
-                  <AlphabetText text={petDisplayName} size={36} />
+              <div
+                className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 md:translate-x-[200px]"
+                style={{ paddingLeft: 25 }}
+              >
+                <AlphabetText text="Sherlock Shells is detecting meals for" size={36} />
+                <span className="inline-flex items-center gap-0 relative" style={{ top: '11px' }}>
+                  <AlphabetText text="-" size={36} />
+                  <span style={{ marginLeft: 10 }}>
+                    <AlphabetText text={petDisplayName} size={36} />
+                  </span>
                 </span>
               </div>
             </div>

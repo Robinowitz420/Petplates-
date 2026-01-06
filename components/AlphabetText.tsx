@@ -50,6 +50,20 @@ export default function AlphabetText({
         );
       }
 
+      if (ch === '-') {
+        return (
+          <Image
+            key={key}
+            src="/images/Buttons/Alphabet/Dash.png"
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            className="object-contain"
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
       if (isLetterAZ(ch)) {
         const lower = ch.toLowerCase();
         return (
