@@ -1330,7 +1330,7 @@ export default function RecipeDetailPage() {
           {/* Breadcrumb */}
           <Link
             href="/profile"
-            className="inline-flex items-center text-gray-400 hover:text-primary-400 mb-6 font-medium transition-colors"
+            className="inline-flex items-center text-gray-400 hover:text-primary-400 mb-6 font-medium transition-colors sr-only"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Back to My Pets

@@ -27,6 +27,55 @@ import {
 
 export const runtime = 'nodejs';
 
+function isSupplementLikeIngredient(ing: any): boolean {
+  if (!ing) return false;
+  const id = String(ing?.id || '').toLowerCase();
+  const name = String(ing?.name || '').toLowerCase();
+  const category = String(ing?.category || '').toLowerCase();
+  const feedingRole = String(ing?.feedingRole || '').toLowerCase();
+
+  if (category === 'supplement') return true;
+  if (feedingRole === 'supplement') return true;
+
+  const haystack = `${id} ${name}`;
+  const keywords = [
+    'supplement',
+    'vitamin',
+    'mineral',
+    'capsule',
+    'tablet',
+    'softgel',
+    'drops',
+    'powder',
+    'extract',
+    'taurine',
+    'calcium_carbonate',
+    'calcium carbonate',
+    'cuttlebone',
+    'eggshell',
+    'omega',
+    'fish_oil',
+    'fish oil',
+    'salmon_oil',
+    'salmon oil',
+    'krill',
+    'algae oil',
+    'kelp',
+    'spirulina',
+    'probiotic',
+    'psyllium',
+    'enzyme',
+    'glucosamine',
+    'chondroitin',
+    'msm',
+    'l-carnitine',
+    'quercetin',
+    'curcumin',
+  ];
+
+  return keywords.some((kw) => haystack.includes(kw));
+}
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   if (!value || typeof value !== 'object') return false;
   const proto = Object.getPrototypeOf(value);
@@ -316,7 +365,7 @@ function validateAndNormalizeRecipes(params: {
     return HEALTH_CONTRAINDICATIONS[key] || HEALTH_CONTRAINDICATIONS[c] || [];
   });
 
-  const allowedIngredientObjs = getIngredientsForSpecies(species as any);
+  const allowedIngredientObjs = getIngredientsForSpecies(species as any).filter((i: any) => !isSupplementLikeIngredient(i));
   const allowedById = new Map<string, string>();
   const allowedByNormalizedName = new Map<string, string>();
   for (const ing of allowedIngredientObjs) {
@@ -497,9 +546,8 @@ export async function POST(request: NextRequest) {
 
     const allowedIngredientIds = getIngredientsForSpecies(species as any)
       .filter((i: any) => {
-        const category = String(i?.category || '').toLowerCase();
         // Supplements are handled separately by the app; Gemini should output whole-food meals only.
-        if (category === 'supplement') return false;
+        if (isSupplementLikeIngredient(i)) return false;
         // Hard block organ meats entirely.
         if (isOrganIngredient(i)) return false;
         // Hard block duck and rabbit meats.

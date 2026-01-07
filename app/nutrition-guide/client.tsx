@@ -22,7 +22,7 @@ export default function NutritionGuideClientPage() {
     <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
-          <Link href="/" className="text-orange-600 font-semibold hover:underline">
+          <Link href="/" className="text-orange-600 font-semibold hover:underline sr-only">
             ← Back to home
           </Link>
         </div>

@@ -266,7 +266,7 @@ export default function SavedRecipesPage() {
         </p>
         <Link
           href="/profile"
-          className="mt-6 inline-flex items-center text-green-800 hover:text-green-900 transition-colors font-medium"
+          className="mt-6 inline-flex items-center text-green-800 hover:text-green-900 transition-colors font-medium sr-only"
         >
           <ArrowLeft className="w-5 h-5 mr-2" /> Back to Pet Profiles
         </Link>
@@ -292,7 +292,7 @@ export default function SavedRecipesPage() {
         </div>
         <Link
           href="/profile"
-          className="inline-flex items-center text-gray-500 hover:text-green-800 transition-colors mb-3 text-sm"
+          className="inline-flex items-center text-gray-500 hover:text-green-800 transition-colors mb-3 text-sm sr-only"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Pet Profiles
         </Link>

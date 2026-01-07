@@ -65,6 +65,9 @@ export default function RecommendedRecipesPage() {
   const [loadingMeals, setLoadingMeals] = useState(true);
   const [cardMessage, setCardMessage] = useState<{ id: string; text: string } | null>(null);
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
+  const [findMealsRemaining, setFindMealsRemaining] = useState<number | null>(null);
+  const [findMealsLimit, setFindMealsLimit] = useState<number | null>(null);
+  const [findMealsUsed, setFindMealsUsed] = useState<number | null>(null);
   const generationInFlightRef = useRef(false);
   const lastGeneratedPetIdRef = useRef<string | null>(null);
   const petId = params.id as string;
@@ -118,6 +121,26 @@ export default function RecommendedRecipesPage() {
       allergies: pet.allergies || [],
     } as any;
   }, [pet?.id, pet?.type, pet?.breed, pet?.age, pet?.weightKg, healthConcernsKey, allergiesKey, petDisplayName, pet?.dietaryRestrictions]);
+
+  const refreshFindMealsRemaining = useMemo(() => {
+    const refresh = async (targetPetId: string) => {
+      if (!targetPetId) return;
+      try {
+        const resp = await fetch(`/api/find-meals/remaining?petId=${encodeURIComponent(targetPetId)}`);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const limit = typeof data?.limit === 'number' ? data.limit : null;
+        const used = typeof data?.used === 'number' ? data.used : null;
+        const remaining = typeof data?.remaining === 'number' ? data.remaining : null;
+        setFindMealsLimit(limit);
+        setFindMealsUsed(used);
+        setFindMealsRemaining(remaining);
+      } catch {
+        // ignore
+      }
+    };
+    return refresh;
+  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -181,6 +204,8 @@ export default function RecommendedRecipesPage() {
       return;
     }
 
+    refreshFindMealsRemaining(pet.id);
+
     if (forceRegenerate && typeof window !== 'undefined') {
       try {
         localStorage.removeItem(mealsCacheKey);
@@ -225,6 +250,7 @@ export default function RecommendedRecipesPage() {
 
     (async () => {
       try {
+        await refreshFindMealsRemaining(pet.id);
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -255,11 +281,13 @@ export default function RecommendedRecipesPage() {
 
         if (!response.ok) {
           let friendly = '';
+          let errorCode = '';
           try {
             const contentType = response.headers.get('content-type') || '';
             if (contentType.includes('application/json')) {
               const errorJson = await response.json();
               const code = typeof errorJson?.code === 'string' ? errorJson.code : '';
+              errorCode = code;
               const message = typeof errorJson?.message === 'string' ? errorJson.message : '';
               const details = typeof errorJson?.details === 'string' ? errorJson.details : '';
               const errorText = typeof errorJson?.error === 'string' ? errorJson.error : '';
@@ -270,6 +298,15 @@ export default function RecommendedRecipesPage() {
               friendly = await response.text();
             }
           } catch {
+          }
+
+          if (errorCode === 'LIMIT_REACHED') {
+            if (isMounted) {
+              setEngineError(friendly || 'Free plan limit reached.');
+              setEngineMeals(null);
+            }
+            await refreshFindMealsRemaining(pet.id);
+            return;
           }
 
           throw new Error(
@@ -301,8 +338,11 @@ export default function RecommendedRecipesPage() {
         } else {
           throw new Error('No recipes generated');
         }
+
+        await refreshFindMealsRemaining(pet.id);
       } catch (error) {
         if (!isMounted) return;
+
         const isAbortError =
           (error as any)?.name === 'AbortError' ||
           (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError');
@@ -339,13 +379,6 @@ export default function RecommendedRecipesPage() {
         generationInFlightRef.current = false;
       }
     })();
-
-    return () => {
-      isMounted = false;
-      generationInFlightRef.current = false;
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
   }, [pet, regenerateNonce, forceRegenerate, mealsCacheKey, petId]);
 
   const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
@@ -705,13 +738,15 @@ export default function RecommendedRecipesPage() {
         <UserAgreementModal isOpen={true} onAgree={handleAgreeToDisclaimer} />
       ) : null}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link
-          href="/profile"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-primary-400 mb-6"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          Back to Profile
-        </Link>
+        <div className="mb-6">
+          <Link
+            href="/profile"
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-primary-400 sr-only"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Back to Profile
+          </Link>
+        </div>
 
         <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex gap-6 relative">
           <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1">
@@ -778,93 +813,8 @@ export default function RecommendedRecipesPage() {
                   </span>
                   <span className="sr-only">{loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}</span>
                 </button>
-              </div>
 
-              <div
-                className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1 lg:-translate-y-[60px] pb-10"
-                style={{ marginLeft: '-115px' }}
-              >
-
-                <div className="flex-shrink-0 min-w-[200px]">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">
-                    <AlphabetText text="Bio" size={30} />
-                  </h3>
-                  <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
-                    {pet.breed && (
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-orange-400 mt-0.5">•</span>
-                        <span><strong className="text-gray-200">Breed:</strong> {pet.breed}</span>
-                      </div>
-                    )}
-                    {pet.age && (
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-orange-400 mt-0.5">•</span>
-                        <span><strong className="text-gray-200">Age:</strong> {pet.age}</span>
-                      </div>
-                    )}
-                    {(pet.weightKg || pet.weight) && (
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-orange-400 mt-0.5">•</span>
-                        <span><strong className="text-gray-200">Weight:</strong> {pet.weightKg ? `${pet.weightKg}kg` : pet.weight}</span>
-                      </div>
-                    )}
-                    {pet.activityLevel && (
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-orange-400 mt-0.5">•</span>
-                        <span>
-                          <strong className="text-gray-200">Activity Level:</strong> {formatActivityLevel(pet.activityLevel)}
-                        </span>
-                      </div>
-                    )}
-                    {(pet.dietaryRestrictions || []).length > 0 && (
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-orange-400 mt-0.5">•</span>
-                        <span>
-                          <strong className="text-gray-200">Dietary Restrictions:</strong> {(pet.dietaryRestrictions || []).join(', ')}
-                        </span>
-                      </div>
-                    )}
-                    {(pet.dislikes || []).length > 0 && (
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-orange-400 mt-0.5">•</span>
-                        <span>
-                          <strong className="text-gray-200">Dislikes:</strong> {(pet.dislikes || []).join(', ')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 min-w-[160px]">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
-                    <AlphabetText text="Health concerns" size={30} />
-                  </h3>
-                  <div className="flex flex-col gap-1.5">
-                    {(pet.healthConcerns || []).length > 0 ? (
-                      (pet.healthConcerns || []).map((concern) => (
-                        <div
-                          key={concern}
-                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                        >
-                          {concern.replace(/-/g, ' ')}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 min-w-[160px]">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
-                    <AlphabetText text="Allergies" size={30} />
-                  </h3>
-                  <div className="flex flex-col gap-1.5">
-                    {(pet.allergies || []).length > 0 ? (
-                      (pet.allergies || []).map((allergy) => (
-                        <div
-                          key={allergy}
-                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                <div className="ml-4 flex items-center">
                         >
                           {allergy.replace(/-/g, ' ')}
                         </div>
@@ -993,6 +943,33 @@ export default function RecommendedRecipesPage() {
                         {scoringPet && (
                           <div className="mt-4 flex flex-col items-center gap-2">
                             {(() => {
+                              const score =
+                                'score' in (meal as any) && typeof (meal as any).score === 'number'
+                                  ? ((meal as any).score as number)
+                                  : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
+
+                              return (
+                                <div className="flex flex-col items-center">
+                                  <CompatibilityRadial score={score} size={135} />
+                                  <div className="mt-2">
+                                    <Image
+                                      src="/images/Buttons/CompatabilityScore.png"
+                                      alt="Compatibility Score"
+                                      width={160}
+                                      height={24}
+                                      className="h-11 w-auto"
+                                      unoptimized
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-auto pt-4">
+                        <button
                           type="button"
                           onClick={(e) => {
                             e.preventDefault();
@@ -1003,7 +980,7 @@ export default function RecommendedRecipesPage() {
                           className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
                           aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
                         >
-                          <span className="relative h-12 w-full overflow-hidden rounded-2xl">
+                          <span className="relative h-[60px] w-full overflow-hidden rounded-2xl">
                             <Image
                               src={
                                 savedRecipeIds.has(recipeId)

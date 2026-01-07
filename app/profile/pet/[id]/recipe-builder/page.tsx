@@ -171,6 +171,60 @@ const shouldExcludeIngredientName = (value: string): boolean => {
   return organKeywords.some((kw) => n.includes(kw));
 };
 
+const shouldExcludeSupplementLikeName = (value: string): boolean => {
+  const n = String(value || '').toLowerCase();
+  if (!n) return false;
+
+  // Explicit supplement-ish items we never want in the meal generator ingredient tabs.
+  const supplementKeywords = [
+    'supplement',
+    'capsule',
+    'softgel',
+    'tablet',
+    'drop',
+    'drops',
+    'powder',
+    'extract',
+    'vitamin',
+    'mineral',
+    'taurine',
+    'calcium carbonate',
+    'cuttlebone',
+    'eggshell',
+    'omega',
+    'fish oil',
+    'salmon oil',
+    'sardine oil',
+    'anchovy oil',
+    'herring oil',
+    'mackerel oil',
+    'krill oil',
+    'algae oil',
+    'kelp',
+    'spirulina',
+    'probiotic',
+    'psyllium',
+    'enzyme',
+    'glucosamine',
+    'chondroitin',
+    'msm',
+    'l-carnitine',
+    'quercetin',
+    'curcumin',
+  ];
+
+  if (supplementKeywords.some((kw) => n.includes(kw))) return true;
+
+  // Treat “oil” as supplement-like only for fish/animal omega oils; cooking oils are okay.
+  if (n.includes('oil') && !n.includes('olive') && !n.includes('coconut') && !n.includes('avocado')) {
+    if (n.includes('fish') || n.includes('salmon') || n.includes('sardine') || n.includes('anchovy') || n.includes('krill') || n.includes('algae')) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 // Get filtered ingredients based on pet species - ONLY show species-specific ingredients
 const getAvailableIngredients = (species: string, bannedIngredients?: string[]): string[] => {
   const normalizedSpecies = normalizeSpecies(species);
@@ -221,6 +275,7 @@ const getAvailableIngredients = (species: string, bannedIngredients?: string[]):
   }
 
   filtered = filtered.filter((ing) => !shouldExcludeIngredientName(ing));
+  filtered = filtered.filter((ing) => !shouldExcludeSupplementLikeName(ing));
 
   return Array.from(filtered).sort();
 };

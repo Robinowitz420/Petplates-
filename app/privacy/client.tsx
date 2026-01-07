@@ -62,7 +62,7 @@ export default function PrivacyClientPage() {
       />
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
-          <Link href="/" className="text-orange-600 font-semibold hover:underline">
+          <Link href="/" className="text-orange-600 font-semibold hover:underline sr-only">
             ← Back to home
           </Link>
         </div>

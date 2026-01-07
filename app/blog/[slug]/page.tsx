@@ -257,7 +257,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           </nav>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-orange-300 hover:text-orange-200 font-medium"
+            className="inline-flex items-center gap-2 text-orange-300 hover:text-orange-200 font-medium sr-only"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog

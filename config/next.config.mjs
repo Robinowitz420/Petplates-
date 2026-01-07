@@ -11,11 +11,6 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig = {
-  // Ensure Turbopack resolves the correct project root when running in
-  // environments where `node_modules` may be hoisted to a parent folder.
-  turbopack: {
-    root: path.resolve(__dirname, '..'),
-  },
   experimental: process.platform === 'win32' ? { cpus: 4 } : {},
   typescript: {
     ignoreBuildErrors: true,

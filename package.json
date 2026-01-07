@@ -6,8 +6,9 @@
   "scripts": {
     "normalize:alphabet": "tsx scripts/normalize-alphabet-images.ts",
     "clean:next": "node -e \"require('node:fs').rmSync('.next',{recursive:true,force:true})\"",
-    "predev": "npm run clean:next",
-    "dev": "next dev",
+    "clean:turbo": "node -e \"require('node:fs').rmSync('node_modules/.cache',{recursive:true,force:true})\"",
+    "predev": "npm run clean:next && npm run clean:turbo",
+    "dev": "cross-env NEXT_DISABLE_TURBOPACK=1 next dev",
     "prebuild": "npm run clean:next",
     "build": "npm run validate:recipes && next build",
     "typecheck": "tsc --noEmit",

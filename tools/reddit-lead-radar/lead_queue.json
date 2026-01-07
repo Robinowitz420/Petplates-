@@ -1,4 +1,18 @@
 {
-  "leads": [],
-  "generated_at": 1767807867.1162014
+  "leads": [
+    {
+      "id": "lead_1q6p3du",
+      "post_id": "1q6p3du",
+      "subreddit": "hamsters",
+      "author": "/u/SnooPoems2015",
+      "title": "best food for chinese dwarf",
+      "content": "<!-- SC_OFF --><div class=\"md\"><p>help! i just got her yesterday so i picked up some oxbow hamster food. but google is telling me they\u2019re very prone to diabetes so i want to avoid that at all costs. so drop the food recommendations please!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/SnooPoems2015\"> /u/SnooPoems2015 </a> <br /> <span><a href=\"https://www.reddit.com/r/hamsters/comments/1q6p3du/best_food_for_chinese_dwarf/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/hamsters/comments/1q6p3du/best_food_for_chinese_dwarf/\">[comments]</a></span>",
+      "url": "https://www.reddit.com/r/hamsters/comments/1q6p3du/best_food_for_chinese_dwarf/",
+      "score": 0.753,
+      "species": "pocket_pets",
+      "draft_reply": "I built something specifically for pet parents struggling with feeding questions like this. It's free meal plans + shoppable ingredient lists for dogs, cats, birds, reptiles, and pocket pets. https://paws-and-plates.vercel.app/ - lmk if it helps!",
+      "created_at": null
+    }
+  ],
+  "generated_at": 1767815126.3312907
 }

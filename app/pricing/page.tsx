@@ -9,7 +9,7 @@ const PricingTable = dynamic(() => import('@clerk/nextjs').then((m) => m.Pricing
   ssr: false,
 });
 
-const billingEnabled = process.env.NEXT_PUBLIC_CLERK_BILLING_ENABLED === 'true';
+const billingEnabled = process.env.NEXT_PUBLIC_CLERK_BILLING_ENABLED !== 'false';
 
 export default function PricingPage() {
   return (
@@ -24,7 +24,7 @@ export default function PricingPage() {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/profile"
-              className="inline-flex items-center justify-center rounded-lg border border-surface-highlight bg-surface-highlight/30 px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-surface-highlight/40 transition-colors"
+              className="inline-flex items-center justify-center rounded-lg border border-surface-highlight bg-surface-highlight/30 px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-surface-highlight/40 transition-colors sr-only"
             >
               Back to My Pets
             </Link>

@@ -15,6 +15,44 @@ import { normalizePetType } from '@/lib/utils/petType';
 import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
 import AlphabetText from '@/components/AlphabetText';
 
+// Simple modal for meal save confirmation
+function MealSavedModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+      <div className="relative max-w-md w-full bg-surface border border-surface-highlight rounded-2xl p-6 shadow-2xl">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition-colors"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+
+        <div className="text-center">
+          <div className="mb-4">
+            <div className="text-6xl mb-2">🌱</div>
+            <h3 className="text-xl font-bold text-green-400 mb-2">
+              <AlphabetText text="Meal Harvested!" size={28} />
+            </h3>
+            <p className="text-gray-300 text-sm">
+              This meal has been saved to your pet's recipe collection. You can now access it anytime from their profile.
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface RecipeCardProps {
   recipe: Recipe;
   pet?: Pet | null;
@@ -33,6 +71,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [isAddingMeal, setIsAddingMeal] = useState(false);
   const [localMealSaved, setLocalMealSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [showSavedModal, setShowSavedModal] = useState(false);
   const { userId } = useAuth();
 
   useEffect(() => {
@@ -196,6 +235,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                     if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
                     await savePersistedPet(userId, { ...pet, savedRecipes: nextSavedRecipes } as any);
                     setLocalMealSaved(true);
+                    setShowSavedModal(true); // Show success modal
                   } catch (err) {
                     const raw = err instanceof Error ? err.message : String(err || '');
                     const friendly = raw || 'Unable to save this meal.';
@@ -209,7 +249,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                 className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label={isMealSaved ? 'Meal Harvested' : 'Harvest Meal'}
               >
-                <span className="relative h-12 w-full overflow-hidden rounded-2xl">
+                <span className="relative h-[60px] w-full overflow-hidden rounded-2xl">
                   <Image
                     src={isMealSaved ? '/images/Buttons/MealSaved.png' : '/images/Buttons/SaveMeal.png'}
                     alt={isMealSaved ? 'Meal Harvested' : 'Harvest Meal'}
@@ -233,6 +273,13 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
           recipe={recipe}
           pet={pet}
           onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {showSavedModal && (
+        <MealSavedModal
+          isOpen={showSavedModal}
+          onClose={() => setShowSavedModal(false)}
         />
       )}
     </>

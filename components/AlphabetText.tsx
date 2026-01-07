@@ -14,6 +14,10 @@ function isLetterAZ(ch: string): boolean {
   return ch.length === 1 && ch.toLowerCase() >= 'a' && ch.toLowerCase() <= 'z';
 }
 
+function isDigit(ch: string): boolean {
+  return ch.length === 1 && ch >= '0' && ch <= '9';
+}
+
 export default function AlphabetText({
   text,
   size = 24,
@@ -41,6 +45,34 @@ export default function AlphabetText({
           <Image
             key={key}
             src="/images/Buttons/Alphabet/AND.png"
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            className="object-contain"
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
+      if (isDigit(ch)) {
+        return (
+          <Image
+            key={key}
+            src={`/images/Buttons/Alphabet/NUMBERS/${ch}.png`}
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            className="object-contain"
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
+      if (ch === '%') {
+        return (
+          <Image
+            key={key}
+            src="/images/Buttons/Alphabet/NUMBERS/PERCENT.png"
             alt=""
             width={renderSize}
             height={renderSize}
