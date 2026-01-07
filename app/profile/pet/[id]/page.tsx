@@ -255,6 +255,7 @@ export default function RecommendedRecipesPage() {
 
         if (!response.ok) {
           let friendly = '';
+          let errorCode = '';
           try {
             const contentType = response.headers.get('content-type') || '';
             if (contentType.includes('application/json')) {
@@ -265,11 +266,21 @@ export default function RecommendedRecipesPage() {
               const errorText = typeof errorJson?.error === 'string' ? errorJson.error : '';
 
               const core = message || details || errorText;
+              errorCode = code;
               friendly = core ? `${code ? `${code}: ` : ''}${core}` : '';
             } else {
               friendly = await response.text();
             }
           } catch {
+          }
+
+          if (errorCode === 'LIMIT_REACHED' || friendly.includes('LIMIT_REACHED')) {
+            if (isMounted) {
+              setEngineError(friendly || 'Free plan limit reached.');
+              setEngineMeals(null);
+            }
+            await refreshFindMealsRemaining(pet.id);
+            return;
           }
 
           throw new Error(
@@ -306,14 +317,15 @@ export default function RecommendedRecipesPage() {
         const isAbortError =
           (error as any)?.name === 'AbortError' ||
           (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError');
-        if (!isAbortError) {
+        const rawMessage = error instanceof Error ? error.message : String(error);
+        const isExpectedError = rawMessage.includes('LIMIT_REACHED');
+        if (!isAbortError && !isExpectedError) {
           console.error('Recipe generation error:', error);
         }
         if (isAbortError) {
           setEngineError('Meal generation timed out.');
           setEngineMeals(null);
         }
-        const rawMessage = error instanceof Error ? error.message : String(error);
         const isQuotaClosed =
           rawMessage.includes('Gemini quota is not enabled') ||
           rawMessage.includes('RESOURCE_EXHAUSTED') ||
@@ -993,6 +1005,33 @@ export default function RecommendedRecipesPage() {
                         {scoringPet && (
                           <div className="mt-4 flex flex-col items-center gap-2">
                             {(() => {
+                              const score =
+                                'score' in (meal as any) && typeof (meal as any).score === 'number'
+                                  ? ((meal as any).score as number)
+                                  : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
+
+                              return (
+                                <div className="flex flex-col items-center">
+                                  <CompatibilityRadial score={score} size={135} />
+                                  <div className="mt-2">
+                                    <Image
+                                      src="/images/Buttons/CompatabilityScore.png"
+                                      alt="Compatibility Score"
+                                      width={160}
+                                      height={24}
+                                      className="h-11 w-auto"
+                                      unoptimized
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-auto pt-4">
+                        <button
                           type="button"
                           onClick={(e) => {
                             e.preventDefault();
@@ -1003,7 +1042,7 @@ export default function RecommendedRecipesPage() {
                           className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
                           aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
                         >
-                          <span className="relative h-12 w-full overflow-hidden rounded-2xl">
+                          <span className="relative h-[60px] w-full overflow-hidden rounded-2xl">
                             <Image
                               src={
                                 savedRecipeIds.has(recipeId)
