@@ -12,7 +12,8 @@ import Tooltip from '@/components/Tooltip';
 import { getPets } from '@/lib/utils/petStorage';
 import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendations';
 import { logger } from '@/lib/utils/logger';
-import { getProductUrl } from '@/lib/data/product-prices';
+import { getIngredientDisplayPricing, getProductUrl } from '@/lib/data/product-prices';
+import { getPackageSize } from '@/lib/data/packageSizes';
 import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
@@ -611,17 +612,12 @@ export default function MealCompleteView({
   };
 
   const { ingredientSelections, supplementSelections } = useMemo(() => {
-    const ingredientSelections: IngredientSelection[] = [];
+    // All ingredients go to ingredients tab - supplements tab is only for recommended supplements
+    const ingredientSelections: IngredientSelection[] = [...selectedIngredients];
     const supplementSelections: IngredientSelection[] = [];
 
-    for (const ing of selectedIngredients) {
-      const displayName = getIngredientDisplayName(ing.key);
-      if (isSupplementLikeName(displayName)) supplementSelections.push(ing);
-      else ingredientSelections.push(ing);
-    }
-
     return { ingredientSelections, supplementSelections };
-  }, [selectedIngredients, getIngredientDisplayName]);
+  }, [selectedIngredients]);
 
   const toIngredientKey = useCallback((name: string) => {
     return String(name || '')
@@ -649,11 +645,19 @@ export default function MealCompleteView({
       const displayName = String(supplement?.productName || supplement?.name || 'Supplement').trim();
       if (!displayName) return;
       const key = toIngredientKey(displayName) || displayName;
+
+      // Check if this supplement is already added
+      const alreadyAdded = selectedIngredients.some(ing => ing.key === key);
+      if (alreadyAdded) {
+        setActiveTab('ingredients');
+        return;
+      }
+
       const grams = Math.max(1, Math.round(parseSupplementAmountToGrams(supplement?.defaultAmount)));
       onAddIngredient(key, grams);
       setActiveTab('ingredients');
     },
-    [onAddIngredient, parseSupplementAmountToGrams, toIngredientKey]
+    [onAddIngredient, parseSupplementAmountToGrams, toIngredientKey, selectedIngredients]
   );
 
   // Prepare ingredients for ShoppingList (memoized)
@@ -662,7 +666,7 @@ export default function MealCompleteView({
     if (debugEnabled) debugLog('[MealCompleteView] selectedIngredients:', selectedIngredients);
     if (debugEnabled) debugLog('[MealCompleteView] selectedIngredients.length:', selectedIngredients.length);
     
-    const result = selectedIngredients
+    const result = ingredientSelections
       .map((ing, index) => {
         if (debugEnabled) debugLog(`[MealCompleteView] Processing ingredient ${index + 1}:`, ing);
         const displayName = getIngredientDisplayName(ing.key);
@@ -687,10 +691,10 @@ export default function MealCompleteView({
     if (debugEnabled) debugLog('[MealCompleteView] ingredientsWithASINs.length:', result.length);
     if (debugEnabled) debugLog('[MealCompleteView] =====================================================');
     return result;
-  }, [debugEnabled, getIngredientDisplayName, selectedIngredients]);
+  }, [debugEnabled, getIngredientDisplayName, ingredientSelections, selectedIngredients]);
 
   const ingredientsWithoutASINs = useMemo(() => {
-    return selectedIngredients
+    return ingredientSelections
       .filter(ing => {
         const displayName = getIngredientDisplayName(ing.key);
         const link = getProductUrl(displayName);
@@ -701,10 +705,51 @@ export default function MealCompleteView({
         name: getIngredientDisplayName(ing.key),
         amount: `${ing.grams}g`,
       }));
-  }, [getIngredientDisplayName, selectedIngredients]);
+  }, [getIngredientDisplayName, ingredientSelections]);
 
-  // Get recommended supplements
-  const recommendedSupplements = healthAnalysis?.recommendations || [];
+  const supplementTotalCost = useMemo(() => {
+    if (!Array.isArray(supplementSelections) || supplementSelections.length === 0) return 0;
+
+    return supplementSelections.reduce((sum, item) => {
+      const displayName = getIngredientDisplayName(item.key);
+      if (!displayName) return sum;
+
+      const pricing = getIngredientDisplayPricing(displayName);
+      const pkg = getPackageSize(displayName);
+
+      const estimatedPrice = Number(pkg?.estimatedCost) || 0;
+      const isEstimatedPrice =
+        pricing?.priceSource === 'none' ||
+        pricing?.priceSource === 'package' ||
+        !(pricing?.packagePrice && pricing.packagePrice > 0);
+      const bestPackagePrice = isEstimatedPrice ? estimatedPrice : (pricing.packagePrice as number);
+
+      return sum + (Number.isFinite(bestPackagePrice) ? bestPackagePrice : 0);
+    }, 0);
+  }, [getIngredientDisplayName, supplementSelections]);
+
+  // Get recommended supplements (filter out already added ones)
+  const recommendedSupplements = useMemo(() => {
+    const rawRecommendations = healthAnalysis?.recommendations || [];
+
+    // Create a set of normalized keys for already added ingredients
+    const addedKeys = new Set(
+      selectedIngredients.map(ing => ing.key.toLowerCase())
+    );
+
+    return rawRecommendations.filter(supplement => {
+      const supplementName = String(supplement?.productName || supplement?.name || '').toLowerCase().trim();
+      if (!supplementName) return false;
+
+      // Normalize supplement name to match key format
+      const normalizedKey = supplementName
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+
+      // Hide if already added
+      return !addedKeys.has(normalizedKey);
+    });
+  }, [healthAnalysis?.recommendations, selectedIngredients]);
 
   // Calculate meal estimate only for CostComparison component
   const mealEstimateForCost = useMemo(() => {
@@ -783,7 +828,41 @@ export default function MealCompleteView({
     typeof mealEstimateForCost?.costPerMeal === 'number' && Number.isFinite(mealEstimateForCost.costPerMeal) && mealEstimateForCost.costPerMeal > 0
       ? mealEstimateForCost.costPerMeal
       : null;
-  const costPerMealForDisplay = canonicalCostPerMeal ?? fallbackCostPerMeal;
+
+  const supplementCostPerMealAddon = useMemo(() => {
+    if (!supplementTotalCost || !Number.isFinite(supplementTotalCost) || supplementTotalCost <= 0) return 0;
+
+    const estimateMealsRaw = mealEstimateForCost?.estimatedMeals;
+    const servingsRaw = typeof recipeServings === 'number' ? recipeServings : null;
+
+    const baseDenom =
+      typeof estimateMealsRaw === 'number' && Number.isFinite(estimateMealsRaw) && estimateMealsRaw > 0
+        ? estimateMealsRaw
+        : typeof servingsRaw === 'number' && Number.isFinite(servingsRaw) && servingsRaw > 0
+          ? servingsRaw
+          : 1;
+
+    const denom = Math.max(1, Math.floor(baseDenom));
+    return supplementTotalCost / denom;
+  }, [mealEstimateForCost?.estimatedMeals, recipeServings, supplementTotalCost]);
+
+  const costPerMealForDisplay = useMemo(() => {
+    const base = canonicalCostPerMeal ?? fallbackCostPerMeal;
+    if (!base || !Number.isFinite(base) || base <= 0) return null;
+    const addon = Number.isFinite(supplementCostPerMealAddon) && supplementCostPerMealAddon > 0 ? supplementCostPerMealAddon : 0;
+    const combined = base + addon;
+    return Number.isFinite(combined) && combined > 0 ? combined : base;
+  }, [canonicalCostPerMeal, fallbackCostPerMeal, supplementCostPerMealAddon]);
+
+  const estimatedMealsForDisplay = mealEstimateForCost?.estimatedMeals;
+  const totalCostForDisplay = useMemo(() => {
+    const base = typeof mealEstimateForCost?.totalCost === 'number' && Number.isFinite(mealEstimateForCost.totalCost)
+      ? mealEstimateForCost.totalCost
+      : null;
+    if (base === null) return null;
+    const combined = base + supplementTotalCost;
+    return Number.isFinite(combined) ? combined : base;
+  }, [mealEstimateForCost?.totalCost, supplementTotalCost]);
 
   // Diagnostic logging - NOW AFTER DECLARATIONS
   useEffect(() => {
@@ -882,7 +961,7 @@ export default function MealCompleteView({
                       aria-label="View compatibility details"
                     >
                       <div className="flex items-center justify-between gap-5">
-                        <CompatibilityRadial score={displayScoreRounded} size={118} strokeWidth={10} label="" />
+                        <CompatibilityRadial score={displayScoreRounded} size={113} strokeWidth={10} label="" />
                         <div className="text-left">
                           <div className="text-sm font-semibold text-gray-200">Compatibility</div>
                           <div className="text-xs text-gray-400 mt-1">Click for details</div>
@@ -937,13 +1016,7 @@ export default function MealCompleteView({
                       : 'border-transparent text-gray-500 hover:text-gray-300'
                   }`}
                 >
-                  <span className="sr-only">Supplements</span>
-                  <Image
-                    src={SupplementsTabImage}
-                    alt="Supplements"
-                    className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
-                    unoptimized
-                  />
+                  <span>Supplements</span>
                 </button>
               </div>
 
@@ -1067,24 +1140,20 @@ export default function MealCompleteView({
             {/* Cost Comparison */}
             {ingredientsWithASINs.length > 0 && costPerMealForDisplay && costPerMealForDisplay > 0 && (
               <div className="mb-8">
-                {canonicalCostPerMeal ? (
-                  <CostComparison
-                    costPerMeal={canonicalCostPerMeal}
-                    pricingSource={apiPricing?.pricingSource}
-                    asOf={apiPricing?.asOf}
-                    missingIngredientCount={Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0}
-                    isComplete={apiPricing?.isComplete}
-                  />
-                ) : (
-                  mealEstimateForCost && mealEstimateForCost.costPerMeal > 0 && (
-                    <CostComparison
-                      costPerMeal={mealEstimateForCost.costPerMeal}
-                      totalCost={mealEstimateForCost.totalCost}
-                      estimatedMeals={mealEstimateForCost.estimatedMeals}
-                      exceedsBudget={mealEstimateForCost.exceedsBudget || false}
-                    />
-                  )
-                )}
+                <CostComparison
+                  costPerMeal={costPerMealForDisplay}
+                  pricingSource={canonicalCostPerMeal ? apiPricing?.pricingSource : undefined}
+                  asOf={canonicalCostPerMeal ? apiPricing?.asOf : undefined}
+                  missingIngredientCount={
+                    canonicalCostPerMeal && Array.isArray(apiPricing?.missingIngredientKeys)
+                      ? apiPricing?.missingIngredientKeys.length
+                      : undefined
+                  }
+                  isComplete={canonicalCostPerMeal ? apiPricing?.isComplete : undefined}
+                  totalCost={typeof totalCostForDisplay === 'number' ? totalCostForDisplay : undefined}
+                  estimatedMeals={typeof estimatedMealsForDisplay === 'number' ? estimatedMealsForDisplay : undefined}
+                  exceedsBudget={mealEstimateForCost?.exceedsBudget || false}
+                />
               </div>
             )}
           </main>

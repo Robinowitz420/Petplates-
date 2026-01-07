@@ -101,7 +101,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
 
           {speciesScore && (
             <div className="mb-4 flex items-center justify-between rounded-lg border border-surface-highlight bg-surface-highlight/40 p-3">
-              <CompatibilityRadial score={speciesScore.overallScore} size={88} strokeWidth={8} label="" />
+              <CompatibilityRadial score={speciesScore.overallScore} size={83} strokeWidth={8} label="" />
               <div className="flex flex-col items-end gap-1">
                 <div className="text-[10px] uppercase tracking-wide text-gray-400">
                   {gradeToCompatibility(speciesScore.grade)} match

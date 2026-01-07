@@ -1,0 +1,66 @@
+{
+  "queries": [
+    {
+      "query": "homemade dog food how much",
+      "description": "Homemade dog food portions and recipes"
+    },
+    {
+      "query": "raw feeding beginner",
+      "description": "Beginner raw feeding questions"
+    },
+    {
+      "query": "balanced homemade cat food",
+      "description": "Homemade cat food nutrition balance"
+    },
+    {
+      "query": "switching off kibble",
+      "description": "Transitioning from commercial to homemade"
+    },
+    {
+      "query": "fresh feeding portion",
+      "description": "Fresh/cooked food portions"
+    },
+    {
+      "query": "DIY dog diet",
+      "description": "DIY homemade dog diets"
+    },
+    {
+      "query": "homemade puppy food",
+      "description": "Puppy homemade feeding"
+    },
+    {
+      "query": "senior dog homemade diet",
+      "description": "Senior dog homemade nutrition"
+    },
+    {
+      "query": "homemade kitten food",
+      "description": "Kitten homemade feeding"
+    },
+    {
+      "query": "bird seed mix homemade",
+      "description": "Homemade bird seed mixes"
+    },
+    {
+      "query": "reptile homemade diet",
+      "description": "Homemade reptile feeding"
+    },
+    {
+      "query": "rabbit homemade pellets",
+      "description": "Homemade rabbit food"
+    },
+    {
+      "query": "guinea pig homemade hay",
+      "description": "Homemade guinea pig food"
+    },
+    {
+      "query": "hamster homemade mix",
+      "description": "Homemade hamster food"
+    },
+    {
+      "query": "ferret homemade diet",
+      "description": "Homemade ferret feeding"
+    }
+  ],
+  "search_interval_minutes": 30,
+  "max_results_per_query": 25
+}

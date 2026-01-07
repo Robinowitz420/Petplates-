@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import type { RecipePricingSource } from '@/lib/hooks/useRecipePricing';
 
 interface CostComparisonProps {
@@ -12,6 +13,7 @@ interface CostComparisonProps {
   asOf?: string | null;
   missingIngredientCount?: number;
   isComplete?: boolean;
+  cacheKey?: string;
 }
 
 export function CostComparison({
@@ -24,10 +26,41 @@ export function CostComparison({
   asOf,
   missingIngredientCount,
   isComplete,
+  cacheKey,
 }: CostComparisonProps) {
   const commercialCost = 4.50; // Average commercial pet food per meal
-  const savings = commercialCost - costPerMeal;
+  const resolvedCostPerMeal =
+    typeof totalCost === 'number' &&
+    Number.isFinite(totalCost) &&
+    totalCost > 0 &&
+    typeof estimatedMeals === 'number' &&
+    Number.isFinite(estimatedMeals) &&
+    estimatedMeals > 0
+      ? totalCost / estimatedMeals
+      : costPerMeal;
+
+  const savings = commercialCost - resolvedCostPerMeal;
   const savingsPercent = savings > 0 ? Math.round((savings / commercialCost) * 100) : 0;
+
+  useEffect(() => {
+    if (!cacheKey) return;
+    if (typeof window === 'undefined') return;
+    if (!resolvedCostPerMeal || resolvedCostPerMeal <= 0) return;
+
+    const payload = {
+      costPerMeal: resolvedCostPerMeal,
+      totalCost: typeof totalCost === 'number' && Number.isFinite(totalCost) ? totalCost : null,
+      estimatedMeals:
+        typeof estimatedMeals === 'number' && Number.isFinite(estimatedMeals) ? estimatedMeals : null,
+      timestamp: Date.now(),
+    };
+
+    try {
+      window.sessionStorage.setItem(`costComparison:${cacheKey}`, JSON.stringify(payload));
+    } catch {
+      // ignore storage failures (SSR / private mode / quota)
+    }
+  }, [cacheKey, resolvedCostPerMeal, totalCost, estimatedMeals]);
 
   const provenance = (() => {
     if (!pricingSource || pricingSource === 'none') return null;
@@ -59,7 +92,7 @@ export function CostComparison({
   })();
   
   // Don't render if invalid data
-  if (!costPerMeal || costPerMeal <= 0) {
+  if (!resolvedCostPerMeal || resolvedCostPerMeal <= 0) {
     return null;
   }
   
@@ -86,7 +119,7 @@ export function CostComparison({
         {/* Homemade */}
         <div className="bg-surface rounded-lg p-4 border border-green-700/30 text-center">
           <p className="text-sm text-gray-400 mb-2">Homemade (Your Cost)</p>
-          <p className="text-3xl font-bold text-green-400">${costPerMeal.toFixed(2)}/meal</p>
+          <p className="text-3xl font-bold text-green-400">${resolvedCostPerMeal.toFixed(2)}/meal</p>
           <div className="mt-2 space-y-1 inline-block text-left">
             <p className="text-xs text-green-300">✓ Fresh ingredients</p>
             <p className="text-xs text-green-300">✓ Full control</p>
@@ -143,7 +176,7 @@ export function CostComparison({
             </div>
             <div className="text-center">
               <p className="text-gray-400 mb-1">Cost Per Meal</p>
-              <p className="font-bold text-lg text-green-400">${costPerMeal.toFixed(2)}</p>
+              <p className="font-bold text-lg text-green-400">${resolvedCostPerMeal.toFixed(2)}</p>
               <p className="text-gray-500 text-[10px] mt-0.5">average</p>
             </div>
           </div>

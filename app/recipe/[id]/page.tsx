@@ -71,6 +71,14 @@ import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.pn
 import StorageServingBanner from '@/public/images/Site Banners/unnamed.jpg';
 import CostComparisonBanner from '@/public/images/Site Banners/CostComparison.png';
 
+const getIngredientKey = (ingredient: any): string => {
+  if (!ingredient) return '';
+  const rawId = ingredient.id ?? ingredient.ingredientId ?? '';
+  if (rawId) return String(rawId);
+  const rawName = typeof ingredient.name === 'string' ? ingredient.name : ingredient.productName;
+  return rawName ? String(rawName).trim().toLowerCase() : '';
+};
+
 // =================================================================
 // 1. CONSTANTS
 // =================================================================
@@ -223,7 +231,15 @@ const getSpeciesFromRecipeCategory = (category?: string): string | undefined => 
 
 // Helper function to vet recipe ingredients even without a pet selected
 const vetRecipeIngredients = (recipe: Recipe): Recipe => {
-  if (!recipe) return recipe;
+  if (!recipe) {
+    console.error('vetRecipeIngredients: recipe is null/undefined');
+    return recipe;
+  }
+
+  if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+    console.error('vetRecipeIngredients: recipe.ingredients is invalid:', recipe.ingredients);
+    return recipe;
+  }
 
   // Derive species from recipe category
   const species = getSpeciesFromRecipeCategory(recipe.category);
@@ -231,13 +247,20 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
   return {
     ...recipe,
     ingredients: recipe.ingredients.map((ing) => {
-      // Remove old amazonLink property
-      const { amazonLink, ...ingWithoutOldLink } = ing as any;
+      try {
+        // Defensive check for ingredient object
+        if (!ing || typeof ing !== 'object') {
+          console.error('vetRecipeIngredients: invalid ingredient object:', ing);
+          return ing; // Return as-is to prevent crash
+        }
 
-      const existingLink = ing.asinLink || amazonLink;
+        // Remove old amazonLink property
+        const { amazonLink, ...ingWithoutOldLink } = ing as any;
 
-      const genericKey = getGenericIngredientName((ing as any).productName || ing.name);
-      const displayName = genericKey ? formatIngredientNameForDisplay(genericKey) : ing.name;
+        const existingLink = ing.asinLink || amazonLink;
+
+        const genericKey = getGenericIngredientName((ing as any).productName || ing.name);
+        const displayName = genericKey ? formatIngredientNameForDisplay(genericKey) : ing.name;
 
       // Try to find vetted product using the ingredient name
       // If the name is a product name (from applyModifiers), try to reverse-lookup
@@ -276,6 +299,10 @@ const vetRecipeIngredients = (recipe: Recipe): Recipe => {
         asinLink: existingLink ? ensureSellerId(existingLink) : undefined,
         amazonSearchUrl: ensureSellerId(buildAmazonSearchUrl(displayName)),
       };
+      } catch (error) {
+        console.error('vetRecipeIngredients: error processing ingredient:', ing, error);
+        return ing; // Return original ingredient to prevent crash
+      }
     }),
   };
 };
@@ -308,6 +335,7 @@ export default function RecipeDetailPage() {
   const [vettedRecipe, setVettedRecipe] = useState<Recipe | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [modifiedRecipe, setModifiedRecipe] = useState<Recipe | null>(null);
+  const [removedIngredientKeys, setRemovedIngredientKeys] = useState<Set<string>>(new Set());
   const [recommendedSupplements, setRecommendedSupplements] = useState<RecommendedSupplement[]>([]);
   const [hopAddedLabel, setHopAddedLabel] = useState<string | null>(null);
 
@@ -336,6 +364,8 @@ export default function RecipeDetailPage() {
   const queryPetId = searchParams?.get('petId') || '';
 
   const activePetId = selectedPetId || queryPetId;
+
+  const hasLocalEdits = removedIngredientKeys.size > 0 || Boolean(modifiedRecipe);
 
   const activePet = useMemo(() => {
     if (!activePetId) return null;
@@ -387,8 +417,25 @@ export default function RecipeDetailPage() {
     }
   }, [recipe, activePet]);
 
+  const recipeForScoring = useMemo(() => {
+    const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
+    if (!baseRecipe) return null;
+
+    const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
+    const filteredIngredients = allIngredients.filter((ing: any) => {
+      const key = getIngredientKey(ing);
+      if (!key) return true;
+      return !removedIngredientKeys.has(key);
+    });
+
+    return {
+      ...baseRecipe,
+      ingredients: filteredIngredients,
+    } as any;
+  }, [modifiedRecipe, recipe, removedIngredientKeys, vettedRecipe]);
+
   const scoreForQueryPet = useMemo(() => {
-    if (!recipe || !activePetId) return null;
+    if (!recipeForScoring || !activePetId) return null;
     const pet = pets.find((p) => p.id === activePetId);
     if (!pet) return null;
 
@@ -407,7 +454,7 @@ export default function RecipeDetailPage() {
         allergies: pet.allergies || [],
       } as any;
 
-      const scored = scoreWithSpeciesEngine(recipe, scoringPet);
+      const scored = scoreWithSpeciesEngine(recipeForScoring as any, scoringPet);
 
       // Check badges if score is 100% (Perfect Match)
       if (scored.overallScore === 100 && activePetId && userId) {
@@ -460,7 +507,7 @@ export default function RecipeDetailPage() {
       console.error('Error calculating compatibility:', error);
       return null;
     }
-  }, [recipe, activePetId, pets, userId]);
+  }, [recipeForScoring, activePetId, pets, userId]);
 
   useEffect(() => {
     if (scoreForQueryPet) {
@@ -561,9 +608,16 @@ export default function RecipeDetailPage() {
 
       if (sessionRecipe) {
         // Use recipe from session storage
-        const vetted = vetRecipeIngredients(sessionRecipe);
-        setRecipe(vetted);
-        setVettedRecipe(vetted);
+        try {
+          const vetted = vetRecipeIngredients(sessionRecipe);
+          setRecipe(vetted);
+          setVettedRecipe(vetted);
+        } catch (error) {
+          console.error('Error vetting session recipe:', error);
+          // Set recipe without vetting to prevent crash
+          setRecipe(sessionRecipe);
+          setVettedRecipe(sessionRecipe);
+        }
         setIsLoading(false);
       } else {
         // Load persisted generated recipe from Firestore (via API)
@@ -575,9 +629,16 @@ export default function RecipeDetailPage() {
           })
           .then((foundRecipe) => {
             if (foundRecipe) {
-              const vetted = vetRecipeIngredients(foundRecipe);
-              setRecipe(vetted);
-              setVettedRecipe(vetted);
+              try {
+                const vetted = vetRecipeIngredients(foundRecipe);
+                setRecipe(vetted);
+                setVettedRecipe(vetted);
+              } catch (error) {
+                console.error('Error vetting loaded recipe:', error);
+                // Set recipe without vetting to prevent crash
+                setRecipe(foundRecipe);
+                setVettedRecipe(foundRecipe);
+              }
             } else {
               setRecipe(null);
               setVettedRecipe(null);
@@ -702,6 +763,21 @@ export default function RecipeDetailPage() {
     animate();
   }, []);
 
+  const handleRemoveIngredient = useCallback((ingredientId: string) => {
+    const key = String(ingredientId || '').trim();
+    if (!key) return;
+    setRemovedIngredientKeys((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  }, []);
+
+  const handleResetLocalEdits = useCallback(() => {
+    setRemovedIngredientKeys(new Set());
+    setModifiedRecipe(null);
+  }, []);
+
   // Function to add supplement to recipe
   const handleAddSupplement = useCallback((supplement: RecommendedSupplement) => {
 
@@ -709,6 +785,7 @@ export default function RecipeDetailPage() {
     if (!baseRecipe) return;
 
     const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
+    if (!Array.isArray(newRecipe.ingredients)) newRecipe.ingredients = [];
 
     const searchUrl = ensureSellerId(
       buildAmazonSearchUrl(supplement.productName || supplement.name || 'pet supplement')
@@ -735,54 +812,7 @@ export default function RecipeDetailPage() {
       // ignore
     }
 
-    // Recalculate score
-    const baselineScore = currentScore || scoreForQueryPet;
-    if (activePetId && baselineScore) {
-      const pet = pets.find((p) => p.id === activePetId);
-      if (pet) {
-        const petAge = pet.age === 'baby' ? 0.5 : pet.age === 'young' ? 2 : pet.age === 'adult' ? 5 : 10;
-        const petType = normalizePetType(pet.type, 'recipe/[id].recalcScore');
-        const scoringPet = {
-          id: pet.id,
-          name: getRandomName(pet.names),
-          type: petType,
-          breed: pet.breed,
-          age: petAge,
-          weight: parseFloat(pet.weight) || (petType === 'dog' ? 25 : petType === 'cat' ? 10 : 5),
-          activityLevel: 'moderate' as const,
-          healthConcerns: pet.healthConcerns || [],
-          dietaryRestrictions: pet.allergies || [],
-          allergies: pet.allergies || [],
-        } as any;
-
-        try {
-          const newScored = scoreWithSpeciesEngine(newRecipe, scoringPet);
-          const oldScore = baselineScore.overallScore;
-
-          // Always boost compatibility when a supplement is added: random +2 to +10 points, capped at 100.
-          const randomBoost = Math.floor(Math.random() * 9) + 2; // 2–10 inclusive
-          const boostedScore = Math.min(100, newScored.overallScore + randomBoost);
-          const scoreDiff = boostedScore - oldScore;
-
-          if (scoreDiff > 0) {
-            // Animate score change using the boosted score
-            animateScoreChange(oldScore, boostedScore);
-          }
-
-          setCurrentScore({ ...newScored, overallScore: boostedScore });
-          setAnimatedScore(boostedScore);
-          setMessage(
-            `${supplement.name} added! Score improved by ${scoreDiff > 0 ? '+' : ''}${scoreDiff.toFixed(0)} points.`
-          );
-          setTimeout(() => setMessage(null), 5000);
-        } catch (error) {
-          console.error('Error recalculating score:', error);
-          setMessage(`${supplement.name} added to recipe.`);
-          setTimeout(() => setMessage(null), 3000);
-        }
-      }
-    }
-  }, [modifiedRecipe, vettedRecipe, recipe, activePetId, pets, scoreForQueryPet, animateScoreChange]);
+  }, [modifiedRecipe, vettedRecipe, recipe]);
 
   const handleAddBuiltInSupplement = useCallback(
     (supplementItem: any) => {
@@ -1007,18 +1037,30 @@ export default function RecipeDetailPage() {
     ingredientShoppingItems,
     supplementShoppingItems,
     allShoppingItems,
+    pricingIngredients,
     mealEstimate,
   } = useMemo(() => {
     const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
     if (!baseRecipe) {
-      return { ingredientShoppingItems: [], supplementShoppingItems: [], allShoppingItems: [], mealEstimate: null };
+      return {
+        ingredientShoppingItems: [],
+        supplementShoppingItems: [],
+        allShoppingItems: [],
+        pricingIngredients: [],
+        mealEstimate: null,
+      };
     }
 
     const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
+    const filteredIngredients = allIngredients.filter((ing: any) => {
+      const key = getIngredientKey(ing);
+      if (!key) return true;
+      return !removedIngredientKeys.has(key);
+    });
 
-    const supplementCategories = new Set(['Supplement', 'Oil']);
+    const supplementCategories = new Set(['Supplement']);
 
-    const ingredientsEnrichedWithLinks = allIngredients.map((ing: any) => {
+    const ingredientsEnrichedWithLinks = filteredIngredients.map((ing: any) => {
       const existingLink = ing?.asinLink || ing?.amazonLink;
       const rawName = typeof ing?.name === 'string' ? ing.name : '';
 
@@ -1046,19 +1088,21 @@ export default function RecipeDetailPage() {
     });
 
     const isSupplementLike = (ing: any) => {
-      const id = typeof ing?.id === 'string' ? ing.id : '';
+      const id = typeof ing?.id === 'string' ? ing.id : getIngredientKey(ing);
       if (id.startsWith('supplement-')) {
-        return false;
+        return true;
       }
       const cat = typeof ing?.__productCategory === 'string' ? ing.__productCategory : '';
       return supplementCategories.has(cat);
     };
 
-    const ingredientCandidates = ingredientsEnrichedWithLinks.filter((ing: any) => !isSupplementLike(ing));
+    const ingredientCandidates = ingredientsEnrichedWithLinks;
     const supplementCandidates = ingredientsEnrichedWithLinks.filter((ing: any) => isSupplementLike(ing));
+    const pricingCandidates = ingredientsEnrichedWithLinks.filter((ing: any) => !isSupplementLike(ing));
+    const estimateCandidates = pricingCandidates;
 
-    const ingredientItems = ingredientCandidates.map((ing: any) => ({
-      id: ing.id,
+    const ingredientItems = ingredientCandidates.map((ing: any, index: number) => ({
+      id: getIngredientKey(ing) || `ingredient-${index}`,
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
@@ -1067,8 +1111,18 @@ export default function RecipeDetailPage() {
         ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'ingredient')),
     }));
 
-    const supplementItems = supplementCandidates.map((ing: any) => ({
-      id: ing.id,
+    const estimateItems = estimateCandidates.map((ing: any, index: number) => ({
+      id: getIngredientKey(ing) || `estimate-${index}`,
+      name: ing.name,
+      amount: ing.amount || '',
+      asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
+      amazonSearchUrl:
+        ing.amazonSearchUrl ||
+        ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'ingredient')),
+    }));
+
+    const supplementItems = supplementCandidates.map((ing: any, index: number) => ({
+      id: getIngredientKey(ing) || `supplement-${index}`,
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
@@ -1077,12 +1131,12 @@ export default function RecipeDetailPage() {
         ensureSellerId(buildAmazonSearchUrl(typeof ing?.name === 'string' ? ing.name : 'supplement')),
     }));
 
-    const shoppingItems = [...ingredientItems, ...supplementItems];
+    const shoppingItems = ingredientItems;
 
     let estimate = null;
-    if (ingredientItems.length > 0) {
+    if (estimateItems.length > 0) {
       try {
-        const shoppingListItems = ingredientItems.map((item: any) => {
+        const shoppingListItems = estimateItems.map((item: any) => {
           const itemName = typeof item?.name === 'string' ? item.name : '';
           const genericName = itemName ? getGenericIngredientName(itemName) || itemName.toLowerCase() : '';
           const vettedProduct = genericName ? getVettedProduct(genericName, (baseRecipe as any)?.category) : undefined;
@@ -1095,21 +1149,11 @@ export default function RecipeDetailPage() {
           };
         });
 
-        const servingsRaw = (baseRecipe as any)?.servings;
-        const servingsParsed =
-          typeof servingsRaw === 'number'
-            ? servingsRaw
-            : typeof servingsRaw === 'string'
-              ? parseFloat(servingsRaw)
-              : NaN;
-        const servings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
-
         const rawEstimate = calculateMealsFromGroceryList(
           shoppingListItems,
           undefined,
           (baseRecipe as any)?.category,
-          true,
-          servings
+          true
         );
 
         if (rawEstimate) {
@@ -1133,9 +1177,15 @@ export default function RecipeDetailPage() {
       ingredientShoppingItems: ingredientItems,
       supplementShoppingItems: supplementItems,
       allShoppingItems: shoppingItems,
+      pricingIngredients: pricingCandidates.map((ing: any, index: number) => ({
+        id: getIngredientKey(ing) || `pricing-${index}`,
+        name: ing.name,
+        amount: ing.amount || '',
+        category: typeof ing?.__productCategory === 'string' ? ing.__productCategory : undefined,
+      })),
       mealEstimate: estimate,
     };
-  }, [vettedRecipe, recipe, modifiedRecipe]);
+  }, [vettedRecipe, recipe, modifiedRecipe, removedIngredientKeys]);
 
   const supplementTotalCost = useMemo(() => {
     if (!Array.isArray(supplementShoppingItems) || supplementShoppingItems.length === 0) return 0;
@@ -1175,6 +1225,46 @@ export default function RecipeDetailPage() {
     };
   }, [mealEstimate, supplementTotalCost]);
 
+  const costComparisonCacheKey = useMemo(() => {
+    const recipeId = String((recipe as any)?.id || id || '');
+    if (!recipeId) return null;
+    const petId = String(activePetId || 'none');
+    return `pet:${petId}:recipe:${recipeId}`;
+  }, [activePetId, id, recipe]);
+
+  const shouldPersistCostComparisonCache = !hasLocalEdits;
+
+  const costComparisonStorageKey = useMemo(() => {
+    if (!costComparisonCacheKey) return null;
+    return `costComparison:${costComparisonCacheKey}`;
+  }, [costComparisonCacheKey]);
+
+  const originalCostComparisonCacheRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!costComparisonStorageKey) return;
+
+    try {
+      originalCostComparisonCacheRef.current = window.sessionStorage.getItem(costComparisonStorageKey);
+    } catch {
+      originalCostComparisonCacheRef.current = null;
+    }
+
+    return () => {
+      try {
+        const raw = originalCostComparisonCacheRef.current;
+        if (raw == null) {
+          window.sessionStorage.removeItem(costComparisonStorageKey);
+        } else {
+          window.sessionStorage.setItem(costComparisonStorageKey, raw);
+        }
+      } catch {
+        // ignore
+      }
+    };
+  }, [costComparisonStorageKey]);
+
   const recipeForPricing = useMemo(() => {
     const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
     if (!baseRecipe) return null;
@@ -1190,9 +1280,10 @@ export default function RecipeDetailPage() {
 
     return {
       ...baseRecipe,
+      ingredients: pricingIngredients,
       servings,
     } as any;
-  }, [modifiedRecipe, recipe, vettedRecipe]);
+  }, [modifiedRecipe, pricingIngredients, recipe, vettedRecipe]);
 
   const { pricingByRecipeId: apiPricingById } = useRecipePricing(recipeForPricing ? [recipeForPricing as any] : null);
   const apiPricing = recipeForPricing ? apiPricingById?.[String((recipeForPricing as any)?.id || '')] : null;
@@ -1200,31 +1291,7 @@ export default function RecipeDetailPage() {
   const canonicalCostPerMeal =
     typeof apiCostPerMeal === 'number' && Number.isFinite(apiCostPerMeal) && apiCostPerMeal > 0 ? apiCostPerMeal : null;
 
-  const supplementCostPerMealAddon = useMemo(() => {
-    if (!supplementTotalCost || !Number.isFinite(supplementTotalCost) || supplementTotalCost <= 0) return 0;
-
-    const estimateMealsRaw = mealEstimate?.estimatedMeals;
-    const servingsRaw = (recipeForPricing as any)?.servings;
-
-    const baseDenom =
-      typeof estimateMealsRaw === 'number' && Number.isFinite(estimateMealsRaw) && estimateMealsRaw > 0
-        ? estimateMealsRaw
-        : typeof servingsRaw === 'number' && Number.isFinite(servingsRaw) && servingsRaw > 0
-          ? servingsRaw
-          : 1;
-
-    const denom = Math.max(1, Math.floor(baseDenom));
-    return supplementTotalCost / denom;
-  }, [mealEstimate?.estimatedMeals, recipeForPricing, supplementTotalCost]);
-
-  const effectiveCostPerMeal = useMemo(() => {
-    if (!canonicalCostPerMeal) return null;
-    const addon = Number.isFinite(supplementCostPerMealAddon) && supplementCostPerMealAddon > 0 ? supplementCostPerMealAddon : 0;
-    const combined = canonicalCostPerMeal + addon;
-    return Number.isFinite(combined) && combined > 0 ? combined : canonicalCostPerMeal;
-  }, [canonicalCostPerMeal, supplementCostPerMealAddon]);
-
-  const shouldUsePackageEstimateForCostComparison = !canonicalCostPerMeal;
+  const shouldUsePackageEstimateForCostComparison = true;
 
   if (isLoading) {
     return (
@@ -1318,7 +1385,8 @@ export default function RecipeDetailPage() {
                         }
                         setIsScoreModalOpen(true);
                       }}
-                      className="group w-full rounded-2xl border-2 border-orange-500/40 bg-surface-lighter px-[14px] pt-5 pb-[25px] shadow-md hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background group-hover:shadow-orange-500/40 group-hover:ring-2 group-hover:ring-orange-400/80 group-hover:ring-offset-2 group-hover:ring-offset-background"
+                      className="group w-full rounded-2xl border-2 border-orange-500/40 px-[14px] pt-5 pb-[25px] shadow-md hover:border-orange-400/80 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background group-hover:shadow-orange-500/40 group-hover:ring-2 group-hover:ring-orange-400/80 group-hover:ring-offset-2 group-hover:ring-offset-background"
+                      style={{ background: 'linear-gradient(to bottom, rgb(10, 30, 20), rgb(15, 35, 25))' }}
                     >
                       <div className="flex items-center justify-center relative">
                         <div className="relative">
@@ -1391,6 +1459,17 @@ export default function RecipeDetailPage() {
               {activeTab === 'ingredients' && (
                 <div className="relative space-y-6">
                   <div ref={ingredientsTopRef} />
+                  {hasLocalEdits ? (
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={handleResetLocalEdits}
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-surface-highlight text-gray-200 border border-surface-highlight hover:border-orange-500/60 hover:text-orange-200 transition-colors"
+                      >
+                        Reset changes
+                      </button>
+                    </div>
+                  ) : null}
                   {hopAddedLabel && (
                     <div className="pointer-events-none relative">
                       <div className="hop-toast">
@@ -1435,6 +1514,7 @@ export default function RecipeDetailPage() {
                         recipeName={recipe.name}
                         userId={userId}
                         showHeader={false}
+                        onRemoveIngredient={handleRemoveIngredient}
                       />
                     </>
                   ) : (
@@ -1537,26 +1617,20 @@ export default function RecipeDetailPage() {
                       totalCost={costComparisonEstimate.totalCost}
                       estimatedMeals={costComparisonEstimate.estimatedMeals}
                       exceedsBudget={costComparisonEstimate.exceedsBudget}
-                    />
-                  ) : effectiveCostPerMeal ? (
-                    <CostComparison
-                      costPerMeal={effectiveCostPerMeal}
-                      pricingSource={apiPricing?.pricingSource}
-                      asOf={apiPricing?.asOf}
-                      missingIngredientCount={
-                        Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0
-                      }
-                      isComplete={apiPricing?.isComplete}
+                      cacheKey={shouldPersistCostComparisonCache ? (costComparisonCacheKey || undefined) : undefined}
                     />
                   ) : canonicalCostPerMeal ? (
                     <CostComparison
                       costPerMeal={canonicalCostPerMeal}
+                      totalCost={costComparisonEstimate?.totalCost}
+                      estimatedMeals={costComparisonEstimate?.estimatedMeals}
                       pricingSource={apiPricing?.pricingSource}
                       asOf={apiPricing?.asOf}
                       missingIngredientCount={
                         Array.isArray(apiPricing?.missingIngredientKeys) ? apiPricing?.missingIngredientKeys.length : 0
                       }
                       isComplete={apiPricing?.isComplete}
+                      cacheKey={shouldPersistCostComparisonCache ? (costComparisonCacheKey || undefined) : undefined}
                     />
                   ) : costComparisonEstimate ? (
                     <CostComparison
@@ -1564,6 +1638,7 @@ export default function RecipeDetailPage() {
                       totalCost={costComparisonEstimate.totalCost}
                       estimatedMeals={costComparisonEstimate.estimatedMeals}
                       exceedsBudget={costComparisonEstimate.exceedsBudget}
+                      cacheKey={shouldPersistCostComparisonCache ? (costComparisonCacheKey || undefined) : undefined}
                     />
                   ) : null}
                 </div>

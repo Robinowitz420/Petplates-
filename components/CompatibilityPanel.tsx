@@ -63,7 +63,7 @@ export default function CompatibilityPanel({
         </div>
 
         <div className="flex flex-col items-center gap-2">
-          <CompatibilityRadial score={analysis.score} size={120} strokeWidth={10} label="" />
+          <CompatibilityRadial score={analysis.score} size={115} strokeWidth={10} label="" />
 
           <div className="text-xs opacity-75 mt-2">
             {analysis.score >= 80 && '✓ Excellent match for your pet'}

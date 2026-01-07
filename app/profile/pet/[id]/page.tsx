@@ -14,6 +14,7 @@ import EmojiIcon from '@/components/EmojiIcon';
 import { getPets, savePet } from '@/lib/utils/petStorage';
 import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
 import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
+import { calculateMealsFromGroceryList, type ShoppingListItem } from '@/lib/utils/mealEstimation';
 
 import ScoringProgress from '@/components/ScoringProgress';
 
@@ -68,6 +69,7 @@ export default function RecommendedRecipesPage() {
   const lastGeneratedPetIdRef = useRef<string | null>(null);
   const petId = params.id as string;
   const [regenerateNonce, setRegenerateNonce] = useState(0);
+  const [sortBy, setSortBy] = useState<'compatibility' | 'cheapest'>('compatibility');
   const [hasAgreedToDisclaimer, setHasAgreedToDisclaimer] = useState(false);
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
 
@@ -228,6 +230,7 @@ export default function RecommendedRecipesPage() {
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
           body: JSON.stringify({
+            petId: pet.id,
             species: pet.type,
             count: 18,
             petProfile: {
@@ -382,6 +385,107 @@ export default function RecommendedRecipesPage() {
 
   const { pricingByRecipeId: apiPricingById } = useRecipePricing(recipesForPricing.length > 0 ? recipesForPricing : null);
 
+  const packageEstimateByRecipeId = useMemo(() => {
+    if (!Array.isArray(mealsToRender) || mealsToRender.length === 0) return {};
+
+    const map: Record<
+      string,
+      {
+        costPerMeal: number;
+        totalCost: number;
+        estimatedMeals: number;
+      }
+    > = {};
+
+    for (const meal of mealsToRender) {
+      const recipe = (meal as any)?.recipe;
+      const recipeId = recipe?.id;
+      if (!recipeId) continue;
+
+      const shoppingListRaw = Array.isArray((meal as any)?.shoppingList) ? ((meal as any)?.shoppingList as ShoppingListItem[]) : null;
+
+      const itemsSource =
+        shoppingListRaw && shoppingListRaw.length > 0
+          ? shoppingListRaw
+          : Array.isArray(recipe?.ingredients)
+            ? (recipe?.ingredients as any[])
+            : [];
+
+      const isSupplementLike = (item: any) => {
+        const id = typeof item?.id === 'string' ? item.id : '';
+        if (id.startsWith('supplement-')) return true;
+        const category = typeof item?.category === 'string' ? item.category : '';
+        return category.toLowerCase() === 'supplement';
+      };
+
+      const normalizedItems = itemsSource
+        .map((item: any, idx: number) => {
+          const name = typeof item?.name === 'string' ? item.name : '';
+          const amount = typeof item?.amount === 'string' ? item.amount : '';
+          if (!name || !amount) return null;
+          return {
+            id: String(item?.id || `${recipeId}-item-${idx}`),
+            name,
+            amount,
+            category: typeof item?.category === 'string' ? item.category : undefined,
+          };
+        })
+        .filter(Boolean)
+        .filter((item: any) => !isSupplementLike(item)) as ShoppingListItem[];
+
+      if (normalizedItems.length === 0) continue;
+
+      try {
+        const estimate = calculateMealsFromGroceryList(
+          normalizedItems,
+          undefined,
+          recipe?.category,
+          true
+        );
+        if (estimate && Number.isFinite(estimate.costPerMeal) && estimate.costPerMeal > 0) {
+          map[recipeId] = {
+            costPerMeal: estimate.costPerMeal,
+            totalCost: estimate.totalCost,
+            estimatedMeals: estimate.estimatedMeals,
+          };
+        }
+      } catch (error) {
+        console.error('[profile/pet/[id]] Failed to compute package estimate for recipe', recipeId, error);
+      }
+    }
+
+    return map;
+  }, [mealsToRender]);
+
+  const costComparisonCachedByRecipeId = useMemo(() => {
+    if (typeof window === 'undefined') return {} as Record<string, number>;
+
+    const map: Record<string, number> = {};
+    const petKey = String(petId || 'none');
+
+    for (const meal of mealsToRender) {
+      const recipe = (meal as any)?.recipe;
+      const recipeId = recipe?.id;
+      if (!recipeId) continue;
+
+      const cacheKey = `costComparison:pet:${petKey}:recipe:${String(recipeId)}`;
+
+      try {
+        const raw = window.sessionStorage.getItem(cacheKey);
+        if (!raw) continue;
+        const parsed = JSON.parse(raw);
+        const cost = typeof parsed?.costPerMeal === 'number' ? parsed.costPerMeal : NaN;
+        if (Number.isFinite(cost) && cost > 0) {
+          map[String(recipeId)] = cost;
+        }
+      } catch {
+        // ignore invalid cache
+      }
+    }
+
+    return map;
+  }, [mealsToRender, petId]);
+
   const handleRegenerate = () => {
     if (!hasAgreedToDisclaimer) return;
     if (typeof window !== 'undefined') {
@@ -415,18 +519,67 @@ export default function RecommendedRecipesPage() {
   );
 
   const sortedMealsToRender = useMemo(() => {
-    return [...scoredMeals].sort((a: any, b: any) => {
-      const aScore = ('score' in a && typeof a.score === 'number') ? a.score : 0;
-      const bScore = ('score' in b && typeof b.score === 'number') ? b.score : 0;
-      const scoreDiff = bScore - aScore;
-      if (Math.abs(scoreDiff) > 0.001) {
-        return scoreDiff;
+    const list = [...scoredMeals];
+
+    const getScore = (item: any) => {
+      const raw = 'score' in item && typeof item.score === 'number' ? (item.score as number) : 0;
+      return Number.isFinite(raw) ? raw : 0;
+    };
+
+    const getResolvedCost = (item: any) => {
+      const recipeId = String(item?.recipe?.id || '');
+      if (!recipeId) return null;
+
+      const cached = costComparisonCachedByRecipeId[recipeId];
+      if (typeof cached === 'number' && Number.isFinite(cached) && cached > 0) return cached;
+
+      const pkg = packageEstimateByRecipeId[recipeId];
+      const pkgCost = pkg?.costPerMeal;
+      if (typeof pkgCost === 'number' && Number.isFinite(pkgCost) && pkgCost > 0) return pkgCost;
+
+      const api = apiPricingById?.[recipeId];
+      const apiCost = api?.costPerMealUsd;
+      if (typeof apiCost === 'number' && Number.isFinite(apiCost) && apiCost > 0) return apiCost;
+
+      return null;
+    };
+
+    list.sort((a: any, b: any) => {
+      const aId = String(a?.recipe?.id || '');
+      const bId = String(b?.recipe?.id || '');
+
+      if (sortBy === 'cheapest') {
+        const aCost = getResolvedCost(a);
+        const bCost = getResolvedCost(b);
+
+        const aHas = typeof aCost === 'number' && Number.isFinite(aCost) && aCost > 0;
+        const bHas = typeof bCost === 'number' && Number.isFinite(bCost) && bCost > 0;
+
+        if (aHas && bHas) {
+          const diff = (aCost as number) - (bCost as number);
+          if (Math.abs(diff) > 0.0001) return diff;
+
+          const scoreDiff = getScore(b) - getScore(a);
+          if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
+
+          return aId.localeCompare(bId);
+        }
+
+        if (aHas && !bHas) return -1;
+        if (!aHas && bHas) return 1;
+
+        const scoreDiff = getScore(b) - getScore(a);
+        if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
+        return aId.localeCompare(bId);
       }
-      const aId = a.recipe?.id || '';
-      const bId = b.recipe?.id || '';
+
+      const scoreDiff = getScore(b) - getScore(a);
+      if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
       return aId.localeCompare(bId);
     });
-  }, [scoredMeals]);
+
+    return list;
+  }, [apiPricingById, costComparisonCachedByRecipeId, packageEstimateByRecipeId, scoredMeals, sortBy]);
 
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
   const [isSaving, setIsSaving] = useState<string | null>(null);
@@ -580,7 +733,7 @@ export default function RecommendedRecipesPage() {
           <div className="flex-1 flex flex-col gap-6 min-w-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div
-                className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 md:translate-x-[200px]"
+                className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 md:translate-x-[300px]"
                 style={{ paddingLeft: 25 }}
               >
                 <AlphabetText text="Sherlock Shells is detecting meals for" size={36} />
@@ -595,7 +748,7 @@ export default function RecommendedRecipesPage() {
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
               <div className="flex flex-col items-center flex-shrink-0 gap-0" style={{ marginLeft: '-60px' }}>
-                <span className="w-48 h-48 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle -translate-y-[15px]">
+                <span className="w-48 h-48 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle -translate-y-[40px]">
                   <Image
                     src={getProfilePictureForPetType(pet.type)}
                     alt={`${petDisplayName} profile`}
@@ -732,132 +885,153 @@ export default function RecommendedRecipesPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...sortedMealsToRender]
-            .sort((a: any, b: any) => {
-              const aScore = 'score' in a && typeof a.score === 'number' ? a.score : 0;
-              const bScore = 'score' in b && typeof b.score === 'number' ? b.score : 0;
-              const scoreDiff = bScore - aScore;
-              if (Math.abs(scoreDiff) > 0.001) {
-                return scoreDiff;
-              }
-              const aId = a.recipe?.id || '';
-              const bId = b.recipe?.id || '';
-              return aId.localeCompare(bId);
-            })
-            .slice(0, 18)
-            .map((meal) => {
-              const recipe = (meal as any).recipe;
-              const recipeId = recipe?.id;
-              if (!recipeId) return null;
-
-              const pricing = apiPricingById?.[recipeId];
-              const costText =
-                typeof pricing?.costPerMealUsd === 'number' && Number.isFinite(pricing.costPerMealUsd)
-                  ? `$${pricing.costPerMealUsd.toFixed(2)} Per Meal`
-                  : null;
-              const mealsText = null;
-
-              const provenanceLabel = (() => {
-                const source = pricing?.pricingSource;
-                if (!source || source === 'none') return null;
-                if (source === 'snapshot') return 'Snapshot';
-                if (source === 'estimate') return null;
-                return 'Mixed';
-              })();
-
+        <div className="mb-6 flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-4">
+          <AlphabetText text="Sort" size={30} className="text-orange-300 drop-shadow-sm" />
+          <div className="inline-flex rounded-2xl border border-surface-highlight bg-surface-highlight/40 p-1">
+            {([
+              { value: 'compatibility', label: 'Compatibility' },
+              { value: 'cheapest', label: 'Cheapest' },
+            ] as const).map((option) => {
+              const isActive = sortBy === option.value;
               return (
-                <Link
-                  key={recipeId}
-                  href={`/recipe/${recipeId}?petId=${petId}`}
-                  className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-2xl"
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipe));
-                    }
-                  }}
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setSortBy(option.value)}
+                  className={`group inline-flex items-center rounded-2xl px-4 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 transition ${
+                    isActive
+                      ? 'bg-orange-500/20 border border-orange-400 text-orange-200 shadow-[0_0_15px_rgba(251,146,60,0.45)]'
+                      : 'border border-transparent text-gray-400 hover:text-orange-200'
+                  }`}
+                  aria-pressed={isActive}
                 >
-                  <div className="relative">
-                    <div
-                      className="bg-surface rounded-2xl shadow-md border-2 border-orange-500/40 overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-400/80 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col group-hover:shadow-orange-500/40 group-hover:ring-2 group-hover:ring-orange-400/80 group-hover:ring-offset-2 group-hover:ring-offset-background"
-                    >
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="mb-3">
-                          <h3 className="text-xl font-bold text-foreground text-center">
-                            <AlphabetText text={recipe.name} size={28} />
-                          </h3>
-                          <div className="mt-3 flex justify-center">
-                            {costText ? (
-                              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
-                                <span className="text-white">{costText}</span>
-                                {provenanceLabel ? (
-                                  <span className="text-gray-300">• {provenanceLabel}</span>
-                                ) : null}
-                                {mealsText ? (
-                                  <span className="text-gray-300">• Est. meals: {mealsText}</span>
-                                ) : null}
-                              </div>
-                            ) : (
-                              <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-surface-highlight border border-white/10 text-xs font-semibold text-gray-300">
-                                Pricing unavailable
-                              </div>
-                            )}
-                          </div>
+                  <AlphabetText text={option.label} size={22} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                          {scoringPet && (
-                            <div className="mt-4 flex flex-col items-center gap-2">
-                              {(() => {
-                                const score =
-                                  'score' in (meal as any) && typeof (meal as any).score === 'number'
-                                    ? ((meal as any).score as number)
-                                    : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
-                                return (
-                                  <div>
-                                    <CompatibilityRadial score={score} size={140} />
-                                  </div>
-                                );
-                              })()}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedMealsToRender.slice(0, 18).map((meal) => {
+            const recipe = (meal as any).recipe;
+            const recipeId = recipe?.id;
+            if (!recipeId) return null;
+
+            const pricing = apiPricingById?.[recipeId];
+            const packageEstimate = packageEstimateByRecipeId[recipeId];
+            const cachedCostPerMeal = costComparisonCachedByRecipeId[recipeId];
+
+            const resolvedCostPerMeal =
+              typeof cachedCostPerMeal === 'number' && Number.isFinite(cachedCostPerMeal) && cachedCostPerMeal > 0
+                ? cachedCostPerMeal
+                : packageEstimate
+                  ? packageEstimate.costPerMeal
+                  : typeof pricing?.costPerMealUsd === 'number' && Number.isFinite(pricing.costPerMealUsd)
+                    ? pricing.costPerMealUsd
+                    : null;
+
+            const costText = resolvedCostPerMeal ? `$${resolvedCostPerMeal.toFixed(2)} Per Meal` : null;
+            const mealsText = packageEstimate ? String(packageEstimate.estimatedMeals) : null;
+
+            const provenanceLabel = (() => {
+              if (typeof cachedCostPerMeal === 'number' && Number.isFinite(cachedCostPerMeal) && cachedCostPerMeal > 0) {
+                return 'Recipe';
+              }
+              if (packageEstimate) {
+                return 'Package';
+              }
+              const source = pricing?.pricingSource;
+              if (!source || source === 'none') return null;
+              if (source === 'snapshot') return 'Snapshot';
+              if (source === 'estimate') return null;
+              return 'Mixed';
+            })();
+
+            return (
+              <Link
+                key={recipeId}
+                href={`/recipe/${recipeId}?petId=${petId}`}
+                className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-2xl"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipe));
+                  }
+                }}
+              >
+                <div className="relative">
+                  <div
+                    className="bg-surface rounded-2xl shadow-md border-2 border-orange-500/40 overflow-hidden cursor-pointer hover:shadow-xl hover:border-orange-400/80 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 ease-out h-full flex flex-col group-hover:shadow-orange-500/40 group-hover:ring-2 group-hover:ring-orange-400/80 group-hover:ring-offset-2 group-hover:ring-offset-background"
+                  >
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="mb-3">
+                        <h3 className="text-xl font-bold text-foreground text-center">
+                          <AlphabetText text={recipe.name} size={28} />
+                        </h3>
+                        <div className="mt-3 flex justify-center">
+                          {costText ? (
+                            <div
+                              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200"
+                            >
+                              <span className="text-white">{costText}</span>
+                              {provenanceLabel ? (
+                                <span className="text-gray-300">• {provenanceLabel}</span>
+                              ) : null}
+                              {mealsText ? (
+                                <span className="text-gray-300">• Est. meals: {mealsText}</span>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <div
+                              className="inline-flex items-center px-3 py-1.5 rounded-full bg-surface-highlight border border-white/10 text-xs font-semibold text-gray-300"
+                            >
+                              Pricing unavailable
                             </div>
                           )}
                         </div>
 
-                        <div className="mt-auto pt-4">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSaveRecipe(recipeId, recipe.name);
-                            }}
-                            disabled={savedRecipeIds.has(recipeId) || isSaving === recipeId}
-                            className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
-                            aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
-                          >
-                            <span className="relative h-12 w-full overflow-hidden rounded-2xl">
-                              <Image
-                                src={
-                                  savedRecipeIds.has(recipeId)
-                                    ? '/images/Buttons/MealSaved.png'
-                                    : '/images/Buttons/SaveMeal.png'
-                                }
-                                alt={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
-                                fill
-                                sizes="100vw"
-                                className="object-contain"
-                                unoptimized
-                              />
-                            </span>
-                            <span className="sr-only">
-                              {savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
-                            </span>
-                          </button>
-                        </div>
+                        {scoringPet && (
+                          <div className="mt-4 flex flex-col items-center gap-2">
+                            {(() => {
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSaveRecipe(recipeId, recipe.name);
+                          }}
+                          disabled={savedRecipeIds.has(recipeId) || isSaving === recipeId}
+                          className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
+                          aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
+                        >
+                          <span className="relative h-12 w-full overflow-hidden rounded-2xl">
+                            <Image
+                              src={
+                                savedRecipeIds.has(recipeId)
+                                  ? '/images/Buttons/MealSaved.png'
+                                  : '/images/Buttons/SaveMeal.png'
+                              }
+                              alt={
+                                savedRecipeIds.has(recipeId)
+                                  ? 'Meal Harvested'
+                                  : 'Harvest Meal'
+                              }
+                              fill
+                              sizes="100vw"
+                              className="object-contain"
+                              unoptimized
+                            />
+                          </span>
+                          <span className="sr-only">
+                            {savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
+                          </span>
+                        </button>
                       </div>
                     </div>
                   </div>
-                </Link>
-              );
-            })}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

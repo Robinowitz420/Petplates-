@@ -74,7 +74,7 @@ export function CompatibilityRadial({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative inline-flex items-center justify-center rounded-full bg-surface/40 p-3">
+      <div className="relative inline-flex items-center justify-center rounded-full bg-surface/40 p-3 border-4 border-orange-400">
         <div className="relative" style={{ width: size, height: size }}>
           <svg width={size} height={size} className="relative">
             <defs>
@@ -163,7 +163,7 @@ export function CompatibilityRadial({
           </svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`font-bold ${baseTextClass} ${computedSizeClass}`}>{displayScore}</span>
+            <span className={`font-bold ${baseTextClass} ${computedSizeClass}`}>{displayScore}%</span>
             {label ? (
               <span className="text-[10px] uppercase tracking-wide text-gray-400">{label}</span>
             ) : null}

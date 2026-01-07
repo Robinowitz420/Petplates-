@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { ShoppingCart, CheckCircle } from 'lucide-react';
+import { ShoppingCart, CheckCircle, X } from 'lucide-react';
 import { addPurchase } from '@/lib/utils/purchaseTracking';
 import { useVillageStore } from '@/lib/state/villageStore';
 import { getButtonCopy, trackButtonClick, type ButtonCopyVariant } from '@/lib/utils/abTesting';
@@ -26,6 +26,7 @@ interface ShoppingListProps {
   totalGrams?: number;
   recommendedServingGrams?: number;
   showHeader?: boolean;
+  onRemoveIngredient?: (ingredientId: string) => void;
 }
 
 // Helper to get generic ingredient name
@@ -44,7 +45,8 @@ function getGenericIngredientName(name: string): string {
 export function ShoppingList({ 
   ingredients, 
   userId,
-  showHeader = true
+  showHeader = true,
+  onRemoveIngredient,
 }: ShoppingListProps) {
   const [isOpening, setIsOpening] = useState(false);
   const [openedCount, setOpenedCount] = useState(0);
@@ -206,6 +208,17 @@ export function ShoppingList({
             </div>
             
             <div className="flex flex-col items-end gap-1">
+              {typeof onRemoveIngredient === 'function' ? (
+                <button
+                  type="button"
+                  onClick={() => onRemoveIngredient(item.id)}
+                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-red-700/40 bg-red-900/20 text-red-200 hover:bg-red-900/30 transition-colors duration-200 text-sm font-semibold whitespace-nowrap"
+                  aria-label={`Remove ${item.genericName}`}
+                >
+                  <X size={16} />
+                  Remove
+                </button>
+              ) : null}
               <a
                 href={item.link}
                 target="_blank"

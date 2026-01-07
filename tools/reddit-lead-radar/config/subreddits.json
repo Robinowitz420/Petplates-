@@ -1,0 +1,117 @@
+{
+  "subreddits": [
+    {
+      "name": "reptiles",
+      "tags": ["allowed_link"],
+      "description": "General reptile care and feeding"
+    },
+    {
+      "name": "BeardedDragons",
+      "tags": ["allowed_link"],
+      "description": "Bearded dragon care and feeding"
+    },
+    {
+      "name": "snakes",
+      "tags": ["allowed_link"],
+      "description": "Snake care and feeding"
+    },
+    {
+      "name": "leopardgeckos",
+      "tags": ["allowed_link"],
+      "description": "Leopard gecko care and feeding"
+    },
+    {
+      "name": "ballpython",
+      "tags": ["allowed_link"],
+      "description": "Ball python care and feeding"
+    },
+    {
+      "name": "parrots",
+      "tags": ["allowed_link"],
+      "description": "Parrot care and feeding"
+    },
+    {
+      "name": "budgies",
+      "tags": ["allowed_link"],
+      "description": "Budgie care and feeding"
+    },
+    {
+      "name": "Conures",
+      "tags": ["allowed_link"],
+      "description": "Conure care and feeding"
+    },
+    {
+      "name": "Cockatiels",
+      "tags": ["allowed_link"],
+      "description": "Cockatiel care and feeding"
+    },
+    {
+      "name": "Rabbits",
+      "tags": ["allowed_link"],
+      "description": "Rabbit care and feeding"
+    },
+    {
+      "name": "guineapigs",
+      "tags": ["allowed_link"],
+      "description": "Guinea pig care and feeding"
+    },
+    {
+      "name": "RATS",
+      "tags": ["allowed_link"],
+      "description": "Rat care and feeding"
+    },
+    {
+      "name": "ferrets",
+      "tags": ["allowed_link"],
+      "description": "Ferret care and feeding"
+    },
+    {
+      "name": "Hedgehog",
+      "tags": ["allowed_link"],
+      "description": "Hedgehog care and feeding"
+    },
+    {
+      "name": "hamsters",
+      "tags": ["allowed_link"],
+      "description": "Hamster care and feeding"
+    },
+    {
+      "name": "chinchilla",
+      "tags": ["allowed_link"],
+      "description": "Chinchilla care and feeding"
+    },
+    {
+      "name": "BackYardChickens",
+      "tags": ["allowed_link"],
+      "description": "Chicken care and feeding"
+    },
+    {
+      "name": "dogs",
+      "tags": ["no_promo"],
+      "description": "Dog care (no promotion allowed)"
+    },
+    {
+      "name": "DogAdvice",
+      "tags": ["no_promo"],
+      "description": "Dog advice (no promotion allowed)"
+    },
+    {
+      "name": "cats",
+      "tags": ["no_promo"],
+      "description": "Cat care (no promotion allowed)"
+    },
+    {
+      "name": "CatAdvice",
+      "tags": ["no_promo"],
+      "description": "Cat advice (no promotion allowed)"
+    },
+    {
+      "name": "AskVet",
+      "tags": ["read_only"],
+      "description": "Veterinary questions (read only, no engagement)"
+    }
+  ],
+  "polling_interval_seconds": 600,
+  "max_posts_per_check": 50,
+  "include_comments": true
+}

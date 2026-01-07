@@ -260,7 +260,7 @@ export default function CustomMealsHistoryPage() {
                     <span className="text-sm font-medium">Compatibility Score</span>
                   </div>
                   <div className="mt-3 flex justify-center">
-                    <CompatibilityRadial score={meal.analysis.score} size={96} strokeWidth={8} label="" />
+                    <CompatibilityRadial score={meal.analysis.score} size={91} strokeWidth={8} label="" />
                   </div>
                 </div>
 

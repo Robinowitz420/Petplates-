@@ -1,0 +1,40 @@
+{
+  "megathreads": [
+    {
+      "subreddit": "dogs",
+      "post_id": "1b8jz8x",
+      "title_keywords": ["weekly", "questions", "q&a", "ask us anything"],
+      "description": "Dogs weekly questions thread"
+    },
+    {
+      "subreddit": "cats",
+      "post_id": "1b8jz8y",
+      "title_keywords": ["weekly", "questions", "q&a"],
+      "description": "Cats weekly questions thread"
+    },
+    {
+      "subreddit": "DogAdvice",
+      "post_id": "1b8jz8z",
+      "title_keywords": ["advice", "questions"],
+      "description": "DogAdvice questions thread"
+    },
+    {
+      "subreddit": "CatAdvice",
+      "post_id": "1b8jz9a",
+      "title_keywords": ["advice", "questions"],
+      "description": "CatAdvice questions thread"
+    }
+  ],
+  "auto_detect": true,
+  "detection_keywords": [
+    "weekly questions",
+    "weekly q&a",
+    "weekly advice",
+    "sticky questions",
+    "pinned questions",
+    "faq thread",
+    "questions thread"
+  ],
+  "min_comments_threshold": 50,
+  "monitoring_interval_minutes": 60
+}

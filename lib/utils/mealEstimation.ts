@@ -4,7 +4,7 @@
  */
 
 import { getPackageSize } from '@/lib/data/packageSizes';
-import { getProductQuantity, getProductByIngredient } from '@/lib/data/product-prices';
+import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
 
 export interface MealEstimate {
   estimatedMeals: number;
@@ -32,6 +32,17 @@ export interface ShoppingListItem {
   amount: string; // Recipe amount (e.g., "200g", "2 tbsp", "1 tsp")
   asinLink?: string;
   category?: string;
+}
+
+function normalizeShoppingIngredientName(name: string): string {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/freeze[- ]dried/gi, '')
+    .replace(/fresh is best/gi, '')
+    .replace(/organic/gi, '')
+    .replace(/premium/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /**
@@ -209,7 +220,7 @@ export function calculateMealsFromGroceryList(
   console.log('[calculateMealsFromGroceryList] ========== Starting calculation ==========');
   console.log('[calculateMealsFromGroceryList] Input shoppingList:', shoppingList);
   console.log('[calculateMealsFromGroceryList] shoppingList.length:', shoppingList?.length);
-  console.log('[calculateMealsFromGroceryList] getProductByIngredient available:', typeof getProductByIngredient !== 'undefined');
+  console.log('[calculateMealsFromGroceryList] preferBudget:', preferBudget);
   
   const breakdown: MealEstimate['breakdown'] = [];
   const notes: string[] = [];
@@ -230,27 +241,27 @@ export function calculateMealsFromGroceryList(
   for (let i = 0; i < shoppingList.length; i++) {
     const item = shoppingList[i];
     console.log(`[calculateMealsFromGroceryList] Processing item ${i + 1}/${shoppingList.length}:`, item);
+
+    const ingredientNameNormalized = normalizeShoppingIngredientName(item.name);
     
-    const ingredientNameLower = item.name.toLowerCase();
-    
-    // Try to get product data from product-prices.json first
     let packageSizeGrams = 0;
     let itemCost = 0;
     let priceSource = 'package-estimate';
-    
-    const product = getProductByIngredient(ingredientNameLower);
-    if (product) {
-      // Use actual product quantity from Amazon
-      if (product.quantity) {
-        packageSizeGrams = quantityToGrams(product.quantity);
-        console.log(`[calculateMealsFromGroceryList]   ✅ Got quantity from product-prices.json: "${product.quantity}" = ${packageSizeGrams}g`);
-      }
-      
-      // Use actual product price
-      if (product.price?.amount) {
-        itemCost = product.price.amount;
-        priceSource = 'product-prices-json';
-        console.log(`[calculateMealsFromGroceryList]   ✅ Using product-prices.json price: $${itemCost}`);
+
+    const pricing = getIngredientDisplayPricing(ingredientNameNormalized);
+    const packagePrice = Number(pricing?.packagePrice);
+    if (Number.isFinite(packagePrice) && packagePrice > 0) {
+      itemCost = packagePrice;
+      priceSource = pricing?.priceSource || 'package-estimate';
+      console.log(`[calculateMealsFromGroceryList]   ✅ Using display pricing (${priceSource}) price: $${itemCost}`);
+    }
+
+    const quantity = pricing?.quantity;
+    if (quantity) {
+      const gramsFromQuantity = quantityToGrams(quantity);
+      if (gramsFromQuantity > 0) {
+        packageSizeGrams = gramsFromQuantity;
+        console.log(`[calculateMealsFromGroceryList]   ✅ Using display pricing quantity: "${quantity}" = ${packageSizeGrams}g`);
       }
     }
     
@@ -272,11 +283,10 @@ export function calculateMealsFromGroceryList(
     
     // Parse recipe amount to grams
     const parsedBatchGrams = parseAmountToGrams(item.amount);
-    const servings = typeof recipeServings === 'number' && recipeServings > 0 ? recipeServings : 1;
-    const recipeGrams = parsedBatchGrams / servings;
+    const recipeGrams = parsedBatchGrams;
     console.log(`[calculateMealsFromGroceryList]   Recipe amount input: "${item.amount}" (type: ${typeof item.amount})`);
     console.log(`[calculateMealsFromGroceryList]   Recipe grams parsed (batch):`, parsedBatchGrams);
-    console.log(`[calculateMealsFromGroceryList]   Recipe grams per meal (batch/servings=${servings}):`, recipeGrams);
+    console.log(`[calculateMealsFromGroceryList]   Recipe grams per meal (batch):`, recipeGrams);
     
     if (recipeGrams <= 0) {
       console.log(`[calculateMealsFromGroceryList]   ❌ Skipping - invalid recipeGrams:`, recipeGrams);

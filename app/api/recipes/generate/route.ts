@@ -18,6 +18,7 @@ import { getFirebaseAdminDb, getGeneratedRecipesCollectionPath } from '@/lib/ser
 import { type PetType } from '@/lib/utils/petType';
 import { jsonError } from '@/lib/utils/apiResponse';
 import { getUsageLimitsForPlan } from '@/lib/utils/usageLimits';
+import { enforceFindMealsPerPet } from '@/lib/utils/findMealsLimit';
 import { getUserPlanTier } from '@/lib/utils/userPlan';
 import {
   enforceAndIncrementRecipeGenerationMonthly,
@@ -51,6 +52,7 @@ function stripUndefinedDeep<T>(value: T): T {
 }
 
 interface RecipeRequest {
+  petId?: string;
   species?: string;
   count?: number;
   userId?: string;
@@ -417,7 +419,22 @@ export async function POST(request: NextRequest) {
       return jsonError({ code: 'UNAUTHORIZED', message: 'Please sign in to generate meals.', status: 401 });
     }
 
-    const body: RecipeRequest = await request.json();
+    let reqJson: RecipeRequest | null = null;
+    try {
+      reqJson = (await request.json()) as any;
+    } catch {
+      return jsonError({ code: 'INVALID_REQUEST', message: 'Invalid JSON', status: 400 });
+    }
+    if (!reqJson || typeof reqJson !== 'object') {
+      return jsonError({ code: 'INVALID_REQUEST', message: 'Invalid request', status: 400 });
+    }
+
+    const body: RecipeRequest = reqJson as RecipeRequest;
+    const petId = typeof body.petId === 'string' ? body.petId.trim() : '';
+    if (!petId) {
+      return jsonError({ code: 'INVALID_REQUEST', message: 'petId is required', status: 400 });
+    }
+
     const species = normalizeRequestSpecies(body.species);
     const { petProfile } = body;
     const userId = authedUserId;
@@ -425,6 +442,17 @@ export async function POST(request: NextRequest) {
     const db = getFirebaseAdminDb();
     const planTier = await getUserPlanTier(db as any, userId);
     const limits = getUsageLimitsForPlan(planTier);
+
+    if (planTier === 'free') {
+      const perPetLimitResult = await enforceFindMealsPerPet(db as any, userId, petId, 3);
+      if (perPetLimitResult.ok === false) {
+        return jsonError({
+          code: perPetLimitResult.code,
+          message: perPetLimitResult.message,
+          status: perPetLimitResult.status,
+        });
+      }
+    }
     const nowMs = Date.now();
 
     const rl = await enforceRecipeGenerationRateLimit(db as any, userId, nowMs);

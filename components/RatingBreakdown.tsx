@@ -51,7 +51,7 @@ export const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
       {/* Overall Score */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
         <div className="flex flex-col items-center gap-2">
-          <CompatibilityRadial score={rating.overallScore} size={140} strokeWidth={10} label="Overall" />
+          <CompatibilityRadial score={rating.overallScore} size={135} strokeWidth={10} label="Overall" />
           <p className="text-sm text-gray-600 mt-2 capitalize">{rating.compatibility} match for your pet</p>
         </div>
       </div>

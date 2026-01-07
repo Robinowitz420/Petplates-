@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit Lead Radar - Paws & Plates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'rgb(var(--background-start-rgb))',
+                        foreground: 'rgb(var(--foreground-rgb))',
+                        'dark-green': '#0f2c0f',
+                        surface: {
+                            DEFAULT: '#143424',
+                            highlight: '#1e4a36',
+                            lighter: '#2a6148',
+                        },
+                        primary: {
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        },
+                        secondary: {
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    },
+                    backgroundImage: {
+                        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+                        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --foreground-rgb: 240, 240, 240;
+            --background-start-rgb: 10, 30, 20;
+            --background-end-rgb: 15, 35, 25;
+        }
+
+        body {
+            color: rgb(var(--foreground-rgb));
+            background: linear-gradient(
+                to bottom,
+                rgb(var(--background-start-rgb)),
+                rgb(var(--background-end-rgb))
+            );
+        }
+
+        .lead-card {
+            transition: all 0.2s ease;
+        }
+        .lead-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.2);
+        }
+        .score-high { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .score-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .score-low { background: linear-gradient(135deg, #6b7280, #4b5563); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-surface rounded-xl shadow-lg p-6 mb-8 border border-surface-highlight">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-foreground">Reddit Lead Radar</h1>
+                    <p class="text-gray-300 mt-2">Pet feeding help opportunities from Reddit</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-secondary-500" id="leadCount">0</div>
+                    <div class="text-sm text-gray-400">Active Leads</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-surface rounded-lg shadow p-6 border border-surface-highlight">
+                <div class="flex items-center">
+                    <div class="text-2xl">📊</div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-400">Total Scanned</div>
+                        <div class="text-2xl font-bold text-foreground" id="totalScanned">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-surface rounded-lg shadow p-6 border border-surface-highlight">
+                <div class="flex items-center">
+                    <div class="text-2xl">🎯</div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-400">High-Intent</div>
+                        <div class="text-2xl font-bold text-secondary-500" id="highIntent">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-surface rounded-lg shadow p-6 border border-surface-highlight">
+                <div class="flex items-center">
+                    <div class="text-2xl">🚨</div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-400">Emergencies</div>
+                        <div class="text-2xl font-bold text-red-500" id="emergencies">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-surface rounded-lg shadow p-6 border border-surface-highlight">
+                <div class="flex items-center">
+                    <div class="text-2xl">⏰</div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-400">Last Update</div>
+                        <div class="text-lg font-bold text-foreground" id="lastUpdate">Never</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-surface rounded-lg shadow p-6 mb-6 border border-surface-highlight">
+            <div class="flex flex-wrap gap-4 items-center">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Species</label>
+                    <select id="speciesFilter" class="bg-surface-highlight border border-surface-highlight text-foreground rounded-md px-3 py-2 focus:border-secondary-500 focus:ring-1 focus:ring-secondary-500">
+                        <option value="">All Species</option>
+                        <option value="dogs">Dogs</option>
+                        <option value="cats">Cats</option>
+                        <option value="birds">Birds</option>
+                        <option value="reptiles">Reptiles</option>
+                        <option value="pocket_pets">Pocket Pets</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Min Score</label>
+                    <select id="scoreFilter" class="bg-surface-highlight border border-surface-highlight text-foreground rounded-md px-3 py-2 focus:border-secondary-500 focus:ring-1 focus:ring-secondary-500">
+                        <option value="0">All Scores</option>
+                        <option value="0.8">High (0.8+)</option>
+                        <option value="0.6">Medium (0.6+)</option>
+                        <option value="0.4">Low (0.4+)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Subreddit</label>
+                    <select id="subredditFilter" class="bg-surface-highlight border border-surface-highlight text-foreground rounded-md px-3 py-2 focus:border-secondary-500 focus:ring-1 focus:ring-secondary-500">
+                        <option value="">All Subreddits</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="refreshBtn" class="bg-secondary-500 text-dark-green px-4 py-2 rounded-md hover:bg-secondary-600 transition-colors font-semibold">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leads Grid -->
+        <div id="leadsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Leads will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-xl font-semibold text-foreground mb-2">No leads found</h3>
+            <p class="text-gray-400">The radar is scanning Reddit for pet feeding opportunities. Check back soon!</p>
+        </div>
+    </div>
+
+    <!-- Lead Detail Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-surface rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-surface-highlight">
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <h2 class="text-xl font-bold text-foreground" id="modalTitle"></h2>
+                        <button id="closeModal" class="text-gray-400 hover:text-gray-300">
+                            <span class="text-2xl">×</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Subreddit:</span>
+                            <span class="ml-2 text-sm text-secondary-500" id="modalSubreddit"></span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Score:</span>
+                            <span class="ml-2 text-sm font-bold text-foreground" id="modalScore"></span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Species:</span>
+                            <span class="ml-2 text-sm text-primary-400" id="modalSpecies"></span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Posted:</span>
+                            <span class="ml-2 text-sm text-gray-300" id="modalTime"></span>
+                        </div>
+
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Original Post:</span>
+                            <p class="mt-2 text-foreground p-3 bg-surface-highlight rounded-lg" id="modalContent"></p>
+                        </div>
+
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Draft Reply:</span>
+                            <div class="mt-2 p-3 bg-surface-highlight border-l-4 border-secondary-500 rounded-r-lg">
+                                <p class="text-secondary-200" id="modalReply"></p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 pt-4">
+                            <a id="viewPostBtn" target="_blank" class="bg-secondary-500 text-dark-green px-4 py-2 rounded-md hover:bg-secondary-600 transition-colors font-semibold">
+                                View on Reddit
+                            </a>
+                            <button id="copyReplyBtn" class="bg-primary-600 text-foreground px-4 py-2 rounded-md hover:bg-primary-700 transition-colors font-semibold">
+                                Copy Reply
+                            </button>
+                            <button id="markReviewedBtn" class="bg-surface-highlight text-foreground px-4 py-2 rounded-md hover:bg-surface border border-surface-highlight transition-colors">
+                                Mark Reviewed
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let leadsData = [];
+        let filteredLeads = [];
+
+        // Load leads data
+        async function loadLeads() {
+            try {
+                const response = await fetch('./lead_queue.json');
+                const data = await response.json();
+                leadsData = data.leads || [];
+                filteredLeads = [...leadsData];
+
+                updateStats();
+                updateFilters();
+                renderLeads();
+            } catch (error) {
+                console.error('Error loading leads:', error);
+                showEmptyState();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('leadCount').textContent = leadsData.length;
+            document.getElementById('totalScanned').textContent = 'N/A'; // Would need to track this
+            document.getElementById('highIntent').textContent = leadsData.filter(l => l.score > 0.8).length;
+            document.getElementById('emergencies').textContent = '0'; // Would need to track this
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        function updateFilters() {
+            // Update subreddit filter options
+            const subreddits = [...new Set(leadsData.map(l => l.subreddit))];
+            const subredditSelect = document.getElementById('subredditFilter');
+
+            // Clear existing options except "All Subreddits"
+            subredditSelect.innerHTML = '<option value="">All Subreddits</option>';
+
+            subreddits.forEach(subreddit => {
+                const option = document.createElement('option');
+                option.value = subreddit;
+                option.textContent = `r/${subreddit}`;
+                subredditSelect.appendChild(option);
+            });
+        }
+
+        function renderLeads() {
+            const container = document.getElementById('leadsContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredLeads.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = '';
+
+            filteredLeads.forEach(lead => {
+                const card = createLeadCard(lead);
+                container.appendChild(card);
+            });
+        }
+
+        function createLeadCard(lead) {
+            const card = document.createElement('div');
+            card.className = 'bg-surface rounded-xl shadow-lg lead-card overflow-hidden border border-surface-highlight';
+
+            const scoreClass = lead.score > 0.8 ? 'score-high' : lead.score > 0.6 ? 'score-medium' : 'score-low';
+
+            card.innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${scoreClass} text-white">
+                                ${lead.score.toFixed(2)}
+                            </span>
+                            <span class="text-xs text-gray-400">r/${lead.subreddit}</span>
+                        </div>
+                        <span class="text-xs text-gray-400">
+                            ${formatTime(lead.created_at)}
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-foreground mb-2 line-clamp-2">
+                        ${lead.title}
+                    </h3>
+
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-500/20 text-primary-400 capitalize">
+                            ${lead.species || 'Unknown'}
+                        </span>
+                        <button class="text-secondary-500 hover:text-secondary-400 text-sm font-medium view-lead-btn"
+                                data-lead-id="${lead.id}">
+                            View Details →
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Add click handler
+            card.querySelector('.view-lead-btn').addEventListener('click', () => {
+                showLeadModal(lead);
+            });
+
+            return card;
+        }
+
+        function showLeadModal(lead) {
+            document.getElementById('modalTitle').textContent = lead.title;
+            document.getElementById('modalSubreddit').textContent = `r/${lead.subreddit}`;
+            document.getElementById('modalScore').textContent = lead.score.toFixed(3);
+            document.getElementById('modalSpecies').textContent = lead.species || 'Unknown';
+            document.getElementById('modalTime').textContent = formatTime(lead.created_at);
+            document.getElementById('modalContent').textContent = lead.content || lead.title;
+            document.getElementById('modalReply').textContent = lead.draft_reply || 'No draft available';
+
+            const viewBtn = document.getElementById('viewPostBtn');
+            viewBtn.href = lead.url || '#';
+
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp * 1000);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = diffMs / (1000 * 60 * 60);
+
+            if (diffHours < 1) {
+                return `${Math.floor(diffMs / (1000 * 60))}m ago`;
+            } else if (diffHours < 24) {
+                return `${Math.floor(diffHours)}h ago`;
+            } else {
+                return `${Math.floor(diffHours / 24)}d ago`;
+            }
+        }
+
+        function showEmptyState() {
+            document.getElementById('leadsContainer').innerHTML = '';
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('speciesFilter').addEventListener('change', filterLeads);
+        document.getElementById('scoreFilter').addEventListener('change', filterLeads);
+        document.getElementById('subredditFilter').addEventListener('change', filterLeads);
+        document.getElementById('refreshBtn').addEventListener('click', loadLeads);
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        document.getElementById('copyReplyBtn').addEventListener('click', () => {
+            const replyText = document.getElementById('modalReply').textContent;
+            navigator.clipboard.writeText(replyText).then(() => {
+                alert('Reply copied to clipboard!');
+            });
+        });
+
+        // Filter functions
+        function filterLeads() {
+            const speciesFilter = document.getElementById('speciesFilter').value;
+            const scoreFilter = parseFloat(document.getElementById('scoreFilter').value) || 0;
+            const subredditFilter = document.getElementById('subredditFilter').value;
+
+            filteredLeads = leadsData.filter(lead => {
+                if (speciesFilter && lead.species !== speciesFilter) return false;
+                if (lead.score < scoreFilter) return false;
+                if (subredditFilter && lead.subreddit !== subredditFilter) return false;
+                return true;
+            });
+
+            renderLeads();
+        }
+
+        // Initialize
+        loadLeads();
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadLeads, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

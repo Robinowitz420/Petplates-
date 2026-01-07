@@ -12,38 +12,65 @@ import MealPrepForAllYourPets from '@/public/images/emojis/Mascots/HeroPics/Meal
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [planTier, setPlanTier] = useState<'free' | 'pro' | null>(null);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (!hasMounted) return;
+
+    let isMounted = true;
+
+    (async () => {
+      try {
+        const res = await fetch('/api/plan');
+        if (!res.ok) return;
+        const json = (await res.json()) as any;
+        const tier = typeof json?.planTier === 'string' ? (json.planTier as string) : '';
+        if (!isMounted) return;
+        if (tier === 'pro' || tier === 'free') {
+          setPlanTier(tier);
+        }
+      } catch {
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasMounted]);
+
   return (
     <nav className="bg-surface border-b border-surface-highlight sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-0.5">
-          <Link href="/" className="flex items-center gap-3 sm:gap-4 -ml-[200px]">
-            <div className="relative flex-shrink-0 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] overflow-visible">
-              <Image
-                src={LogoFinal2}
-                alt="Paws & Plates mascot logo"
-                fill
-                className="object-contain rounded-md scale-[1.6] origin-left"
-                sizes="(min-width: 640px) 192px, 160px"
-                priority
-              />
-            </div>
+          <div className="flex flex-col items-start -ml-[200px]">
+            <Link href="/" className="relative z-10 flex items-center gap-3 sm:gap-4">
+              <div className="relative flex-shrink-0 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] overflow-visible">
+                <Image
+                  src={LogoFinal2}
+                  alt="Paws & Plates mascot logo"
+                  fill
+                  className="object-contain rounded-md scale-[1.6] origin-left pointer-events-none"
+                  sizes="(min-width: 640px) 192px, 160px"
+                  priority
+                />
+              </div>
 
-            <div className="relative flex-shrink-0 w-[140px] h-[36px] sm:w-[182px] sm:h-[48px] translate-x-[100px] sm:translate-x-[100px]">
-              <Image
-                src={MealPrepForAllYourPets}
-                alt="Meal prep for all your pets"
-                fill
-                className="object-contain"
-                sizes="(min-width: 640px) 260px, 200px"
-                priority
-              />
-            </div>
-          </Link>
+              <div className="relative flex-shrink-0 w-[140px] h-[36px] sm:w-[182px] sm:h-[48px] translate-x-[100px] sm:translate-x-[100px]">
+                <Image
+                  src={MealPrepForAllYourPets}
+                  alt="Meal prep for all your pets"
+                  fill
+                  className="object-contain pointer-events-none"
+                  sizes="(min-width: 640px) 260px, 200px"
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
 
           <div className="hidden md:flex items-center space-x-8">
             <Link
@@ -84,7 +111,14 @@ export default function Navigation() {
                 >
                   <AlphabetText text="My Pets" size={32} className="text-gray-300 group-hover:text-orange-400 transition-colors" />
                 </Link>
-                <UserButton afterSignOutUrl="/" />
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: 'w-[42px] h-[42px]',
+                    },
+                  }}
+                />
               </SignedIn>
             ) : null}
             {hasMounted ? (
@@ -154,7 +188,14 @@ export default function Navigation() {
                     <AlphabetText text="My Pets" size={32} />
                   </Link>
                   <div className="mt-2">
-                    <UserButton afterSignOutUrl="/" />
+                    <UserButton
+                      afterSignOutUrl="/"
+                      appearance={{
+                        elements: {
+                          avatarBox: 'w-[42px] h-[42px]',
+                        },
+                      }}
+                    />
                   </div>
                 </SignedIn>
               ) : null}
@@ -172,6 +213,27 @@ export default function Navigation() {
           </div>
         )}
       </div>
+
+      {/* Go Pro Button positioned below the header */}
+      {hasMounted ? (
+        <div className="fixed top-24 z-40" style={{ left: '22px' }}>
+          <Link
+            href="/pricing"
+            className={`inline-flex items-center justify-center rounded-full border-4 border-orange-400 px-6 py-2 text-base font-bold transition-all duration-1000 animate-pulse ${
+              planTier === 'pro'
+                ? 'bg-green-600/15 text-green-200 shadow-lg shadow-green-500/50'
+                : 'bg-orange-500/10 text-orange-200 hover:bg-orange-500/15 shadow-xl shadow-orange-500/60'
+            }`}
+            aria-label={planTier === 'pro' ? 'You are Pro' : 'Go Pro'}
+          >
+            {planTier === 'pro' ? (
+              <AlphabetText text="PRO" size={32} className="text-green-200" />
+            ) : (
+              <AlphabetText text="Go - Pro" size={24} className="text-orange-200" />
+            )}
+          </Link>
+        </div>
+      ) : null}
     </nav>
   );
 }
