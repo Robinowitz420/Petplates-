@@ -814,15 +814,20 @@ export default function RecommendedRecipesPage() {
                   <span className="sr-only">{loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}</span>
                 </button>
 
-                <div className="ml-4 flex items-center">
-                        >
-                          {allergy.replace(/-/g, ' ')}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
-                    )}
-                  </div>
+                <div className="ml-4 flex items-center gap-2 flex-wrap">
+                  {pet.allergies && pet.allergies.length > 0 ? (
+                    pet.allergies.map((allergy) => (
+                      <div
+                        key={allergy}
+                        className="px-2 py-1 rounded bg-surface-highlight text-xs font-semibold text-red-300"
+                      >
+                        {allergy.replace(/-/g, ' ')}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
+                  )}
+                </div>
                 </div>
               </div>
             </div>
@@ -1011,6 +1016,5 @@ export default function RecommendedRecipesPage() {
           })}
         </div>
       </div>
-    </div>
   );
 }
