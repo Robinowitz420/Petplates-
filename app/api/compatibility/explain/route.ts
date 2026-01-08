@@ -64,7 +64,7 @@ function cleanJSON(text: string): string {
 }
 
 async function generateWithModel(params: { apiKey: string; model: string; prompt: string }): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(params.model)}:generateContent`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(params.model)}:generateContent`;
   const resp = await fetch(url, {
     method: 'POST',
     headers: {

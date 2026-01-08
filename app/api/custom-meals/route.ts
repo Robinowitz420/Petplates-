@@ -4,8 +4,6 @@ import { getFirebaseAdminDb } from '@/lib/services/firebaseAdmin';
 import type { CustomMeal } from '@/lib/types';
 import { validateCustomMeal } from '@/lib/validation/petSchema';
 import { jsonError } from '@/lib/utils/apiResponse';
-import { getUsageLimitsForPlan } from '@/lib/utils/usageLimits';
-import { getUserPlanTier } from '@/lib/utils/userPlan';
 import { FieldPath } from 'firebase-admin/firestore';
 
 export const runtime = 'nodejs';
@@ -127,8 +125,6 @@ export async function POST(req: Request) {
     }
 
     const adminDb = getFirebaseAdminDb();
-    const planTier = await getUserPlanTier(adminDb as any, userId);
-    const limits = getUsageLimitsForPlan(planTier);
     const body = await req.json().catch(() => null);
     const rawMeal = body?.customMeal ?? body?.meal;
     if (!rawMeal || typeof rawMeal !== 'object') {
@@ -142,29 +138,12 @@ export async function POST(req: Request) {
     const mealDoc = mealsCol.doc(mealId);
 
     await adminDb.runTransaction(async (tx) => {
-      const existing = await tx.get(mealDoc);
-      const creating = !existing.exists;
-      if (creating) {
-        const mealsSnap = await tx.get(mealsCol);
-        if (mealsSnap.size >= limits.customMeals) {
-          const msg =
-            planTier === 'pro'
-              ? 'You’ve reached the custom meals cap for Pro (fair use).'
-              : 'You’ve reached the Free plan custom meals limit. Upgrade to Pro for Unlimited (fair use).';
-          const err = new Error(msg) as any;
-          err.code = 'LIMIT_REACHED';
-          throw err;
-        }
-      }
       tx.set(mealDoc, JSON.parse(JSON.stringify(validatedMeal)), { merge: true });
     });
 
     return NextResponse.json({ customMeal: validatedMeal }, { status: 200 });
   } catch (err: any) {
     console.error('POST /api/custom-meals failed:', err);
-    if (err?.code === 'LIMIT_REACHED') {
-      return jsonError({ code: 'LIMIT_REACHED', message: String(err.message || 'Limit reached'), status: 403 });
-    }
     const message = err?.message ? String(err.message) : 'Validation failed';
     const status = message.toLowerCase().includes('invalid') || message.toLowerCase().includes('required') ? 400 : 500;
     const code = status === 400 ? 'INVALID_REQUEST' : 'INTERNAL_ERROR';
