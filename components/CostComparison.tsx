@@ -29,7 +29,8 @@ export function CostComparison({
   cacheKey,
 }: CostComparisonProps) {
   const commercialCost = 4.50; // Average commercial pet food per meal
-  const resolvedCostPerMeal =
+  const hasExplicitCostPerMeal = typeof costPerMeal === 'number' && Number.isFinite(costPerMeal) && costPerMeal > 0;
+  const fallbackFromTotals =
     typeof totalCost === 'number' &&
     Number.isFinite(totalCost) &&
     totalCost > 0 &&
@@ -37,7 +38,8 @@ export function CostComparison({
     Number.isFinite(estimatedMeals) &&
     estimatedMeals > 0
       ? totalCost / estimatedMeals
-      : costPerMeal;
+      : null;
+  const resolvedCostPerMeal = hasExplicitCostPerMeal ? costPerMeal : fallbackFromTotals || 0;
 
   const savings = commercialCost - resolvedCostPerMeal;
   const savingsPercent = savings > 0 ? Math.round((savings / commercialCost) * 100) : 0;

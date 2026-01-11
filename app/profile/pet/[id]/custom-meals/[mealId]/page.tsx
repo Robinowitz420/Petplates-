@@ -12,7 +12,7 @@ export default function CustomMealDetailPage() {
   useEffect(() => {
     // Redirect to recipe detail page with petId query parameter
     if (mealId && petId) {
-      router.replace(`/recipe/${mealId}?petId=${petId}`);
+      router.replace(`/custom-recipe/${mealId}?petId=${petId}`);
     }
   }, [mealId, petId, router]);
 

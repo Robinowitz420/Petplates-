@@ -8,6 +8,7 @@
     "clean:next": "node -e \"require('node:fs').rmSync('.next',{recursive:true,force:true})\"",
     "predev": "npm run clean:next",
     "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "prebuild": "npm run clean:next",
     "build": "npm run validate:recipes && next build",
     "typecheck": "tsc --noEmit",

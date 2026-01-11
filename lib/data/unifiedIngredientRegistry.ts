@@ -8,6 +8,15 @@ import { VETTED_SPECIES_MAP } from './vetted-species-map';
 import { ALL_INGREDIENTS } from '../utils/allIngredients';
 import { getFallbackNutrition } from '../utils/nutritionFallbacks';
 
+const EXCLUDED_INGREDIENT_IDS = new Set<string>([
+  'lamb',
+  'ground_lamb',
+  'lamb_liver',
+  'veal',
+  'ground_veal',
+  'veal_liver',
+]);
+
 export type Species = 'dog' | 'cat' | 'bird' | 'reptile' | 'pocket-pet';
 export type IngredientCategory = 'protein' | 'grain' | 'vegetable' | 'fruit' | 'supplement' | 'fat' | 'insect' | 'hay' | 'pellet' | 'seed' | 'nut';
 
@@ -409,6 +418,7 @@ function buildRegistry(): Map<string, UnifiedIngredient> {
   
   // Step 5: Build unified ingredients
   idToNames.forEach((names, id) => {
+    if (EXCLUDED_INGREDIENT_IDS.has(id)) return;
     const nameArray = Array.from(names);
     const primaryName = nameArray[0] || id.replace(/_/g, ' ');
     const unified = buildUnifiedIngredient(id, nameArray, primaryName);

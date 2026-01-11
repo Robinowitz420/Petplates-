@@ -323,7 +323,7 @@ export async function generateRecipesJsonWithFallbackAndPrompt(params: {
   for (const model of models) {
     console.info(`[Gemini] Attempting generation with model: ${model}`);
 
-    const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
     const backoffMs = [0, 2000, 4000];
 

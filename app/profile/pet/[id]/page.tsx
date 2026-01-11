@@ -1,27 +1,26 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import type { ModifiedRecipeResult, Recipe } from '@/lib/types';
 import { applyModifiers } from '@/lib/applyModifiers';
-import { getRandomName } from '@/lib/utils/petUtils';
-import EmojiIcon from '@/components/EmojiIcon';
-
-import { getPets, savePet } from '@/lib/utils/petStorage';
-import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
+import { normalizePetType } from '@/lib/utils/petType';
 import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
+import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
+import { readCachedCompatibilityScore, writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
 import { calculateMealsFromGroceryList, type ShoppingListItem } from '@/lib/utils/mealEstimation';
+import { getPets, savePet } from '@/lib/utils/petStorage';
+import { getRandomName } from '@/lib/utils/petUtils';
 
 import ScoringProgress from '@/components/ScoringProgress';
 
 import AlphabetText from '@/components/AlphabetText';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { getProfilePictureForPetType } from '@/lib/utils/emojiMapping';
-import { normalizePetType } from '@/lib/utils/petType';
 import { scoreWithSpeciesEngine } from '@/lib/utils/speciesScoringEngines';
 import { getPetBadges } from '@/lib/utils/badgeStorage';
 
@@ -51,6 +50,7 @@ interface Pet {
   dislikes?: string[];
   activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
   notes?: string;
+  savedRecipeScores?: Record<string, { overallScore: number; ts: number }>;
 }
 
 export default function RecommendedRecipesPage() {
@@ -59,19 +59,26 @@ export default function RecommendedRecipesPage() {
   const { userId, isLoaded } = useAuth();
   const [pet, setPet] = useState<Pet | null>(null);
 
+  const petId = String((params as any)?.id || '');
+
+  const [saasScoresByRecipeId, setSaasScoresByRecipeId] = useState<Record<string, number>>({});
+  const [saasLoadingByRecipeId, setSaasLoadingByRecipeId] = useState<Record<string, boolean>>({});
+
+  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
+  const [isSaving, setIsSaving] = useState<string | null>(null);
+
   const [hoveredRecipe, setHoveredRecipe] = useState<string | null>(null);
   const [engineMeals, setEngineMeals] = useState<ModifiedRecipeResult[] | null>(null);
   const [engineError, setEngineError] = useState<string | null>(null);
   const [loadingMeals, setLoadingMeals] = useState(true);
   const [cardMessage, setCardMessage] = useState<{ id: string; text: string } | null>(null);
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
-  const generationInFlightRef = useRef(false);
-  const lastGeneratedPetIdRef = useRef<string | null>(null);
-  const petId = params.id as string;
   const [regenerateNonce, setRegenerateNonce] = useState(0);
+
   const [sortBy, setSortBy] = useState<'compatibility' | 'cheapest'>('compatibility');
   const [hasAgreedToDisclaimer, setHasAgreedToDisclaimer] = useState(false);
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
+  const [costCacheRefreshNonce, setCostCacheRefreshNonce] = useState(0);
 
   const formatActivityLevel = (level?: Pet['activityLevel']) => {
     if (!level) return '';
@@ -154,10 +161,15 @@ export default function RecommendedRecipesPage() {
           names: p.names || (p.name ? [p.name] : []),
           savedRecipes: p.savedRecipes || [],
           healthConcerns: p.healthConcerns || [],
+          savedRecipeScores: p.savedRecipeScores || {},
         }));
 
         const foundPet = normalizedPets.find((p: any) => p.id === petId) || null;
         setPet(foundPet);
+
+        if (foundPet) {
+          setSavedRecipeIds(new Set(foundPet.savedRecipes || []));
+        }
 
         if (!foundPet) {
           console.warn('Pet not found with id:', petId);
@@ -186,7 +198,6 @@ export default function RecommendedRecipesPage() {
         localStorage.removeItem(mealsCacheKey);
       } catch {
       }
-      lastGeneratedPetIdRef.current = null;
       setEngineMeals(null);
     }
 
@@ -212,27 +223,19 @@ export default function RecommendedRecipesPage() {
       }
     }
 
-    if (generationInFlightRef.current) return;
-    if (lastGeneratedPetIdRef.current === pet.id && engineMeals && engineMeals.length > 0) return;
-    let isMounted = true;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 90000);
     setLoadingMeals(true);
     setEngineError(null);
     setShowQuotaPopup(false);
-    generationInFlightRef.current = true;
-    lastGeneratedPetIdRef.current = pet.id;
 
     (async () => {
       try {
         const response = await fetch('/api/recipes/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
           body: JSON.stringify({
             petId: pet.id,
             species: pet.type,
-            count: 18,
+            count: 12,
             petProfile: {
               name: petDisplayName,
               breed: pet.breed || undefined,
@@ -250,8 +253,6 @@ export default function RecommendedRecipesPage() {
             },
           }),
         });
-
-        clearTimeout(timeoutId);
 
         if (!response.ok) {
           let friendly = '';
@@ -275,11 +276,8 @@ export default function RecommendedRecipesPage() {
           }
 
           if (errorCode === 'LIMIT_REACHED' || friendly.includes('LIMIT_REACHED')) {
-            if (isMounted) {
-              setEngineError(friendly || 'Free plan limit reached.');
-              setEngineMeals(null);
-            }
-            await refreshFindMealsRemaining(pet.id);
+            setEngineError(friendly || 'Free plan limit reached.');
+            setEngineMeals(null);
             return;
           }
 
@@ -289,8 +287,6 @@ export default function RecommendedRecipesPage() {
         }
 
         const data = await response.json();
-        if (!isMounted) return;
-
         if (data?.recipes && data.recipes.length > 0) {
           const generatedMeals = data.recipes.map((recipe: any) => ({
             recipe,
@@ -313,18 +309,10 @@ export default function RecommendedRecipesPage() {
           throw new Error('No recipes generated');
         }
       } catch (error) {
-        if (!isMounted) return;
-        const isAbortError =
-          (error as any)?.name === 'AbortError' ||
-          (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError');
         const rawMessage = error instanceof Error ? error.message : String(error);
         const isExpectedError = rawMessage.includes('LIMIT_REACHED');
-        if (!isAbortError && !isExpectedError) {
+        if (!isExpectedError) {
           console.error('Recipe generation error:', error);
-        }
-        if (isAbortError) {
-          setEngineError('Meal generation timed out.');
-          setEngineMeals(null);
         }
         const isQuotaClosed =
           rawMessage.includes('Gemini quota is not enabled') ||
@@ -332,7 +320,7 @@ export default function RecommendedRecipesPage() {
           rawMessage.includes('Quota exceeded') ||
           rawMessage.includes('limit: 0');
 
-        if (!isQuotaClosed && !isAbortError) {
+        if (!isQuotaClosed) {
           setEngineError(rawMessage || 'Meal generation failed.');
           setEngineMeals(null);
         }
@@ -344,20 +332,9 @@ export default function RecommendedRecipesPage() {
           setShowQuotaPopup(true);
         }
       } finally {
-        clearTimeout(timeoutId);
-        if (isMounted) {
-          setLoadingMeals(false);
-        }
-        generationInFlightRef.current = false;
+        setLoadingMeals(false);
       }
     })();
-
-    return () => {
-      isMounted = false;
-      generationInFlightRef.current = false;
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
   }, [pet, regenerateNonce, forceRegenerate, mealsCacheKey, petId]);
 
   const mealsToRender: (ModifiedRecipeResult | { recipe: Recipe; explanation: string })[] = useMemo(() => {
@@ -365,10 +342,13 @@ export default function RecommendedRecipesPage() {
     return hasAnyFromAPI ? engineMeals : [];
   }, [engineMeals]);
 
+  const { scoredMeals } = useChunkedRecipeScoring(mealsToRender, null, scoringPet);
+
   const recipesForPricing = useMemo(() => {
     return mealsToRender
       .map((m: any) => {
         const recipe = m?.recipe;
+
         if (!recipe) return null;
 
         const servingsRaw = (recipe as any)?.servings;
@@ -414,7 +394,9 @@ export default function RecommendedRecipesPage() {
       const recipeId = recipe?.id;
       if (!recipeId) continue;
 
-      const shoppingListRaw = Array.isArray((meal as any)?.shoppingList) ? ((meal as any)?.shoppingList as ShoppingListItem[]) : null;
+      const shoppingListRaw = Array.isArray((meal as any)?.shoppingList)
+        ? ((meal as any)?.shoppingList as ShoppingListItem[])
+        : null;
 
       const itemsSource =
         shoppingListRaw && shoppingListRaw.length > 0
@@ -448,11 +430,21 @@ export default function RecommendedRecipesPage() {
       if (normalizedItems.length === 0) continue;
 
       try {
+        const servingsRaw = (recipe as any)?.servings;
+        const servingsParsed =
+          typeof servingsRaw === 'number'
+            ? servingsRaw
+            : typeof servingsRaw === 'string'
+              ? parseFloat(servingsRaw)
+              : NaN;
+        const recipeServings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
+
         const estimate = calculateMealsFromGroceryList(
           normalizedItems,
           undefined,
           recipe?.category,
-          true
+          true,
+          recipeServings
         );
         if (estimate && Number.isFinite(estimate.costPerMeal) && estimate.costPerMeal > 0) {
           map[recipeId] = {
@@ -496,39 +488,7 @@ export default function RecommendedRecipesPage() {
     }
 
     return map;
-  }, [mealsToRender, petId]);
-
-  const handleRegenerate = () => {
-    if (!hasAgreedToDisclaimer) return;
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem(mealsCacheKey);
-      } catch {
-      }
-
-      lastGeneratedPetIdRef.current = null;
-      setEngineMeals(null);
-    }
-    setEngineError(null);
-    setRegenerateNonce(Date.now());
-  };
-
-  const closeQuotaPopup = () => setShowQuotaPopup(false);
-
-  const handleAgreeToDisclaimer = () => {
-    try {
-      localStorage.setItem(USER_AGREEMENT_STORAGE_KEY, 'true');
-    } catch {
-    }
-    setHasAgreedToDisclaimer(true);
-    setRegenerateNonce(Date.now());
-  };
-
-  const { scoredMeals, isLoading: isScoring, progress, totalMeals: totalMealsToScore, scoredCount } = useChunkedRecipeScoring(
-    mealsToRender,
-    null,
-    scoringPet
-  );
+  }, [mealsToRender, petId, costCacheRefreshNonce]);
 
   const sortedMealsToRender = useMemo(() => {
     const list = [...scoredMeals];
@@ -536,6 +496,13 @@ export default function RecommendedRecipesPage() {
     const getScore = (item: any) => {
       const raw = 'score' in item && typeof item.score === 'number' ? (item.score as number) : 0;
       return Number.isFinite(raw) ? raw : 0;
+    };
+
+    const getSaasScore = (item: any) => {
+      const recipeId = String(item?.recipe?.id || '');
+      if (!recipeId) return null;
+      const v = (saasScoresByRecipeId as any)?.[recipeId];
+      return typeof v === 'number' && Number.isFinite(v) ? v : null;
     };
 
     const getResolvedCost = (item: any) => {
@@ -585,6 +552,20 @@ export default function RecommendedRecipesPage() {
         return aId.localeCompare(bId);
       }
 
+      const aSaas = getSaasScore(a);
+      const bSaas = getSaasScore(b);
+      const aHasSaas = typeof aSaas === 'number';
+      const bHasSaas = typeof bSaas === 'number';
+
+      if (aHasSaas && bHasSaas) {
+        const diff = (bSaas as number) - (aSaas as number);
+        if (Math.abs(diff) > 0.001) return diff;
+        return aId.localeCompare(bId);
+      }
+
+      if (aHasSaas && !bHasSaas) return -1;
+      if (!aHasSaas && bHasSaas) return 1;
+
       const scoreDiff = getScore(b) - getScore(a);
       if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
       return aId.localeCompare(bId);
@@ -593,19 +574,191 @@ export default function RecommendedRecipesPage() {
     return list;
   }, [apiPricingById, costComparisonCachedByRecipeId, packageEstimateByRecipeId, scoredMeals, sortBy]);
 
-  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
-  const [isSaving, setIsSaving] = useState<string | null>(null);
+  useEffect(() => {
+    if (!userId || !pet?.id) return;
+
+    const next: Record<string, number> = {};
+
+    const persisted =
+      (pet as any)?.savedRecipeScores && typeof (pet as any).savedRecipeScores === 'object'
+        ? (pet as any).savedRecipeScores
+        : {};
+
+    const visibleMeals = sortedMealsToRender.slice(0, 60);
+    for (const meal of visibleMeals) {
+      const recipe = (meal as any)?.recipe;
+      const recipeId = String(recipe?.id || '');
+      if (!recipeId) continue;
+
+      const fromSession = readCachedCompatibilityScore({ userId, petId: pet.id, recipeId, ttlMs: 30 * 60 * 1000 });
+      if (fromSession && typeof fromSession.overallScore === 'number') {
+        next[recipeId] = fromSession.overallScore;
+        continue;
+      }
+
+      const persistedScore = persisted?.[recipeId]?.overallScore;
+      if (typeof persistedScore === 'number' && Number.isFinite(persistedScore)) {
+        next[recipeId] = persistedScore;
+      }
+    }
+
+    setSaasScoresByRecipeId((prev) => {
+      const keysPrev = Object.keys(prev);
+      const keysNext = Object.keys(next);
+      if (keysPrev.length === keysNext.length && keysNext.every((k) => prev[k] === next[k])) {
+        return prev; // no change -> avoid re-render loop
+      }
+      return next;
+    });
+  }, [pet?.id, sortedMealsToRender, userId]);
 
   useEffect(() => {
-    if (pet?.savedRecipes) {
-      setSavedRecipeIds(new Set(pet.savedRecipes));
+    if (!isLoaded || !userId || !pet?.id) return;
+
+    let isCancelled = false;
+
+    const run = async () => {
+      const ttlMs = 30 * 60 * 1000;
+      const visible = sortedMealsToRender.slice(0, 60);
+      const pending: Array<{ recipe: any; recipeId: string }> = [];
+
+      for (const meal of visible) {
+        if (isCancelled) return;
+
+        const recipe = (meal as any)?.recipe;
+        const recipeId = String(recipe?.id || '');
+        if (!recipeId) continue;
+
+        const fromSession = readCachedCompatibilityScore({ userId, petId: pet.id, recipeId, ttlMs });
+        if (fromSession && typeof fromSession.overallScore === 'number') {
+          setSaasScoresByRecipeId((prev) => {
+            if (prev[recipeId] === fromSession.overallScore) return prev;
+            return { ...prev, [recipeId]: fromSession.overallScore };
+          });
+          continue;
+        }
+
+        pending.push({ recipe, recipeId });
+      }
+
+      if (pending.length === 0) return;
+
+      const CONCURRENCY = 4;
+      let idx = 0;
+
+      const worker = async () => {
+        while (!isCancelled) {
+          const current = pending[idx++];
+          if (!current) return;
+
+          const { recipe, recipeId } = current;
+
+          setSaasLoadingByRecipeId((prev) => ({ ...prev, [recipeId]: true }));
+
+          try {
+            const response = await fetch('/api/compatibility/score', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                recipe,
+                pet: {
+                  id: pet.id,
+                  name: petDisplayName,
+                  type: pet.type,
+                  breed: pet.breed,
+                  age: pet.age,
+                  weight: (pet as any).weightKg || (pet as any).weight,
+                  activityLevel: (pet as any).activityLevel,
+                  healthConcerns: (pet as any).healthConcerns || [],
+                  dietaryRestrictions: (pet as any).dietaryRestrictions || [],
+                  allergies: (pet as any).allergies || [],
+                },
+              }),
+            });
+
+            if (!response.ok) {
+              continue;
+            }
+
+            const data = await response.json();
+            const scoreObj = data.score || data;
+            const overallScore =
+              typeof scoreObj?.overallScore === 'number' && Number.isFinite(scoreObj.overallScore) ? scoreObj.overallScore : null;
+            if (overallScore === null) continue;
+
+            // Store the full score object
+            if (process.env.NODE_ENV === 'development') {
+              console.log('PET PROFILE CACHE WRITE:', {
+                recipeId,
+                hasScoreObj: !!scoreObj,
+                scoreObjKeys: scoreObj ? Object.keys(scoreObj) : [],
+                hasBreakdown: !!scoreObj?.breakdown,
+                breakdownKeys: scoreObj?.breakdown ? Object.keys(scoreObj.breakdown) : [],
+                dataKeys: Object.keys(data),
+                hasDataScore: !!data.score,
+              });
+            }
+
+            writeCachedCompatibilityScore({
+              userId,
+              petId: pet.id,
+              recipeId,
+              overallScore,
+              breakdown: scoreObj?.breakdown,
+              warnings: scoreObj?.warnings,
+              strengths: scoreObj?.strengths,
+              nutritionalGaps: scoreObj?.nutritionalGaps,
+              supplementRecommendations: scoreObj?.supplementRecommendations,
+              compatibility: scoreObj?.compatibility,
+              summaryReasoning: scoreObj?.summaryReasoning,
+            });
+
+            setSaasScoresByRecipeId((prev) => ({ ...prev, [recipeId]: overallScore }));
+          } catch {
+            // ignore
+          } finally {
+            setSaasLoadingByRecipeId((prev) => ({ ...prev, [recipeId]: false }));
+          }
+        }
+      };
+
+      const workers = Array.from({ length: Math.min(CONCURRENCY, pending.length) }, () => worker());
+      await Promise.all(workers);
+    };
+
+    run();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isLoaded, pet?.id, petDisplayName, sortedMealsToRender, userId]);
+
+  const handleRegenerate = () => {
+    if (!hasAgreedToDisclaimer) return;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(mealsCacheKey);
+      } catch {
+      }
+      setEngineMeals(null);
     }
-  }, [pet?.id]);
+    setEngineError(null);
+    setRegenerateNonce(Date.now());
+  };
+
+  const handleAgreeToDisclaimer = () => {
+    try {
+      localStorage.setItem(USER_AGREEMENT_STORAGE_KEY, 'true');
+    } catch {
+    }
+    setHasAgreedToDisclaimer(true);
+    setRegenerateNonce(Date.now());
+  };
 
   const handleSaveRecipe = async (recipeId: string, recipeName: string) => {
-    if (!isLoaded || !userId || !pet || isSaving) return;
+    if (!isLoaded || !userId || !pet) return;
 
-    if (savedRecipeIds.has(recipeId)) {
+    if (pet.savedRecipes && pet.savedRecipes.includes(recipeId)) {
       setCardMessage({ id: recipeId, text: 'Already saved for this pet.' });
       setTimeout(() => setCardMessage(null), 2500);
       return;
@@ -616,8 +769,9 @@ export default function RecommendedRecipesPage() {
     try {
       const updatedPet = {
         ...pet,
-        savedRecipes: [...(pet.savedRecipes || []), recipeId]
+        savedRecipes: [...(pet.savedRecipes || []), recipeId],
       };
+
       await savePet(userId, updatedPet);
 
       setPet(updatedPet);
@@ -634,10 +788,9 @@ export default function RecommendedRecipesPage() {
           const parsed = JSON.parse(raw);
           if (parsed && typeof parsed === 'object' && typeof (parsed as any).message === 'string') {
             friendly = String((parsed as any).message);
-            isExpectedError = parsed.code === 'LIMIT_REACHED';
+            isExpectedError = (parsed as any).code === 'LIMIT_REACHED';
           }
         } catch {
-          // Check for expected errors in raw text
           isExpectedError = raw.includes('LIMIT_REACHED') || raw.includes('limit');
         }
       }
@@ -645,7 +798,6 @@ export default function RecommendedRecipesPage() {
       setCardMessage({ id: recipeId, text: friendly });
       setTimeout(() => setCardMessage(null), 5000);
 
-      // Only log unexpected errors to console
       if (!isExpectedError) {
         console.error('Failed to save recipe:', error);
       }
@@ -667,7 +819,7 @@ export default function RecommendedRecipesPage() {
 
   const PetEmojiIcon = ({ type, size = 24 }: { type: PetCategory; size?: number }) => {
     const emoji = getPetEmoji(type);
-    return <EmojiIcon emoji={emoji} size={size} />;
+    return <span style={{ fontSize: size, lineHeight: 1 }}>{emoji}</span>;
   };
 
   const getHealthCompatibilityScore = (recipe: any, pet: Pet): number => {
@@ -725,7 +877,7 @@ export default function RecommendedRecipesPage() {
           Back to Profile
         </Link>
 
-        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex gap-6 relative">
+        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex flex-col gap-6 lg:flex-row lg:items-start relative">
           <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1">
             <span className="relative block w-40 md:w-48 lg:w-56 h-full overflow-hidden rounded-md">
               <MealGenerationScene
@@ -742,25 +894,22 @@ export default function RecommendedRecipesPage() {
               />
             </span>
           </span>
-          <div className="flex-1 flex flex-col gap-6 min-w-0">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div
-                className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 md:translate-x-[300px]"
-                style={{ paddingLeft: 25 }}
-              >
-                <AlphabetText text="Sherlock Shells is detecting meals for" size={36} />
-                <span className="inline-flex items-center gap-0 relative" style={{ top: '11px' }}>
-                  <AlphabetText text="-" size={36} />
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 ml-[275px] mt-5">
+                <AlphabetText text="Sherlock Shells is detecting meals for" size={45} />
+                <span className="inline-flex items-center gap-0 relative" style={{ top: '14px' }}>
+                  <AlphabetText text="-" size={45} />
                   <span style={{ marginLeft: 10 }}>
-                    <AlphabetText text={petDisplayName} size={36} />
+                    <AlphabetText text={petDisplayName} size={45} />
                   </span>
                 </span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-              <div className="flex flex-col items-center flex-shrink-0 gap-0" style={{ marginLeft: '-60px' }}>
-                <span className="w-48 h-48 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle -translate-y-[40px]">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex flex-col items-center flex-shrink-0 gap-2 lg:-ml-[100px] -mt-20">
+                <span className="w-48 h-48 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle">
                   <Image
                     src={getProfilePictureForPetType(pet.type)}
                     alt={`${petDisplayName} profile`}
@@ -792,14 +941,10 @@ export default function RecommendedRecipesPage() {
                 </button>
               </div>
 
-              <div
-                className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:justify-center lg:flex-1 lg:-translate-y-[60px] pb-10"
-                style={{ marginLeft: '-115px' }}
-              >
-
-                <div className="flex-shrink-0 min-w-[200px]">
+              <div className="flex flex-col gap-4 mt-6 lg:grid lg:grid-cols-3 lg:gap-4 lg:flex-1 lg:-ml-[100px] lg:mt-[50px] pb-6">
+                <div>
                   <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">
-                    <AlphabetText text="Bio" size={30} />
+                    <AlphabetText text="Bio" size={26} />
                   </h3>
                   <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
                     {pet.breed && (
@@ -847,16 +992,16 @@ export default function RecommendedRecipesPage() {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 min-w-[160px]">
+                <div>
                   <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
-                    <AlphabetText text="Health concerns" size={30} />
+                    <AlphabetText text="Health concerns" size={26} />
                   </h3>
                   <div className="flex flex-col gap-1.5">
                     {(pet.healthConcerns || []).length > 0 ? (
                       (pet.healthConcerns || []).map((concern) => (
                         <div
                           key={concern}
-                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
+                          className="text-sm text-gray-300"
                         >
                           {concern.replace(/-/g, ' ')}
                         </div>
@@ -867,22 +1012,17 @@ export default function RecommendedRecipesPage() {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 min-w-[160px]">
+                <div>
                   <h3 className="text-sm font-semibold text-gray-300 mb-1 pb-1 border-b border-surface-highlight">
-                    <AlphabetText text="Allergies" size={30} />
+                    <AlphabetText text="Allergies" size={26} />
                   </h3>
                   <div className="flex flex-col gap-1.5">
                     {(pet.allergies || []).length > 0 ? (
-                      (pet.allergies || []).map((allergy) => (
-                        <div
-                          key={allergy}
-                          className="px-2 py-1 bg-orange-900/40 text-orange-200 border border-orange-700/50 text-xs rounded"
-                        >
-                          {allergy.replace(/-/g, ' ')}
-                        </div>
-                      ))
+                      <div className="text-sm text-gray-300">
+                        {(pet.allergies || []).join(', ')}
+                      </div>
                     ) : (
-                      <div className="px-2 py-1 text-gray-500 text-xs italic">None</div>
+                      <div className="text-sm text-gray-500 italic">None</div>
                     )}
                   </div>
                 </div>
@@ -927,7 +1067,7 @@ export default function RecommendedRecipesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedMealsToRender.slice(0, 18).map((meal) => {
             const recipe = (meal as any).recipe;
-            const recipeId = recipe?.id;
+            const recipeId = String(recipe?.id || '');
             if (!recipeId) return null;
 
             const pricing = apiPricingById?.[recipeId];
@@ -941,7 +1081,7 @@ export default function RecommendedRecipesPage() {
                   ? packageEstimate.costPerMeal
                   : typeof pricing?.costPerMealUsd === 'number' && Number.isFinite(pricing.costPerMealUsd)
                     ? pricing.costPerMealUsd
-                    : null;
+                  : null;
 
             const costText = resolvedCostPerMeal ? `$${resolvedCostPerMeal.toFixed(2)} Per Meal` : null;
             const mealsText = packageEstimate ? String(packageEstimate.estimatedMeals) : null;
@@ -977,43 +1117,20 @@ export default function RecommendedRecipesPage() {
                   >
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="mb-3">
-                        <h3 className="text-xl font-bold text-foreground text-center">
+                        <h3 className="text-xl font-bold text-foreground text-center border-2 border-orange-500/60 rounded-lg p-3 bg-orange-500/10 shadow-lg shadow-orange-500/20 ring-2 ring-orange-500/30 ring-offset-2 ring-offset-background">
                           <AlphabetText text={recipe.name} size={28} />
                         </h3>
-                        <div className="mt-3 flex justify-center">
-                          {costText ? (
-                            <div
-                              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200"
-                            >
-                              <span className="text-white">{costText}</span>
-                              {provenanceLabel ? (
-                                <span className="text-gray-300">• {provenanceLabel}</span>
-                              ) : null}
-                              {mealsText ? (
-                                <span className="text-gray-300">• Est. meals: {mealsText}</span>
-                              ) : null}
-                            </div>
-                          ) : (
-                            <div
-                              className="inline-flex items-center px-3 py-1.5 rounded-full bg-surface-highlight border border-white/10 text-xs font-semibold text-gray-300"
-                            >
-                              Pricing unavailable
-                            </div>
-                          )}
-                        </div>
+                      </div>
 
-                        {scoringPet && (
+                      {scoringPet && (
                           <div className="mt-4 flex flex-col items-center gap-2">
                             {(() => {
-                              const score =
-                                'score' in (meal as any) && typeof (meal as any).score === 'number'
-                                  ? ((meal as any).score as number)
-                                  : scoreWithSpeciesEngine(recipe, scoringPet as any).overallScore;
+                              const effectiveScore = typeof saasScoresByRecipeId[recipeId] === 'number' ? saasScoresByRecipeId[recipeId] : null;
 
                               return (
+                                effectiveScore !== null ? (
                                 <div className="flex flex-col items-center">
-                                  <CompatibilityRadial score={score} size={135} />
-                                  <div className="mt-2">
+                                  <div className="mb-2">
                                     <Image
                                       src="/images/Buttons/CompatabilityScore.png"
                                       alt="Compatibility Score"
@@ -1023,14 +1140,18 @@ export default function RecommendedRecipesPage() {
                                       unoptimized
                                     />
                                   </div>
+                                  <div className="relative">
+                                    <CompatibilityRadial score={effectiveScore} size={135} />
+                                  </div>
                                 </div>
+                                ) : null
                               );
                             })()}
                           </div>
                         )}
                       </div>
 
-                      <div className="mt-auto pt-4">
+                      <div className="mt-auto pt-4 -mt-[30px]">
                         <button
                           type="button"
                           onClick={(e) => {
@@ -1042,7 +1163,7 @@ export default function RecommendedRecipesPage() {
                           className="group relative w-full inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed"
                           aria-label={savedRecipeIds.has(recipeId) ? 'Meal Harvested' : 'Harvest Meal'}
                         >
-                          <span className="relative h-[60px] w-full overflow-hidden rounded-2xl">
+                          <span className="relative h-[78px] w-full overflow-hidden rounded-2xl">
                             <Image
                               src={
                                 savedRecipeIds.has(recipeId)
@@ -1067,7 +1188,6 @@ export default function RecommendedRecipesPage() {
                       </div>
                     </div>
                   </div>
-                </div>
               </Link>
             );
           })}

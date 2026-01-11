@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo, startTransition, useR
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { Plus, Edit, Trash2, ShoppingCart } from 'lucide-react';
+import { Plus, Edit, Trash2, ShoppingCart, X } from 'lucide-react';
 import { getPrimaryName } from '@/lib/utils/petUtils';
 import type { Pet } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -570,8 +570,6 @@ export default function MyPetsPage() {
   const [userId, setUserId] = useState<string>('');
   const { setUserId: setVillageUserId } = useVillageStore();
   const router = useRouter();
-
-  const [planTier, setPlanTier] = useState<'free' | 'pro'>('free');
   const [profileNotice, setProfileNotice] = useState<string | null>(null);
 
   const [pets, setPets] = useState<ProfilePet[]>([]);
@@ -728,23 +726,6 @@ const buildWeeklyPlan = useCallback(
     setUserId(uid);
     setVillageUserId(uid);
   }, [isLoaded, user?.id, setVillageUserId]);
-
-  useEffect(() => {
-    if (!userId) {
-      setPlanTier('free');
-      return;
-    }
-
-    fetch('/api/plan', { method: 'GET', credentials: 'include' })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        const tier = data?.planTier;
-        if (tier === 'pro' || tier === 'free') {
-          setPlanTier(tier);
-        }
-      })
-      .catch(() => {});
-  }, [userId]);
 
   useEffect(() => {
     setIsClient(true);
@@ -1478,7 +1459,7 @@ const buildWeeklyPlan = useCallback(
 
               <div
                 className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
-                style={{ width: 440, height: 300, transform: 'translateX(-15px)' }}
+                style={{ width: 440, height: 300 }}
                 aria-hidden="true"
               >
                 <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
@@ -1489,7 +1470,7 @@ const buildWeeklyPlan = useCallback(
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
             <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 lg:gap-6 items-start">
               <div className="flex flex-col gap-3">
-                <span className="relative block h-24 w-full overflow-hidden">
+                <span className="relative block w-full overflow-hidden border-[3px] border-green-800/80 rounded-2xl shadow-lg" style={{ height: '70px' }}>
                   <Image src={PetsBanner} alt="Pets" fill sizes="260px" className="object-contain" />
                 </span>
 
@@ -1727,14 +1708,12 @@ const buildWeeklyPlan = useCallback(
                       </div>
                       <div className="flex flex-col gap-3 mt-9">
                         <div className="flex justify-center">
-                          <Tooltip content={BADGE_SUMMARY_TEXT} wide>
-                            <Image
-                              src={BadgesBanner}
-                              alt="Badges"
-                              className="h-auto w-[220px] cursor-help border-2 border-orange-400 rounded-md"
-                              priority
-                            />
-                          </Tooltip>
+                          <Image
+                            src={BadgesBanner}
+                            alt="Badges"
+                            className="h-auto w-[220px] border-2 border-orange-400 rounded-md"
+                            priority
+                          />
                         </div>
                         <div className="p-4 border border-orange-400 rounded-lg bg-surface-highlight/30 min-h-[140px] w-[520px] max-w-full">
                           <PetBadges key={badgeRefreshKey} petId={activePet.id} userId={userId} />
@@ -1902,28 +1881,27 @@ const buildWeeklyPlan = useCallback(
                                         return (
                                           <div
                                             key={rid}
-                                            className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4"
+                                            className="relative p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4"
                                           >
                                             <div className="min-w-0 text-sm text-gray-400 break-words">Not found</div>
-                                            <div className="flex items-center gap-2 flex-shrink-0">
-                                              <button
-                                                onClick={(e) => {
-                                                  e.preventDefault();
-                                                  setConfirmModal({
-                                                    isOpen: true,
-                                                    title: 'Remove Meal',
-                                                    message: 'Remove this saved meal? It could not be loaded.',
-                                                    onConfirm: () => {
-                                                      handleRemoveSavedMeal(rid);
-                                                    },
-                                                  });
-                                                }}
-                                                className="btn btn-success btn-sm"
-                                                title="Remove meal"
-                                              >
-                                                Remove
-                                              </button>
-                                            </div>
+                                            <button
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                setConfirmModal({
+                                                  isOpen: true,
+                                                  title: 'Remove Meal',
+                                                  message: 'Remove this saved meal? It could not be loaded.',
+                                                  onConfirm: () => {
+                                                    handleRemoveSavedMeal(rid);
+                                                  },
+                                                });
+                                              }}
+                                              className="absolute -top-2 -right-2 inline-flex items-center justify-center h-4 w-4 bg-transparent text-red-600 hover:text-red-700 transition-colors duration-200"
+                                              title="Remove meal"
+                                              aria-label="Remove meal"
+                                            >
+                                              <X size={14} strokeWidth={3} />
+                                            </button>
                                           </div>
                                         );
                                       }
@@ -1955,7 +1933,7 @@ const buildWeeklyPlan = useCallback(
                                               : 'Cost/meal: —'}
                                           </div>
                                         </div>
-                                        <div className="flex items-center gap-3 flex-shrink-0">
+                                        <div className="relative flex items-center gap-3 flex-shrink-0">
                                           <button
                                             onClick={(e) => {
                                               e.preventDefault();
@@ -1992,13 +1970,23 @@ const buildWeeklyPlan = useCallback(
                                               (Array.isArray((activePet as any).mealPlan) &&
                                                 ((activePet as any).mealPlan as string[]).includes(rid))
                                             }
-                                            className="btn btn-success btn-sm"
+                                            className={`group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-xl flex-shrink-0 transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                                              Array.isArray((activePet as any).mealPlan) &&
+                                              ((activePet as any).mealPlan as string[]).includes(rid)
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : ''
+                                            }`}
                                             title="Add to meal plan"
                                           >
-                                            {Array.isArray((activePet as any).mealPlan) &&
-                                            ((activePet as any).mealPlan as string[]).includes(rid)
-                                              ? 'In Plan'
-                                              : 'Add to Plan'}
+                                            <span className="relative h-[50px] w-[140px] overflow-hidden rounded-xl">
+                                              <Image
+                                                src="/images/Buttons/AddToPlan.jpg"
+                                                alt="Add to Plan"
+                                                fill
+                                                sizes="140px"
+                                                className="object-contain"
+                                              />
+                                            </span>
                                           </button>
 
                                           <button
@@ -2013,10 +2001,11 @@ const buildWeeklyPlan = useCallback(
                                                 },
                                               });
                                             }}
-                                            className="btn btn-success btn-sm"
+                                            className="absolute -top-2 -right-2 inline-flex items-center justify-center h-4 w-4 bg-transparent text-red-600 hover:text-red-700 transition-colors duration-200"
                                             title="Remove meal"
+                                            aria-label="Remove meal"
                                           >
-                                            Remove
+                                            <X size={14} strokeWidth={3} />
                                           </button>
 
                                           {Array.isArray((recipeObj as any).ingredients) && (
@@ -2225,7 +2214,7 @@ const buildWeeklyPlan = useCallback(
                                                     e.preventDefault();
                                                     setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
                                                   }}
-                                                  className="btn btn-success btn-sm"
+                                                  className="btn btn-success btn-sm btn-ripple hover:scale-105 transition-all duration-200"
                                                   title="Edit this slot"
                                                 >
                                                   Edit
@@ -2323,7 +2312,7 @@ const buildWeeklyPlan = useCallback(
                     setEditingPet(null);
                     setIsModalOpen(true);
                   }}
-                  className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg"
+                  className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg shadow-green-500/25"
                   style={{ width: 220, height: 48 }}
                   aria-label="Add Pet"
                 >
@@ -2374,13 +2363,6 @@ const buildWeeklyPlan = useCallback(
         />
 
         {/* Free plan badge - bottom right corner */}
-        {planTier !== 'pro' && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <div className="rounded-lg border border-orange-400/30 bg-orange-500/8 px-2 py-1 text-xs text-orange-200 font-medium shadow-sm">
-              Free plan: Limits apply
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

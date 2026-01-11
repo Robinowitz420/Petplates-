@@ -4,8 +4,6 @@ import { getFirebaseAdminDb } from '@/lib/services/firebaseAdmin';
 import type { Pet } from '@/lib/types';
 import { validatePet } from '@/lib/validation/petSchema';
 import { jsonError } from '@/lib/utils/apiResponse';
-import { getUsageLimitsForPlan } from '@/lib/utils/usageLimits';
-import { getUserPlanTier } from '@/lib/utils/userPlan';
 
 export const runtime = 'nodejs';
 
@@ -49,8 +47,6 @@ export async function POST(req: Request) {
     }
 
     const adminDb = getFirebaseAdminDb();
-    const planTier = await getUserPlanTier(adminDb as any, userId);
-    const limits = getUsageLimitsForPlan(planTier);
 
     const body = await req.json().catch(() => null);
     const rawPet = body?.pet;
@@ -89,35 +85,14 @@ export async function POST(req: Request) {
       const existingPet = await tx.get(petDoc);
       const creating = !existingPet.exists;
 
-      const petsSnap = await tx.get(petsCol);
-
-      if (creating && petsSnap.size >= limits.pets) {
-        const msg =
-          planTier === 'pro'
-            ? 'You’ve reached the maximum number of pets for Pro (fair use).'
-            : 'You’ve reached the Free plan pet limit. Upgrade to Pro for Unlimited (fair use).';
-        const err = new Error(msg) as any;
-        err.code = 'LIMIT_REACHED';
-        throw err;
-      }
-
       const previousSavedThisPet = existingPet.exists
         ? normalizeIds((existingPet.data() as any)?.savedRecipes)
         : [];
 
       const nextSavedThisPet = normalizeIds((validatedPet as any).savedRecipes);
-      const increasesSavedCount = nextSavedThisPet.length > previousSavedThisPet.length;
-
-      if (nextSavedThisPet.length > limits.savedMeals && increasesSavedCount) {
-        const msg =
-          planTier === 'pro'
-            ? 'You’ve reached the saved meals cap for Pro (fair use).'
-            : 'You’ve reached the Free plan saved meals limit. Upgrade to Pro for Unlimited (fair use).';
-        const err = new Error(msg) as any;
-        err.message = `${msg} (saved: ${nextSavedThisPet.length}, limit: ${limits.savedMeals})`;
-        err.code = 'LIMIT_REACHED';
-        throw err;
-      }
+      void creating;
+      void previousSavedThisPet;
+      void nextSavedThisPet;
 
       tx.set(petDoc, JSON.parse(JSON.stringify(validatedPet)), { merge: true });
     });

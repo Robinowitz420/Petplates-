@@ -121,6 +121,42 @@ function toTextList(recipe: Recipe): string {
   return (ingredients.join(' ') + ' ' + supplements.join(' ')).toLowerCase();
 }
 
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+function getSupplementNamesForBoost(recipe: Recipe): string[] {
+  const fromIngredients = (recipe.ingredients || [])
+    .map((i: any) => {
+      if (!i || typeof i !== 'object') return null;
+      const id = typeof i?.id === 'string' ? i.id : '';
+      const category = typeof i?.category === 'string' ? i.category : '';
+      const name = typeof i?.name === 'string' ? i.name : '';
+      const looksLikeSupplement =
+        (id && id.toLowerCase().startsWith('supplement-')) ||
+        (category && category.toLowerCase() === 'supplement');
+      if (!looksLikeSupplement) return null;
+      return name || null;
+    })
+    .filter(Boolean) as string[];
+
+  return Array.from(new Set(fromIngredients.map((s) => s.trim()).filter(Boolean)));
+}
+
+function getSupplementScoreBoost(recipe: Recipe): number {
+  const supplementNames = getSupplementNamesForBoost(recipe);
+  if (supplementNames.length === 0) return 0;
+
+  const seed = `${String((recipe as any)?.id || '')}|${supplementNames.join('|').toLowerCase()}`;
+  return 2 + (hashString(seed) % 7);
+}
+
 function computeBaselineFactors(params: { recipe: Recipe; pet: SpeciesScoringPet; species: PetType }): {
   factors: SpeciesFactorScores;
   warnings: string[];
@@ -272,10 +308,13 @@ abstract class NativeSpeciesEngine implements SpeciesScoringEngine {
           )
         : clampScore((factors.safety + factors.nutrition + factors.health + factors.quality) / 4);
 
+    const supplementBoost = getSupplementScoreBoost(recipe);
+    const boostedOverallScore = clampScore(overallScore + supplementBoost);
+
     return {
       species: this.species,
-      overallScore,
-      grade: getGrade(overallScore),
+      overallScore: boostedOverallScore,
+      grade: getGrade(boostedOverallScore),
       factors: {
         safety: clampScore(factors.safety),
         nutrition: clampScore(factors.nutrition),
@@ -286,8 +325,8 @@ abstract class NativeSpeciesEngine implements SpeciesScoringEngine {
       warnings: [...new Set(warnings)],
       strengths: [...new Set(strengths)],
       raw: {
-        overallScore,
-        grade: getGrade(overallScore),
+        overallScore: boostedOverallScore,
+        grade: getGrade(boostedOverallScore),
         factors: {
           ingredientSafety: { score: clampScore(factors.safety), weight: 0.3, reasoning: '', issues: [], strengths: [] },
           nutritionalAdequacy: { score: clampScore(factors.nutrition), weight: 0.4, reasoning: '', issues: [], strengths: [] },

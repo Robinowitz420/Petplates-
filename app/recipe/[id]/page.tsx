@@ -6,7 +6,6 @@ import React, {
   useMemo,
   useRef,
   useState,
-  startTransition,
 } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -70,6 +69,7 @@ import CompatibilityRadial from '@/components/CompatibilityRadial';
 import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
 import StorageServingBanner from '@/public/images/Site Banners/unnamed.jpg';
 import CostComparisonBanner from '@/public/images/Site Banners/CostComparison.png';
+import { readCachedCompatibilityScore, writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
 
 const getIngredientKey = (ingredient: any): string => {
   if (!ingredient) return '';
@@ -77,6 +77,16 @@ const getIngredientKey = (ingredient: any): string => {
   if (rawId) return String(rawId);
   const rawName = typeof ingredient.name === 'string' ? ingredient.name : ingredient.productName;
   return rawName ? String(rawName).trim().toLowerCase() : '';
+};
+
+const normalizeToScoringIngredientId = (value: string): string => {
+  return String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_]/g, '')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '');
 };
 
 // =================================================================
@@ -120,7 +130,7 @@ function extractSafetyFlags(ingredients: Array<{ name?: string } | string>): str
 
 const NUTRITION_GUIDELINES: Record<
   CategoryType,
-  { protein: string; fat: string; fiber: string }
+  { protein: string; fat: string; fiber: string }  
 > = {
   dogs: { protein: '25-35%', fat: '10-20%', fiber: '2-5%' },
   cats: { protein: '40-50%', fat: '25-35%', fiber: '1-3%' },
@@ -339,6 +349,41 @@ export default function RecipeDetailPage() {
   const [recommendedSupplements, setRecommendedSupplements] = useState<RecommendedSupplement[]>([]);
   const [hopAddedLabel, setHopAddedLabel] = useState<string | null>(null);
 
+  const getSupplementDedupKey = useCallback((value: any) => {
+    const nameRaw =
+      (typeof value?.productName === 'string' && value.productName) ||
+      (typeof value?.name === 'string' && value.name) ||
+      '';
+    const base = String(nameRaw || '').trim();
+    const generic = base ? getGenericIngredientName(base) || base : '';
+    return String(generic || '').trim().toLowerCase();
+  }, []);
+
+  const addedSupplementKeys = useMemo(() => {
+    const baseRecipe: any = modifiedRecipe || vettedRecipe || recipe;
+    const ingredients = Array.isArray(baseRecipe?.ingredients) ? baseRecipe.ingredients : [];
+    const keys = new Set<string>();
+
+    for (const ing of ingredients) {
+      const id = typeof ing?.id === 'string' ? ing.id : '';
+      if (!id || !id.startsWith('supplement-')) continue;
+      const key = getSupplementDedupKey(ing);
+      if (key) keys.add(key);
+    }
+
+    return keys;
+  }, [getSupplementDedupKey, modifiedRecipe, recipe, vettedRecipe]);
+
+  const visibleRecommendedSupplements = useMemo(() => {
+    if (!Array.isArray(recommendedSupplements) || recommendedSupplements.length === 0) return [];
+    if (!addedSupplementKeys || addedSupplementKeys.size === 0) return recommendedSupplements;
+    return recommendedSupplements.filter((supplement) => {
+      const key = getSupplementDedupKey(supplement);
+      if (!key) return true;
+      return !addedSupplementKeys.has(key);
+    });
+  }, [addedSupplementKeys, getSupplementDedupKey, recommendedSupplements]);
+
   type RecipeScoreSummary = {
     overallScore: number;
     compatibility: string;
@@ -352,6 +397,29 @@ export default function RecipeDetailPage() {
     recommendations: any[];
     usesFallbackNutrition: boolean;
   };
+
+  type CachedCompatibilityScore = NonNullable<ReturnType<typeof readCachedCompatibilityScore>>;
+
+  const normalizeCachedScoreToSummary = useCallback(
+    (cached: CachedCompatibilityScore): RecipeScoreSummary => {
+      return {
+        overallScore: cached.overallScore,
+        compatibility: typeof (cached as any)?.compatibility === 'string' ? (cached as any).compatibility : 'unknown',
+        summaryReasoning: typeof (cached as any)?.summaryReasoning === 'string' ? (cached as any).summaryReasoning : '',
+        explainRecommendations: [],
+        nutritionalGaps: Array.isArray((cached as any)?.nutritionalGaps) ? (cached as any).nutritionalGaps : [],
+        supplementRecommendations: Array.isArray((cached as any)?.supplementRecommendations)
+          ? (cached as any).supplementRecommendations
+          : [],
+        breakdown: (cached as any)?.breakdown && typeof (cached as any).breakdown === 'object' ? (cached as any).breakdown : {},
+        warnings: Array.isArray((cached as any)?.warnings) ? (cached as any).warnings : [],
+        strengths: Array.isArray((cached as any)?.strengths) ? (cached as any).strengths : [],
+        recommendations: [],
+        usesFallbackNutrition: false,
+      };
+    },
+    []
+  );
 
   type EffectiveScore = ReturnType<typeof scoreWithSpeciesEngine> | RecipeScoreSummary;
 
@@ -428,13 +496,33 @@ export default function RecipeDetailPage() {
       return !removedIngredientKeys.has(key);
     });
 
+    const scoringIngredients = filteredIngredients.map((ing: any) => {
+      const id = typeof ing?.id === 'string' ? ing.id : '';
+      if (!id.startsWith('supplement-')) return ing;
+
+      const nameRaw =
+        (typeof ing?.productName === 'string' && ing.productName) ||
+        (typeof ing?.name === 'string' && ing.name) ||
+        '';
+      const genericKey = getGenericIngredientName(nameRaw) || nameRaw;
+      const normalizedId = normalizeToScoringIngredientId(genericKey);
+
+      if (!normalizedId) return ing;
+      return {
+        ...ing,
+        id: normalizedId,
+        ingredientId: normalizedId,
+        category: 'supplement',
+      };
+    });
+
     return {
       ...baseRecipe,
-      ingredients: filteredIngredients,
+      ingredients: scoringIngredients,
     } as any;
   }, [modifiedRecipe, recipe, removedIngredientKeys, vettedRecipe]);
 
-  const scoreForQueryPet = useMemo(() => {
+  const localScoreForQueryPet = useMemo(() => {
     if (!recipeForScoring || !activePetId) return null;
     const pet = pets.find((p) => p.id === activePetId);
     if (!pet) return null;
@@ -509,20 +597,142 @@ export default function RecipeDetailPage() {
     }
   }, [recipeForScoring, activePetId, pets, userId]);
 
-  useEffect(() => {
-    if (scoreForQueryPet) {
-      setCurrentScore(scoreForQueryPet);
-      setAnimatedScore(scoreForQueryPet.overallScore);
-    } else {
-      setCurrentScore(null);
-      setAnimatedScore(null);
+  const cachedCardScoreForQueryPet = useMemo(() => {
+    if (!userId || !recipeForScoring) return null;
+    const recipeId = String((recipeForScoring as any)?.id || id || '');
+    if (!recipeId) return null;
+
+    // First try to read cache for the active pet
+    if (activePetId) {
+      const fromSession = readCachedCompatibilityScore({ userId, petId: activePetId, recipeId, ttlMs: 30 * 60 * 1000 });
+      if (fromSession) return normalizeCachedScoreToSummary(fromSession); // normalize cached score into full summary shape
     }
-  }, [scoreForQueryPet]);
+
+    // Then try to read cache for the query pet (from URL)
+    if (queryPetId && queryPetId !== activePetId) {
+      const fromSession = readCachedCompatibilityScore({ userId, petId: queryPetId, recipeId, ttlMs: 30 * 60 * 1000 });
+      if (fromSession) return normalizeCachedScoreToSummary(fromSession); // normalize cached score into full summary shape
+    }
+
+    return null;
+  }, [activePetId, id, normalizeCachedScoreToSummary, queryPetId, recipeForScoring, userId]);
+
+  const scoreForQueryPet = cachedCardScoreForQueryPet;
+
+  // Calculate compatibility score if we don't have cached data
+  useEffect(() => {
+    if (!userId || !activePetId || !recipeForScoring || cachedCardScoreForQueryPet || pets.length === 0) {
+      return; // Already have cached data or missing requirements
+    }
+
+    const calculateScore = async () => {
+      try {
+        const pet = pets.find(p => p.id === activePetId);
+        if (!pet) return;
+
+        const response = await fetch('/api/compatibility/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipe: recipeForScoring,
+            pet: {
+              id: pet.id,
+              name: pet.name,
+              type: pet.type,
+              breed: pet.breed,
+              age: pet.age,
+              weightKg: pet.weightKg,
+              activityLevel: pet.activityLevel,
+              healthConcerns: pet.healthConcerns,
+              dietaryRestrictions: pet.dietaryRestrictions,
+              allergies: pet.allergies,
+            },
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.score) {
+            // Cache the result
+            writeCachedCompatibilityScore({
+              userId,
+              petId: activePetId,
+              recipeId: String((recipeForScoring as any)?.id || id || ''),
+              overallScore: data.score.overallScore,
+              breakdown: data.score.breakdown,
+              warnings: data.score.warnings,
+              strengths: data.score.strengths,
+              nutritionalGaps: data.score.nutritionalGaps,
+              supplementRecommendations: data.score.supplementRecommendations,
+              compatibility: data.score.compatibility,
+              summaryReasoning: data.score.summaryReasoning,
+            });
+
+            // Update local state
+            setCurrentScore(data.score);
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating compatibility score:', error);
+      }
+    };
+
+    calculateScore();
+  }, [userId, activePetId, recipeForScoring, cachedCardScoreForQueryPet, pets, id]);
+
+  const lastAnimatedTargetRef = useRef<number | null>(null);
+
+  // Score animation function
+  const animateScoreChange = useCallback((from: number, to: number) => {
+    const duration = 1500; // 1.5 seconds
+    const steps = 60;
+    const increment = (to - from) / steps;
+    let current = from;
+    let step = 0;
+
+    const animate = () => {
+      step++;
+      current = from + increment * step;
+
+      if (step < steps) {
+        setAnimatedScore(Math.round(current));
+        requestAnimationFrame(animate);
+      } else {
+        setAnimatedScore(to);
+      }
+    };
+
+    void duration;
+    animate();
+  }, []);
+
+  useEffect(() => {
+    const nextScore = scoreForQueryPet?.overallScore;
+    if (typeof nextScore !== 'number' || !Number.isFinite(nextScore)) {
+      lastAnimatedTargetRef.current = null;
+      setAnimatedScore(null);
+      setCurrentScore(null);
+      return;
+    }
+
+    if (lastAnimatedTargetRef.current === nextScore) {
+      return;
+    }
+
+    const from = typeof animatedScore === 'number' && Number.isFinite(animatedScore) ? animatedScore : nextScore;
+    lastAnimatedTargetRef.current = nextScore;
+    animateScoreChange(from, nextScore);
+    setCurrentScore(scoreForQueryPet);
+  }, [animateScoreChange, animatedScore, scoreForQueryPet]);
 
   const effectiveScore: EffectiveScore | null = currentScore || scoreForQueryPet;
 
   const effectiveBreakdown = useMemo(() => {
     if (!effectiveScore) return {};
+
+    // First try to use the cached breakdown from Sherlock Shells
+    const cachedBreakdown = (effectiveScore as any)?.breakdown;
+    if (cachedBreakdown && typeof cachedBreakdown === 'object') return cachedBreakdown;
 
     const explicit = (effectiveScore as any)?.breakdown;
     if (explicit && typeof explicit === 'object') return explicit;
@@ -739,30 +949,6 @@ export default function RecipeDetailPage() {
     setVettedRecipe(vetted);
   }, [selectedPetId, queryPetId, pets, recipe]);
 
-  // Score animation function
-  const animateScoreChange = useCallback((from: number, to: number) => {
-    const duration = 1500; // 1.5 seconds
-    const steps = 60;
-    const increment = (to - from) / steps;
-    let current = from;
-    let step = 0;
-
-    const animate = () => {
-      step++;
-      current = from + (increment * step);
-      
-      if (step < steps) {
-        setAnimatedScore(Math.round(current));
-        requestAnimationFrame(animate);
-      } else {
-        setAnimatedScore(to);
-      }
-    };
-
-    void duration;
-    animate();
-  }, []);
-
   const handleRemoveIngredient = useCallback((ingredientId: string) => {
     const key = String(ingredientId || '').trim();
     if (!key) return;
@@ -787,6 +973,22 @@ export default function RecipeDetailPage() {
     const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
     if (!Array.isArray(newRecipe.ingredients)) newRecipe.ingredients = [];
 
+    const supplementKey = getSupplementDedupKey(supplement);
+    if (supplementKey) {
+      const alreadyAdded = newRecipe.ingredients.some((ing: any) => {
+        const ingId = typeof ing?.id === 'string' ? ing.id : '';
+        if (!ingId.startsWith('supplement-')) return false;
+        return getSupplementDedupKey(ing) === supplementKey;
+      });
+
+      if (alreadyAdded) {
+        setMessage('That supplement is already added.');
+        setTimeout(() => setMessage(null), 2500);
+        setActiveTab('ingredients');
+        return;
+      }
+    }
+
     const searchUrl = ensureSellerId(
       buildAmazonSearchUrl(supplement.productName || supplement.name || 'pet supplement')
     );
@@ -797,6 +999,7 @@ export default function RecipeDetailPage() {
       productName: supplement.productName || supplement.name,
       amount: supplement.defaultAmount,
       notes: supplement.benefits,
+      category: 'supplement',
       amazonSearchUrl: searchUrl,
     };
 
@@ -812,7 +1015,7 @@ export default function RecipeDetailPage() {
       // ignore
     }
 
-  }, [modifiedRecipe, vettedRecipe, recipe]);
+  }, [getSupplementDedupKey, modifiedRecipe, vettedRecipe, recipe]);
 
   const handleAddBuiltInSupplement = useCallback(
     (supplementItem: any) => {
@@ -828,6 +1031,27 @@ export default function RecipeDetailPage() {
 
       const newRecipe = JSON.parse(JSON.stringify(baseRecipe));
       const nextId = `supplement-${Date.now()}`;
+
+      const builtInKey = getSupplementDedupKey({
+        name: targetName,
+        productName: supplementItem?.productName,
+      });
+      if (builtInKey) {
+        const alreadyAdded = Array.isArray(newRecipe.ingredients)
+          ? newRecipe.ingredients.some((ing: any) => {
+              const ingId = typeof ing?.id === 'string' ? ing.id : '';
+              if (!ingId.startsWith('supplement-')) return false;
+              return getSupplementDedupKey(ing) === builtInKey;
+            })
+          : false;
+
+        if (alreadyAdded) {
+          setMessage('That supplement is already added.');
+          setTimeout(() => setMessage(null), 2500);
+          setActiveTab('ingredients');
+          return;
+        }
+      }
 
       let promoted = false;
       if (Array.isArray(newRecipe.ingredients)) {
@@ -849,6 +1073,7 @@ export default function RecipeDetailPage() {
           id: nextId,
           name: targetName || 'Supplement',
           amount: supplementItem?.amount || '',
+          category: 'supplement',
           amazonSearchUrl: supplementItem?.amazonSearchUrl || searchUrl,
         };
         if (!Array.isArray(newRecipe.ingredients)) newRecipe.ingredients = [];
@@ -866,7 +1091,7 @@ export default function RecipeDetailPage() {
         // ignore
       }
     },
-    [modifiedRecipe, vettedRecipe, recipe]
+    [getSupplementDedupKey, modifiedRecipe, vettedRecipe, recipe]
   );
 
   useEffect(() => {
@@ -1149,11 +1374,21 @@ export default function RecipeDetailPage() {
           };
         });
 
+        const servingsRaw = (baseRecipe as any)?.servings;
+        const servingsParsed =
+          typeof servingsRaw === 'number'
+            ? servingsRaw
+            : typeof servingsRaw === 'string'
+              ? parseFloat(servingsRaw)
+              : NaN;
+        const recipeServings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
+
         const rawEstimate = calculateMealsFromGroceryList(
           shoppingListItems,
           undefined,
           (baseRecipe as any)?.category,
-          true
+          true,
+          recipeServings
         );
 
         if (rawEstimate) {
@@ -1187,6 +1422,14 @@ export default function RecipeDetailPage() {
     };
   }, [vettedRecipe, recipe, modifiedRecipe, removedIngredientKeys]);
 
+  const availableSupplementShoppingItems = useMemo(() => {
+    if (!Array.isArray(supplementShoppingItems) || supplementShoppingItems.length === 0) return [];
+    return supplementShoppingItems.filter((item: any) => {
+      const id = typeof item?.id === 'string' ? item.id : '';
+      return !id.startsWith('supplement-');
+    });
+  }, [supplementShoppingItems]);
+
   const supplementTotalCost = useMemo(() => {
     if (!Array.isArray(supplementShoppingItems) || supplementShoppingItems.length === 0) return 0;
 
@@ -1194,9 +1437,9 @@ export default function RecipeDetailPage() {
       const rawName = typeof item?.name === 'string' ? item.name : '';
       if (!rawName) return sum;
 
-      const normalizedName = getGenericIngredientName(rawName);
-      const pricing = getIngredientDisplayPricing(normalizedName);
-      const packageEstimate = getPackageSize(normalizedName);
+      const lookupName = getGenericIngredientName(rawName) || rawName;
+      const pricing = getIngredientDisplayPricing(lookupName);
+      const packageEstimate = getPackageSize(lookupName);
 
       const estimatedPrice = Number(packageEstimate?.estimatedCost) || 0;
       const isEstimatedPrice =
@@ -1211,7 +1454,7 @@ export default function RecipeDetailPage() {
 
   const costComparisonEstimate = useMemo(() => {
     if (!mealEstimate || mealEstimate.estimatedMeals <= 0) return null;
-    const totalCost = (mealEstimate.totalCost || 0) + supplementTotalCost;
+    const totalCost = mealEstimate.totalCost || 0;
     const estimatedMeals = mealEstimate.estimatedMeals;
     const costPerMeal = estimatedMeals > 0 ? totalCost / estimatedMeals : 0;
 
@@ -1232,7 +1475,7 @@ export default function RecipeDetailPage() {
     return `pet:${petId}:recipe:${recipeId}`;
   }, [activePetId, id, recipe]);
 
-  const shouldPersistCostComparisonCache = !hasLocalEdits;
+  const shouldPersistCostComparisonCache = true;
 
   const costComparisonStorageKey = useMemo(() => {
     if (!costComparisonCacheKey) return null;
@@ -1245,24 +1488,26 @@ export default function RecipeDetailPage() {
     if (typeof window === 'undefined') return;
     if (!costComparisonStorageKey) return;
 
-    try {
-      originalCostComparisonCacheRef.current = window.sessionStorage.getItem(costComparisonStorageKey);
-    } catch {
-      originalCostComparisonCacheRef.current = null;
-    }
-
-    return () => {
+    if (!shouldPersistCostComparisonCache) {
       try {
-        const raw = originalCostComparisonCacheRef.current;
-        if (raw == null) {
-          window.sessionStorage.removeItem(costComparisonStorageKey);
-        } else {
-          window.sessionStorage.setItem(costComparisonStorageKey, raw);
-        }
+        originalCostComparisonCacheRef.current = window.sessionStorage.getItem(costComparisonStorageKey);
       } catch {
-        // ignore
+        originalCostComparisonCacheRef.current = null;
       }
-    };
+
+      return () => {
+        try {
+          const raw = originalCostComparisonCacheRef.current;
+          if (raw == null) {
+            window.sessionStorage.removeItem(costComparisonStorageKey);
+          } else {
+            window.sessionStorage.setItem(costComparisonStorageKey, raw);
+          }
+        } catch {
+          // ignore
+        }
+      };
+    }
   }, [costComparisonStorageKey]);
 
   const recipeForPricing = useMemo(() => {
@@ -1336,6 +1581,27 @@ export default function RecipeDetailPage() {
             Back to My Pets
           </Link>
 
+          {/* Pet Selector - only show if no pet is selected */}
+          {!activePet && pets.length > 0 && (
+            <div className="bg-surface rounded-2xl shadow-lg p-6 mb-8 border border-surface-highlight">
+              <h2 className="text-xl font-bold text-foreground mb-4">Select a Pet for Compatibility Analysis</h2>
+              <p className="text-gray-600 mb-4">Choose a pet to see detailed health analysis and compatibility scores for this recipe.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pets.map((pet) => (
+                  <button
+                    key={pet.id}
+                    onClick={() => setSelectedPetId(pet.id)}
+                    className="bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg p-4 text-left transition-colors"
+                  >
+                    <div className="font-semibold text-primary-800">{pet.name}</div>
+                    <div className="text-sm text-primary-600 capitalize">{pet.type}{pet.breed ? ` • ${pet.breed}` : ''}</div>
+                    <div className="text-xs text-primary-500 mt-1">{pet.age} years old</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Full-width title card with compatibility score + Save Meal */}
           <div className="bg-surface rounded-2xl shadow-xl overflow-hidden mb-8 border border-surface-highlight">
             <div className="px-8 py-4 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
@@ -1343,11 +1609,6 @@ export default function RecipeDetailPage() {
                 <h1 className="text-4xl font-extrabold text-foreground mb-6 tracking-tight leading-tight break-words">
                   <div className="flex items-center justify-center gap-3 flex-wrap break-words">
                     <AlphabetText text={recipe.name} size={53} />
-                    {(recipe.needsReview === true || (scoreForQueryPet && 'usesFallbackNutrition' in scoreForQueryPet && (scoreForQueryPet as any).usesFallbackNutrition)) && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
-                        Experimental / Topper Only
-                      </span>
-                    )}
                   </div>
                 </h1>
 
@@ -1527,9 +1788,9 @@ export default function RecipeDetailPage() {
 
               {activeTab === 'supplements' && (
                 <div className="space-y-4">
-                  {supplementShoppingItems.length > 0 ? (
+                  {availableSupplementShoppingItems.length > 0 ? (
                     <div className="space-y-4">
-                      {supplementShoppingItems.map((supplementItem: any) => {
+                      {availableSupplementShoppingItems.map((supplementItem: any) => {
                         return (
                           <div
                             key={supplementItem.id || supplementItem.name}
@@ -1558,9 +1819,9 @@ export default function RecipeDetailPage() {
                     </div>
                   ) : null}
 
-                  {recommendedSupplements.length > 0 ? (
+                  {visibleRecommendedSupplements.length > 0 ? (
                     <div className="space-y-4">
-                      {recommendedSupplements.map((supplement) => {
+                      {visibleRecommendedSupplements.map((supplement) => {
                         return (
                           <div
                             key={`${supplement.name}-${supplement.addressesDeficiency}`}
@@ -1588,7 +1849,7 @@ export default function RecipeDetailPage() {
                         );
                       })}
                     </div>
-                  ) : supplementShoppingItems.length === 0 ? (
+                  ) : availableSupplementShoppingItems.length === 0 ? (
                     <div className="py-10 flex justify-center">
                       <span className="inline-flex items-center px-4 py-2 rounded-full bg-green-900/40 text-green-200 border border-green-700/50 text-sm font-semibold">
                         Meal is Complete!
@@ -1646,6 +1907,8 @@ export default function RecipeDetailPage() {
           </main>
 
           <aside className="lg:col-span-2 space-y-8">
+
+
             {/* Health Breakdown Panel */}
             {effectiveScore && (
               <div className="bg-surface rounded-2xl shadow-lg p-6 border-l-4 border-green-500 border border-surface-highlight">
@@ -1677,13 +1940,8 @@ export default function RecipeDetailPage() {
                       return true;
                     })
                     .filter(([_key, factor]) => {
-                      const f = factor as { weight: number; reason?: string; recommendations?: any[] };
-                      const weight = typeof f.weight === 'number' && Number.isFinite(f.weight) ? f.weight : 0;
-                      if (weight > 0) return true;
-
-                      const hasReason = typeof f.reason === 'string' && f.reason.trim().length > 0;
-                      const hasRecs = Array.isArray(f.recommendations) && f.recommendations.length > 0;
-                      return hasReason || hasRecs;
+                      // Show all factors that exist in the breakdown
+                      return true;
                     })
                     .map(([key, factor]) => {
                       const f = factor as {
@@ -1723,19 +1981,34 @@ export default function RecipeDetailPage() {
                       return (
                         <div
                           key={key}
-                          className={`flex items-center justify-between p-3 ${bgColor} rounded-lg border transition-colors`}
+                          className="flex items-center justify-between py-2"
                         >
                           <div className="flex items-center gap-2">
                             <span className="text-sm">{icon}</span>
-                            <span className={`text-sm font-medium capitalize ${textColor}`}>{factorName}</span>
+                            <span className="text-sm font-medium capitalize text-foreground">{factorName}</span>
                           </div>
                           <div className="flex flex-col items-end">
-                            <span className={`text-sm font-bold ${textColor}`}>{formatPercent(score)}</span>
+                            <span className="text-sm font-bold text-foreground">{formatPercent(score)}</span>
                             <span className="text-xs text-gray-400">+{weightedContribution} pts</span>
                           </div>
                         </div>
                       );
                     })}
+                  {Object.entries(effectiveBreakdown)
+                    .filter(([key]) => {
+                      const k = String(key || '').toLowerCase();
+                      if (k.includes('life') && k.includes('stage') && k.includes('fit')) return false;
+                      if (k.includes('activity') && k.includes('fit')) return false;
+                      return true;
+                    })
+                    .filter(([_key, factor]) => {
+                      // Show all factors that exist in the breakdown
+                      return true;
+                    }).length === 0 && (
+                    <div className="text-center py-4 text-gray-500">
+                      No detailed health factors available for this recipe.
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1836,8 +2109,13 @@ export default function RecipeDetailPage() {
       {/* Recipe Score Modal */}
       {isScoreModalOpen && effectiveScore && (
         <RecipeScoreModal
-          recipe={recipe}
+          recipe={((recipeForScoring as any) || recipe) as any}
           pet={modalPet}
+          score={{
+            overallScore: (scoreForQueryPet as any)?.overallScore,
+            warnings: Array.isArray((scoreForQueryPet as any)?.warnings) ? (scoreForQueryPet as any).warnings : undefined,
+            strengths: Array.isArray((scoreForQueryPet as any)?.strengths) ? (scoreForQueryPet as any).strengths : undefined,
+          }}
           onClose={() => setIsScoreModalOpen(false)}
         />
       )}

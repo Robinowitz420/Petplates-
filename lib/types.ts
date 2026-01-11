@@ -110,6 +110,7 @@ export interface Pet {
   activityLevel?: 'sedentary' | 'moderate' | 'active' | 'very-active';
   mealPlan?: string[];
   savedRecipes?: string[];
+  savedRecipeScores?: Record<string, { overallScore: number; ts: number }>;
   // Wellness and preference fields
   healthConcerns?: string[];
   dietaryRestrictions?: string[];

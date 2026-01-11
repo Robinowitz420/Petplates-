@@ -1,11 +1,8 @@
 'use client';
 
-import { memo, useCallback, useMemo, useState, useEffect } from 'react';
-import { X, ChevronRight, ChevronLeft, Check, Star, ArrowUp } from 'lucide-react';
+import { memo, useCallback, useMemo, useState } from 'react';
+import { X, ChevronRight, ChevronLeft, Check, Star } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { INGREDIENT_COMPOSITIONS, getIngredientComposition, type IngredientComposition } from '@/lib/data/ingredientCompositions';
-import { getFallbackNutrition } from '@/lib/utils/nutritionFallbacks';
-import AlphabetText from '@/components/AlphabetText';
 
 interface Category {
   name: string;
@@ -41,73 +38,7 @@ interface MealBuilderWizardProps {
 
 const CATEGORY_ORDER = ['proteins', 'grains', 'greens', 'fruits', 'supplements'] as const;
 
-const nutrientBadgeCache = new Map<string, Array<{ name: string; value: number }>>();
-
-/**
- * Get the highest nutrient value for an ingredient
- * Returns the nutrient name and a normalized value for comparison
- */
-function getTopNutrients(ingredientName: string, count: number = 3): Array<{ name: string; value: number }> {
-  const cacheKey = ingredientName.toLowerCase();
-  const cached = nutrientBadgeCache.get(cacheKey);
-  if (cached) {
-    return cached.slice(0, count);
-  }
-
-  // Normalize ingredient name
-  const normalized = ingredientName.toLowerCase()
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/[^a-z0-9_]/g, '')
-    .replace(/_+/g, '_');
-  
-  // Try to get composition
-  let composition: IngredientComposition | null = INGREDIENT_COMPOSITIONS[normalized] || null;
-  if (!composition) {
-    composition = getIngredientComposition(ingredientName) || null;
-  }
-  if (!composition) {
-    // Try fallback
-    composition = getFallbackNutrition(ingredientName);
-  }
-  
-  if (!composition) {
-    nutrientBadgeCache.set(cacheKey, []);
-    return [];
-  }
-  
-  // Define nutrients to check with their display names and normalization factors
-  const nutrients = [
-    { key: 'protein', name: 'Protein', value: composition.protein || 0, factor: 1 },
-    { key: 'fat', name: 'Fat', value: composition.fat || 0, factor: 1 },
-    { key: 'fiber', name: 'Fiber', value: composition.fiber || 0, factor: 1 },
-    { key: 'calcium', name: 'Calcium', value: (composition.calcium || 0) / 100, factor: 100 }, // Convert mg to g for comparison
-    { key: 'omega3', name: 'Omega-3', value: composition.omega3 || 0, factor: 1 },
-    { key: 'taurine', name: 'Taurine', value: (composition.taurine || 0) / 100, factor: 100 }, // Convert mg to g
-    { key: 'vitaminA', name: 'Vitamin A', value: (composition.vitaminA || 0) / 1000, factor: 1000 }, // Convert IU to thousands
-    { key: 'vitaminC', name: 'Vitamin C', value: (composition.vitaminC || 0) / 100, factor: 100 }, // Convert mg to g
-  ];
-  
-  // Calculate normalized values and filter out insignificant ones
-  const nutrientsWithNormalized = nutrients
-    .map(nutrient => ({
-      ...nutrient,
-      normalizedValue: nutrient.value * nutrient.factor
-    }))
-    .filter(nutrient => nutrient.normalizedValue > 0.1); // Only include significant values
-  
-  // Sort by normalized value (descending) and take top N
-  const topNutrients = nutrientsWithNormalized
-    .sort((a, b) => b.normalizedValue - a.normalizedValue)
-    .slice(0, count)
-    .map(nutrient => ({
-      name: nutrient.name,
-      value: nutrient.value
-    }));
-  
-  nutrientBadgeCache.set(cacheKey, topNutrients);
-  return topNutrients;
-}
+const MAX_INGREDIENTS_PER_CATEGORY = 36;
 
 type IngredientTileProps = {
   ingredient: string;
@@ -122,19 +53,16 @@ const IngredientTile = memo(function IngredientTile({
   isRecommended,
   onToggle,
 }: IngredientTileProps) {
-  const showNutrients = isSelected || isRecommended;
-  const topNutrients = useMemo(() => (showNutrients ? getTopNutrients(ingredient, 3) : []), [ingredient, showNutrients]);
-
   return (
     <button
       type="button"
       onClick={() => onToggle(ingredient)}
-      className={`relative p-4 text-left rounded-2xl border transition-colors duration-75 bg-gradient-to-br [content-visibility:auto] [contain-intrinsic-size:180px] ${
+      className={`relative p-4 text-left rounded-2xl border bg-gradient-to-br [content-visibility:auto] [contain-intrinsic-size:180px] ${
         isSelected
-          ? 'from-orange-500/20 via-orange-500/10 to-transparent border-orange-300/80 ring-2 ring-orange-400/40 shadow-[0_12px_30px_rgba(249,115,22,0.25)] scale-[1.01]'
+          ? 'from-orange-500/20 via-orange-500/10 to-transparent border-orange-300/80 shadow-md'
           : isRecommended
-          ? 'from-emerald-700/40 via-emerald-900/30 to-transparent border-emerald-400/60 hover:border-orange-300/70 hover:shadow-[0_10px_25px_rgba(249,115,22,0.15)]'
-          : 'from-emerald-900/30 via-emerald-950/30 to-transparent border-emerald-800/50 hover:border-emerald-500/70 hover:-translate-y-0.5'
+          ? 'from-emerald-700/40 via-emerald-900/30 to-transparent border-emerald-400/60 hover:border-orange-300/70'
+          : 'from-emerald-900/30 via-emerald-950/30 to-transparent border-emerald-800/50 hover:border-emerald-500/70'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -154,19 +82,6 @@ const IngredientTile = memo(function IngredientTile({
           </span>
         )}
       </div>
-      {topNutrients.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {topNutrients.map((nutrient, idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-orange-200 bg-orange-400/10 border border-orange-300/30 px-2 py-1 rounded-full"
-            >
-              <ArrowUp size={12} className="text-orange-300" />
-              {nutrient.name}
-            </span>
-          ))}
-        </div>
-      )}
     </button>
   );
 });
@@ -218,7 +133,9 @@ export default function MealBuilderWizard({
         regular.push(ingredient);
       }
     });
-    return [...recommended, ...regular];
+    const combined = [...recommended, ...regular];
+    if (combined.length <= MAX_INGREDIENTS_PER_CATEGORY) return combined;
+    return combined.slice(0, MAX_INGREDIENTS_PER_CATEGORY);
   }, [currentCategory, recommendedSet]);
 
   const isRequired = currentCategory.required;
@@ -273,15 +190,15 @@ export default function MealBuilderWizard({
 
 
   const wizardContent = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-      <div className="w-full max-w-6xl bg-gradient-to-br from-[#0f291c] via-[#091710] to-[#030704] rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.65)] border border-emerald-700/40 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+      <div className="w-full max-w-6xl bg-gradient-to-br from-[#0f291c] via-[#091710] to-[#030704] rounded-3xl shadow-xl border border-emerald-700/40 max-h-[92vh] flex flex-col">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4 p-6 border-b border-emerald-800/40">
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.25em] text-emerald-200/60">Chef Mode</p>
             <h2 className="text-3xl font-black text-gray-100 tracking-tight">
               <span className="mr-2">Create Meal for</span>
-              <AlphabetText text={petName} size={28} />
+              <span className="font-extrabold">{petName}</span>
             </h2>
             <p className="text-sm text-emerald-200/80">
               Step {currentStep + 1} of {stepOrder.length}
@@ -289,7 +206,7 @@ export default function MealBuilderWizard({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full border border-emerald-600/70 bg-emerald-900/40 hover:bg-emerald-800/70 text-gray-200 transition"
+            className="p-2 rounded-full border border-emerald-600/70 bg-emerald-900/40 hover:bg-emerald-800/70 text-gray-200 transition-colors"
           >
             <X size={20} className="text-gray-200" />
           </button>
@@ -307,7 +224,7 @@ export default function MealBuilderWizard({
               return (
                 <div
                   key={key}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wide border transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wide border transition-colors ${
                     isActive
                       ? 'border-orange-400/80 bg-orange-400/10 text-orange-100'
                       : isCompleted || isPast
@@ -343,7 +260,7 @@ export default function MealBuilderWizard({
             </div>
 
             {/* Ingredient List */}
-            <div className="rounded-3xl border border-emerald-800/60 bg-gradient-to-br from-emerald-950/80 via-emerald-950/60 to-black/70 p-4 lg:p-6 shadow-[0_20px_45px_rgba(0,0,0,0.55)]">
+            <div className="rounded-3xl border border-emerald-800/60 bg-gradient-to-br from-emerald-950/80 via-emerald-950/60 to-black/70 p-4 lg:p-6 shadow-lg">
               {currentCategory.ingredients.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   No ingredients available in this category for this pet.

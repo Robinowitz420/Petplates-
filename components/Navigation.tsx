@@ -12,35 +12,10 @@ import MealPrepForAllYourPets from '@/public/images/emojis/Mascots/HeroPics/Meal
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [planTier, setPlanTier] = useState<'free' | 'pro' | null>(null);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!hasMounted) return;
-
-    let isMounted = true;
-
-    (async () => {
-      try {
-        const res = await fetch('/api/plan');
-        if (!res.ok) return;
-        const json = (await res.json()) as any;
-        const tier = typeof json?.planTier === 'string' ? (json.planTier as string) : '';
-        if (!isMounted) return;
-        if (tier === 'pro' || tier === 'free') {
-          setPlanTier(tier);
-        }
-      } catch {
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [hasMounted]);
 
   return (
     <nav className="bg-surface border-b border-surface-highlight sticky top-0 z-50">
@@ -213,27 +188,6 @@ export default function Navigation() {
           </div>
         )}
       </div>
-
-      {/* Go Pro Button positioned below the header */}
-      {hasMounted ? (
-        <div className="fixed top-24 z-40" style={{ left: '22px' }}>
-          <Link
-            href="/pricing"
-            className={`inline-flex items-center justify-center rounded-full border-4 border-orange-400 px-6 py-2 text-base font-bold transition-all duration-1000 animate-pulse ${
-              planTier === 'pro'
-                ? 'bg-green-600/15 text-green-200 shadow-lg shadow-green-500/50'
-                : 'bg-orange-500/10 text-orange-200 hover:bg-orange-500/15 shadow-xl shadow-orange-500/60'
-            }`}
-            aria-label={planTier === 'pro' ? 'You are Pro' : 'Go Pro'}
-          >
-            {planTier === 'pro' ? (
-              <AlphabetText text="PRO" size={32} className="text-green-200" />
-            ) : (
-              <AlphabetText text="Go - Pro" size={24} className="text-orange-200" />
-            )}
-          </Link>
-        </div>
-      ) : null}
     </nav>
   );
 }

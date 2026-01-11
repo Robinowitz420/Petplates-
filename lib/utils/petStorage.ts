@@ -27,9 +27,10 @@ async function fetchJsonOrThrow<T>(res: Response): Promise<T> {
         }
         throw error;
       } catch {
-        const error = new Error(text);
+        const textStr = String(text || 'Unknown error');
+        const error = new Error(textStr);
         // Don't log expected business logic errors to console
-        const isBusinessLogicError = text.includes('LIMIT_REACHED') || text.includes('UNAUTHORIZED');
+        const isBusinessLogicError = textStr.includes('LIMIT_REACHED') || textStr.includes('UNAUTHORIZED');
         if (!isBusinessLogicError) {
           console.error('API Error:', error);
         }

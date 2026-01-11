@@ -171,25 +171,14 @@ export default function AboutPage() {
               <div key={record.name} className="rounded-lg border border-surface-highlight bg-background/40 p-6">
                 <div className="flex flex-col md:flex-row md:items-stretch gap-6">
                   <div className="w-full md:w-[380px] flex flex-col h-full">
-                    <div className="grid grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 gap-5">
                       <div className="rounded-md border border-white/10 bg-black/20 p-4">
                         <div className="relative w-full aspect-square">
                           <Image
                             src={record.frontImage}
-                            alt={`${record.name} front photo`}
+                            alt={`${record.name} photo`}
                             fill
                             className="object-cover rounded"
-                            sizes="220px"
-                          />
-                        </div>
-                      </div>
-                      <div className="rounded-md border border-white/10 bg-black/20 p-4">
-                        <div className="relative w-full aspect-square">
-                          <Image
-                            src={record.sideImage}
-                            alt={`${record.name} side photo`}
-                            fill
-                            className="object-cover rounded grayscale"
                             sizes="220px"
                           />
                         </div>
@@ -332,14 +321,6 @@ export default function AboutPage() {
                 <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Anyone looking for “miracle diets”</span></li>
               </ul>
             </div>
-          </div>
-        </section>
-
-        <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Next steps</h2>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/guides" className="btn btn-success btn-md">Start with an ingredient question</Link>
-            <Link href="/profile" className="btn btn-darkgreen btn-md">Explore recipes safely</Link>
           </div>
         </section>
 

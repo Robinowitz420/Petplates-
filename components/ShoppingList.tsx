@@ -188,8 +188,18 @@ export function ShoppingList({
         {purchasableItems.map((item, index) => (
           <div
             key={`${item.id}-${index}`}
-            className="flex items-center justify-between gap-3 p-3 bg-surface-lighter rounded-lg border border-surface-highlight hover:border-gray-500 transition-all duration-200"
+            className="relative flex items-center justify-between gap-3 p-3 bg-surface-lighter rounded-lg border border-surface-highlight hover:border-gray-500 transition-all duration-200"
           >
+            {typeof onRemoveIngredient === 'function' ? (
+              <button
+                type="button"
+                onClick={() => onRemoveIngredient(item.id)}
+                className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 bg-transparent text-red-600 hover:text-red-700 transition-colors duration-200"
+                aria-label={`Remove ${item.genericName}`}
+              >
+                <X size={14} strokeWidth={3} />
+              </button>
+            ) : null}
             <div className="flex-1 min-w-0 pr-2">
               <div className="font-medium text-gray-200 capitalize">{item.genericName}</div>
               <div className="text-sm text-gray-400">
@@ -208,17 +218,6 @@ export function ShoppingList({
             </div>
             
             <div className="flex flex-col items-end gap-1">
-              {typeof onRemoveIngredient === 'function' ? (
-                <button
-                  type="button"
-                  onClick={() => onRemoveIngredient(item.id)}
-                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-red-700/40 bg-red-900/20 text-red-200 hover:bg-red-900/30 transition-colors duration-200 text-sm font-semibold whitespace-nowrap"
-                  aria-label={`Remove ${item.genericName}`}
-                >
-                  <X size={16} />
-                  Remove
-                </button>
-              ) : null}
               <a
                 href={item.link}
                 target="_blank"

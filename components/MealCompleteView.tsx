@@ -18,6 +18,7 @@ import { ShoppingList } from '@/components/ShoppingList';
 import { CostComparison } from '@/components/CostComparison';
 import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import { debugEnabled, debugLog } from '@/lib/utils/debugLog';
@@ -39,6 +40,7 @@ import AlphabetText from '@/components/AlphabetText';
 import ShoppingListBanner from '@/public/images/Site Banners/ShoppingList.png';
 import StorageServingBanner from '@/public/images/Site Banners/unnamed.jpg';
 import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
+import CostComparisonBanner from '@/public/images/Site Banners/CostComparison.png';
 
 interface MealCompleteViewProps {
   petName: string;
@@ -114,6 +116,7 @@ export default function MealCompleteView({
   isFirstCreation = false,
   petType = 'dog', // Default to dog if not provided
 }: MealCompleteViewProps) {
+  const router = useRouter();
   const totalGrams = selectedIngredients.reduce((sum, s) => sum + s.grams, 0);
   const [mealName, setMealName] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
@@ -218,8 +221,13 @@ export default function MealCompleteView({
 
     setIsSaving(true);
     try {
-      await saveCustomMeal(userId, petId, mealName.trim(), selectedIngredients, analysis);
+      const saved = await saveCustomMeal(userId, petId, mealName.trim(), selectedIngredients, analysis);
       setIsSaved(true);
+
+      // After saving, navigate to the cloned custom recipe detail page for this custom meal
+      if (saved && saved.id) {
+        router.push(`/custom-recipe/${saved.id}?petId=${petId}`);
+      }
     } catch (error) {
       logger.error('Error saving meal:', error);
       setIsSaved(false);
@@ -982,14 +990,14 @@ export default function MealCompleteView({
           <main className="lg:col-span-3">
             {/* Ingredients & Supplements Tabs */}
             <div className="bg-surface rounded-2xl shadow-lg p-8 mb-8 border border-surface-highlight">
-              <div className="mb-6 flex justify-center">
+              <h3 className="text-xl font-bold text-foreground mb-4 border-b border-surface-highlight pb-3 flex items-center justify-center">
                 <Image
                   src={ShoppingListBanner}
-                  alt="Shopping list"
-                  className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
+                  alt="Shopping List"
+                  className="h-auto w-full max-w-md border-[2px] border-orange-500/60 rounded-lg"
                   unoptimized
                 />
-              </div>
+              </h3>
               {/* Tab Navigation */}
               <div className="flex border-b border-surface-highlight mb-6">
                 <button
@@ -1016,7 +1024,13 @@ export default function MealCompleteView({
                       : 'border-transparent text-gray-500 hover:text-gray-300'
                   }`}
                 >
-                  <span>Supplements</span>
+                  <span className="sr-only">Supplements</span>
+                  <Image
+                    src={SupplementsTabImage}
+                    alt="Supplements"
+                    className={`h-8 w-auto ${activeTab === 'supplements' ? '' : 'opacity-70 group-hover:opacity-100'}`}
+                    unoptimized
+                  />
                 </button>
               </div>
 
@@ -1139,7 +1153,15 @@ export default function MealCompleteView({
 
             {/* Cost Comparison */}
             {ingredientsWithASINs.length > 0 && costPerMealForDisplay && costPerMealForDisplay > 0 && (
-              <div className="mb-8">
+              <div className="bg-surface rounded-2xl shadow-lg p-6 mb-8 border border-surface-highlight">
+                <div className="mb-4 flex justify-center">
+                  <Image
+                    src={CostComparisonBanner}
+                    alt="Cost comparison"
+                    className="h-auto w-full max-w-md border border-surface-highlight rounded-lg"
+                    unoptimized
+                  />
+                </div>
                 <CostComparison
                   costPerMeal={costPerMealForDisplay}
                   pricingSource={canonicalCostPerMeal ? apiPricing?.pricingSource : undefined}

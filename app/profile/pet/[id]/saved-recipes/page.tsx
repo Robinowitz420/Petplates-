@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { HeartOff, ArrowLeft, Utensils, Clock, Trash2, ShoppingCart } from 'lucide-react';
+import { HeartOff, ArrowLeft, Utensils, Clock, Trash2, ShoppingCart, X } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import { getCustomMeals, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
@@ -316,10 +316,10 @@ export default function SavedRecipesPage() {
             <button
               onClick={() => router.push(`/profile/pet/${pet.id}/meal-plan`)}
               disabled={savedRecipeDetails.length < 2}
-              className={`px-5 py-3 rounded-lg font-semibold transition-colors ${
+              className={`btn btn-lg btn-ripple transition-all duration-200 ${
                 savedRecipeDetails.length < 2
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-green-800 text-white hover:bg-green-900'
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                  : 'btn-success hover:scale-105 hover:shadow-xl'
               }`}
             >
               Create Meal Plan
@@ -374,7 +374,7 @@ export default function SavedRecipesPage() {
                   </div>
                 </Link>
 
-                <div className="ml-4 flex items-center gap-2">
+                <div className="ml-4 flex items-center gap-2 relative">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -383,10 +383,10 @@ export default function SavedRecipesPage() {
                       void handleBuyMeal(recipe.id, !!recipe.isCustom);
                     }}
                     disabled={isBuyingId === recipe.id}
-                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-colors border ${
+                    className={`btn btn-md btn-ripple inline-flex items-center gap-2 transition-all duration-200 ${
                       isBuyingId === recipe.id
-                        ? 'bg-gray-200 text-gray-500 border-gray-300 cursor-wait'
-                        : 'bg-[#FF9900] hover:bg-[#E07704] text-black border-orange-400/60'
+                        ? 'bg-gray-300 text-gray-500 cursor-wait opacity-50'
+                        : 'bg-[#FF9900] hover:bg-[#E07704] text-black border-2 border-orange-400/60 hover:border-orange-500 hover:scale-105 hover:shadow-lg'
                     }`}
                     aria-label={`Buy ingredients for ${recipe.name}`}
                     title="Buy ingredients"
@@ -398,10 +398,10 @@ export default function SavedRecipesPage() {
                   <button
                     type="button"
                     onClick={() => handleRemoveRecipe(recipe.id, recipe.isCustom)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                    className="absolute -top-2 -right-2 inline-flex items-center justify-center h-4 w-4 bg-transparent text-red-600 hover:text-red-700 transition-colors duration-200"
                     aria-label={`Remove ${recipe.name}`}
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <X size={14} strokeWidth={3} />
                   </button>
                 </div>
               </div>
@@ -447,7 +447,7 @@ export default function SavedRecipesPage() {
             <button
               type="button"
               onClick={() => setVisibleCount((v) => v + 30)}
-              className="px-5 py-3 rounded-lg font-semibold bg-surface border border-surface-highlight hover:bg-surface-highlight transition-colors"
+              className="btn btn-md btn-ripple bg-surface border-2 border-surface-highlight hover:bg-surface-highlight hover:border-primary-400 hover:scale-105 transition-all duration-200"
             >
               Load more
             </button>

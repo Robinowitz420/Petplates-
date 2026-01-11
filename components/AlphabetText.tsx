@@ -8,6 +8,7 @@ type AlphabetTextProps = {
   className?: string;
   gapPx?: number;
   spaceWidthEm?: number;
+  forceSingleLine?: boolean;
 };
 
 function isLetterAZ(ch: string): boolean {
@@ -20,6 +21,7 @@ export default function AlphabetText({
   className = '',
   gapPx = 2,
   spaceWidthEm = 0.55,
+  forceSingleLine = false,
 }: AlphabetTextProps) {
   const safeText = typeof text === 'string' ? text : '';
   const scale = (1 / 3) * 1.3;
@@ -28,7 +30,7 @@ export default function AlphabetText({
   const renderSpaceWidthPx = Math.max(0, Math.round(renderSize * spaceWidthEm));
 
   const words = safeText.trim().split(/\s+/).filter(Boolean);
-  const shouldSplit = words.length > 4;
+  const shouldSplit = !forceSingleLine && words.length > 3;
 
   const renderCharacters = (segmentText: string, segmentKey: string) => {
     const chars = Array.from(segmentText);

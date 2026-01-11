@@ -283,10 +283,13 @@ export function calculateMealsFromGroceryList(
     
     // Parse recipe amount to grams
     const parsedBatchGrams = parseAmountToGrams(item.amount);
-    const recipeGrams = parsedBatchGrams;
+    const servingsRaw = typeof recipeServings === 'number' ? recipeServings : NaN;
+    const servings = Number.isFinite(servingsRaw) && servingsRaw > 0 ? servingsRaw : 1;
+    const recipeGrams = parsedBatchGrams / servings;
     console.log(`[calculateMealsFromGroceryList]   Recipe amount input: "${item.amount}" (type: ${typeof item.amount})`);
     console.log(`[calculateMealsFromGroceryList]   Recipe grams parsed (batch):`, parsedBatchGrams);
-    console.log(`[calculateMealsFromGroceryList]   Recipe grams per meal (batch):`, recipeGrams);
+    console.log(`[calculateMealsFromGroceryList]   Recipe servings:`, servings);
+    console.log(`[calculateMealsFromGroceryList]   Recipe grams per meal (derived):`, recipeGrams);
     
     if (recipeGrams <= 0) {
       console.log(`[calculateMealsFromGroceryList]   ❌ Skipping - invalid recipeGrams:`, recipeGrams);
@@ -359,9 +362,15 @@ export function calculateMealsFromGroceryList(
   // ✅ FIX: Floor the final result (not individual ingredients) to get whole meals
   // This gives accurate estimates without compounding rounding errors
   const finalMeals = Math.max(1, Math.floor(estimatedMeals));
-  const costPerMeal = finalMeals > 0 ? totalCost / finalMeals : 0;
+  const amortizedCostPerMealRaw = breakdown.reduce((sum, b) => {
+    const denom = typeof b.mealsFromPackage === 'number' && Number.isFinite(b.mealsFromPackage) && b.mealsFromPackage > 0 ? b.mealsFromPackage : 0;
+    if (denom <= 0) return sum;
+    const perMeal = b.packageCost / denom;
+    return sum + (Number.isFinite(perMeal) && perMeal > 0 ? perMeal : 0);
+  }, 0);
+  const costPerMeal = amortizedCostPerMealRaw;
   console.log('[calculateMealsFromGroceryList] Final meals after rounding:', finalMeals);
-  console.log('[calculateMealsFromGroceryList] Cost per meal:', costPerMeal);
+  console.log('[calculateMealsFromGroceryList] Cost per meal (amortized):', costPerMeal);
   
   // Check if cost exceeds budget threshold
   const finalCostPerMeal = Math.round(costPerMeal * 100) / 100;

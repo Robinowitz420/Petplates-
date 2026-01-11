@@ -40,7 +40,7 @@ interface IndividualCacheEntry {
   version?: string;
 }
 
-const SCORING_VERSION = 'v4';
+const SCORING_VERSION = 'v7';
 const CACHE_KEY_PREFIX = `recipe_scores_${SCORING_VERSION}_`;
 const INDIVIDUAL_CACHE_KEY_PREFIX = `recipe_score_${SCORING_VERSION}_`;
 const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes

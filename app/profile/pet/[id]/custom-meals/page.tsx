@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Trash2, Edit, Calendar, ChefHat } from 'lucide-react';
+import { ArrowLeft, Trash2, Edit, Calendar, ChefHat, Loader2 } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import { getCustomMealsPaged, deleteCustomMeal } from '@/lib/utils/customMealStorage';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
 import type { CustomMeal, Pet } from '@/lib/types';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
 import AlphabetText from '@/components/AlphabetText';
+import { normalizePetType } from '@/lib/utils/petType';
 
 export default function CustomMealsHistoryPage() {
   const params = useParams();
@@ -24,6 +25,10 @@ export default function CustomMealsHistoryPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+
+  const [saasScoresByMealId, setSaasScoresByMealId] = useState<Record<string, number>>({});
+  const [saasLoadingByMealId, setSaasLoadingByMealId] = useState<Record<string, boolean>>({});
+  const saasScoreCacheRef = useRef<Map<string, { ts: number; score: number }>>(new Map());
 
   const loadPage = async (mode: 'initial' | 'more') => {
     if (!isLoaded) return;
@@ -82,6 +87,107 @@ export default function CustomMealsHistoryPage() {
     };
     loadData();
   }, [isLoaded, petId, userId]);
+
+  useEffect(() => {
+    if (!userId || !pet) {
+      setSaasScoresByMealId({});
+      setSaasLoadingByMealId({});
+      saasScoreCacheRef.current.clear();
+      return;
+    }
+
+    let isCancelled = false;
+    const TTL_MS = 30 * 60 * 1000;
+    const visibleMeals = customMeals.slice(0, 30);
+
+    const run = async () => {
+      for (const meal of visibleMeals) {
+        if (isCancelled) return;
+        const mealId = String(meal?.id || '');
+        if (!mealId) continue;
+
+        const ingredients = Array.isArray(meal.ingredients) ? meal.ingredients : [];
+        const ingredientsKey = ingredients
+          .map((ing) => `${String((ing as any)?.key || '')}:${String((ing as any)?.grams ?? '')}`)
+          .join('|');
+
+        const petKey = [
+          String(pet.id || ''),
+          String(pet.type || ''),
+          Array.isArray((pet as any).healthConcerns) ? (pet as any).healthConcerns.join('|') : '',
+          Array.isArray((pet as any).allergies) ? (pet as any).allergies.join('|') : '',
+          Array.isArray((pet as any).dietaryRestrictions) ? (pet as any).dietaryRestrictions.join('|') : '',
+        ].join('::');
+
+        const cacheKey = `${userId}::${petKey}::customMeal::${mealId}::${ingredientsKey}`;
+        const cached = saasScoreCacheRef.current.get(cacheKey);
+        if (cached && Date.now() - cached.ts < TTL_MS) {
+          setSaasScoresByMealId((prev) => (prev[mealId] === cached.score ? prev : { ...prev, [mealId]: cached.score }));
+          continue;
+        }
+
+        setSaasLoadingByMealId((prev) => ({ ...prev, [mealId]: true }));
+
+        try {
+          const recipePayload = {
+            id: mealId,
+            name: meal.name,
+            category: 'custom',
+            ingredients: ingredients
+              .map((ing: any, idx: number) => {
+                const key = typeof ing?.key === 'string' ? ing.key : '';
+                const grams = typeof ing?.grams === 'number' ? ing.grams : Number(ing?.grams);
+                if (!key || !Number.isFinite(grams) || grams <= 0) return null;
+                return {
+                  id: `${mealId}:${key}:${idx}`,
+                  name: key.replace(/_/g, ' '),
+                  amount: `${grams}g`,
+                };
+              })
+              .filter(Boolean),
+          };
+
+          const response = await fetch('/api/compatibility/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              recipe: recipePayload,
+              pet: {
+                id: pet.id,
+                name: pet.name || (Array.isArray(pet.names) && pet.names.length > 0 ? pet.names[0] : 'Pet'),
+                type: normalizePetType((pet as any).type, 'CustomMealsHistoryPage'),
+                breed: (pet as any).breed,
+                age: (pet as any).age,
+                weight: (pet as any).weightKg || (pet as any).weight,
+                activityLevel: (pet as any).activityLevel,
+                healthConcerns: (pet as any).healthConcerns || [],
+                dietaryRestrictions: (pet as any).dietaryRestrictions || [],
+                allergies: (pet as any).allergies || [],
+              },
+            }),
+          });
+
+          if (!response.ok) continue;
+          const data = await response.json();
+          const score = typeof data?.overallScore === 'number' && Number.isFinite(data.overallScore) ? data.overallScore : null;
+          if (score === null) continue;
+
+          saasScoreCacheRef.current.set(cacheKey, { ts: Date.now(), score });
+          setSaasScoresByMealId((prev) => (prev[mealId] === score ? prev : { ...prev, [mealId]: score }));
+        } catch {
+          // ignore - fall back to stored local score
+        } finally {
+          setSaasLoadingByMealId((prev) => ({ ...prev, [mealId]: false }));
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [customMeals, pet, userId]);
 
   const handleDelete = async (mealId: string) => {
     if (!confirm('Are you sure you want to delete this custom meal?')) return;
@@ -255,14 +361,31 @@ export default function CustomMealsHistoryPage() {
                 </div>
 
                 {/* Compatibility Score */}
-                <div className={`mb-4 p-3 rounded-lg border ${getScoreColor(meal.analysis.score)}`}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Compatibility Score</span>
-                  </div>
-                  <div className="mt-3 flex justify-center">
-                    <CompatibilityRadial score={meal.analysis.score} size={91} strokeWidth={8} label="" />
-                  </div>
-                </div>
+                {(() => {
+                  const mealId = String(meal?.id || '');
+                  const localScore = typeof meal?.analysis?.score === 'number' ? meal.analysis.score : 0;
+                  const saasScore = typeof saasScoresByMealId[mealId] === 'number' ? saasScoresByMealId[mealId] : null;
+                  const effectiveScore = saasScore === null ? localScore : saasScore;
+                  const isSaasLoading = Boolean(saasLoadingByMealId[mealId]);
+
+                  return (
+                    <div className={`mb-4 p-3 rounded-lg border ${getScoreColor(effectiveScore)}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Compatibility Score</span>
+                      </div>
+                      <div className="mt-3 flex justify-center">
+                        <div className="relative">
+                          <CompatibilityRadial score={effectiveScore} size={91} strokeWidth={8} label="" />
+                          {isSaasLoading ? (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Loader2 className="h-6 w-6 animate-spin text-orange-400" />
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Ingredients Summary */}
                 <div className="mb-4">

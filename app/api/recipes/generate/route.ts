@@ -17,11 +17,7 @@ import { getRecommendationsForRecipe } from '@/lib/utils/nutritionalRecommendati
 import { getFirebaseAdminDb, getGeneratedRecipesCollectionPath } from '@/lib/services/firebaseAdmin';
 import { type PetType } from '@/lib/utils/petType';
 import { jsonError } from '@/lib/utils/apiResponse';
-import { getUsageLimitsForPlan } from '@/lib/utils/usageLimits';
-import { enforceFindMealsPerPet } from '@/lib/utils/findMealsLimit';
-import { getUserPlanTier } from '@/lib/utils/userPlan';
 import {
-  enforceAndIncrementRecipeGenerationMonthly,
   enforceRecipeGenerationRateLimit,
 } from '@/lib/utils/recipeGenerationGuards';
 
@@ -369,8 +365,8 @@ function validateAndNormalizeRecipes(params: {
   const allowedById = new Map<string, string>();
   const allowedByNormalizedName = new Map<string, string>();
   for (const ing of allowedIngredientObjs) {
-    const id = String((ing as any)?.id || '').trim();
-    const displayName = String((ing as any)?.name || '').trim();
+    const id = String(ing?.id || '').trim();
+    const displayName = String(ing?.name || '').trim();
     if (id) allowedById.set(id.toLowerCase(), displayName || id);
     if (displayName) {
       const key = normalizeTerm(displayName);
@@ -489,33 +485,11 @@ export async function POST(request: NextRequest) {
     const userId = authedUserId;
 
     const db = getFirebaseAdminDb();
-    const planTier = await getUserPlanTier(db as any, userId);
-    const limits = getUsageLimitsForPlan(planTier);
-
-    if (planTier === 'free') {
-      const perPetLimitResult = await enforceFindMealsPerPet(db as any, userId, petId, 3);
-      if (perPetLimitResult.ok === false) {
-        return jsonError({
-          code: perPetLimitResult.code,
-          message: perPetLimitResult.message,
-          status: perPetLimitResult.status,
-        });
-      }
-    }
     const nowMs = Date.now();
 
     const rl = await enforceRecipeGenerationRateLimit(db as any, userId, nowMs);
     if (rl.ok === false) {
       return jsonError({ code: 'RATE_LIMITED', message: rl.message, status: rl.status });
-    }
-
-    const monthly = await enforceAndIncrementRecipeGenerationMonthly(db as any, userId, nowMs, limits.recipeGenMonthly);
-    if (monthly.ok === false) {
-      const msg =
-        planTier === 'pro'
-          ? 'You’ve hit the Pro fair-use cap for meal generations this month. Please try again later.'
-          : monthly.message;
-      return jsonError({ code: 'LIMIT_REACHED', message: msg, status: monthly.status });
     }
 
     const debug = request.nextUrl.searchParams.get('debug') === '1';
@@ -528,7 +502,7 @@ export async function POST(request: NextRequest) {
       typeof body.count === 'number' && Number.isFinite(body.count) && body.count > 0
         ? Math.floor(body.count)
         : 18;
-    const targetCount = Math.max(18, requestedByClient);
+    const targetCount = requestedByClient;
     const requestedCount = Math.max(24, targetCount * 2);
     const maxAttempts = 6;
 

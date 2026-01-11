@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Users } from 'lucide-react';
+import { Clock, Users, Loader2 } from 'lucide-react';
 import { Recipe } from '@/lib/types';
 import { useAuth } from '@clerk/nextjs';
 
@@ -14,6 +14,7 @@ import CompatibilityRadial from '@/components/CompatibilityRadial';
 import { normalizePetType } from '@/lib/utils/petType';
 import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
 import AlphabetText from '@/components/AlphabetText';
+import { writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -33,7 +34,11 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [isAddingMeal, setIsAddingMeal] = useState(false);
   const [localMealSaved, setLocalMealSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const { userId } = useAuth();
+  const [saasScore, setSaasScore] = useState<number | null>(null);
+  const [isSaasLoading, setIsSaasLoading] = useState(false);
+  const [saasScoreFailed, setSaasScoreFailed] = useState(false);
+  const saasScoreCache = useRef<Map<string, { score: number; timestamp: number }>>(new Map());
+  const { userId, isLoaded } = useAuth();
 
   useEffect(() => {
     setLocalMealSaved(false);
@@ -44,31 +49,135 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
     localMealSaved ||
     (Array.isArray(pet?.savedRecipes) ? pet!.savedRecipes.includes(recipe.id) : false);
 
-  // Calculate compatibility rating if pet is provided
-  const speciesScore = pet
-    ? (() => {
-        const ageYears = typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : 1;
-        const weightNum =
-          typeof pet.weightKg === 'number'
-            ? pet.weightKg
-            : typeof pet.weight === 'string'
-              ? parseFloat(pet.weight) || 10
-              : 10;
+  // Get local score for fallback
+  const getLocalScore = useCallback(() => {
+    if (!pet) return null;
+    
+    const ageYears =
+      typeof pet.age === 'number'
+        ? (Number.isFinite(pet.age) && pet.age > 0 ? pet.age : 1)
+        : typeof pet.age === 'string'
+          ? parseFloat(pet.age) || 1
+          : 1;
+    const weightNum =
+      typeof pet.weightKg === 'number'
+        ? pet.weightKg
+        : typeof pet.weight === 'string'
+          ? parseFloat(pet.weight) || 10
+          : 10;
 
-        return scoreWithSpeciesEngine(recipe, {
-          id: pet.id,
-          name: pet.name || (pet.names?.[0] ?? 'Pet'),
-          type: normalizePetType(pet.type, 'RecipeCard'),
-          breed: pet.breed || '',
-          age: ageYears,
-          weight: Number.isFinite(weightNum) ? weightNum : 10,
-          activityLevel: pet.activityLevel || 'moderate',
-          healthConcerns: pet.healthConcerns || [],
-          dietaryRestrictions: pet.dietaryRestrictions || [],
-          allergies: pet.allergies || [],
-        } as any);
-      })()
-    : null;
+    return scoreWithSpeciesEngine(recipe, {
+      id: pet.id,
+      name: pet.name || (pet.names?.[0] ?? 'Pet'),
+      type: normalizePetType(pet.type, 'RecipeCard'),
+      breed: pet.breed || '',
+      age: ageYears,
+      weight: Number.isFinite(weightNum) ? weightNum : 10,
+      activityLevel: pet.activityLevel || 'moderate',
+      healthConcerns: pet.healthConcerns || [],
+      dietaryRestrictions: pet.dietaryRestrictions || [],
+      allergies: pet.allergies || [],
+    } as any);
+  }, [pet, recipe]);
+
+  // Calculate compatibility rating if pet is provided
+  const localScore = pet ? getLocalScore() : null;
+
+  // Fetch SaaS score when pet or recipe changes
+  useEffect(() => {
+    console.log('[RecipeCard saasScore]', {
+      isLoaded,
+      hasUserId: Boolean(userId),
+      hasPet: Boolean(pet),
+      petId: (pet as any)?.id,
+      recipeId: (recipe as any)?.id,
+    });
+
+    if (!isLoaded || !pet || !userId) {
+      console.log('[RecipeCard saasScore] skip', {
+        reason: !isLoaded ? 'auth_not_loaded' : !pet ? 'missing_pet' : 'missing_userId',
+      });
+      setSaasScore(null);
+      setSaasScoreFailed(false);
+      return;
+    }
+
+    const cacheKey = `${userId}:${pet.id}:${recipe.id}`;
+    const cached = saasScoreCache.current.get(cacheKey);
+    
+    // Use cached score if it's less than 30 minutes old
+    if (cached && Date.now() - cached.timestamp < 30 * 60 * 1000) {
+      setSaasScore(cached.score);
+      setSaasScoreFailed(false);
+      return;
+    }
+
+    const fetchSaasScore = async () => {
+      try {
+        setIsSaasLoading(true);
+        setSaasScoreFailed(false);
+
+        console.log('[RecipeCard saasScore] fetch /api/compatibility/score', {
+          userId,
+          petId: (pet as any)?.id,
+          recipeId: (recipe as any)?.id,
+        });
+
+        const response = await fetch('/api/compatibility/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipe,
+            pet: {
+              id: pet.id,
+              name: pet.name || 'Pet',
+              type: normalizePetType(pet.type, 'RecipeCard'),
+              breed: pet.breed,
+              age: typeof pet.age === 'string' ? parseFloat(pet.age) || 1 : (pet.age || 1),
+              weight: (pet as any).weightKg || pet.weight || 10,
+              activityLevel: (pet as any).activityLevel,
+              healthConcerns: (pet as any).healthConcerns || [],
+              dietaryRestrictions: (pet as any).dietaryRestrictions || [],
+              allergies: (pet as any).allergies || [],
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          let body = '';
+          try {
+            body = await response.text();
+          } catch {
+          }
+          console.error('[/api/compatibility/score] failed', response.status, body);
+          throw new Error('Failed to fetch score');
+        }
+        
+        const data = await response.json();
+        const score = typeof data.overallScore === 'number' ? data.overallScore : null;
+        
+        if (score !== null) {
+          saasScoreCache.current.set(cacheKey, { score, timestamp: Date.now() });
+          setSaasScore(score);
+          setSaasScoreFailed(false);
+          writeCachedCompatibilityScore({ userId, petId: pet.id, recipeId: recipe.id, overallScore: score });
+        } else {
+          setSaasScore(null);
+          setSaasScoreFailed(true);
+        }
+      } catch (error) {
+        console.error('Error fetching SaaS score:', error);
+        setSaasScore(null);
+        setSaasScoreFailed(true);
+      } finally {
+        setIsSaasLoading(false);
+      }
+    };
+
+    fetchSaasScore();
+  }, [isLoaded, pet, recipe, userId]);
+
+  const hasSaasScore = typeof saasScore === 'number' && Number.isFinite(saasScore);
 
   return (
     <>
@@ -81,11 +190,6 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
             <div className="text-xs font-semibold text-foreground uppercase tracking-wide">
               {recipe.category}
             </div>
-            {(recipe.needsReview === true || (recipe as any).usesFallbackNutrition) && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-900/40 text-amber-200 border border-amber-700/50">
-                ⚠️ Experimental / Topper Only
-              </span>
-            )}
           </div>
           <div className="text-[11px] text-gray-400">
             {recipe.servings} servings • {recipe.prepTime}
@@ -99,13 +203,23 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
             {recipe.description}
           </p>
 
-          {speciesScore && (
+          {hasSaasScore ? (
             <div className="mb-4 flex items-center justify-between rounded-lg border border-surface-highlight bg-surface-highlight/40 p-3">
-              <CompatibilityRadial score={speciesScore.overallScore} size={83} strokeWidth={8} label="" />
+              <div className="relative">
+                <CompatibilityRadial 
+                  score={saasScore as number} 
+                  size={83} 
+                  strokeWidth={8} 
+                  label="" 
+                />
+                {isSaasLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-orange-400" />
+                  </div>
+                )}
+              </div>
               <div className="flex flex-col items-end gap-1">
-                <div className="text-[10px] uppercase tracking-wide text-gray-400">
-                  {gradeToCompatibility(speciesScore.grade)} match
-                </div>
+                <div className="text-[10px] uppercase tracking-wide text-gray-400">Compatibility</div>
                 <button
                   onClick={(e) => {
                     e.preventDefault();
@@ -118,7 +232,11 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                 </button>
               </div>
             </div>
-          )}
+          ) : saasScoreFailed && !isSaasLoading ? (
+            <div className="mb-4 rounded-lg border border-surface-highlight bg-surface-highlight/30 p-3">
+              <div className="text-xs text-gray-300">Score not available</div>
+            </div>
+          ) : null}
 
           {(() => {
             const rawCost = (recipe as any).meta?.estimatedCost;
@@ -185,16 +303,30 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                 onClick={async (e) => {
                   e.preventDefault();
                   e.stopPropagation();
-
-                  if (!userId) return;
+                  
+                  if (!pet || !userId) return;
                   if (isMealSaved || isAddingMeal) return;
 
                   setSaveError(null);
                   setIsAddingMeal(true);
                   try {
-                    const nextSavedRecipes = Array.isArray(pet.savedRecipes) ? [...pet.savedRecipes] : [];
-                    if (!nextSavedRecipes.includes(recipe.id)) nextSavedRecipes.push(recipe.id);
-                    await savePersistedPet(userId, { ...pet, savedRecipes: nextSavedRecipes } as any);
+                    const currentSavedRecipes = Array.isArray(pet.savedRecipes) ? pet.savedRecipes : [];
+                    const updatedPet: Pet = {
+                      ...pet,
+                      savedRecipes: [...currentSavedRecipes, recipe.id],
+                    };
+
+                    if (saasScore !== null) {
+                      (updatedPet as any).savedRecipeScores = {
+                        ...(typeof (pet as any).savedRecipeScores === 'object' && (pet as any).savedRecipeScores ? (pet as any).savedRecipeScores : {}),
+                        [recipe.id]: {
+                          overallScore: saasScore,
+                          ts: Date.now(),
+                        },
+                      };
+                    }
+                    
+                    await savePersistedPet(userId, updatedPet);
                     setLocalMealSaved(true);
                   } catch (err) {
                     const raw = err instanceof Error ? err.message : String(err || '');
@@ -232,6 +364,11 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
         <RecipeScoreModal
           recipe={recipe}
           pet={pet}
+          score={{
+            overallScore: hasSaasScore ? (saasScore as number) : null,
+            warnings: undefined,
+            strengths: undefined
+          }}
           onClose={() => setIsModalOpen(false)}
         />
       )}

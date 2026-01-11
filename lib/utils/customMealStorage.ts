@@ -151,6 +151,12 @@ export async function saveCustomMeal(
   analysis: MealAnalysis
 ): Promise<CustomMeal> {
   const now = new Date().toISOString();
+  const normalizedRecommendedServingGrams =
+    typeof analysis.recommendedServingGrams === 'number' && analysis.recommendedServingGrams > 0
+      ? analysis.recommendedServingGrams
+      : analysis.totalRecipeGrams && analysis.totalRecipeGrams > 0
+        ? analysis.totalRecipeGrams
+        : 1; // Fallback to a minimal positive value to satisfy backend validation
   
   const customMeal: CustomMeal = {
     id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -167,7 +173,7 @@ export async function saveCustomMeal(
       score: analysis.score,
       nutrients: analysis.nutrients,
       totalRecipeGrams: analysis.totalRecipeGrams,
-      recommendedServingGrams: analysis.recommendedServingGrams,
+      recommendedServingGrams: normalizedRecommendedServingGrams,
       breakdown: analysis.breakdown,
       toxicityWarnings: analysis.toxicityWarnings.map(w => ({
         message: w.message,

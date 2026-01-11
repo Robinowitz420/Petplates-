@@ -19,8 +19,8 @@ import MealCompositionList from '@/components/MealCompositionList';
 import CompatibilityPanel from '@/components/CompatibilityPanel';
 import SuggestedIngredients from '@/components/SuggestedIngredients';
 import MealBuilderWizard from '@/components/MealBuilderWizard';
-import MealCompleteView from '@/components/MealCompleteView';
 import { getPets } from '@/lib/utils/petStorage'; // Import async storage
+import { saveCustomMeal } from '@/lib/utils/customMealStorage';
 
 // Style mapping for severity levels
 const severityStyles = {
@@ -420,6 +420,8 @@ export default function RecipeBuilderPage() {
   const [isFirstCreation, setIsFirstCreation] = useState(false); // Track if this is the first creation
   const [recommendedMeals, setRecommendedMeals] = useState<any[]>([]); // Store recommended meals
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isSavingMeal, setIsSavingMeal] = useState(false);
+  const [hasSavedMealId, setHasSavedMealId] = useState<string | null>(null);
 
   // Get species-appropriate ingredients and categories
   const normalizedSpeciesType = pet ? normalizeSpecies(pet.type) : null;
@@ -834,6 +836,33 @@ export default function RecipeBuilderPage() {
 
   const totalGrams = selectedIngredients.reduce((sum, s) => sum + s.grams, 0);
 
+  // Auto-save analyzed custom meal and redirect directly to the cloned detail page
+  useEffect(() => {
+    const maybeSaveAndRedirect = async () => {
+      if (!userId) return;
+      if (!pet) return;
+      if (!analysis || isAnalyzing) return;
+      if (selectedIngredients.length === 0) return;
+      if (isSavingMeal || hasSavedMealId) return;
+
+      setIsSavingMeal(true);
+      try {
+        const defaultMealName = `Custom meal for ${pet.names[0] || 'Pet'}`;
+        const saved = await saveCustomMeal(userId, petId, defaultMealName, selectedIngredients, analysis);
+        if (saved && saved.id) {
+          setHasSavedMealId(saved.id);
+          router.push(`/custom-recipe/${saved.id}?petId=${petId}`);
+        }
+      } catch (error) {
+        console.error('Failed to auto-save custom meal from recipe builder:', error);
+      } finally {
+        setIsSavingMeal(false);
+      }
+    };
+
+    maybeSaveAndRedirect();
+  }, [userId, pet, analysis, isAnalyzing, selectedIngredients, isSavingMeal, hasSavedMealId, petId, router]);
+
   if (!pet) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0f2c0f' }}>
@@ -911,141 +940,15 @@ export default function RecipeBuilderPage() {
     );
   }
 
-  // Show meal complete view after wizard or if ingredients exist
+  // After wizard/builder sets ingredients, show a simple transition while auto-saving
   if (wizardCompleted || selectedIngredients.length > 0) {
     return (
-      <>
-        <MealCompleteView
-          petName={pet.names[0] || 'Pet'}
-          petBreed={pet.breed}
-          petAge={pet.age}
-          petWeight={pet.weight}
-          petId={petId}
-          userId={userId || ''}
-          selectedIngredients={selectedIngredients}
-          analysis={analysis}
-          isAnalyzing={isAnalyzing}
-          onUpdateAmount={updateIngredientGrams}
-          onAddIngredient={addIngredientWithGrams}
-          onRemove={removeIngredient}
-          onAddMore={handleAddMore}
-          onStartOver={handleStartOver}
-          petType={pet.type}
-          getIngredientDisplayName={(key) => {
-            // Normalize key to match vetted products
-            const normalized = key
-              .toLowerCase()
-              .replace(/_/g, ' ')      // chicken_breast → chicken breast
-              .replace(/-/g, ' ')      // chicken-breast → chicken breast
-              .trim();
-            
-            // Try to find display name in vetted products
-            const product = require('@/lib/data/vetted-products').getVettedProduct(normalized);
-            return product?.productName || normalized;
-          }}
-          isFirstCreation={isFirstCreation}
-          getCompatibilityIndicator={(key) => {
-            if (!analysis) return null;
-            const hasToxicityWarning = analysis.toxicityWarnings.some(w => 
-              w.ingredientKey === key || (w.ingredientName && w.ingredientName.toLowerCase().includes(key.toLowerCase()))
-            );
-            if (hasToxicityWarning) return 'blocked';
-            const hasAllergyWarning = analysis.allergyWarnings.some(w => 
-              (typeof w === 'string' ? w : w.message).toLowerCase().includes(key.toLowerCase())
-            );
-            if (hasAllergyWarning) return 'warning';
-            return 'safe';
-          }}
-        />
-
-        {/* Add More Ingredients Modal/View */}
-        {showAddMore && categorizedIngredients && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-                <h2 className="text-xl font-bold text-gray-100">Add More Ingredients</h2>
-                <button
-                  onClick={() => setShowAddMore(false)}
-                  className="p-2 hover:opacity-80 rounded-full transition-colors"
-                  style={{ backgroundColor: '#2d5a47' }}
-                >
-                  <X size={20} className="text-gray-200" />
-                </button>
-              </div>
-              <div className="p-6">
-                {/* Recommended Ingredients Quick Add */}
-                {suggestedIngredients.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm font-semibold text-gray-200">Recommended Additions:</span>
-                      <span className="text-xs text-gray-400">Click to add quickly</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {suggestedIngredients
-                        .filter(sug => !selectedIngredients.some(sel => sel.key === sug.name))
-                        .slice(0, 12)
-                        .map((suggestion, idx) => {
-                          // Check if this ingredient comes from recommended meals
-                          const fromMeal = recommendedMeals.some((meal: any) => {
-                            const mealIngredients = meal.recipe?.ingredients || meal.adjustedIngredients || [];
-                            return mealIngredients.some((ing: any) => 
-                              (ing.name || ing.productName || '').toLowerCase() === suggestion.name.toLowerCase()
-                            );
-                          });
-                          
-                          return (
-                            <button
-                              key={idx}
-                              onClick={() => {
-                                addIngredient(suggestion.name);
-                              }}
-                              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-opacity ${
-                                fromMeal
-                                  ? 'bg-green-50 border border-green-300 text-green-900 hover:opacity-80'
-                                  : 'bg-blue-50 border border-blue-200 text-blue-900 hover:opacity-80'
-                              }`}
-                              title={suggestion.reason}
-                            >
-                              <span>{fromMeal ? '✨' : '⭐'}</span>
-                              <span>{suggestion.name}</span>
-                              {fromMeal && (
-                                <span className="text-xs opacity-75">(from meals)</span>
-                              )}
-                            </button>
-                          );
-                        })}
-                    </div>
-                    {suggestedIngredients.filter(sug => !selectedIngredients.some(sel => sel.key === sug.name)).length === 0 && (
-                      <p className="text-xs text-gray-500 italic">All recommended ingredients have been added</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Search Bar */}
-                <div className="mb-4">
-                  <IngredientPicker
-                    ingredients={availableIngredients.map(name => {
-                      let category = 'Other';
-                      for (const [catKey, cat] of Object.entries(categorizedIngredients)) {
-                        if (cat.ingredients.includes(name)) {
-                          category = cat.name;
-                          break;
-                        }
-                      }
-                      return { name, category };
-                    })}
-                    categories={categorizedIngredients}
-                    onSelect={(ingredientName) => {
-                      addIngredient(ingredientName);
-                    }}
-                    disabled={isAnalyzing}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0f2c0f' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto" />
+          <p className="mt-4 text-gray-300">Creating your custom meal...</p>
+        </div>
+      </div>
     );
   }
 

@@ -26,10 +26,15 @@ type ModalPet = {
 interface Props {
   recipe: Recipe;
   pet?: ModalPet | null;
+  score?: {
+    overallScore?: number;
+    warnings?: string[];
+    strengths?: string[];
+  } | null;
   onClose?: () => void;
 }
 
-export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
+export default function RecipeScoreModal({ recipe, pet, score, onClose }: Props) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiExplain, setAiExplain] = useState<{
@@ -41,6 +46,18 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
   } | null>(null);
 
   const scorePayload = useMemo(() => {
+    const fromParent = score && typeof score === 'object' ? score : null;
+    const parentOverall = typeof fromParent?.overallScore === 'number' && Number.isFinite(fromParent.overallScore)
+      ? fromParent.overallScore
+      : undefined;
+    if (parentOverall !== undefined) {
+      return {
+        overallScore: parentOverall,
+        warnings: Array.isArray(fromParent?.warnings) ? fromParent!.warnings! : undefined,
+        strengths: Array.isArray(fromParent?.strengths) ? fromParent!.strengths! : undefined,
+      };
+    }
+
     if (!pet) return { overallScore: undefined };
 
     try {
@@ -66,7 +83,7 @@ export default function RecipeScoreModal({ recipe, pet, onClose }: Props) {
       console.error('Error calculating compatibility:', error);
       return { overallScore: undefined };
     }
-  }, [pet, recipe]);
+  }, [pet, recipe, score]);
 
   const recipePayload = useMemo(() => {
     return {
