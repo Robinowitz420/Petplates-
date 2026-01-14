@@ -79,6 +79,11 @@ const getIngredientKey = (ingredient: any): string => {
   return rawName ? String(rawName).trim().toLowerCase() : '';
 };
 
+const getRemovalKey = (ingredient: any, originalIndex: number): string => {
+  const key = getIngredientKey(ingredient);
+  return key || `__idx-${originalIndex}`;
+};
+
 const normalizeToScoringIngredientId = (value: string): string => {
   return String(value || '')
     .toLowerCase()
@@ -429,6 +434,9 @@ export default function RecipeDetailPage() {
   const [animatedScore, setAnimatedScore] = useState<number | null>(null);
   const [isRescoring, setIsRescoring] = useState(false);
   const [lastStableOverallScore, setLastStableOverallScore] = useState<number | null>(null);
+  const baselineScoreRef = useRef<{ petId: string; recipeId: string; score: any } | null>(null);
+  const supplementBoostByIdRef = useRef<Record<string, number>>({});
+  const supplementIdByKeyRef = useRef<Record<string, string>>({});
 
   const userId = clerkUserId || '';
 
@@ -494,11 +502,11 @@ export default function RecipeDetailPage() {
     if (!baseRecipe) return null;
 
     const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
-    const filteredIngredients = allIngredients.filter((ing: any) => {
-      const key = getIngredientKey(ing);
-      if (!key) return true;
-      return !removedIngredientKeys.has(key);
+    const taggedIngredients = allIngredients.map((ing: any, index: number) => {
+      const removalKey = getRemovalKey(ing, index);
+      return ing && typeof ing === 'object' ? { ...ing, __removalKey: removalKey } : { name: String(ing || ''), __removalKey: removalKey };
     });
+    const filteredIngredients = taggedIngredients.filter((ing: any) => !removedIngredientKeys.has(String(ing?.__removalKey || '')));
 
     const scoringIngredients = filteredIngredients.map((ing: any) => {
       const id = typeof ing?.id === 'string' ? ing.id : '';
@@ -645,6 +653,27 @@ export default function RecipeDetailPage() {
   const resolvedRecipeIdForLock = useMemo(() => {
     return String((recipeForScoring as any)?.id || id || '').trim();
   }, [id, recipeForScoring]);
+
+  useEffect(() => {
+    supplementBoostByIdRef.current = {};
+    supplementIdByKeyRef.current = {};
+  }, [activePetId, resolvedRecipeIdForLock]);
+
+  useEffect(() => {
+    if (!activePetId || !resolvedRecipeIdForLock) return;
+    if (!scoreForQueryPet) return;
+
+    const existing = baselineScoreRef.current;
+    if (existing && existing.petId === activePetId && existing.recipeId === resolvedRecipeIdForLock) {
+      return;
+    }
+
+    baselineScoreRef.current = {
+      petId: activePetId,
+      recipeId: resolvedRecipeIdForLock,
+      score: scoreForQueryPet as any,
+    };
+  }, [activePetId, hasLocalEdits, resolvedRecipeIdForLock, scoreForQueryPet]);
 
   // Calculate compatibility score if we don't have cached data
   useEffect(() => {
@@ -999,17 +1028,186 @@ export default function RecipeDetailPage() {
   const handleRemoveIngredient = useCallback((ingredientId: string) => {
     const key = String(ingredientId || '').trim();
     if (!key) return;
+
+    try {
+      const baseRecipeDbg: any = modifiedRecipe || vettedRecipe || recipe;
+      const allIngredientsDbg = Array.isArray(baseRecipeDbg?.ingredients) ? baseRecipeDbg.ingredients : [];
+      const nextRemovedDbg = new Set(removedIngredientKeys);
+      nextRemovedDbg.add(key);
+      const nextCountDbg = allIngredientsDbg.filter((ing: any, index: number) => !nextRemovedDbg.has(getRemovalKey(ing, index))).length;
+      console.log('[handleRemoveIngredient]', {
+        key,
+        beforeCount: allIngredientsDbg.length,
+        afterCount: nextCountDbg,
+        willRemove: nextCountDbg < allIngredientsDbg.length,
+      });
+    } catch {
+      // ignore
+    }
+
+    const resolvedSupplementId = key.startsWith('supplement-') ? key : supplementIdByKeyRef.current[key];
+    const deltaToApply = resolvedSupplementId ? supplementBoostByIdRef.current[resolvedSupplementId] : undefined;
+    if (typeof deltaToApply === 'number' && Number.isFinite(deltaToApply) && deltaToApply > 0) {
+      const baseObj: any = currentScore || scoreForQueryPet || {};
+      const baseOverall = typeof baseObj?.overallScore === 'number' && Number.isFinite(baseObj.overallScore) ? baseObj.overallScore : 0;
+      const nextOverall = Math.max(0, Math.min(100, Math.round(baseOverall - deltaToApply)));
+      const nextScoreObj: any = {
+        ...baseObj,
+        overallScore: nextOverall,
+      };
+
+      delete supplementBoostByIdRef.current[resolvedSupplementId];
+      delete supplementIdByKeyRef.current[key];
+      // clean any other key aliases pointing to the same supplement id
+      for (const [k, v] of Object.entries(supplementIdByKeyRef.current)) {
+        if (v === resolvedSupplementId) delete supplementIdByKeyRef.current[k];
+      }
+
+      manualScoreOverrideRef.current = { petId: activePetId, recipeId: resolvedRecipeIdForLock };
+      lastAnimatedTargetRef.current = nextOverall;
+      setAnimatedScore(nextOverall);
+      setCurrentScore(nextScoreObj);
+    } else {
+      // Core ingredient removal -> SaaS rescore (wait)
+      if (userId && activePetId) {
+        const baseRecipe: any = modifiedRecipe || vettedRecipe || recipe;
+        const activePetLocal = pets.find((p) => p.id === activePetId) || null;
+        if (baseRecipe && activePetLocal) {
+          const nextRemovedKeys = new Set(removedIngredientKeys);
+          nextRemovedKeys.add(key);
+
+          const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
+          const filteredIngredients = allIngredients.filter((ing: any, index: number) => {
+            const k = getRemovalKey(ing, index);
+            return !nextRemovedKeys.has(k);
+          });
+
+          const nextRecipeForScoring: any = {
+            ...baseRecipe,
+            ingredients: filteredIngredients,
+          };
+
+          const nextRecipeForSaas: any = {
+            ...nextRecipeForScoring,
+            ingredients: Array.isArray(nextRecipeForScoring.ingredients)
+              ? nextRecipeForScoring.ingredients.filter((i: any) => {
+                  const category = String(i?.category || '').toLowerCase();
+                  const id = String(i?.id || '').toLowerCase();
+                  return category !== 'supplement' && !id.startsWith('supplement-');
+                })
+              : [],
+          };
+
+          setIsRescoring(true);
+          fetch('/api/compatibility/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              recipe: nextRecipeForSaas,
+              pet: {
+                id: activePetLocal.id,
+                name: getRandomName(activePetLocal.names),
+                type: activePetLocal.type,
+                breed: activePetLocal.breed,
+                age: activePetLocal.age,
+                weight: activePetLocal.weight,
+                healthConcerns: activePetLocal.healthConcerns,
+                allergies: activePetLocal.allergies,
+              },
+            }),
+          })
+            .then(async (res) => {
+              if (!res.ok) {
+                let text = '';
+                try {
+                  text = await res.text();
+                } catch {
+                  text = '';
+                }
+                console.error('[core remove] /api/compatibility/score failed', res.status, text);
+                setMessage('Unable to rescore meal right now.');
+                setTimeout(() => setMessage(null), 3500);
+                return null;
+              }
+              return res.json();
+            })
+            .then((data) => {
+              if (!data?.score) return;
+
+              const baseOverallRaw = data.score.overallScore;
+              const baseOverall = typeof baseOverallRaw === 'number' && Number.isFinite(baseOverallRaw) ? baseOverallRaw : 0;
+              const remainingBoost = Object.entries(supplementBoostByIdRef.current)
+                .filter(([k]) => k.startsWith('supplement-'))
+                .reduce((sum, [, v]) => sum + (typeof v === 'number' && Number.isFinite(v) ? v : 0), 0);
+
+              const nextOverall = Math.max(0, Math.min(100, Math.round(baseOverall + remainingBoost)));
+              const nextScoreObj: any = {
+                ...data.score,
+                overallScore: nextOverall,
+              };
+
+              const recipeIdForCache = String((recipe as any)?.id || resolvedRecipeIdForLock || '');
+              const nextFingerprint = getRecipeFingerprint(nextRecipeForScoring);
+              manualScoreOverrideRef.current = { petId: activePetId, recipeId: recipeIdForCache };
+
+              writeCachedCompatibilityScore({
+                userId,
+                petId: activePetId,
+                recipeId: recipeIdForCache,
+                recipeFingerprint: nextFingerprint,
+                overallScore: nextScoreObj.overallScore,
+                breakdown: nextScoreObj.breakdown,
+                warnings: nextScoreObj.warnings,
+                strengths: nextScoreObj.strengths,
+                nutritionalGaps: nextScoreObj.nutritionalGaps,
+                supplementRecommendations: nextScoreObj.supplementRecommendations,
+                compatibility: nextScoreObj.compatibility,
+                summaryReasoning: nextScoreObj.summaryReasoning,
+              });
+
+              lastAnimatedTargetRef.current = nextOverall;
+              setAnimatedScore(nextOverall);
+              setCurrentScore(nextScoreObj);
+            })
+            .finally(() => {
+              setIsRescoring(false);
+            });
+        }
+      }
+    }
+
     setRemovedIngredientKeys((prev) => {
       const next = new Set(prev);
       next.add(key);
       return next;
     });
-  }, []);
+  }, [activePetId, currentScore, modifiedRecipe, pets, recipe, removedIngredientKeys, resolvedRecipeIdForLock, scoreForQueryPet, userId, vettedRecipe]);
 
   const handleResetLocalEdits = useCallback(() => {
     setRemovedIngredientKeys(new Set());
     setModifiedRecipe(null);
-  }, []);
+    supplementBoostByIdRef.current = {};
+    supplementIdByKeyRef.current = {};
+
+    const baseline = baselineScoreRef.current;
+    if (baseline && baseline.petId === activePetId && baseline.recipeId === resolvedRecipeIdForLock) {
+      const baseObj: any = baseline.score || scoreForQueryPet || {};
+      const nextOverall = typeof baseObj?.overallScore === 'number' && Number.isFinite(baseObj.overallScore) ? Math.round(baseObj.overallScore) : 0;
+      const nextScoreObj: any = {
+        ...baseObj,
+        overallScore: nextOverall,
+      };
+
+      manualScoreOverrideRef.current = { petId: activePetId, recipeId: resolvedRecipeIdForLock };
+      lastAnimatedTargetRef.current = nextOverall;
+      setAnimatedScore(nextOverall);
+      setCurrentScore(nextScoreObj);
+    } else {
+      lastAnimatedTargetRef.current = null;
+      setAnimatedScore(null);
+      setCurrentScore(null);
+    }
+  }, [activePetId, resolvedRecipeIdForLock, scoreForQueryPet]);
 
   // Function to add supplement to recipe
   const handleAddSupplement = useCallback((supplement: RecommendedSupplement) => {
@@ -1101,6 +1299,9 @@ export default function RecipeDetailPage() {
       lastAnimatedTargetRef.current = nextOverall;
       setAnimatedScore(nextOverall);
       setCurrentScore(boostedScore);
+
+      supplementBoostByIdRef.current[ingredientToAdd.id] = boost;
+      supplementIdByKeyRef.current[getIngredientKey(ingredientToAdd)] = ingredientToAdd.id;
     }
 
     setActiveTab('ingredients');
@@ -1229,6 +1430,9 @@ export default function RecipeDetailPage() {
         lastAnimatedTargetRef.current = nextOverall;
         setAnimatedScore(nextOverall);
         setCurrentScore(boostedScore);
+
+        supplementBoostByIdRef.current[nextId] = boost;
+        supplementIdByKeyRef.current[getIngredientKey({ id: nextId, name: targetName || 'Supplement' })] = nextId;
       }
 
       setActiveTab('ingredients');
@@ -1383,13 +1587,7 @@ export default function RecipeDetailPage() {
   };
 
   // Calculate all shopping items and meal estimate for sidebar (MUST be before early returns)
-  const {
-    ingredientShoppingItems,
-    supplementShoppingItems,
-    allShoppingItems,
-    pricingIngredients,
-    mealEstimate,
-  } = useMemo(() => {
+  const { ingredientShoppingItems, supplementShoppingItems, allShoppingItems, pricingIngredients, mealEstimate } = useMemo(() => {
     const baseRecipe = modifiedRecipe || vettedRecipe || recipe;
     if (!baseRecipe) {
       return {
@@ -1402,11 +1600,11 @@ export default function RecipeDetailPage() {
     }
 
     const allIngredients = Array.isArray((baseRecipe as any).ingredients) ? (baseRecipe as any).ingredients : [];
-    const filteredIngredients = allIngredients.filter((ing: any) => {
-      const key = getIngredientKey(ing);
-      if (!key) return true;
-      return !removedIngredientKeys.has(key);
+    const taggedIngredients = allIngredients.map((ing: any, index: number) => {
+      const removalKey = getRemovalKey(ing, index);
+      return ing && typeof ing === 'object' ? { ...ing, __removalKey: removalKey } : { name: String(ing || ''), __removalKey: removalKey };
     });
+    const filteredIngredients = taggedIngredients.filter((ing: any) => !removedIngredientKeys.has(String(ing?.__removalKey || '')));
 
     const supplementCategories = new Set(['Supplement']);
 
@@ -1456,7 +1654,7 @@ export default function RecipeDetailPage() {
     const estimateCandidates = pricingCandidates;
 
     const ingredientItems = ingredientCandidates.map((ing: any, index: number) => ({
-      id: getIngredientKey(ing) || `ingredient-${index}`,
+      id: String((ing as any)?.__removalKey || getRemovalKey(ing, index)),
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
@@ -1466,7 +1664,7 @@ export default function RecipeDetailPage() {
     }));
 
     const estimateItems = estimateCandidates.map((ing: any, index: number) => ({
-      id: getIngredientKey(ing) || `estimate-${index}`,
+      id: String((ing as any)?.__removalKey || getRemovalKey(ing, index)),
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
@@ -1476,7 +1674,7 @@ export default function RecipeDetailPage() {
     }));
 
     const supplementItems = supplementCandidates.map((ing: any, index: number) => ({
-      id: getIngredientKey(ing) || `supplement-${index}`,
+      id: String((ing as any)?.__removalKey || getRemovalKey(ing, index)),
       name: ing.name,
       amount: ing.amount || '',
       asinLink: ing.asinLink || ing.amazonLink ? ensureSellerId(ing.asinLink || ing.amazonLink) : undefined,
@@ -1783,6 +1981,11 @@ export default function RecipeDetailPage() {
                             strokeWidth={10}
                             label=""
                           />
+                          {isRescoring && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="h-10 w-10 rounded-full border-2 border-orange-500 border-t-transparent animate-spin" />
+                            </div>
+                          )}
                           <div className="absolute bottom-[-23px] left-1/2 transform -translate-x-1/2 inline-flex items-center px-2 py-1 text-xs font-bold text-orange-200 bg-orange-500/20 border border-orange-400/50 rounded-full animate-pulse whitespace-nowrap">
                             Tap for details!
                           </div>

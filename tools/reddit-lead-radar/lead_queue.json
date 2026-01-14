@@ -1,4 +1,10 @@
 {
   "leads": [],
-  "generated_at": 1767807867.1162014
+  "generated_at": 1767917120.1644442,
+  "stats": {
+    "total_scanned": 1,
+    "leads_found": 0,
+    "high_intent": 0,
+    "emergencies": 0
+  }
 }

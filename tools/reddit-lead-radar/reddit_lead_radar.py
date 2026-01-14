@@ -1042,9 +1042,9 @@ class RedditLeadRadar:
         print(f"{'='*60}")
 
         # Generate lead queue JSON
-        self.generate_lead_queue()
+        self.generate_lead_queue(metrics)
 
-    def generate_lead_queue(self):
+    def generate_lead_queue(self, metrics=None):
         """Generate lead queue JSON file"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -1084,7 +1084,16 @@ class RedditLeadRadar:
             leads.append(lead)
 
         with open('lead_queue.json', 'w') as f:
-            json.dump({'leads': leads, 'generated_at': time.time()}, f, indent=2)
+            json.dump({
+                'leads': leads,
+                'generated_at': time.time(),
+                'stats': {
+                    'total_scanned': metrics.get('total_processed', 0) if metrics else 0,
+                    'leads_found': metrics.get('leads_found', 0) if metrics else 0,
+                    'high_intent': len([l for l in leads if l.get('score', 0) > 0.8]),
+                    'emergencies': 0  # Could be tracked separately if needed
+                }
+            }, f, indent=2)
 
         conn.close()
 
@@ -1114,7 +1123,6 @@ class RedditLeadRadar:
     def run_once(self):
         """Run a single ingestion cycle"""
         self.run_ingestion_cycle()
-        self.generate_lead_queue()
 
 def main():
     """Main entry point"""

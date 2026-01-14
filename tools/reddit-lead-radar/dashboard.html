@@ -231,6 +231,7 @@
     <script>
         let leadsData = [];
         let filteredLeads = [];
+        let statsData = {};
 
         // Load leads data
         async function loadLeads() {
@@ -239,6 +240,7 @@
                 const data = await response.json();
                 leadsData = data.leads || [];
                 filteredLeads = [...leadsData];
+                statsData = data.stats || {};
 
                 updateStats();
                 updateFilters();
@@ -251,9 +253,9 @@
 
         function updateStats() {
             document.getElementById('leadCount').textContent = leadsData.length;
-            document.getElementById('totalScanned').textContent = 'N/A'; // Would need to track this
-            document.getElementById('highIntent').textContent = leadsData.filter(l => l.score > 0.8).length;
-            document.getElementById('emergencies').textContent = '0'; // Would need to track this
+            document.getElementById('totalScanned').textContent = statsData.total_scanned || 0;
+            document.getElementById('highIntent').textContent = statsData.high_intent || leadsData.filter(l => l.score > 0.8).length;
+            document.getElementById('emergencies').textContent = statsData.emergencies || 0;
             document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
         }
 
