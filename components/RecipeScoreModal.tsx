@@ -189,7 +189,7 @@ export default function RecipeScoreModal({ recipe, pet, score, onClose }: Props)
       return (
         found || {
           concern,
-          note: 'No specific note available for this concern based on the current data. Consider confirming with your veterinarian.',
+          note: 'No specific note available for this concern based on the current data. Consider confirming with a qualified animal health professional.',
         }
       );
     });

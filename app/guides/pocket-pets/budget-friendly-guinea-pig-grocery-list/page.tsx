@@ -178,8 +178,8 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">What this list is (and is not)</h2>
             <p className="text-gray-200">
-              This is a shopping/logistics guide. It is not medical advice. For diet questions, consult a veterinarian and use trusted
-              species resources.
+              This is a shopping/logistics guide. It is not medical advice. For diet questions, consult a qualified animal health
+              professional and use trusted species resources.
             </p>
           </section>
 

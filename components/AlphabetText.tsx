@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useCallback, useState } from 'react';
 
 type AlphabetTextProps = {
   text: string;
@@ -13,6 +14,10 @@ type AlphabetTextProps = {
 
 function isLetterAZ(ch: string): boolean {
   return ch.length === 1 && ch.toLowerCase() >= 'a' && ch.toLowerCase() <= 'z';
+}
+
+function isDigit(ch: string): boolean {
+  return ch.length === 1 && ch >= '0' && ch <= '9';
 }
 
 export default function AlphabetText({
@@ -29,6 +34,17 @@ export default function AlphabetText({
   const renderGapPx = Math.max(0, Math.round(gapPx * scale));
   const renderSpaceWidthPx = Math.max(0, Math.round(renderSize * spaceWidthEm));
 
+  const [failedGlyphKeys, setFailedGlyphKeys] = useState<Set<string>>(() => new Set());
+
+  const markGlyphFailed = useCallback((glyphKey: string) => {
+    setFailedGlyphKeys((prev) => {
+      if (prev.has(glyphKey)) return prev;
+      const next = new Set(prev);
+      next.add(glyphKey);
+      return next;
+    });
+  }, []);
+
   const words = safeText.trim().split(/\s+/).filter(Boolean);
   const shouldSplit = !forceSingleLine && words.length > 3;
 
@@ -38,6 +54,24 @@ export default function AlphabetText({
       const isLast = idx === chars.length - 1;
       const key = `${segmentKey}-${idx}-${ch}`;
 
+      if (failedGlyphKeys.has(key)) {
+        return (
+          <span
+            key={key}
+            aria-hidden="true"
+            className="inline-flex items-center"
+            style={{
+              height: renderSize,
+              fontSize: Math.max(8, Math.round(renderSize * 0.75)),
+              lineHeight: 1,
+              marginRight: isLast ? 0 : renderGapPx,
+            }}
+          >
+            {ch}
+          </span>
+        );
+      }
+
       if (ch === '&') {
         return (
           <Image
@@ -46,7 +80,9 @@ export default function AlphabetText({
             alt=""
             width={renderSize}
             height={renderSize}
+            unoptimized
             className="object-contain"
+            onError={() => markGlyphFailed(key)}
             style={{ marginRight: isLast ? 0 : renderGapPx }}
           />
         );
@@ -60,7 +96,73 @@ export default function AlphabetText({
             alt=""
             width={renderSize}
             height={renderSize}
+            unoptimized
             className="object-contain"
+            onError={() => markGlyphFailed(key)}
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
+      if (isDigit(ch)) {
+        return (
+          <Image
+            key={key}
+            src={`/images/Buttons/Alphabet/NUMBERS/${ch}.png`}
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            unoptimized
+            className="object-contain"
+            onError={() => markGlyphFailed(key)}
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
+      if (ch === '$') {
+        return (
+          <Image
+            key={key}
+            src="/images/Buttons/Alphabet/NUMBERS/MoneySign.png"
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            unoptimized
+            className="object-contain"
+            onError={() => markGlyphFailed(key)}
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
+      if (ch === '/') {
+        return (
+          <Image
+            key={key}
+            src="/images/Buttons/Alphabet/NUMBERS/Backslash.png"
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            unoptimized
+            className="object-contain"
+            onError={() => markGlyphFailed(key)}
+            style={{ marginRight: isLast ? 0 : renderGapPx }}
+          />
+        );
+      }
+
+      if (ch === '.') {
+        return (
+          <Image
+            key={key}
+            src="/images/Buttons/Alphabet/NUMBERS/Period.png"
+            alt=""
+            width={renderSize}
+            height={renderSize}
+            unoptimized
+            className="object-contain"
+            onError={() => markGlyphFailed(key)}
             style={{ marginRight: isLast ? 0 : renderGapPx }}
           />
         );
@@ -75,7 +177,9 @@ export default function AlphabetText({
             alt=""
             width={renderSize}
             height={renderSize}
+            unoptimized
             className="object-contain"
+            onError={() => markGlyphFailed(key)}
             style={{ marginRight: isLast ? 0 : renderGapPx }}
           />
         );

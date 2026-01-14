@@ -4,6 +4,36 @@ import type { CustomMeal, Recipe } from '@/lib/types';
  * Converts a CustomMeal to Recipe format for display in recipe detail pages
  */
 export function convertCustomMealToRecipe(customMeal: CustomMeal): Recipe {
+  // Helper function to identify supplements (same logic as in recipeNutrition.ts)
+  const mapSupplementToCompositionKey = (ingredientName: string): string | null => {
+    const lower = ingredientName.toLowerCase();
+    if (lower.includes('taurine')) return 'taurine_powder';
+    if (lower.includes('eggshell') || lower.includes('egg shell') || lower.includes('egg shells')) return 'calcium_carbonate';
+    if (lower.includes('calcium') && (lower.includes('carbonate') || lower.includes('supplement'))) return 'calcium_carbonate';
+    if (lower.includes('omega') || lower.includes('fish oil') || lower.includes('krill') || lower.includes('salmon oil')) return 'fish_oil';
+    return null;
+  };
+
+  // Separate ingredients and supplements
+  const regularIngredients: { id: string; name: string; amount: string }[] = [];
+  const supplements: { id: string; name: string; amount: string }[] = [];
+
+  customMeal.ingredients.forEach((ing, idx) => {
+    const displayName = ing.key.replace(/_/g, ' ');
+    const ingredient = {
+      id: `${idx + 1}`,
+      name: displayName,
+      amount: `${ing.grams}g`,
+    };
+
+    // Check if this is a supplement
+    if (mapSupplementToCompositionKey(displayName) !== null) {
+      supplements.push(ingredient);
+    } else {
+      regularIngredients.push(ingredient);
+    }
+  });
+
   return {
     id: customMeal.id,
     name: customMeal.name,
@@ -11,11 +41,8 @@ export function convertCustomMealToRecipe(customMeal: CustomMeal): Recipe {
     ageGroup: ['adult'],
     healthConcerns: [],
     description: `Custom meal created on ${customMeal.createdAt ? new Date(customMeal.createdAt).toLocaleDateString() : 'unknown date'}`,
-    ingredients: customMeal.ingredients.map((ing, idx) => ({
-      id: `${idx + 1}`,
-      name: ing.key.replace(/_/g, ' '),
-      amount: `${ing.grams}g`,
-    })),
+    ingredients: regularIngredients,
+    supplements: supplements.length > 0 ? supplements : undefined,
     instructions: [
       'Mix all ingredients according to saved recipe',
       'Serve at recommended portion size',

@@ -43,7 +43,7 @@ const faqItems = [
   {
     question: 'Can baby rabbits eat lettuce?',
     answer:
-      'Baby rabbits can be more sensitive. Keep changes conservative and confirm your plan with trusted rabbit care resources or a rabbit-savvy veterinarian.',
+      'Baby rabbits can be more sensitive. Keep changes conservative and confirm your plan with trusted rabbit care resources or a qualified animal health professional.',
   },
   {
     question: 'How much lettuce can rabbits eat?',
@@ -53,7 +53,7 @@ const faqItems = [
   {
     question: 'What should I do if my rabbit gets diarrhea?',
     answer:
-      'Digestive upset in rabbits can become serious. Pause new foods and contact a rabbit-savvy veterinarian for guidance.',
+      'Digestive upset in rabbits can become serious. Pause new foods and seek professional guidance promptly.',
   },
 ];
 
@@ -169,7 +169,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">What to do if your rabbit gets digestive upset</h2>
             <p className="text-gray-200">
-              Digestive upset can become serious in rabbits. Pause new foods and contact a rabbit-savvy veterinarian.
+              Digestive upset can become serious in rabbits. Pause new foods and seek professional guidance promptly.
             </p>
           </section>
 
@@ -222,7 +222,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
-              <li>Rabbit-savvy veterinary resources</li>
+              <li>Reputable rabbit care resources</li>
               <li>Species-specific care resources</li>
             </ul>
           </section>

@@ -33,27 +33,27 @@ const faqItems = [
   {
     question: 'Should dogs with pancreatitis eat a low-fat diet?',
     answer:
-      'Often, reducing dietary fat is a common veterinary recommendation for pancreatitis management. Your veterinarian should set targets for your dog’s specific situation.',
+      'Often, reducing dietary fat is a common professional recommendation for pancreatitis management. A qualified animal health professional should set targets for your dog’s specific situation.',
   },
   {
     question: 'What ingredients are commonly avoided for pancreatitis?',
     answer:
-      'High-fat ingredients and rich add-ins are commonly avoided. Keep the plan simple and confirm ingredient choices with your veterinarian.',
+      'High-fat ingredients and rich add-ins are commonly avoided. Keep the plan simple and confirm ingredient choices with a qualified animal health professional.',
   },
   {
     question: 'Can I feed homemade food during a pancreatitis flare-up?',
     answer:
-      'During a flare-up, follow your veterinarian’s instructions. Do not switch diets impulsively without medical guidance.',
+      'During a flare-up, follow professional instructions. Do not switch diets impulsively without guidance.',
   },
   {
     question: 'Are treats okay for dogs with pancreatitis?',
     answer:
-      'Treats can derail a low-fat plan quickly. If you use treats, keep them planned, consistent, and aligned with your vet’s recommendations.',
+      'Treats can derail a low-fat plan quickly. If you use treats, keep them planned, consistent, and aligned with your care plan.',
   },
   {
-    question: 'When should I ask my vet about a prescription diet?',
+    question: 'When should I ask about a prescription diet?',
     answer:
-      'If your dog has recurring flare-ups, weight loss, severe symptoms, or complex medical history, a prescription diet may be recommended by your veterinarian.',
+      'If your dog has recurring flare-ups, weight loss, severe symptoms, or complex medical history, a prescription diet may be recommended by a qualified animal health professional.',
   },
 ];
 
@@ -122,11 +122,11 @@ export default function Page() {
 
           <p className="mt-4 text-gray-300">
             Quick answer: pancreatitis changes the priorities. Keep the plan simple, keep fat conservative, and coordinate with your
-            veterinarian—especially during a flare-up.
+            professional support team—especially during a flare-up.
           </p>
 
           <div className="mt-5 rounded-xl border border-green-800/40 p-4 bg-surface-lighter text-sm text-gray-200">
-            This page is educational and not veterinary advice. If your pet has symptoms or a condition, contact your veterinarian.
+            This page is educational and not medical advice. If your pet has symptoms or a condition, seek professional guidance.
           </div>
 
           <div className="mt-6 bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
@@ -147,7 +147,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Quick answer: the safest planning mindset</h2>
             <p className="text-gray-200">
-              The safest mindset is risk reduction. Avoid dramatic ingredient swings, avoid rich add-ins, and treat your vet’s plan as
+              The safest mindset is risk reduction. Avoid dramatic ingredient swings, avoid rich add-ins, and treat your care plan as
               the primary reference.
             </p>
           </section>
@@ -175,21 +175,21 @@ export default function Page() {
             <ul className="space-y-2 text-gray-200">
               <li>Prefer simpler, unseasoned ingredients.</li>
               <li>Be cautious with oils, butter, skin-on meats, and fatty cuts.</li>
-              <li>If you’re unsure, verify with your veterinarian before changing the plan.</li>
+              <li>If you’re unsure, seek professional guidance before changing the plan.</li>
             </ul>
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
-            <h2 className="text-xl font-bold text-orange-400 mb-4">When to pause and consult your vet (red flags)</h2>
+            <h2 className="text-xl font-bold text-orange-400 mb-4">When to pause and seek professional help (red flags)</h2>
             <p className="text-gray-200">
               If your dog is vomiting, not eating, seems painful, lethargic, or symptoms worsen—pause diet experiments and contact your
-              veterinarian.
+              professional support team.
             </p>
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">
-              How Pet Plates helps you plan meals (without replacing veterinary care)
+              How Pet Plates helps you plan meals (without replacing medical care)
             </h2>
             <p className="text-gray-200">
               Pet Plates is an educational planning tool. It can help you keep ingredients and routines organized, but it does not
@@ -244,8 +244,8 @@ export default function Page() {
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
               <li>VCA Animal Hospitals (pancreatitis overviews)</li>
-              <li>University veterinary hospital resources</li>
-              <li>Your veterinarian’s individualized plan</li>
+              <li>University hospital resources</li>
+              <li>Your care plan</li>
             </ul>
           </section>
         </div>

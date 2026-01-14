@@ -81,6 +81,7 @@ export type MealAnalysis = {
     baseScore?: number;
     nutritionPenalty?: number;
     balancePenalty?: number;
+    supplementBoost?: number;
   };
 };
 
@@ -471,6 +472,7 @@ function calculateGamifiedScore(
   nutrientWarnings: WarningItem[],
   ingredientsNotFound?: string[],
   totalIngredientCount?: number,
+  selections?: IngredientSelection[],
 ) {
   const { coverageScores } = computeNutrientCoverageAndWarnings(pet, totals, totalGrams);
 
@@ -535,8 +537,29 @@ function calculateGamifiedScore(
   const maxPenalty = Math.round(base * 0.4);
   const penaltyApplied = Math.min(maxPenalty, Math.round((toxicityPenalty / 100) * base));
   
-  const finalScore = Math.max(20, base - penaltyApplied);
-  
+  // Supplement boost (2-8 points if supplements are present)
+  let supplementBoost = 0;
+  if (selections && selections.length > 0) {
+    const supplementKeys = ['taurine_powder', 'calcium_carbonate', 'fish_oil'];
+    const hasSupplements = selections.some(sel =>
+      supplementKeys.some(key => sel.key.includes(key) || key.includes(sel.key))
+    );
+
+    if (hasSupplements) {
+      // Create deterministic boost based on recipe content
+      const seed = selections.map(s => s.key).join('|') + (pet.id || 'pet');
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash = hash & hash;
+      }
+      supplementBoost = 2 + (Math.abs(hash) % 7); // 2-8 point boost
+      console.log('🔍 CUSTOM MEAL SUPPLEMENT BOOST:', supplementBoost, 'points for supplements');
+    }
+  }
+
+  const finalScore = Math.max(20, base - penaltyApplied + supplementBoost);
+
   return {
     nutrientCoverageScore,
     toxicityPenalty,
@@ -544,6 +567,7 @@ function calculateGamifiedScore(
     finalScore,
     base,
     penaltyApplied,
+    supplementBoost,
   };
 }
 
@@ -792,7 +816,7 @@ export function generateCustomMealAnalysis(petProfile: PetProfile, selections: I
   const nutrientWarnings: WarningItem[] = [];
 
   // Scoring (pass ingredientsNotFound for better scoring)
-  const scoreInfo = calculateGamifiedScore(petProfile, totals, totalGrams, toxicityWarnings, allergyWarnings, nutrientWarnings, ingredientsNotFound, safeSelections.length);
+  const scoreInfo = calculateGamifiedScore(petProfile, totals, totalGrams, toxicityWarnings, allergyWarnings, nutrientWarnings, ingredientsNotFound, safeSelections.length, safeSelections);
 
   // Suggestions
   const suggestions = generatePetSpecificSuggestions(petProfile, totals, totalGrams, toxicityWarnings, allergyWarnings);
@@ -852,6 +876,7 @@ export function generateCustomMealAnalysis(petProfile: PetProfile, selections: I
       baseScore: scoreInfo.base,
       nutritionPenalty: scoreInfo.penaltyApplied,
         balancePenalty: 0,
+        supplementBoost: scoreInfo.supplementBoost || 0,
       },
     };
 

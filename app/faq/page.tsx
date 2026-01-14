@@ -4,7 +4,7 @@ import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions - Paws & Plates',
-  description: 'Answers to the most common questions about how Paws & Plates works, from meal planning to veterinarian approval.',
+  description: 'Answers to the most common questions about how Paws & Plates works, from meal planning to safety boundaries.',
   alternates: {
     canonical: '/faq',
   },
@@ -35,14 +35,14 @@ const faqItems = [
       'No. We guide you to evidence-based nutrition and help you purchase ingredients from trusted retailers and brands.',
   },
   {
-    question: 'Are the meals veterinarian-approved?',
+    question: 'Are the meals professionally reviewed or approved?',
     answer:
-      'Our guidelines follow AAFCO (dogs/cats) and established exotic-pet nutrition research. Expert review is underway as we expand.',
+      'No. Paws & Plates is an educational planning tool. We use established nutrition references (like AAFCO for dogs/cats) as guardrails, but we do not provide clinical review or approval.',
   },
   {
-    question: 'Can I use this instead of my vet?',
+    question: 'Can I use this instead of professional care?',
     answer:
-      'No. Paws & Plates is an educational and planning tool. Always consult your veterinarian when making major dietary changes.',
+      'No. Paws & Plates is an educational and planning tool. If your pet has symptoms, a diagnosis, or is on a prescription diet, consult a qualified animal health professional before changing diet.',
   },
   {
     question: 'Does the app calculate how much to feed?',

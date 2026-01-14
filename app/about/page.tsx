@@ -5,7 +5,7 @@ import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
   title: 'Our Story - Paws & Plates',
-  description: 'Pet Plates helps you plan homemade pet meals with clarity, safety, and common sense — without replacing your vet.',
+  description: 'Pet Plates helps you plan homemade pet meals with clarity, safety, and common sense — without replacing professional care.',
   keywords: ['about us', 'pet nutrition', 'our story', 'pet-loving team'],
   alternates: {
     canonical: '/about',
@@ -222,7 +222,7 @@ export default function AboutPage() {
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
           <h2 className="text-3xl font-bold text-foreground mb-4">Real food for pets shouldn’t be confusing.</h2>
           <p className="text-lg text-white/80 leading-relaxed mb-4">
-            Pet Plates helps you plan homemade pet meals with clarity, structure, and safety — without pretending to replace your vet.
+            Pet Plates helps you plan homemade pet meals with clarity, structure, and safety — without pretending to replace professional care.
           </p>
           <p className="text-white/80 leading-relaxed">
             Pet Plates is a learning project. We test ideas about ingredient safety, nutrition guardrails, and how to make meal planning more transparent.
@@ -250,7 +250,7 @@ export default function AboutPage() {
             <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
               <h3 className="text-xl font-bold text-foreground mb-3">What Pet Plates is not</h3>
               <ul className="space-y-2 text-white/80">
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a veterinary service</span></li>
+                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a medical service</span></li>
                 <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a diagnosis or treatment tool</span></li>
                 <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a replacement for professional care</span></li>
                 <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Not a guarantee of medical outcomes</span></li>
@@ -258,7 +258,7 @@ export default function AboutPage() {
             </div>
           </div>
           <p className="mt-5 text-white/80">
-            Always consult a licensed veterinarian for medical conditions, allergies, or long-term diet decisions.
+            For medical conditions, allergies, or long-term diet decisions, consult a qualified animal health professional.
           </p>
         </section>
 
@@ -329,7 +329,7 @@ export default function AboutPage() {
           <p className="text-white/80 leading-relaxed">
             <strong>User Agreement Disclaimer:</strong>
             <br />
-            Pet Plates is designed for informational and educational purposes only. It is not intended to diagnose, treat, or replace professional veterinary advice. Always consult your veterinarian for any health-related questions or concerns about your pet. By continuing to use this site, you acknowledge and agree to these terms.
+            Pet Plates is designed for informational and educational purposes only. It is not intended to diagnose, treat, or replace professional medical guidance. If your pet has health-related questions or concerns, consult a qualified animal health professional. By continuing to use this site, you acknowledge and agree to these terms.
           </p>
         </section>
 

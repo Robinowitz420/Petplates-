@@ -105,6 +105,68 @@ function normalizeStringList(list: unknown): string[] {
   return Array.isArray(list) ? list.map((v) => String(v || '').trim()).filter(Boolean) : [];
 }
 
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+function getSupplementBoostDebug(recipe: any): {
+  boost: number;
+  detectedSupplements: Array<{ id: string; name: string; source: 'supplements' | 'ingredients' }>;
+} {
+  const detectedSupplements: Array<{ id: string; name: string; source: 'supplements' | 'ingredients' }> = [];
+
+  const supplements = Array.isArray(recipe?.supplements) ? recipe.supplements : [];
+  for (const supp of supplements) {
+    detectedSupplements.push({
+      id: String((supp as any)?.id || ''),
+      name: String((supp as any)?.name || (supp as any)?.productName || (supp as any)?.id || ''),
+      source: 'supplements',
+    });
+  }
+
+  const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
+  for (const ing of ingredients) {
+    const category = String((ing as any)?.category || '').toLowerCase();
+    const id = String((ing as any)?.id || '').toLowerCase();
+    const isSupplementCategory = category === 'supplement';
+    const isSupplementId = id.startsWith('supplement-');
+    if (!isSupplementCategory && !isSupplementId) continue;
+
+    detectedSupplements.push({
+      id: String((ing as any)?.id || ''),
+      name: String((ing as any)?.name || (ing as any)?.productName || (ing as any)?.id || ''),
+      source: 'ingredients',
+    });
+  }
+
+  const combinedNames = detectedSupplements
+    .map((s) => {
+      const id = String(s?.id || '').toLowerCase().trim();
+      const name = String(s?.name || '').toLowerCase().trim();
+      return `${id}:${name}`.trim();
+    })
+    .filter(Boolean)
+    .join('|');
+
+  if (!combinedNames) {
+    return { boost: 0, detectedSupplements };
+  }
+
+  const seed = `${String(recipe?.id || 'recipe')}|${combinedNames}`;
+  const boost = 2 + (hashString(seed) % 7); // keep existing behavior
+  return { boost, detectedSupplements };
+}
+
+function getSupplementBoost(recipe: any): number {
+  return getSupplementBoostDebug(recipe).boost;
+}
+
 function toHash(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -241,6 +303,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonError({ code: 'INVALID_REQUEST', message: 'Missing recipe or pet', status: 400 });
   }
 
+  const supplementDebug = getSupplementBoostDebug(recipeIn);
+  const supplementBoost = supplementDebug.boost;
+  const debugEnabled = process.env.NODE_ENV === 'development';
+
   const cache = getCache();
   const cacheKey = buildCacheKey(body as any);
   const cached = cache.get(cacheKey);
@@ -248,7 +314,29 @@ export async function POST(req: Request): Promise<NextResponse> {
     // Check if cached score has breakdown data
     const hasBreakdown = cached.value.score && typeof cached.value.score.breakdown === 'object' && cached.value.score.breakdown && Object.keys(cached.value.score.breakdown).length > 0;
     if (hasBreakdown) {
-      return NextResponse.json({ ok: true, ...cached.value });
+      // Apply supplement boost to cached scores too
+      const boostedCached = { ...cached };
+      const baseScoreBeforeBoost = boostedCached.value.score.overallScore;
+      boostedCached.value.score.overallScore = clampScore(baseScoreBeforeBoost + supplementBoost);
+      return NextResponse.json({
+        ok: true,
+        ...boostedCached.value,
+        ...(debugEnabled
+          ? {
+              _debug: {
+                supplementBoostApplied: supplementBoost,
+                detectedSupplementCount: supplementDebug.detectedSupplements.length,
+                detectedSupplements: supplementDebug.detectedSupplements,
+                baseScoreBeforeBoost,
+                recipeHadSupplementsArray: Array.isArray((recipeIn as any)?.supplements) && (recipeIn as any).supplements.length > 0,
+                recipeIngredientCount: Array.isArray((recipeIn as any)?.ingredients) ? (recipeIn as any).ingredients.length : 0,
+                sampleIngredients: Array.isArray((recipeIn as any)?.ingredients)
+                  ? (recipeIn as any).ingredients.slice(0, 3).map((ing: any) => ({ id: ing?.id, name: ing?.name, category: ing?.category }))
+                  : [],
+              },
+            }
+          : {}),
+      });
     }
     // Cached score is missing breakdown, recalculate
     console.log('API cache has score without breakdown, recalculating');
@@ -275,13 +363,26 @@ export async function POST(req: Request): Promise<NextResponse> {
     allergies: normalizeStringList(petIn.allergies),
   } as any;
 
+  const baseIngredients = Array.isArray(recipeIn.ingredients)
+    ? recipeIn.ingredients.filter((i: any) => {
+        const category = String(i?.category || '').toLowerCase();
+        const id = String(i?.id || '').toLowerCase();
+        const isSupplementCategory = category === 'supplement';
+        const isSupplementId = id.startsWith('supplement-');
+        return !isSupplementCategory && !isSupplementId;
+      })
+    : [];
+
   const recipeForNutrition = {
     id: String(recipeIn.id || 'recipe'),
     name: String(recipeIn.name || 'Recipe'),
     category: String(recipeIn.category || ''),
-    ingredients: Array.isArray(recipeIn.ingredients)
-      ? recipeIn.ingredients.map((i) => ({ id: String(i?.id || ''), name: String(i?.name || ''), amount: String(i?.amount || ''), category: String(i?.category || '') }))
-      : [],
+    ingredients: baseIngredients.map((i: any) => ({
+      id: String(i?.id || ''),
+      name: String(i?.name || ''),
+      amount: String(i?.amount || ''),
+      category: String(i?.category || ''),
+    })),
   } as any;
 
   const nutrition = calculateRecipeNutrition(recipeForNutrition as any, { includeBreakdown: false });
@@ -311,7 +412,25 @@ export async function POST(req: Request): Promise<NextResponse> {
     };
     const value = { source: 'fallback' as const, score: minimal };
     cache.set(cacheKey, { ts: Date.now(), value });
-    return NextResponse.json({ ok: true, ...value });
+    return NextResponse.json({
+      ok: true,
+      ...value,
+      ...(debugEnabled
+        ? {
+            _debug: {
+              supplementBoostApplied: supplementBoost,
+              detectedSupplementCount: supplementDebug.detectedSupplements.length,
+              detectedSupplements: supplementDebug.detectedSupplements,
+              baseScoreBeforeBoost: 0,
+              recipeHadSupplementsArray: Array.isArray((recipeIn as any)?.supplements) && (recipeIn as any).supplements.length > 0,
+              recipeIngredientCount: Array.isArray((recipeIn as any)?.ingredients) ? (recipeIn as any).ingredients.length : 0,
+              sampleIngredients: Array.isArray((recipeIn as any)?.ingredients)
+                ? (recipeIn as any).ingredients.slice(0, 3).map((ing: any) => ({ id: ing?.id, name: ing?.name, category: ing?.category }))
+                : [],
+            },
+          }
+        : {}),
+    });
   }
 
   let localScored: ReturnType<typeof scoreWithSpeciesEngine> | null = null;
@@ -338,7 +457,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   };
 
   const systemPrefix =
-    'ACT AS A PHD VETERINARY NUTRITIONIST. ' +
+    'ACT AS A PHD-LEVEL PET NUTRITION EXPERT. ' +
     'YOU MUST RETURN ONLY VALID JSON. ' +
     'DO NOT INCLUDE MARKDOWN BACKTICKS OR EXPLANATIONS.';
 
@@ -359,9 +478,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     recipe: {
       name: recipeIn.name,
       category: recipeIn.category,
-      ingredients: Array.isArray(recipeIn.ingredients)
-        ? recipeIn.ingredients.map((i) => ({ name: i?.name, amount: i?.amount }))
-        : [],
+      ingredients: baseIngredients.map((i: any) => ({ name: i?.name, amount: i?.amount })),
     },
     nutrition_breakdown: {
       calories: nutrition.calories,
@@ -477,8 +594,9 @@ export async function POST(req: Request): Promise<NextResponse> {
               ? strengths.slice(0, 3).join('. ')
               : 'Recipe evaluated for compatibility with your pet.';
 
+        const baseScoreBeforeBoost = overallScore;
         const score: RecipeScoreSummary = {
-          overallScore,
+          overallScore: clampScore(baseScoreBeforeBoost + supplementBoost),
           compatibility: gradeToCompatibility(grade),
           summaryReasoning,
           explainRecommendations: [],
@@ -493,7 +611,25 @@ export async function POST(req: Request): Promise<NextResponse> {
 
         const value = { source: 'gemini' as const, modelUsed: model, score };
         cache.set(cacheKey, { ts: Date.now(), value });
-        return NextResponse.json({ ok: true, ...value });
+        return NextResponse.json({
+          ok: true,
+          ...value,
+          ...(debugEnabled
+            ? {
+                _debug: {
+                  supplementBoostApplied: supplementBoost,
+                  detectedSupplementCount: supplementDebug.detectedSupplements.length,
+                  detectedSupplements: supplementDebug.detectedSupplements,
+                  baseScoreBeforeBoost,
+                  recipeHadSupplementsArray: Array.isArray((recipeIn as any)?.supplements) && (recipeIn as any).supplements.length > 0,
+                  recipeIngredientCount: Array.isArray((recipeIn as any)?.ingredients) ? (recipeIn as any).ingredients.length : 0,
+                  sampleIngredients: Array.isArray((recipeIn as any)?.ingredients)
+                    ? (recipeIn as any).ingredients.slice(0, 3).map((ing: any) => ({ id: ing?.id, name: ing?.name, category: ing?.category }))
+                    : [],
+                },
+              }
+            : {}),
+        });
       } catch (err) {
         lastErr = err instanceof Error ? err : new Error(String(err));
       }
@@ -502,9 +638,30 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   if (localScored) {
     const score = buildLocalSummary({ scored: localScored, petType, usesFallbackNutrition });
+    // Apply supplement boost to fallback scoring too
+    const baseScoreBeforeBoost = score.overallScore;
+    score.overallScore = clampScore(baseScoreBeforeBoost + supplementBoost);
     const value = { source: 'fallback' as const, score };
     cache.set(cacheKey, { ts: Date.now(), value });
-    return NextResponse.json({ ok: true, ...value });
+    return NextResponse.json({
+      ok: true,
+      ...value,
+      ...(debugEnabled
+        ? {
+            _debug: {
+              supplementBoostApplied: supplementBoost,
+              detectedSupplementCount: supplementDebug.detectedSupplements.length,
+              detectedSupplements: supplementDebug.detectedSupplements,
+              baseScoreBeforeBoost,
+              recipeHadSupplementsArray: Array.isArray((recipeIn as any)?.supplements) && (recipeIn as any).supplements.length > 0,
+              recipeIngredientCount: Array.isArray((recipeIn as any)?.ingredients) ? (recipeIn as any).ingredients.length : 0,
+              sampleIngredients: Array.isArray((recipeIn as any)?.ingredients)
+                ? (recipeIn as any).ingredients.slice(0, 3).map((ing: any) => ({ id: ing?.id, name: ing?.name, category: ing?.category }))
+                : [],
+            },
+          }
+        : {}),
+    });
   }
 
   return jsonError({

@@ -40,30 +40,30 @@ export function generateRecipeStructuredData(recipe: any) {
 export const pageMetadata: Record<string, Metadata> = {
   home: {
     title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
-    description: 'Free vet-approved meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO & WSAVA compliant.',
+    description: 'Free meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO-aligned nutrition guardrails.',
     keywords: ['homemade dog food', 'homemade cat food', 'DIY pet meals', 'pet meal prep', 'fresh pet food recipes'],
     openGraph: {
       title: 'Paws & Plates - Fresh Meal Prep for All Pets',
-      description: 'Free vet-approved meal plans with one-click Amazon ingredient ordering',
+      description: 'Free meal plans with one-click Amazon ingredient ordering',
     },
   },
   
   dogs: {
-    title: 'Homemade Dog Food Recipes - Vet-Approved & AAFCO Compliant',
-    description: 'Free custom dog food recipes for all breeds, ages, and health needs. AAFCO compliant nutrition with Amazon ingredient links. Puppy, adult, and senior meal plans.',
+    title: 'Homemade Dog Food Recipes - AAFCO-Aligned Meal Planning',
+    description: 'Custom dog food recipes for all breeds, ages, and health needs. AAFCO-aligned nutrition guardrails with Amazon ingredient links. Puppy, adult, and senior meal plans.',
     keywords: ['homemade dog food', 'dog food recipes', 'puppy food recipes', 'senior dog food', 'healthy dog meals'],
     openGraph: {
-      title: 'Homemade Dog Food Recipes - Vet-Approved',
+      title: 'Homemade Dog Food Recipes',
       description: 'AAFCO compliant dog food recipes for all breeds and ages',
     },
   },
   
   cats: {
-    title: 'Homemade Cat Food Recipes - Vet-Approved & Balanced',
-    description: 'Free custom cat food recipes for all breeds and ages. AAFCO compliant nutrition with Amazon ingredient links. Kitten, adult, and senior meal plans.',
+    title: 'Homemade Cat Food Recipes - AAFCO-Aligned Meal Planning',
+    description: 'Custom cat food recipes for all breeds and ages. AAFCO-aligned nutrition guardrails with Amazon ingredient links. Kitten, adult, and senior meal plans.',
     keywords: ['homemade cat food', 'cat food recipes', 'kitten food recipes', 'senior cat food', 'healthy cat meals'],
     openGraph: {
-      title: 'Homemade Cat Food Recipes - Vet-Approved',
+      title: 'Homemade Cat Food Recipes',
       description: 'AAFCO compliant cat food recipes for all breeds and ages',
     },
   },
@@ -100,11 +100,11 @@ export const pageMetadata: Record<string, Metadata> = {
   
   blog: {
     title: 'Pet Nutrition Blog - Meal Prep Tips & Recipes',
-    description: 'Expert pet nutrition advice, homemade food recipes, and meal prep tips for dogs, cats, birds, reptiles, and small pets.',
+    description: 'Pet nutrition education, homemade food recipes, and meal prep tips for dogs, cats, birds, reptiles, and small pets.',
     keywords: ['pet nutrition blog', 'pet food tips', 'homemade pet food advice', 'pet meal prep'],
     openGraph: {
-      title: 'Pet Nutrition Blog - Expert Advice & Recipes',
-      description: 'Expert pet nutrition advice and homemade food recipes',
+      title: 'Pet Nutrition Blog - Recipes & Meal Prep Tips',
+      description: 'Pet nutrition education and homemade food recipes',
     },
   },
   
@@ -134,7 +134,7 @@ export const organizationStructuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Paws & Plates",
-  "description": "Free vet-approved meal plans for dogs, cats, birds, reptiles, and pocket pets",
+  "description": "Meal planning tools for dogs, cats, birds, reptiles, and pocket pets",
   "url": baseUrl,
   "logo": absoluteUrl('/images/emojis/Mascots/HeroPics/HeroBanner-v3.png'),
   "contactPoint": {

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Nutrition Guide - Paws & Plates',
-    description: 'Our guide to pet nutrition, following AAFCO, NRC, and veterinarian standards.',
+    description: 'Our guide to pet nutrition, using established references like AAFCO and NRC as planning guardrails.',
     url: absoluteUrl('/nutrition-guide'),
   },
 };

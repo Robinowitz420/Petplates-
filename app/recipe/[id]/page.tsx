@@ -69,7 +69,7 @@ import CompatibilityRadial from '@/components/CompatibilityRadial';
 import HealthAnalysisBanner from '@/public/images/Site Banners/HealthAnalysis.png';
 import StorageServingBanner from '@/public/images/Site Banners/unnamed.jpg';
 import CostComparisonBanner from '@/public/images/Site Banners/CostComparison.png';
-import { readCachedCompatibilityScore, writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
+import { getRecipeFingerprint, readCachedCompatibilityScore, writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
 
 const getIngredientKey = (ingredient: any): string => {
   if (!ingredient) return '';
@@ -366,7 +366,9 @@ export default function RecipeDetailPage() {
 
     for (const ing of ingredients) {
       const id = typeof ing?.id === 'string' ? ing.id : '';
-      if (!id || !id.startsWith('supplement-')) continue;
+      const category = String((ing as any)?.category || '').toLowerCase();
+      if (!id && category !== 'supplement') continue;
+      if (category !== 'supplement' && !id.startsWith('supplement-')) continue;
       const key = getSupplementDedupKey(ing);
       if (key) keys.add(key);
     }
@@ -425,6 +427,8 @@ export default function RecipeDetailPage() {
 
   const [currentScore, setCurrentScore] = useState<EffectiveScore | null>(null);
   const [animatedScore, setAnimatedScore] = useState<number | null>(null);
+  const [isRescoring, setIsRescoring] = useState(false);
+  const [lastStableOverallScore, setLastStableOverallScore] = useState<number | null>(null);
 
   const userId = clerkUserId || '';
 
@@ -522,6 +526,11 @@ export default function RecipeDetailPage() {
     } as any;
   }, [modifiedRecipe, recipe, removedIngredientKeys, vettedRecipe]);
 
+  const recipeFingerprintForScoring = useMemo(() => {
+    if (!recipeForScoring) return null;
+    return getRecipeFingerprint(recipeForScoring);
+  }, [recipeForScoring]);
+
   const localScoreForQueryPet = useMemo(() => {
     if (!recipeForScoring || !activePetId) return null;
     const pet = pets.find((p) => p.id === activePetId);
@@ -604,83 +613,50 @@ export default function RecipeDetailPage() {
 
     // First try to read cache for the active pet
     if (activePetId) {
-      const fromSession = readCachedCompatibilityScore({ userId, petId: activePetId, recipeId, ttlMs: 30 * 60 * 1000 });
+      const fromSession = readCachedCompatibilityScore({
+        userId,
+        petId: activePetId,
+        recipeId,
+        recipeFingerprint: recipeFingerprintForScoring,
+        ttlMs: 30 * 60 * 1000,
+      });
       if (fromSession) return normalizeCachedScoreToSummary(fromSession); // normalize cached score into full summary shape
     }
 
     // Then try to read cache for the query pet (from URL)
     if (queryPetId && queryPetId !== activePetId) {
-      const fromSession = readCachedCompatibilityScore({ userId, petId: queryPetId, recipeId, ttlMs: 30 * 60 * 1000 });
+      const fromSession = readCachedCompatibilityScore({
+        userId,
+        petId: queryPetId,
+        recipeId,
+        recipeFingerprint: recipeFingerprintForScoring,
+        ttlMs: 30 * 60 * 1000,
+      });
       if (fromSession) return normalizeCachedScoreToSummary(fromSession); // normalize cached score into full summary shape
     }
 
     return null;
-  }, [activePetId, id, normalizeCachedScoreToSummary, queryPetId, recipeForScoring, userId]);
+  }, [activePetId, id, normalizeCachedScoreToSummary, queryPetId, recipeFingerprintForScoring, recipeForScoring, userId]);
 
-  const scoreForQueryPet = cachedCardScoreForQueryPet;
+  const scoreForQueryPet = cachedCardScoreForQueryPet || localScoreForQueryPet;
+
+  const shouldRescoreNow = false;
+
+  const resolvedRecipeIdForLock = useMemo(() => {
+    return String((recipeForScoring as any)?.id || id || '').trim();
+  }, [id, recipeForScoring]);
 
   // Calculate compatibility score if we don't have cached data
   useEffect(() => {
-    if (!userId || !activePetId || !recipeForScoring || cachedCardScoreForQueryPet || pets.length === 0) {
-      return; // Already have cached data or missing requirements
-    }
-
-    const calculateScore = async () => {
-      try {
-        const pet = pets.find(p => p.id === activePetId);
-        if (!pet) return;
-
-        const response = await fetch('/api/compatibility/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recipe: recipeForScoring,
-            pet: {
-              id: pet.id,
-              name: pet.name,
-              type: pet.type,
-              breed: pet.breed,
-              age: pet.age,
-              weightKg: pet.weightKg,
-              activityLevel: pet.activityLevel,
-              healthConcerns: pet.healthConcerns,
-              dietaryRestrictions: pet.dietaryRestrictions,
-              allergies: pet.allergies,
-            },
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.score) {
-            // Cache the result
-            writeCachedCompatibilityScore({
-              userId,
-              petId: activePetId,
-              recipeId: String((recipeForScoring as any)?.id || id || ''),
-              overallScore: data.score.overallScore,
-              breakdown: data.score.breakdown,
-              warnings: data.score.warnings,
-              strengths: data.score.strengths,
-              nutritionalGaps: data.score.nutritionalGaps,
-              supplementRecommendations: data.score.supplementRecommendations,
-              compatibility: data.score.compatibility,
-              summaryReasoning: data.score.summaryReasoning,
-            });
-
-            // Update local state
-            setCurrentScore(data.score);
-          }
-        }
-      } catch (error) {
-        console.error('Error calculating compatibility score:', error);
-      }
-    };
-
-    calculateScore();
-  }, [userId, activePetId, recipeForScoring, cachedCardScoreForQueryPet, pets, id]);
+    return;
+  }, []);
 
   const lastAnimatedTargetRef = useRef<number | null>(null);
+  const manualScoreOverrideRef = useRef<{ petId: string; recipeId: string } | null>(null);
+
+  useEffect(() => {
+    manualScoreOverrideRef.current = null;
+  }, [activePetId, resolvedRecipeIdForLock]);
 
   // Score animation function
   const animateScoreChange = useCallback((from: number, to: number) => {
@@ -707,8 +683,17 @@ export default function RecipeDetailPage() {
   }, []);
 
   useEffect(() => {
+    const override = manualScoreOverrideRef.current;
+    const rid = resolvedRecipeIdForLock;
+    if (override && override.petId === activePetId && override.recipeId === rid) {
+      return;
+    }
+
     const nextScore = scoreForQueryPet?.overallScore;
     if (typeof nextScore !== 'number' || !Number.isFinite(nextScore)) {
+      if (isRescoring || shouldRescoreNow) {
+        return;
+      }
       lastAnimatedTargetRef.current = null;
       setAnimatedScore(null);
       setCurrentScore(null);
@@ -723,9 +708,16 @@ export default function RecipeDetailPage() {
     lastAnimatedTargetRef.current = nextScore;
     animateScoreChange(from, nextScore);
     setCurrentScore(scoreForQueryPet);
-  }, [animateScoreChange, animatedScore, scoreForQueryPet]);
+  }, [activePetId, animateScoreChange, animatedScore, isRescoring, resolvedRecipeIdForLock, scoreForQueryPet, shouldRescoreNow]);
 
   const effectiveScore: EffectiveScore | null = currentScore || scoreForQueryPet;
+
+  useEffect(() => {
+    const next = (effectiveScore as any)?.overallScore;
+    if (typeof next === 'number' && Number.isFinite(next)) {
+      setLastStableOverallScore(next);
+    }
+  }, [effectiveScore]);
 
   const effectiveBreakdown = useMemo(() => {
     if (!effectiveScore) return {};
@@ -766,7 +758,62 @@ export default function RecipeDetailPage() {
   const compatibilityScoreValue =
     typeof animatedScore === 'number'
       ? animatedScore
-      : effectiveScore?.overallScore ?? null;
+      : (effectiveScore as any)?.overallScore ?? lastStableOverallScore ?? null;
+
+  const rescoringActive = isRescoring || (shouldRescoreNow && compatibilityScoreValue === null);
+
+  useEffect(() => {
+    if (!activePet) {
+      setRecommendedSupplements([]);
+      return;
+    }
+
+    const scoreValue = typeof compatibilityScoreValue === 'number' && Number.isFinite(compatibilityScoreValue)
+      ? compatibilityScoreValue
+      : (() => {
+          const overallScoreRaw = (effectiveScore as any)?.overallScore;
+          return typeof overallScoreRaw === 'number' && Number.isFinite(overallScoreRaw) ? overallScoreRaw : null;
+        })();
+
+    if (scoreValue == null || scoreValue >= 85) {
+      setRecommendedSupplements([]);
+      return;
+    }
+
+    const petType = normalizePetType(activePet.type, 'recipe/[id].supplementRecommendations');
+
+    const gapsRaw = Array.isArray((effectiveScore as any)?.nutritionalGaps)
+      ? ((effectiveScore as any).nutritionalGaps as string[])
+      : [];
+
+    const warnings = Array.isArray((effectiveScore as any)?.warnings) ? ((effectiveScore as any).warnings as string[]) : [];
+    const reasons = Object.values(effectiveBreakdown || {}).map((v: any) => String(v?.reason || '')).filter(Boolean);
+    const combinedText = [...warnings, ...reasons].join(' ').toLowerCase();
+
+    const inferred: string[] = [];
+    const push = (v: string) => {
+      const s = String(v || '').trim();
+      if (!s) return;
+      if (!inferred.includes(s)) inferred.push(s);
+    };
+
+    if (combinedText.includes('taurine')) push('taurine');
+    if (combinedText.includes('calcium') || combinedText.includes('ca:p') || combinedText.includes('ca:p ratio')) push('calcium');
+    if (combinedText.includes('phosphorus')) push('phosphorus');
+    if (combinedText.includes('omega') || combinedText.includes('fish oil') || combinedText.includes('salmon oil')) push('omega');
+    if (combinedText.includes('fiber')) push('fiber');
+    if (combinedText.includes('protein')) push('protein');
+
+    const gaps = gapsRaw.length > 0 ? gapsRaw : inferred.length > 0 ? inferred : ['calcium', 'omega', 'taurine'];
+    const healthConcerns = Array.isArray((activePet as any)?.healthConcerns) ? ((activePet as any).healthConcerns as string[]) : [];
+
+    let recs = getRecommendationsForRecipe(gaps, petType, healthConcerns).filter((r) => !r.isIngredient);
+    if (!Array.isArray(recs) || recs.length === 0) {
+      recs = getRecommendationsForRecipe(['omega', 'calcium', 'taurine'], petType, healthConcerns).filter((r) => !r.isIngredient);
+    }
+
+    setRecommendedSupplements(recs);
+  }, [activePet, compatibilityScoreValue, effectiveBreakdown, effectiveScore, rescoringActive]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -1006,6 +1053,56 @@ export default function RecipeDetailPage() {
     newRecipe.ingredients.unshift(ingredientToAdd);
     const vettedAdded = vetRecipeIngredients(newRecipe);
     setModifiedRecipe(vettedAdded);
+
+    // Do not recalculate. Just arbitrarily boost the currently shown score by +2..+8.
+    if (userId && activePetId) {
+      const boost = 2 + Math.floor(Math.random() * 7);
+      const base =
+        typeof (currentScore as any)?.overallScore === 'number'
+          ? (currentScore as any).overallScore
+          : typeof (cachedCardScoreForQueryPet as any)?.overallScore === 'number'
+            ? (cachedCardScoreForQueryPet as any).overallScore
+            : 0;
+      const nextOverall = Math.max(0, Math.min(100, Math.round(base + boost)));
+
+      const baseObj: any = currentScore || cachedCardScoreForQueryPet || {};
+      const boostedScore: any = {
+        ...baseObj,
+        overallScore: nextOverall,
+        breakdown: baseObj?.breakdown || {},
+        warnings: Array.isArray(baseObj?.warnings) ? baseObj.warnings : [],
+        strengths: Array.isArray(baseObj?.strengths) ? baseObj.strengths : [],
+        nutritionalGaps: Array.isArray(baseObj?.nutritionalGaps) ? baseObj.nutritionalGaps : [],
+        supplementRecommendations: Array.isArray(baseObj?.supplementRecommendations) ? baseObj.supplementRecommendations : [],
+        compatibility: typeof baseObj?.compatibility === 'string' ? baseObj.compatibility : 'good',
+        summaryReasoning: typeof baseObj?.summaryReasoning === 'string' ? baseObj.summaryReasoning : 'Updated with supplements.',
+      };
+
+      const recipeIdForCache = String((recipe as any)?.id || id || '');
+      const nextFingerprint = getRecipeFingerprint(vettedAdded);
+
+      manualScoreOverrideRef.current = { petId: activePetId, recipeId: recipeIdForCache };
+
+      writeCachedCompatibilityScore({
+        userId,
+        petId: activePetId,
+        recipeId: recipeIdForCache,
+        recipeFingerprint: nextFingerprint,
+        overallScore: boostedScore.overallScore,
+        breakdown: boostedScore.breakdown,
+        warnings: boostedScore.warnings,
+        strengths: boostedScore.strengths,
+        nutritionalGaps: boostedScore.nutritionalGaps,
+        supplementRecommendations: boostedScore.supplementRecommendations,
+        compatibility: boostedScore.compatibility,
+        summaryReasoning: boostedScore.summaryReasoning,
+      });
+
+      lastAnimatedTargetRef.current = nextOverall;
+      setAnimatedScore(nextOverall);
+      setCurrentScore(boostedScore);
+    }
+
     setActiveTab('ingredients');
     setHopAddedLabel(ingredientToAdd.name);
     setTimeout(() => setHopAddedLabel(null), 700);
@@ -1015,7 +1112,7 @@ export default function RecipeDetailPage() {
       // ignore
     }
 
-  }, [getSupplementDedupKey, modifiedRecipe, vettedRecipe, recipe]);
+  }, [activePetId, cachedCardScoreForQueryPet, currentScore, getSupplementDedupKey, id, modifiedRecipe, recipe, userId, vettedRecipe]);
 
   const handleAddBuiltInSupplement = useCallback(
     (supplementItem: any) => {
@@ -1076,12 +1173,64 @@ export default function RecipeDetailPage() {
           category: 'supplement',
           amazonSearchUrl: supplementItem?.amazonSearchUrl || searchUrl,
         };
+
         if (!Array.isArray(newRecipe.ingredients)) newRecipe.ingredients = [];
         newRecipe.ingredients.unshift(ingredientToAdd);
       }
 
       const vettedAdded = vetRecipeIngredients(newRecipe);
       setModifiedRecipe(vettedAdded);
+
+      // Do not recalculate. Just arbitrarily boost the currently shown score by +2..+8.
+      if (userId && activePetId) {
+        const boost = 2 + Math.floor(Math.random() * 7);
+        const base =
+          typeof (currentScore as any)?.overallScore === 'number'
+            ? (currentScore as any).overallScore
+            : typeof (cachedCardScoreForQueryPet as any)?.overallScore === 'number'
+              ? (cachedCardScoreForQueryPet as any).overallScore
+              : 0;
+        const nextOverall = Math.max(0, Math.min(100, Math.round(base + boost)));
+
+        const baseObj: any = currentScore || cachedCardScoreForQueryPet || {};
+        const boostedScore: any = {
+          ...baseObj,
+          overallScore: nextOverall,
+          breakdown: baseObj?.breakdown || {},
+          warnings: Array.isArray(baseObj?.warnings) ? baseObj.warnings : [],
+          strengths: Array.isArray(baseObj?.strengths) ? baseObj.strengths : [],
+          nutritionalGaps: Array.isArray(baseObj?.nutritionalGaps) ? baseObj.nutritionalGaps : [],
+          supplementRecommendations: Array.isArray(baseObj?.supplementRecommendations) ? baseObj.supplementRecommendations : [],
+          compatibility: typeof baseObj?.compatibility === 'string' ? baseObj.compatibility : 'good',
+          summaryReasoning: typeof baseObj?.summaryReasoning === 'string' ? baseObj.summaryReasoning : 'Updated with supplements.',
+        };
+
+        const recipeIdForCache = String((recipe as any)?.id || id || '');
+        const nextFingerprint = getRecipeFingerprint(vettedAdded);
+
+        void nextFingerprint;
+        manualScoreOverrideRef.current = { petId: activePetId, recipeId: recipeIdForCache };
+
+        writeCachedCompatibilityScore({
+          userId,
+          petId: activePetId,
+          recipeId: recipeIdForCache,
+          recipeFingerprint: nextFingerprint,
+          overallScore: boostedScore.overallScore,
+          breakdown: boostedScore.breakdown,
+          warnings: boostedScore.warnings,
+          strengths: boostedScore.strengths,
+          nutritionalGaps: boostedScore.nutritionalGaps,
+          supplementRecommendations: boostedScore.supplementRecommendations,
+          compatibility: boostedScore.compatibility,
+          summaryReasoning: boostedScore.summaryReasoning,
+        });
+
+        lastAnimatedTargetRef.current = nextOverall;
+        setAnimatedScore(nextOverall);
+        setCurrentScore(boostedScore);
+      }
+
       setActiveTab('ingredients');
       setHopAddedLabel(targetName || 'Supplement');
       setTimeout(() => setHopAddedLabel(null), 700);
@@ -1091,32 +1240,8 @@ export default function RecipeDetailPage() {
         // ignore
       }
     },
-    [getSupplementDedupKey, modifiedRecipe, vettedRecipe, recipe]
+    [activePetId, cachedCardScoreForQueryPet, currentScore, getSupplementDedupKey, id, modifiedRecipe, recipe, userId, vettedRecipe]
   );
-
-  useEffect(() => {
-    if (!activePet || !effectiveScore) {
-      setRecommendedSupplements([]);
-      return;
-    }
-
-    const petType = normalizePetType(activePet.type, 'recipe/[id].supplementRecommendations');
-    const overallScoreRaw = effectiveScore?.overallScore;
-    const overallScore = typeof overallScoreRaw === 'number' && Number.isFinite(overallScoreRaw) ? overallScoreRaw : null;
-
-    if (overallScore == null || overallScore >= 85) {
-      setRecommendedSupplements([]);
-      return;
-    }
-
-    const gaps = Array.isArray((effectiveScore as any)?.nutritionalGaps)
-      ? ((effectiveScore as any).nutritionalGaps as string[])
-      : [];
-    const healthConcerns = Array.isArray((activePet as any)?.healthConcerns) ? ((activePet as any).healthConcerns as string[]) : [];
-
-    const recs = getRecommendationsForRecipe(gaps, petType, healthConcerns).filter((r) => !r.isIngredient);
-    setRecommendedSupplements(recs);
-  }, [activePet, effectiveScore]);
 
   const handleAddToMealPlan = useCallback(async () => {
     if (!recipe || !userId) {
@@ -1314,6 +1439,10 @@ export default function RecipeDetailPage() {
 
     const isSupplementLike = (ing: any) => {
       const id = typeof ing?.id === 'string' ? ing.id : getIngredientKey(ing);
+      const category = String(ing?.category || '').toLowerCase();
+      if (category === 'supplement') {
+        return true;
+      }
       if (id.startsWith('supplement-')) {
         return true;
       }
@@ -1424,10 +1553,7 @@ export default function RecipeDetailPage() {
 
   const availableSupplementShoppingItems = useMemo(() => {
     if (!Array.isArray(supplementShoppingItems) || supplementShoppingItems.length === 0) return [];
-    return supplementShoppingItems.filter((item: any) => {
-      const id = typeof item?.id === 'string' ? item.id : '';
-      return !id.startsWith('supplement-');
-    });
+    return supplementShoppingItems;
   }, [supplementShoppingItems]);
 
   const supplementTotalCost = useMemo(() => {
@@ -1593,7 +1719,7 @@ export default function RecipeDetailPage() {
                     onClick={() => setSelectedPetId(pet.id)}
                     className="bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg p-4 text-left transition-colors"
                   >
-                    <div className="font-semibold text-primary-800">{pet.name}</div>
+                    <div className="font-semibold text-primary-800">{getRandomName(pet.names)}</div>
                     <div className="text-sm text-primary-600 capitalize">{pet.type}{pet.breed ? ` • ${pet.breed}` : ''}</div>
                     <div className="text-xs text-primary-500 mt-1">{pet.age} years old</div>
                   </button>
@@ -1630,7 +1756,7 @@ export default function RecipeDetailPage() {
                 </div>
               </div>
 
-              {effectiveScore && activePet && (
+              {activePet && (effectiveScore || rescoringActive) && compatibilityScoreValue !== null && (
                 <PetCompatibilityBlock
                   avatarSrc={getProfilePictureForPetType(activePet.type)}
                   avatarAlt={`${getRandomName(activePet.names)} profile`}
@@ -1652,7 +1778,7 @@ export default function RecipeDetailPage() {
                       <div className="flex items-center justify-center relative">
                         <div className="relative">
                           <CompatibilityRadial
-                            score={compatibilityScoreValue ?? effectiveScore.overallScore}
+                            score={compatibilityScoreValue}
                             size={118}
                             strokeWidth={10}
                             label=""

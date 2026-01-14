@@ -45,9 +45,9 @@ export default function MealPlansClientPage() {
     {
       id: 'standards',
       title: 'AAFCO Approved',
-      subtitle: 'All meals meet or exceed AAFCO + WSAVA nutritional standards',
+      subtitle: 'All meals use AAFCO-aligned nutrition guardrails',
       hover:
-        'AAFCO = Association of American Feed Control Officials. WSAVA = World Small Animal Veterinary Association. We follow both so every bowl stays complete and balanced.',
+        'AAFCO = Association of American Feed Control Officials. We use standards as planning guardrails to help you build balanced routines.',
     },
     {
       id: 'ordering',

@@ -25,27 +25,27 @@ const faqItems = [
   {
     question: 'Is garlic toxic to dogs?',
     answer:
-      'Garlic is widely considered risky for dogs. If ingestion happened, treat it seriously and contact your veterinarian for guidance—especially if symptoms appear.',
+      'Garlic is widely considered risky for dogs. If ingestion happened, treat it seriously and seek professional guidance—especially if symptoms appear.',
   },
   {
     question: 'How much garlic is dangerous for dogs?',
     answer:
-      'Risk depends on the amount, the form (powder vs fresh), and your dog’s size. If you’re not sure how much was eaten, call your vet and share the product label if available.',
+      'Risk depends on the amount, the form (powder vs fresh), and your dog’s size. If you’re not sure how much was eaten, contact a qualified animal health professional and share the product label if available.',
   },
   {
     question: 'What are signs of garlic poisoning in dogs?',
     answer:
-      'Possible signs can include stomach upset, weakness, or changes in behavior. If you see symptoms, seek veterinary guidance promptly.',
+      'Possible signs can include stomach upset, weakness, or changes in behavior. If you see symptoms, seek professional guidance promptly.',
   },
   {
     question: 'What should I do if my dog ate garlic bread?',
     answer:
-      'Don’t wait for internet certainty. Contact your veterinarian or an emergency clinic and provide details on the amount, ingredients (garlic powder, butter), and timing.',
+      'Don’t wait for internet certainty. Contact an emergency clinic or qualified animal health professional and provide details on the amount, ingredients (garlic powder, butter), and timing.',
   },
   {
     question: 'Are garlic supplements safe for dogs?',
     answer:
-      'Avoid self-prescribing supplements. If a supplement is being considered for a specific reason, discuss it with your veterinarian first.',
+      'Avoid self-prescribing supplements. If a supplement is being considered for a specific reason, discuss it with a qualified animal health professional first.',
   },
 ];
 
@@ -116,7 +116,7 @@ export default function Page() {
 
           <p className="mt-4 text-gray-300">
             Quick answer: treat garlic as risky for dogs. Risk depends on dose and form, so the safest move is to confirm with a
-            veterinarian—especially if your dog is small or showing symptoms.
+            qualified animal health professional—especially if your dog is small or showing symptoms.
           </p>
 
           <div className="mt-6 bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
@@ -138,7 +138,7 @@ export default function Page() {
             <h2 className="text-xl font-bold text-orange-400 mb-4">Quick answer: is garlic safe for dogs?</h2>
             <p className="text-gray-200">
               No. Garlic is commonly considered unsafe for dogs. If ingestion occurred, don’t minimize it—verify next steps with your
-              veterinarian.
+              professional support team.
             </p>
           </section>
 
@@ -162,16 +162,16 @@ export default function Page() {
             <h2 className="text-xl font-bold text-orange-400 mb-4">What to do if your dog ate garlic</h2>
             <div className="text-gray-200 space-y-3">
               <p>
-                If you suspect toxicity or a severe reaction, contact a veterinarian or emergency clinic immediately. Online lists are
-                not faster than professional care.
+                If you suspect toxicity or a severe reaction, contact an emergency clinic immediately. Online lists are not faster than
+                professional care.
               </p>
               <div className="rounded-xl border border-green-800/40 p-4 bg-surface-lighter text-sm text-gray-200">
-                This page is educational and not veterinary advice. If your pet has symptoms or a condition, contact your veterinarian.
+                This page is educational and not medical advice. If your pet has symptoms or a condition, seek professional guidance.
               </div>
               <ul className="space-y-2">
                 <li>Save the label (garlic powder vs fresh garlic matters).</li>
                 <li>Estimate the amount and timing as best you can.</li>
-                <li>Don’t attempt “home fixes” without veterinary guidance.</li>
+                <li>Don’t attempt “home fixes” without professional guidance.</li>
               </ul>
             </div>
           </section>

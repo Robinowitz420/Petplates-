@@ -9,14 +9,14 @@ const BASE_URL = getSiteUrl();
 export const metadata: Metadata = {
   title: 'Homemade Cat Food for Kidney Disease (CKD): Nutrition Priorities & Safer Planning | Pet Plates',
   description:
-    'CKD-friendly homemade cat food planning: nutrition priorities, common pitfalls, and how to plan more safely with your veterinarian.',
+    'CKD-friendly homemade cat food planning: nutrition priorities, common pitfalls, and how to plan more safely with professional guidance.',
   alternates: {
     canonical: '/guides/cats/homemade-cat-food-for-kidney-disease',
   },
   openGraph: {
     title: 'Homemade Cat Food for Kidney Disease (CKD): Nutrition Priorities & Safer Planning | Pet Plates',
     description:
-      'CKD-friendly homemade cat food planning: nutrition priorities, common pitfalls, and how to plan more safely with your veterinarian.',
+      'CKD-friendly homemade cat food planning: nutrition priorities, common pitfalls, and how to plan more safely with professional guidance.',
     url: absoluteUrl('/guides/cats/homemade-cat-food-for-kidney-disease'),
   },
 };
@@ -33,27 +33,27 @@ const faqItems = [
   {
     question: 'Can cats with kidney disease eat homemade food?',
     answer:
-      'In some cases, yes—but CKD is a medical condition. If you’re considering homemade meals, coordinate with your veterinarian (and ideally a veterinary nutritionist) before changing diet.',
+      'In some cases, yes—but CKD is a medical condition. If you’re considering homemade meals, coordinate with a qualified animal health professional before changing diet.',
   },
   {
     question: 'What nutrients matter most for CKD cats?',
     answer:
-      'CKD planning often prioritizes controlling key nutritional factors and avoiding extremes. Your veterinarian should set the priority targets for your cat’s stage and lab results.',
+      'CKD planning often prioritizes controlling key nutritional factors and avoiding extremes. A qualified animal health professional should set the priority targets for your cat’s stage and lab results.',
   },
   {
     question: 'Should CKD cats be on a prescription diet?',
     answer:
-      'Many cats benefit from prescription diets. Whether homemade is appropriate depends on your cat’s condition, appetite, and your veterinarian’s guidance.',
+      'Many cats benefit from prescription diets. Whether homemade is appropriate depends on your cat’s condition, appetite, and professional guidance.',
   },
   {
     question: 'What are signs a CKD diet change isn’t going well?',
     answer:
-      'If appetite drops, vomiting increases, weight loss accelerates, or behavior changes, pause diet changes and check in with your veterinarian.',
+      'If appetite drops, vomiting increases, weight loss accelerates, or behavior changes, pause diet changes and seek professional guidance.',
   },
   {
     question: 'Can I rotate proteins for a CKD cat?',
     answer:
-      'Rotation is possible, but it should be slow and deliberate so you can observe response and keep the overall plan consistent. Confirm protein choices with your veterinarian.',
+      'Rotation is possible, but it should be slow and deliberate so you can observe response and keep the overall plan consistent. Confirm protein choices with professional guidance.',
   },
 ];
 
@@ -122,11 +122,11 @@ export default function Page() {
 
           <p className="mt-4 text-gray-300">
             Quick answer: CKD changes the priorities. The safest approach is to plan conservatively and coordinate with your
-            veterinarian—especially if your cat is on a prescription diet.
+            professional support team—especially if your cat is on a prescription diet.
           </p>
 
           <div className="mt-5 rounded-xl border border-green-800/40 p-4 bg-surface-lighter text-sm text-gray-200">
-            This page is educational and not veterinary advice. If your pet has symptoms or a condition, contact your veterinarian.
+            This page is educational and not medical advice. If your pet has symptoms or a condition, seek professional guidance.
           </div>
 
           <div className="mt-6 bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
@@ -147,7 +147,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Quick answer: what matters most for CKD planning</h2>
             <p className="text-gray-200">
-              Start with your veterinarian’s priorities. CKD is not a DIY-only situation; planning should be conservative and monitored.
+              Start with professional priorities. CKD is not a DIY-only situation; planning should be conservative and monitored.
             </p>
           </section>
 
@@ -156,7 +156,7 @@ export default function Page() {
             <ul className="space-y-2 text-gray-200">
               <li>Consistency beats constant experimentation.</li>
               <li>Avoid extremes and sudden shifts.</li>
-              <li>Confirm targets and supplements with your veterinarian.</li>
+              <li>Confirm targets and supplements with professional guidance.</li>
             </ul>
           </section>
 
@@ -170,26 +170,26 @@ export default function Page() {
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
-            <h2 className="text-xl font-bold text-orange-400 mb-4">How to use a plan safely alongside veterinary care</h2>
+            <h2 className="text-xl font-bold text-orange-400 mb-4">How to use a plan safely alongside medical care</h2>
             <p className="text-gray-200">
-              Use a plan as a consistency tool: stable ingredients, stable portions, and clear notes for your veterinarian. Don’t use it
+              Use a plan as a consistency tool: stable ingredients, stable portions, and clear notes for your care team. Don’t use it
               as a replacement for medical care.
             </p>
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
-            <h2 className="text-xl font-bold text-orange-400 mb-4">Monitoring and “when to re-check with your vet”</h2>
+            <h2 className="text-xl font-bold text-orange-400 mb-4">Monitoring and “when to re-check”</h2>
             <p className="text-gray-200">
               If appetite changes, vomiting increases, weight drops, or energy changes, pause dietary experiments and contact your
-              veterinarian.
+              professional support team.
             </p>
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">How Pet Plates supports CKD-aware planning (educational)</h2>
             <p className="text-gray-200">
-              Pet Plates helps you structure and document meals. It does not diagnose or treat disease and should be used with veterinary
-              oversight.
+              Pet Plates helps you structure and document meals. It does not diagnose or treat disease and should be used with
+              professional oversight.
             </p>
           </section>
 
@@ -242,9 +242,9 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
-              <li>University veterinary hospital resources</li>
+              <li>University hospital resources</li>
               <li>VCA Animal Hospitals (CKD overviews)</li>
-              <li>Your veterinarian’s individualized plan</li>
+              <li>Your care plan</li>
             </ul>
           </section>
         </div>

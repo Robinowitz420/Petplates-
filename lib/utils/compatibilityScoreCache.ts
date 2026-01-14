@@ -16,7 +16,45 @@ type CachedScore = {
   summaryReasoning?: string;
 };
 
-const SESSION_PREFIX = 'compatScore:v2:';
+const SESSION_PREFIX = 'compatScore:v3:';
+
+function hashString(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return String(Math.abs(hash));
+}
+
+export function getRecipeFingerprint(recipe: any): string {
+  const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
+  const supplements = Array.isArray(recipe?.supplements) ? recipe.supplements : [];
+
+  const ingredientParts = ingredients
+    .map((i: any) => {
+      const idOrName = String(i?.id || i?.name || '').trim();
+      const amount = String(i?.amount || '').trim();
+      const category = String(i?.category || '').trim();
+      if (!idOrName) return '';
+      return `${idOrName}:${amount}:${category}`;
+    })
+    .filter(Boolean)
+    .sort();
+
+  const supplementParts = supplements
+    .map((s: any) => {
+      const name = String(s?.name || s?.productName || s?.id || '').trim();
+      const amount = String(s?.amount || s?.defaultAmount || '').trim();
+      if (!name) return '';
+      return `${name}:${amount}`;
+    })
+    .filter(Boolean)
+    .sort();
+
+  const combined = `${ingredientParts.join('|')}||${supplementParts.join('|')}`;
+  return combined ? hashString(combined) : '0';
+}
 
 function safeParseJSON<T>(raw: string | null): T | null {
   if (!raw) return null;
@@ -31,14 +69,19 @@ export function getCompatibilityScoreCacheKey(params: {
   userId: string;
   petId: string;
   recipeId: string;
+  recipeFingerprint?: string;
 }): string {
-  return `${SESSION_PREFIX}${params.userId}::${params.petId}::${params.recipeId}`;
+  const fp = String(params.recipeFingerprint || '').trim();
+  return fp
+    ? `${SESSION_PREFIX}${params.userId}::${params.petId}::${params.recipeId}::${fp}`
+    : `${SESSION_PREFIX}${params.userId}::${params.petId}::${params.recipeId}`;
 }
 
 export function readCachedCompatibilityScore(params: {
   userId?: string | null;
   petId?: string | null;
   recipeId?: string | null;
+  recipeFingerprint?: string | null;
   ttlMs?: number;
 }): CachedScore | null {
   if (typeof window === 'undefined') return null;
@@ -47,17 +90,23 @@ export function readCachedCompatibilityScore(params: {
   const recipeId = String(params.recipeId || '').trim();
   if (!userId || !petId || !recipeId) return null;
 
-  const key = getCompatibilityScoreCacheKey({ userId, petId, recipeId });
+  const fingerprint = String(params.recipeFingerprint || '').trim();
+  const key = getCompatibilityScoreCacheKey({ userId, petId, recipeId, recipeFingerprint: fingerprint || undefined });
   const parsed = safeParseJSON<CachedScore>(window.sessionStorage.getItem(key));
   if (!parsed || typeof parsed.overallScore !== 'number' || typeof parsed.ts !== 'number') {
-    // Fallback to legacy v1 format
-    const legacyKey = `compatScore:v1:${userId}::${petId}::${recipeId}`;
-    const legacyParsed = safeParseJSON<{ overallScore: number; ts: number }>(
-      window.sessionStorage.getItem(legacyKey)
-    );
-    if (legacyParsed?.overallScore) {
-      return { ...legacyParsed, breakdown: undefined };
+    if (fingerprint) {
+      return null;
     }
+
+    const v2Key = `compatScore:v2:${userId}::${petId}::${recipeId}`;
+    const v2Parsed = safeParseJSON<CachedScore>(window.sessionStorage.getItem(v2Key));
+    if (v2Parsed && typeof v2Parsed.overallScore === 'number' && typeof v2Parsed.ts === 'number') {
+      return v2Parsed;
+    }
+
+    const legacyKey = `compatScore:v1:${userId}::${petId}::${recipeId}`;
+    const legacyParsed = safeParseJSON<{ overallScore: number; ts: number }>(window.sessionStorage.getItem(legacyKey));
+    if (legacyParsed?.overallScore) return { ...legacyParsed, breakdown: undefined };
     return null;
   }
 
@@ -71,6 +120,7 @@ export function writeCachedCompatibilityScore(params: {
   userId?: string | null;
   petId?: string | null;
   recipeId?: string | null;
+  recipeFingerprint?: string | null;
   overallScore: number;
   breakdown?: Record<string, any>;
   warnings?: string[];
@@ -89,7 +139,8 @@ export function writeCachedCompatibilityScore(params: {
   const overallScore = params.overallScore;
   if (typeof overallScore !== 'number' || !Number.isFinite(overallScore)) return;
 
-  const key = getCompatibilityScoreCacheKey({ userId, petId, recipeId });
+  const fingerprint = String(params.recipeFingerprint || '').trim();
+  const key = getCompatibilityScoreCacheKey({ userId, petId, recipeId, recipeFingerprint: fingerprint || undefined });
   const value: CachedScore = {
     overallScore,
     ts: Date.now(),

@@ -38,7 +38,7 @@ const faqItems = [
   {
     question: 'Can kittens eat tuna?',
     answer:
-      'Kittens have specific growth needs. If you’re considering tuna for a kitten, keep it occasional and confirm your kitten’s overall diet plan with a veterinarian.',
+      'Kittens have specific growth needs. If you’re considering tuna for a kitten, keep it occasional and confirm your kitten’s overall diet plan with a qualified animal health professional.',
   },
   {
     question: 'Is tuna in water better than tuna in oil for cats?',
@@ -161,7 +161,7 @@ export default function Page() {
             <h2 className="text-xl font-bold text-orange-400 mb-4">Signs your cat isn’t tolerating it well</h2>
             <p className="text-gray-200">
               Watch for digestive upset or any unusual behavior. If your cat has a medical condition, confirm diet changes with your
-              veterinarian.
+              professional support team.
             </p>
           </section>
 
@@ -231,7 +231,7 @@ export default function Page() {
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
               <li>VCA Animal Hospitals</li>
-              <li>University veterinary hospital resources</li>
+              <li>University hospital resources</li>
             </ul>
           </section>
         </div>

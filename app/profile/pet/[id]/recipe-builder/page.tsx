@@ -778,10 +778,10 @@ export default function RecipeBuilderPage() {
         // ingredientKey might be a display name already, try both
         const displayName = ingredientKey; // Assume it's already a display name from the picker
         if (!isWhitelisted(displayName, normalizedSpeciesType as any)) {
-          // Show warning but allow (user can override with vet approval)
+          // Show warning but allow (user can override)
           const confirmed = window.confirm(
             `${displayName} is not in the recommended whitelist for ${pet?.type}.\n\n` +
-            `This ingredient may not be safe for this species. Please check with your vet before using.\n\n` +
+            `This ingredient may not be safe for this species. Please confirm with a qualified animal health professional before using.\n\n` +
             `Do you want to add it anyway?`
           );
           if (!confirmed) return;

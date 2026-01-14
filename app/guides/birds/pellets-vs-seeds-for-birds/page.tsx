@@ -33,7 +33,7 @@ const faqItems = [
   {
     question: 'Are pellets healthier than seeds for birds?',
     answer:
-      'It depends on the bird and the product. Many owners use pellets as a consistent base while using seeds strategically. Work with an avian veterinarian for species-specific guidance.',
+      'It depends on the bird and the product. Many owners use pellets as a consistent base while using seeds strategically. Use trusted species-specific resources when deciding what fits your bird.',
   },
   {
     question: 'Can birds live on seeds alone?',
@@ -43,7 +43,7 @@ const faqItems = [
   {
     question: 'How do I switch my bird from seeds to pellets?',
     answer:
-      'Transition slowly. Don’t panic-switch. Change one variable at a time and monitor appetite and weight. If your bird refuses food, contact an avian veterinarian.',
+      'Transition slowly. Don’t panic-switch. Change one variable at a time and monitor appetite and weight. If your bird refuses food, seek professional guidance promptly.',
   },
   {
     question: 'What if my bird refuses pellets?',
@@ -53,7 +53,7 @@ const faqItems = [
   {
     question: 'Do different bird species need different diets?',
     answer:
-      'Yes. “Bird diet” is not one-size-fits-all. Use species-specific guidance and an avian veterinarian for the safest plan.',
+      'Yes. “Bird diet” is not one-size-fits-all. Use species-specific guidance and conservative routines for the safest plan.',
   },
 ];
 
@@ -170,7 +170,7 @@ export default function Page() {
             <ul className="space-y-2 text-gray-200">
               <li>Make changes slowly and monitor intake.</li>
               <li>Change one variable at a time.</li>
-              <li>If appetite drops or your bird refuses food, contact an avian veterinarian.</li>
+              <li>If appetite drops or your bird refuses food, seek professional guidance.</li>
             </ul>
           </section>
 
@@ -230,7 +230,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
-              <li>Avian veterinary resources</li>
+              <li>Reputable avian care resources</li>
               <li>Species-specific care organizations</li>
             </ul>
           </section>

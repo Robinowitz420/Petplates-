@@ -33,7 +33,7 @@ const faqItems = [
   {
     question: 'Do all reptiles need calcium supplements?',
     answer:
-      'Needs vary by species, life stage, and setup. Use trusted species care resources and a reptile veterinarian to confirm whether supplements are necessary.',
+      'Needs vary by species, life stage, and setup. Use trusted species care resources and a qualified reptile care professional to confirm whether supplements are necessary.',
   },
   {
     question: 'What is a good calcium-to-phosphorus ratio?',
@@ -48,12 +48,12 @@ const faqItems = [
   {
     question: 'Why do reptiles stop eating greens?',
     answer:
-      'There are many possible causes, including routine and husbandry issues. If appetite changes suddenly or persists, consult a reptile veterinarian.',
+      'There are many possible causes, including routine and husbandry issues. If appetite changes suddenly or persists, seek professional guidance.',
   },
   {
-    question: 'When should I talk to a reptile vet about diet?',
+    question: 'When should I seek professional help about diet?',
     answer:
-      'If you see appetite loss, weight loss, abnormal stools, lethargy, or repeated refusal of staples, consult a reptile veterinarian.',
+      'If you see appetite loss, weight loss, abnormal stools, lethargy, or repeated refusal of staples, seek professional guidance promptly.',
   },
 ];
 
@@ -122,7 +122,7 @@ export default function Page() {
 
           <p className="mt-4 text-gray-300">
             Quick answer: calcium planning is about consistency and avoiding extremes. Follow trusted species guidance, build a routine
-            you can repeat, and consult a reptile veterinarian when unsure.
+            you can repeat, and seek professional guidance when unsure.
           </p>
 
           <div className="mt-6 bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
@@ -176,8 +176,8 @@ export default function Page() {
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
-            <h2 className="text-xl font-bold text-orange-400 mb-4">When to consult a reptile vet</h2>
-            <p className="text-gray-200">If symptoms persist, appetite changes, or you’re unsure—consult a reptile veterinarian.</p>
+            <h2 className="text-xl font-bold text-orange-400 mb-4">When to seek professional help</h2>
+            <p className="text-gray-200">If symptoms persist, appetite changes, or you’re unsure—seek professional guidance.</p>
           </section>
 
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
@@ -229,7 +229,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
-              <li>Reptile veterinary resources</li>
+              <li>Reputable reptile care resources</li>
               <li>Species-specific care resources</li>
             </ul>
           </section>

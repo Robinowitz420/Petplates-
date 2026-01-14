@@ -15,6 +15,7 @@ import { normalizePetType } from '@/lib/utils/petType';
 import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
 import AlphabetText from '@/components/AlphabetText';
 import { writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
+import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -82,6 +83,65 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
 
   // Calculate compatibility rating if pet is provided
   const localScore = pet ? getLocalScore() : null;
+
+  const mealEstimateForBadge = (() => {
+    try {
+      const ingredients = Array.isArray((recipe as any)?.ingredients) ? ((recipe as any).ingredients as any[]) : [];
+      if (ingredients.length === 0) return null;
+
+      const shoppingListItems = ingredients
+        .map((ing: any, idx: number) => {
+          const name = typeof ing?.name === 'string' ? ing.name : '';
+          const amount = typeof ing?.amount === 'string' || typeof ing?.amount === 'number' ? ing.amount : '';
+          if (!name) return null;
+          return {
+            id: String(ing?.id || idx),
+            name,
+            amount,
+            category: typeof ing?.category === 'string' ? ing.category : undefined,
+          };
+        })
+        .filter(Boolean) as any[];
+
+      if (shoppingListItems.length === 0) return null;
+
+      const servingsRaw = (recipe as any)?.servings;
+      const servingsParsed =
+        typeof servingsRaw === 'number'
+          ? servingsRaw
+          : typeof servingsRaw === 'string'
+            ? parseFloat(servingsRaw)
+            : NaN;
+      const recipeServings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
+
+      return calculateMealsFromGroceryList(shoppingListItems as any, undefined, (recipe as any)?.category, true, recipeServings);
+    } catch {
+      return null;
+    }
+  })();
+
+  const badgeCostPerMeal = (() => {
+    const fromEstimate = mealEstimateForBadge?.costPerMeal;
+    if (typeof fromEstimate === 'number' && Number.isFinite(fromEstimate) && fromEstimate > 0) return fromEstimate;
+
+    const rawCost = (recipe as any).meta?.estimatedCost;
+    const numericCost = (() => {
+      if (typeof rawCost === 'number') return rawCost;
+      if (typeof rawCost === 'string') {
+        const cleaned = rawCost.replace(/[^0-9.]/g, '');
+        if (cleaned.length === 0) return NaN;
+        return Number(cleaned);
+      }
+      return Number(rawCost);
+    })();
+    return Number.isFinite(numericCost) && numericCost > 0 ? numericCost : null;
+  })();
+
+  const badgeMealsTotal = (() => {
+    const meals = mealEstimateForBadge?.estimatedMeals;
+    if (typeof meals === 'number' && Number.isFinite(meals) && meals > 0) return meals;
+    return null;
+  })();
 
   // Fetch SaaS score when pet or recipe changes
   useEffect(() => {
@@ -205,16 +265,28 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
 
           {hasSaasScore ? (
             <div className="mb-4 flex items-center justify-between rounded-lg border border-surface-highlight bg-surface-highlight/40 p-3">
-              <div className="relative">
-                <CompatibilityRadial 
-                  score={saasScore as number} 
-                  size={83} 
-                  strokeWidth={8} 
-                  label="" 
-                />
-                {isSaasLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-orange-400" />
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <CompatibilityRadial 
+                    score={saasScore as number} 
+                    size={83} 
+                    strokeWidth={8} 
+                    label="" 
+                  />
+                  {isSaasLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Loader2 className="h-6 w-6 animate-spin text-orange-400" />
+                    </div>
+                  )}
+                </div>
+                {badgeCostPerMeal !== null && badgeMealsTotal !== null && (
+                  <div className="mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-highlight border border-orange-500/40 text-[11px] font-semibold text-orange-200 whitespace-nowrap">
+                    <AlphabetText
+                      text={`$${badgeCostPerMeal.toFixed(2)}/Meal - ${badgeMealsTotal} Meals`}
+                      size={18}
+                      gapPx={1}
+                      forceSingleLine
+                    />
                   </div>
                 )}
               </div>
@@ -237,27 +309,6 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
               <div className="text-xs text-gray-300">Score not available</div>
             </div>
           ) : null}
-
-          {(() => {
-            const rawCost = (recipe as any).meta?.estimatedCost;
-            const numericCost = (() => {
-              if (typeof rawCost === 'number') return rawCost;
-              if (typeof rawCost === 'string') {
-                const cleaned = rawCost.replace(/[^0-9.]/g, '');
-                if (cleaned.length === 0) return NaN;
-                return Number(cleaned);
-              }
-              return Number(rawCost);
-            })();
-            if (!Number.isFinite(numericCost)) return null;
-            return (
-              <div className="mb-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-orange-500/40 text-xs font-semibold text-orange-200">
-                  <span className="text-white">{`$${numericCost.toFixed(2)} Per Meal`}</span>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* Meta Information */}
           {(recipe as any).meta && (

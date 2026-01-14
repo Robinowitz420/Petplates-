@@ -33,7 +33,7 @@ const faqItems = [
   {
     question: 'Can parrots eat avocado?',
     answer:
-      'Avocado is commonly considered unsafe for many birds, including parrots. If exposure happens, contact an avian veterinarian or emergency clinic for guidance.',
+      'Avocado is commonly considered unsafe for many birds, including parrots. If exposure happens, contact an emergency clinic for guidance.',
   },
   {
     question: 'Are small amounts of avocado safe for birds?',
@@ -43,12 +43,12 @@ const faqItems = [
   {
     question: 'What are signs of avocado toxicity in birds?',
     answer:
-      'If your bird seems unwell after ingestion, treat it as urgent. Call an avian veterinarian or emergency clinic immediately.',
+      'If your bird seems unwell after ingestion, treat it as urgent. Contact an emergency clinic immediately.',
   },
   {
     question: 'What should I do if my bird ate guacamole?',
     answer:
-      'Guacamole adds extra variables (salt, onion-family ingredients, spices). Contact an avian veterinarian or emergency clinic and share the ingredient list.',
+      'Guacamole adds extra variables (salt, onion-family ingredients, spices). Contact an emergency clinic and share the ingredient list.',
   },
   {
     question: 'Are avocado oils or skins also dangerous?',
@@ -122,7 +122,7 @@ export default function Page() {
 
           <p className="mt-4 text-gray-300">
             Quick answer: avocado is widely considered dangerous for many birds. If ingestion happened, treat it as urgent and contact an
-            avian veterinarian or emergency clinic.
+            emergency clinic.
           </p>
 
           <div className="mt-6 bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
@@ -157,11 +157,11 @@ export default function Page() {
             <h2 className="text-xl font-bold text-orange-400 mb-4">What to do if your bird ate avocado</h2>
             <div className="text-gray-200 space-y-3">
               <p>
-                If you suspect toxicity or a severe reaction, contact a veterinarian or emergency clinic immediately. Online lists are
-                not faster than professional care.
+                If you suspect toxicity or a severe reaction, contact an emergency clinic immediately. Online lists are not faster than
+                professional care.
               </p>
               <div className="rounded-xl border border-green-800/40 p-4 bg-surface-lighter text-sm text-gray-200">
-                This page is educational and not veterinary advice. If your pet has symptoms or a condition, contact your veterinarian.
+                This page is educational and not medical advice. If your pet has symptoms or a condition, seek professional guidance.
               </div>
               <ul className="space-y-2">
                 <li>Estimate the amount and timing.</li>
@@ -236,7 +236,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
-              <li>Avian veterinary resources</li>
+              <li>Reputable avian care resources</li>
               <li>University exotic animal resources</li>
             </ul>
           </section>

@@ -276,7 +276,7 @@ export default function ASINVerificationPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Vet Note
+                      Product Note
                     </label>
                     <textarea
                       value={editData.vetNote}

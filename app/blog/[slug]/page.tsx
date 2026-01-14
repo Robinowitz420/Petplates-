@@ -145,7 +145,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       <div className="space-y-4 mb-6">
         <div className="border-l-4 border-green-800/40 bg-green-900/20 p-4">
           <h3 className="font-semibold text-orange-300">Over-Supplementation</h3>
-          <p className="text-orange-300">Too many vitamins can be as harmful as deficiencies. Stick to veterinary-recommended amounts.</p>
+          <p className="text-orange-300">Too many vitamins can be as harmful as deficiencies. Stick to conservative, well-referenced amounts.</p>
         </div>
         <div className="border-l-4 border-green-800/40 bg-green-900/20 p-4">
           <h3 className="font-semibold text-orange-300">Ignoring Calcium-Phosphorus Balance</h3>
@@ -157,7 +157,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold text-white mt-8 mb-4">When to Consult a Veterinarian</h2>
+      <h2 className="text-2xl font-bold text-white mt-8 mb-4">When to Seek Professional Help</h2>
       <p className="text-orange-300 leading-relaxed mb-4">
         While homemade dog food can be excellent, certain situations require professional guidance:
       </p>

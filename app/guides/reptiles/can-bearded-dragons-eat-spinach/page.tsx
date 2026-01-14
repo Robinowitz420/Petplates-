@@ -53,7 +53,7 @@ const faqItems = [
   {
     question: 'What if my bearded dragon refuses greens?',
     answer:
-      'Don’t panic-switch ingredients daily. Try a slow approach: rotate one variable at a time, keep presentation consistent, and consult a reptile vet if appetite concerns persist.',
+      'Don’t panic-switch ingredients daily. Try a slow approach: rotate one variable at a time, keep presentation consistent, and seek professional guidance if appetite concerns persist.',
   },
 ];
 
@@ -174,7 +174,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">What to do if your dragon won’t eat greens</h2>
             <p className="text-gray-200">
-              Don’t change five variables in the same week. Keep routine stable, change one thing, and consult a reptile veterinarian if
+              Don’t change five variables in the same week. Keep routine stable, change one thing, and seek professional guidance if
               appetite is a concern.
             </p>
           </section>
@@ -228,7 +228,7 @@ export default function Page() {
           <section className="bg-surface rounded-2xl shadow-lg p-6 border border-green-800/50">
             <h2 className="text-xl font-bold text-orange-400 mb-4">Sources</h2>
             <ul className="space-y-2 text-gray-200">
-              <li>Reptile veterinary resources</li>
+              <li>Reputable reptile care resources</li>
               <li>Species-specific care resources</li>
             </ul>
           </section>

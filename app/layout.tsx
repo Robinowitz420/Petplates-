@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     default: "Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets",
     template: "%s | Paws & Plates"
   },
-  description: "Free vet-approved meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO & WSAVA compliant.",
+  description: "Free meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO-aligned nutrition guardrails.",
   manifest: "/manifest.webmanifest",
   themeColor: "#f97316",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Paws & Plates" },
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     "DIY pet meals",
     "pet meal prep",
     "fresh pet food recipes",
-    "vet approved pet food",
+    "pet nutrition",
     "custom pet nutrition",
     "AAFCO pet food",
     "bird food recipes",
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Paws & Plates',
     title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
-    description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering. AAFCO & WSAVA compliant nutrition.',
+    description: 'Free meal plans for ALL your pets. Custom recipes with one-click Amazon ordering. AAFCO-aligned nutrition guardrails.',
     images: [
       {
         url: absoluteUrl('/images/emojis/Mascots/HeroPics/hero4.jpg'),
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Paws & Plates - Fresh Meal Prep for Dogs, Cats, Birds, Reptiles & Small Pets',
-    description: 'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ordering.',
+    description: 'Free meal plans for ALL your pets. Custom recipes with one-click Amazon ordering.',
     images: [absoluteUrl('/images/emojis/Mascots/HeroPics/hero4.jpg')],
   },
   verification: {

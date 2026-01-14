@@ -67,13 +67,13 @@ export async function GET() {
         notes: 'Initial contact made via DM, waiting for response'
       },
       {
-        id: 'youtube_vetemily_3',
+        id: 'youtube_emilyrodriguez_3',
         displayName: 'Dr. Emily Rodriguez',
         platform: 'youtube',
-        handle: 'vetemily',
-        profileUrl: 'https://youtube.com/@vetemily',
-        email: 'emily.vet@example.com',
-        tags: 'veterinarian',
+        handle: 'emilyrodriguez',
+        profileUrl: 'https://youtube.com/@emilyrodriguez',
+        email: 'emily@example.com',
+        tags: 'animal-health',
         personalizationNotes: 'bird specialist|reptile expert|exotic pets',
         recentContentHook: '',
         status: 'replied',

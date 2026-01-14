@@ -156,20 +156,20 @@ export async function POST(request: Request) {
             dailyGrams: normalizedProfile.weightKg * 20,
             multiplier: 1,
             mealsPerDay: 2,
-            notes: ['General recommendation - consult vet']
+            notes: ['General recommendation - seek professional guidance']
           },
           shoppingList: r.ingredients.map(ing => ({
             name: ing.name,
             amount: ing.amount,
             asinLink: ing.asinLink || '',
-            notes: 'General recommendation - consult vet',
+            notes: 'General recommendation - seek professional guidance',
             category: 'Ingredient'
           })),
-          explanation: `${r.name} - General recommendation for ${normalizedProfile.petName || 'your pet'}. Please consult your veterinarian.`,
+          explanation: `${r.name} - General recommendation for ${normalizedProfile.petName || 'your pet'}. Please seek professional guidance.`,
           weeklyPlan: [],
           score: 30, // Low score to indicate it's a general recommendation
           _tierLabel: 'General Recommendation',
-          _warning: 'General recommendation - consult vet',
+          _warning: 'General recommendation - seek professional guidance',
           _healthMatch: undefined
         }));
       

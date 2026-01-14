@@ -84,7 +84,7 @@ function v3ToV2(recipe: GeneratedRecipeV3, opts: GenerateRecipeV2Options): Recip
       servingsPerDay: 2,
       dailyCalories: typeof opts.targetCalories === 'number' ? opts.targetCalories : recipe.nutrition.kcal,
     },
-    explanation: 'Generated using Pet Plates recipe planning logic. Use this as educational guidance and consult a veterinarian for medical conditions.',
+    explanation: 'Generated using Pet Plates recipe planning logic. Use this as educational guidance and consult a qualified animal health professional for medical conditions.',
     validation: {
       isValid: true,
       score,

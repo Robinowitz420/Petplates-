@@ -270,7 +270,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         }
         return {
           concern,
-          note: 'No specific note available for this concern based on the current data. Consider confirming with your veterinarian.',
+          note: 'No specific note available for this concern based on the current data. Consider confirming with a qualified animal health professional.',
         };
       });
 

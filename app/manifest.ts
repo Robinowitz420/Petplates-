@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Paws & Plates',
     short_name: 'Paws&Plates',
     description:
-      'Free vet-approved meal plans for ALL your pets. Custom recipes with one-click Amazon ingredient ordering.',
+      'Free meal plans for ALL your pets. Custom recipes with one-click Amazon ingredient ordering.',
     start_url: '/',
     scope: '/',
     display: 'standalone',

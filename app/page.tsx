@@ -32,9 +32,9 @@ const whyCards = [
   {
     id: 'standards',
     title: 'AAFCO Approved',
-    subtitle: 'All meals meet or exceed AAFCO + WSAVA nutritional standards',
+    subtitle: 'All meals use AAFCO-aligned nutrition guardrails',
     hover:
-      '**AAFCO** (Association of American Feed Control Officials) and **WSAVA** (World Small Animal Veterinary Association) set the gold standard for pet nutrition. We build every meal to those benchmarks with guidance from pet health specialists so your pet stays balanced.',
+      '**AAFCO** (Association of American Feed Control Officials) is a widely used reference framework for dog and cat nutrition. We use standards as planning guardrails to help you build balanced routines.',
     icon: Check,
   },
   {
@@ -102,7 +102,7 @@ export default function HomePage() {
           </div>
           <div className="space-y-3 px-4">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
-              Fresh, vet-approved meal prep for every pet in your home.
+              Fresh meal prep for every pet in your home.
             </h1>
             <p className="text-lg text-gray-200 max-w-2xl mx-auto">
               Custom, species-specific nutrition plans that keep dogs, cats, birds,

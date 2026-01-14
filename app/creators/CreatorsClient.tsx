@@ -42,7 +42,6 @@ const ALL_TAGS = [
   'farm',
   'small-pet',
   'homestead',
-  'vet',
   'training',
 ] as const;
 
@@ -97,10 +96,6 @@ function matchesTagFilter(creator: Creator, tagFilter: Tag | ''): boolean {
   if (creator.tags.includes(tagFilter)) return true;
   if (tagFilter === 'small-pet') return creator.tags.includes('pocket-pets');
   if (tagFilter === 'homestead') return creator.tags.includes('farm');
-  if (tagFilter === 'vet') {
-    const niche = normalizeText(creator.niche);
-    return niche.includes('vet') || niche.includes('veterinary');
-  }
   if (tagFilter === 'training') {
     const niche = normalizeText(creator.niche);
     return niche.includes('training');

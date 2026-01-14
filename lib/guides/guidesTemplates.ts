@@ -1,6 +1,6 @@
 export const guideCommon = {
   disclaimer:
-    'Paws & Plates provides educational meal planning tools and ingredient safety checks. It is not veterinary advice. Consult a veterinarian for medical conditions or prescription diets.',
+    'Paws & Plates provides educational meal planning tools and ingredient safety checks. It is not medical advice. Consult a qualified animal health professional for medical conditions or prescription diets.',
   ctaDefaults: {
     primaryText: 'See example meals',
     primaryHref: '/',
@@ -94,7 +94,7 @@ export const guideTemplates: Record<GuideCategory, GuideTemplate> = {
       },
       {
         q: 'Is this veterinary advice?',
-        a: 'No. Paws & Plates provides educational meal planning tools. If your pet has a diagnosed medical condition or is on a prescription diet, consult a veterinarian before changing diet.',
+        a: 'No. Paws & Plates provides educational meal planning tools. If your pet has a diagnosed medical condition or is on a prescription diet, consult a qualified animal health professional before changing diet.',
       },
       {
         q: 'How do portions work?',
@@ -159,7 +159,7 @@ export const guideTemplates: Record<GuideCategory, GuideTemplate> = {
       },
       {
         q: 'Is this veterinary advice?',
-        a: 'No. Paws & Plates provides educational meal planning tools. If your pet has a diagnosed medical condition or is on a prescription diet, consult a veterinarian before changing diet.',
+        a: 'No. Paws & Plates provides educational meal planning tools. If your pet has a diagnosed medical condition or is on a prescription diet, consult a qualified animal health professional before changing diet.',
       },
       {
         q: 'How do portions work?',

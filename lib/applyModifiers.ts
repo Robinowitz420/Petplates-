@@ -140,7 +140,7 @@ export function applyModifiers(recipe: Recipe, pet: any): ApplyModifiersResult &
             name: genericName,
             productName: vettedProduct.productName,
             asinLink: vettedProduct.asinLink,
-            notes: (ing as any).notes ? `${(ing as any).notes} | VET NOTE: ${vettedProduct.vetNote}` : `VET NOTE: ${vettedProduct.vetNote}`,
+            notes: (ing as any).notes ? `${(ing as any).notes} | PRODUCT NOTE: ${vettedProduct.vetNote}` : `PRODUCT NOTE: ${vettedProduct.vetNote}`,
         };
     }
     // If no vetted product, remove asinLink to ensure only vetted products have buy links

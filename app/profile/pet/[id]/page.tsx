@@ -11,7 +11,7 @@ import { applyModifiers } from '@/lib/applyModifiers';
 import { normalizePetType } from '@/lib/utils/petType';
 import { useRecipePricing } from '@/lib/hooks/useRecipePricing';
 import { useChunkedRecipeScoring } from '@/lib/hooks/useChunkedRecipeScoring';
-import { readCachedCompatibilityScore, writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
+import { getRecipeFingerprint, readCachedCompatibilityScore, writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
 import { calculateMealsFromGroceryList, type ShoppingListItem } from '@/lib/utils/mealEstimation';
 import { getPets, savePet } from '@/lib/utils/petStorage';
 import { getRandomName } from '@/lib/utils/petUtils';
@@ -75,7 +75,7 @@ export default function RecommendedRecipesPage() {
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
   const [regenerateNonce, setRegenerateNonce] = useState(0);
 
-  const [sortBy, setSortBy] = useState<'compatibility' | 'cheapest'>('compatibility');
+  const [sortBy, setSortBy] = useState<'compatibility' | 'cheapest' | 'meals'>('compatibility');
   const [hasAgreedToDisclaimer, setHasAgreedToDisclaimer] = useState(false);
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [costCacheRefreshNonce, setCostCacheRefreshNonce] = useState(0);
@@ -85,13 +85,6 @@ export default function RecommendedRecipesPage() {
     const spaced = level.replace(/-/g, ' ');
     return spaced.charAt(0).toUpperCase() + spaced.slice(1);
   };
-
-  const sceneStatus: SceneStatus = useMemo(() => {
-    if (engineError) return 'error';
-    if (loadingMeals) return 'loading';
-    if (engineMeals && engineMeals.length > 0) return 'ready';
-    return 'idle';
-  }, [engineError, engineMeals, loadingMeals]);
 
   const mealsCacheKey = useMemo(() => {
     return `generated_meals_v3:${userId || 'anon'}:${petId}:count18`;
@@ -523,6 +516,17 @@ export default function RecommendedRecipesPage() {
       return null;
     };
 
+    const getResolvedMeals = (item: any) => {
+      const recipeId = String(item?.recipe?.id || '');
+      if (!recipeId) return null;
+
+      const pkg = packageEstimateByRecipeId[recipeId];
+      const meals = pkg?.estimatedMeals;
+      if (typeof meals === 'number' && Number.isFinite(meals) && meals > 0) return meals;
+
+      return null;
+    };
+
     list.sort((a: any, b: any) => {
       const aId = String(a?.recipe?.id || '');
       const bId = String(b?.recipe?.id || '');
@@ -537,6 +541,31 @@ export default function RecommendedRecipesPage() {
         if (aHas && bHas) {
           const diff = (aCost as number) - (bCost as number);
           if (Math.abs(diff) > 0.0001) return diff;
+
+          const scoreDiff = getScore(b) - getScore(a);
+          if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
+
+          return aId.localeCompare(bId);
+        }
+
+        if (aHas && !bHas) return -1;
+        if (!aHas && bHas) return 1;
+
+        const scoreDiff = getScore(b) - getScore(a);
+        if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
+        return aId.localeCompare(bId);
+      }
+
+      if (sortBy === 'meals') {
+        const aMeals = getResolvedMeals(a);
+        const bMeals = getResolvedMeals(b);
+
+        const aHas = typeof aMeals === 'number' && Number.isFinite(aMeals) && aMeals > 0;
+        const bHas = typeof bMeals === 'number' && Number.isFinite(bMeals) && bMeals > 0;
+
+        if (aHas && bHas) {
+          const diff = (bMeals as number) - (aMeals as number);
+          if (Math.abs(diff) > 0.001) return diff;
 
           const scoreDiff = getScore(b) - getScore(a);
           if (Math.abs(scoreDiff) > 0.001) return scoreDiff;
@@ -573,6 +602,79 @@ export default function RecommendedRecipesPage() {
 
     return list;
   }, [apiPricingById, costComparisonCachedByRecipeId, packageEstimateByRecipeId, scoredMeals, sortBy]);
+
+  const firstThreeScoresReady = useMemo(() => {
+    const visible = sortedMealsToRender.slice(0, 3);
+    if (visible.length === 0) return true;
+
+    for (const meal of visible) {
+      const recipeId = String((meal as any)?.recipe?.id || '');
+      if (!recipeId) return false;
+      const score = (saasScoresByRecipeId as any)?.[recipeId];
+      if (!(typeof score === 'number' && Number.isFinite(score))) return false;
+    }
+    return true;
+  }, [saasScoresByRecipeId, sortedMealsToRender]);
+
+  const loadingForFirstScores = loadingMeals || !firstThreeScoresReady;
+
+  const sceneStatus: SceneStatus = useMemo(() => {
+    if (engineError) return 'error';
+    if (loadingForFirstScores) return 'loading';
+    if (engineMeals && engineMeals.length > 0) return 'ready';
+    return 'idle';
+  }, [engineError, engineMeals, loadingForFirstScores]);
+
+  const saasDisplayScoresByRecipeId = useMemo(() => {
+    const seed = `${userId || 'anon'}|${petId}`;
+    const visible = sortedMealsToRender.slice(0, 60);
+    const items = visible
+      .map((meal, index) => {
+        const recipeId = String((meal as any)?.recipe?.id || '');
+        if (!recipeId) return null;
+        const base = (saasScoresByRecipeId as any)?.[recipeId];
+        if (!(typeof base === 'number' && Number.isFinite(base))) return null;
+        return { recipeId, score: base, index };
+      })
+      .filter(Boolean) as Array<{ recipeId: string; score: number; index: number }>;
+
+    const toHash = (str: string): number => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash);
+    };
+
+    const clamp = (n: number) => Math.max(0, Math.min(100, n));
+    const out: Record<string, number> = {};
+
+    const byScore = new Map<number, Array<{ recipeId: string; index: number }>>();
+    for (const item of items) {
+      const key = Math.round(item.score);
+      const arr = byScore.get(key) || [];
+      arr.push({ recipeId: item.recipeId, index: item.index });
+      byScore.set(key, arr);
+    }
+
+    for (const [scoreKey, group] of byScore.entries()) {
+      const sortedGroup = group.slice().sort((a, b) => a.index - b.index);
+      for (let pos = 0; pos < sortedGroup.length; pos++) {
+        const { recipeId } = sortedGroup[pos];
+        if (sortedGroup.length >= 3 && pos >= 2) {
+          const h = toHash(`${seed}|${recipeId}|${scoreKey}|${pos}`);
+          const pick = h % 4;
+          const delta = pick === 0 ? -2 : pick === 1 ? -1 : pick === 2 ? 1 : 2;
+          out[recipeId] = clamp(scoreKey + delta);
+        } else {
+          out[recipeId] = clamp(scoreKey);
+        }
+      }
+    }
+
+    return out;
+  }, [petId, saasScoresByRecipeId, sortedMealsToRender, userId]);
 
   useEffect(() => {
     if (!userId || !pet?.id) return;
@@ -619,17 +721,79 @@ export default function RecommendedRecipesPage() {
 
     const run = async () => {
       const ttlMs = 30 * 60 * 1000;
+      const priorityVisible = sortedMealsToRender.slice(0, 3);
       const visible = sortedMealsToRender.slice(0, 60);
       const pending: Array<{ recipe: any; recipeId: string }> = [];
 
-      for (const meal of visible) {
-        if (isCancelled) return;
+      const fetchAndStoreScore = async (params: { recipe: any; recipeId: string }) => {
+        const { recipe, recipeId } = params;
+        const recipeFingerprint = getRecipeFingerprint(recipe);
+        setSaasLoadingByRecipeId((prev) => ({ ...prev, [recipeId]: true }));
 
+        try {
+          const response = await fetch('/api/compatibility/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              recipe,
+              pet: {
+                id: pet.id,
+                name: petDisplayName,
+                type: pet.type,
+                breed: pet.breed,
+                age: pet.age,
+                weight: (pet as any).weightKg || (pet as any).weight,
+                activityLevel: (pet as any).activityLevel,
+                healthConcerns: (pet as any).healthConcerns || [],
+                dietaryRestrictions: (pet as any).dietaryRestrictions || [],
+                allergies: (pet as any).allergies || [],
+              },
+            }),
+          });
+
+          if (!response.ok) {
+            return;
+          }
+
+          const data = await response.json();
+          const scoreObj = data.score || data;
+          const overallScore =
+            typeof scoreObj?.overallScore === 'number' && Number.isFinite(scoreObj.overallScore) ? scoreObj.overallScore : null;
+          if (overallScore === null) return;
+
+          writeCachedCompatibilityScore({
+            userId,
+            petId: pet.id,
+            recipeId,
+            recipeFingerprint,
+            overallScore,
+            breakdown: scoreObj?.breakdown,
+            warnings: scoreObj?.warnings,
+            strengths: scoreObj?.strengths,
+            nutritionalGaps: scoreObj?.nutritionalGaps,
+            supplementRecommendations: scoreObj?.supplementRecommendations,
+            compatibility: scoreObj?.compatibility,
+            summaryReasoning: scoreObj?.summaryReasoning,
+          });
+
+          setSaasScoresByRecipeId((prev) => ({ ...prev, [recipeId]: overallScore }));
+        } catch {
+          // ignore
+        } finally {
+          setSaasLoadingByRecipeId((prev) => ({ ...prev, [recipeId]: false }));
+        }
+      };
+
+      // 1) Preload scores for the first 3 visible recipes (sequentially) so the first render shows scores.
+      for (const meal of priorityVisible) {
+        if (isCancelled) return;
         const recipe = (meal as any)?.recipe;
         const recipeId = String(recipe?.id || '');
         if (!recipeId) continue;
 
-        const fromSession = readCachedCompatibilityScore({ userId, petId: pet.id, recipeId, ttlMs });
+        const recipeFingerprint = getRecipeFingerprint(recipe);
+
+        const fromSession = readCachedCompatibilityScore({ userId, petId: pet.id, recipeId, recipeFingerprint, ttlMs });
         if (fromSession && typeof fromSession.overallScore === 'number') {
           setSaasScoresByRecipeId((prev) => {
             if (prev[recipeId] === fromSession.overallScore) return prev;
@@ -638,12 +802,38 @@ export default function RecommendedRecipesPage() {
           continue;
         }
 
+        await fetchAndStoreScore({ recipe, recipeId });
+      }
+
+      for (const meal of visible) {
+        if (isCancelled) return;
+
+        const recipe = (meal as any)?.recipe;
+        const recipeId = String(recipe?.id || '');
+        if (!recipeId) continue;
+
+        const recipeFingerprint = getRecipeFingerprint(recipe);
+
+        const fromSession = readCachedCompatibilityScore({ userId, petId: pet.id, recipeId, recipeFingerprint, ttlMs });
+        if (fromSession && typeof fromSession.overallScore === 'number') {
+          setSaasScoresByRecipeId((prev) => {
+            if (prev[recipeId] === fromSession.overallScore) return prev;
+            return { ...prev, [recipeId]: fromSession.overallScore };
+          });
+          continue;
+        }
+
+        // Skip if already handled in the priority preload.
+        if (priorityVisible.some((p) => String((p as any)?.recipe?.id || '') === recipeId)) {
+          continue;
+        }
+
         pending.push({ recipe, recipeId });
       }
 
       if (pending.length === 0) return;
 
-      const CONCURRENCY = 4;
+      const CONCURRENCY = 3;
       let idx = 0;
 
       const worker = async () => {
@@ -651,74 +841,7 @@ export default function RecommendedRecipesPage() {
           const current = pending[idx++];
           if (!current) return;
 
-          const { recipe, recipeId } = current;
-
-          setSaasLoadingByRecipeId((prev) => ({ ...prev, [recipeId]: true }));
-
-          try {
-            const response = await fetch('/api/compatibility/score', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                recipe,
-                pet: {
-                  id: pet.id,
-                  name: petDisplayName,
-                  type: pet.type,
-                  breed: pet.breed,
-                  age: pet.age,
-                  weight: (pet as any).weightKg || (pet as any).weight,
-                  activityLevel: (pet as any).activityLevel,
-                  healthConcerns: (pet as any).healthConcerns || [],
-                  dietaryRestrictions: (pet as any).dietaryRestrictions || [],
-                  allergies: (pet as any).allergies || [],
-                },
-              }),
-            });
-
-            if (!response.ok) {
-              continue;
-            }
-
-            const data = await response.json();
-            const scoreObj = data.score || data;
-            const overallScore =
-              typeof scoreObj?.overallScore === 'number' && Number.isFinite(scoreObj.overallScore) ? scoreObj.overallScore : null;
-            if (overallScore === null) continue;
-
-            // Store the full score object
-            if (process.env.NODE_ENV === 'development') {
-              console.log('PET PROFILE CACHE WRITE:', {
-                recipeId,
-                hasScoreObj: !!scoreObj,
-                scoreObjKeys: scoreObj ? Object.keys(scoreObj) : [],
-                hasBreakdown: !!scoreObj?.breakdown,
-                breakdownKeys: scoreObj?.breakdown ? Object.keys(scoreObj.breakdown) : [],
-                dataKeys: Object.keys(data),
-                hasDataScore: !!data.score,
-              });
-            }
-
-            writeCachedCompatibilityScore({
-              userId,
-              petId: pet.id,
-              recipeId,
-              overallScore,
-              breakdown: scoreObj?.breakdown,
-              warnings: scoreObj?.warnings,
-              strengths: scoreObj?.strengths,
-              nutritionalGaps: scoreObj?.nutritionalGaps,
-              supplementRecommendations: scoreObj?.supplementRecommendations,
-              compatibility: scoreObj?.compatibility,
-              summaryReasoning: scoreObj?.summaryReasoning,
-            });
-
-            setSaasScoresByRecipeId((prev) => ({ ...prev, [recipeId]: overallScore }));
-          } catch {
-            // ignore
-          } finally {
-            setSaasLoadingByRecipeId((prev) => ({ ...prev, [recipeId]: false }));
-          }
+          await fetchAndStoreScore(current);
         }
       };
 
@@ -877,9 +1000,16 @@ export default function RecommendedRecipesPage() {
           Back to Profile
         </Link>
 
-        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight px-6 py-4 mb-3 flex flex-col gap-6 lg:flex-row lg:items-start relative">
-          <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1">
-            <span className="relative block w-40 md:w-48 lg:w-56 h-full overflow-hidden rounded-md">
+        <div className="bg-surface rounded-lg shadow-md border border-surface-highlight pr-6 pl-[9px] pb-4 pt-24 mb-3 flex flex-col gap-6 lg:flex-row lg:items-start relative">
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 flex flex-col items-center text-center gap-2" style={{ marginLeft: 200 }}>
+            <AlphabetText text="Sherlock Shells is detecting meals for" size={45} />
+            <AlphabetText text={petDisplayName} size={45} />
+          </div>
+          <span className="flex-shrink-0 self-stretch rounded-lg bg-surface-highlight border border-surface-highlight p-1 w-full max-w-[250px]" style={{ marginTop: -80 }}>
+            <span
+              className="relative block w-full h-full min-h-[180px] lg:min-h-[210px] overflow-hidden rounded-md"
+              style={{ aspectRatio: '1 / 1' }}
+            >
               <MealGenerationScene
                 status={sceneStatus}
                 idleImageSrc="/images/emojis/Mascots/Sherlock Shells/Shell4.jpg"
@@ -894,21 +1024,9 @@ export default function RecommendedRecipesPage() {
               />
             </span>
           </span>
-          <div className="flex-1 flex flex-col gap-4 min-w-0">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="text-2xl font-bold text-foreground flex flex-wrap items-center gap-3 min-w-0 ml-[275px] mt-5">
-                <AlphabetText text="Sherlock Shells is detecting meals for" size={45} />
-                <span className="inline-flex items-center gap-0 relative" style={{ top: '14px' }}>
-                  <AlphabetText text="-" size={45} />
-                  <span style={{ marginLeft: 10 }}>
-                    <AlphabetText text={petDisplayName} size={45} />
-                  </span>
-                </span>
-              </div>
-            </div>
-
+          <div className="flex-1 flex flex-col gap-4 min-w-0" style={{ marginLeft: 35 }}>
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-              <div className="flex flex-col items-center flex-shrink-0 gap-2 lg:-ml-[100px] -mt-20">
+              <div className="flex flex-col items-center flex-shrink-0 gap-2 lg:-ml-[120px] -mt-20">
                 <span className="w-48 h-48 rounded-full bg-surface-highlight border-2 border-green-800 overflow-hidden inline-flex items-center justify-center align-middle">
                   <Image
                     src={getProfilePictureForPetType(pet.type)}
@@ -922,10 +1040,10 @@ export default function RecommendedRecipesPage() {
 
                 <button
                   onClick={handleRegenerate}
-                  disabled={loadingMeals}
+                  disabled={loadingForFirstScores}
                   className="group relative inline-flex focus:outline-none focus-visible:outline-none focus-visible:ring-0 rounded-2xl transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ outline: 'none', boxShadow: 'none' }}
-                  aria-label={loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}
+                  aria-label={loadingForFirstScores ? 'Finding a new Batch…' : 'Find a new Batch!'}
                 >
                   <span className="relative h-16 w-[360px] sm:w-[420px] max-w-full overflow-hidden rounded-2xl">
                     <Image
@@ -937,11 +1055,11 @@ export default function RecommendedRecipesPage() {
                       priority
                     />
                   </span>
-                  <span className="sr-only">{loadingMeals ? 'Finding a new Batch…' : 'Find a new Batch!'}</span>
+                  <span className="sr-only">{loadingForFirstScores ? 'Finding a new Batch…' : 'Find a new Batch!'}</span>
                 </button>
               </div>
 
-              <div className="flex flex-col gap-4 mt-6 lg:grid lg:grid-cols-3 lg:gap-4 lg:flex-1 lg:-ml-[100px] lg:mt-[50px] pb-6">
+              <div className="flex flex-col gap-4 mt-6 lg:grid lg:grid-cols-3 lg:gap-4 lg:flex-1 lg:-ml-[90px] lg:mt-[50px] pb-6">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-300 mb-1 pl-4 pb-1 border-b border-surface-highlight">
                     <AlphabetText text="Bio" size={26} />
@@ -1030,7 +1148,7 @@ export default function RecommendedRecipesPage() {
             </div>
           </div>
 
-          <div className="hidden md:flex absolute bottom-3 right-4 pointer-events-none select-none">
+          <div className="hidden md:flex absolute bottom-3 right-[31px] pointer-events-none select-none">
             <div className="max-w-[420px]">
               <AlphabetText text="Click on Meal Cards for Details" size={26} className="justify-end" />
             </div>
@@ -1043,6 +1161,7 @@ export default function RecommendedRecipesPage() {
             {([
               { value: 'compatibility', label: 'Compatibility' },
               { value: 'cheapest', label: 'Cheapest' },
+              { value: 'meals', label: 'Meals' },
             ] as const).map((option) => {
               const isActive = sortBy === option.value;
               return (
@@ -1065,10 +1184,33 @@ export default function RecommendedRecipesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedMealsToRender.slice(0, 18).map((meal) => {
+          {sortedMealsToRender.slice(0, 18).map((meal, mealIndex) => {
             const recipe = (meal as any).recipe;
             const recipeId = String(recipe?.id || '');
             if (!recipeId) return null;
+
+            const hasScore = typeof saasScoresByRecipeId[recipeId] === 'number' && Number.isFinite(saasScoresByRecipeId[recipeId]);
+            if (mealIndex < 3 && !hasScore) {
+              return (
+                <div
+                  key={`skeleton-${recipeId || mealIndex}`}
+                  className="bg-surface rounded-2xl shadow-md border-2 border-orange-500/20 overflow-hidden h-full flex flex-col"
+                >
+                  <div className="p-6 flex-1 flex flex-col animate-pulse">
+                    <div className="mb-3">
+                      <div className="h-10 w-full rounded-lg bg-surface-highlight/60" />
+                    </div>
+                    <div className="mt-6 flex flex-col items-center gap-4">
+                      <div className="h-6 w-40 rounded bg-surface-highlight/60" />
+                      <div className="h-[135px] w-[135px] rounded-full bg-surface-highlight/60" />
+                    </div>
+                    <div className="mt-auto pt-6">
+                      <div className="h-[78px] w-full rounded-2xl bg-surface-highlight/60" />
+                    </div>
+                  </div>
+                </div>
+              );
+            }
 
             const pricing = apiPricingById?.[recipeId];
             const packageEstimate = packageEstimateByRecipeId[recipeId];
@@ -1125,7 +1267,22 @@ export default function RecommendedRecipesPage() {
                       {scoringPet && (
                           <div className="mt-4 flex flex-col items-center gap-2">
                             {(() => {
-                              const effectiveScore = typeof saasScoresByRecipeId[recipeId] === 'number' ? saasScoresByRecipeId[recipeId] : null;
+                              const effectiveScore =
+                                typeof saasDisplayScoresByRecipeId[recipeId] === 'number'
+                                  ? saasDisplayScoresByRecipeId[recipeId]
+                                  : typeof saasScoresByRecipeId[recipeId] === 'number'
+                                    ? saasScoresByRecipeId[recipeId]
+                                    : null;
+
+                              const badgeCostPerMeal =
+                                typeof resolvedCostPerMeal === 'number' && Number.isFinite(resolvedCostPerMeal) && resolvedCostPerMeal > 0
+                                  ? resolvedCostPerMeal
+                                  : null;
+
+                              const badgeMealsTotal =
+                                typeof packageEstimate?.estimatedMeals === 'number' && Number.isFinite(packageEstimate.estimatedMeals)
+                                  ? packageEstimate.estimatedMeals
+                                  : null;
 
                               return (
                                 effectiveScore !== null ? (
@@ -1143,6 +1300,17 @@ export default function RecommendedRecipesPage() {
                                   <div className="relative">
                                     <CompatibilityRadial score={effectiveScore} size={135} />
                                   </div>
+
+                                  {badgeCostPerMeal !== null && badgeMealsTotal !== null && (
+                                    <div className="mt-2 inline-flex items-center rounded-full bg-surface-highlight/40 border border-surface-highlight px-3 py-1 text-xs text-gray-200 shadow-sm">
+                                      <AlphabetText
+                                        text={`$${badgeCostPerMeal.toFixed(2)}/Meal - ${badgeMealsTotal} Meals`}
+                                        size={20}
+                                        gapPx={1}
+                                        forceSingleLine
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                                 ) : null
                               );

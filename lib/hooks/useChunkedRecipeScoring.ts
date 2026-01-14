@@ -47,16 +47,27 @@ const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 const CHUNK_SIZE = 20; // Recipes per frame
 const MAX_CACHE_SIZE_MB = 5; // Maximum cache size in MB
 const MAX_CACHE_ENTRIES = 50; // Maximum number of cache entries before LRU eviction
-const SCORE_JITTER_STEP = 0;
-const MAX_JITTER_TOTAL = 0;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-function applyScoreJitter(items: ScoredMeal[]): ScoredMeal[] {
-  if (SCORE_JITTER_STEP <= 0 || MAX_JITTER_TOTAL <= 0) return items;
-  const jittered = items.map((item) => ({ ...item }));
-  let i = 0;
+function seededHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
 
+export function applyScoreTieBreakJitter<T extends { score: number; recipeId: string }>(
+  items: T[],
+  seed: string
+): T[] {
+  if (!Array.isArray(items) || items.length < 3) return items;
+
+  const jittered = items.map((item) => ({ ...item }));
+
+  let i = 0;
   while (i < jittered.length) {
     const baseScore = jittered[i].score;
     let j = i + 1;
@@ -66,13 +77,13 @@ function applyScoreJitter(items: ScoredMeal[]): ScoredMeal[] {
     }
 
     const groupSize = j - i;
-    if (groupSize > 1) {
-      const positiveOffset = Math.min(SCORE_JITTER_STEP, MAX_JITTER_TOTAL);
-      jittered[i].score = Math.round(clamp(baseScore + positiveOffset, 0, 100));
-
-      for (let idx = 1; idx < groupSize; idx++) {
-        const negativeOffset = Math.min(SCORE_JITTER_STEP * idx, MAX_JITTER_TOTAL);
-        jittered[i + idx].score = Math.round(clamp(baseScore - negativeOffset, 0, 100));
+    if (groupSize >= 3) {
+      for (let idx = 2; idx < groupSize; idx++) {
+        const item = jittered[i + idx];
+        const h = seededHash(`${seed}|${item.recipeId}|${baseScore}|${idx}`);
+        const pick = h % 4;
+        const delta = pick === 0 ? -2 : pick === 1 ? -1 : pick === 2 ? 1 : 2;
+        item.score = Math.round(clamp(baseScore + delta, 0, 100));
       }
     }
 
@@ -105,13 +116,13 @@ function generatePetProfileHash(
   enhancedPet: ScoringPet | null
 ): string {
   if (!enhancedPet) return 'no-pet';
-  
+
   const petData = enhancedPet;
-  
+
   // Create stable string representation with sorted arrays
   const healthConcerns = (petData.healthConcerns || []).slice().sort().join(',');
   const allergies = ((petData.allergies || petData.dietaryRestrictions || [])).slice().sort().join(',');
-  
+
   const stableString = [
     petData.id || '',
     petData.type || '',
@@ -122,7 +133,7 @@ function generatePetProfileHash(
     healthConcerns,
     allergies,
   ].join('|');
-  
+
   return simpleHash(stableString);
 }
 
@@ -138,11 +149,11 @@ function getCachedRecipeScore(
   try {
     const cacheKey = `${INDIVIDUAL_CACHE_KEY_PREFIX}${recipeId}_${petProfileHash}`;
     const cached = localStorage.getItem(cacheKey);
-    
+
     if (!cached) return null;
 
     const entry: IndividualCacheEntry = JSON.parse(cached);
-    
+
     // Validate cache
     const now = Date.now();
     const isExpired = now - entry.timestamp > CACHE_DURATION_MS;
@@ -198,16 +209,16 @@ function getCachedScores(
   try {
     const cacheKey = `${CACHE_KEY_PREFIX}${petProfileHash}`;
     const cached = localStorage.getItem(cacheKey);
-    
+
     if (!cached) return null;
 
     const entry: CacheEntry = JSON.parse(cached);
-    
+
     // Validate cache
     const now = Date.now();
     const isExpired = now - entry.timestamp > CACHE_DURATION_MS;
     const versionMatch = (entry.version || 'v1') === SCORING_VERSION; // Default to v1 for old caches
-    const recipeIdsMatch = 
+    const recipeIdsMatch =
       entry.recipeIds.length === meals.length &&
       entry.recipeIds.every((id, i) => id === (meals[i]?.recipe?.id || ''));
     const hashMatch = entry.petProfileHash === petProfileHash;
@@ -228,7 +239,7 @@ function getCachedScores(
  */
 function getCacheSize(): number {
   if (typeof window === 'undefined') return 0;
-  
+
   let size = 0;
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -247,9 +258,9 @@ function getCacheSize(): number {
  */
 function getCacheEntriesWithTimestamps(): Array<{ key: string; timestamp: number; size: number }> {
   if (typeof window === 'undefined') return [];
-  
+
   const entries: Array<{ key: string; timestamp: number; size: number }> = [];
-  
+
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && (key.startsWith(CACHE_KEY_PREFIX) || key.startsWith(INDIVIDUAL_CACHE_KEY_PREFIX))) {
@@ -268,7 +279,7 @@ function getCacheEntriesWithTimestamps(): Array<{ key: string; timestamp: number
       }
     }
   }
-  
+
   return entries.sort((a, b) => a.timestamp - b.timestamp); // Oldest first
 }
 
@@ -277,20 +288,20 @@ function getCacheEntriesWithTimestamps(): Array<{ key: string; timestamp: number
  */
 function evictOldCacheEntries(): void {
   if (typeof window === 'undefined') return;
-  
+
   const maxSizeBytes = MAX_CACHE_SIZE_MB * 1024 * 1024;
   const currentSize = getCacheSize();
-  
+
   if (currentSize <= maxSizeBytes) return;
-  
+
   // Get entries sorted by timestamp (oldest first)
   const entries = getCacheEntriesWithTimestamps();
-  
+
   // Remove oldest entries until we're under the limit
   let sizeToRemove = currentSize - maxSizeBytes;
   for (const entry of entries) {
     if (sizeToRemove <= 0) break;
-    
+
     try {
       localStorage.removeItem(entry.key);
       sizeToRemove -= entry.size;
@@ -298,7 +309,7 @@ function evictOldCacheEntries(): void {
       // Continue if removal fails
     }
   }
-  
+
   // Also limit by entry count
   const remainingEntries = getCacheEntriesWithTimestamps();
   if (remainingEntries.length > MAX_CACHE_ENTRIES) {
@@ -318,7 +329,7 @@ function evictOldCacheEntries(): void {
  */
 export function clearCacheForVersion(version: string): void {
   if (typeof window === 'undefined') return;
-  
+
   const keysToRemove: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -326,7 +337,7 @@ export function clearCacheForVersion(version: string): void {
       keysToRemove.push(key);
     }
   }
-  
+
   keysToRemove.forEach(key => {
     try {
       localStorage.removeItem(key);
@@ -360,7 +371,7 @@ function cacheScores(
 
   try {
     localStorage.setItem(cacheKey, JSON.stringify(entry));
-    
+
     // Also cache individual scores for future use
     scores.forEach(scored => {
       cacheRecipeScore(scored.recipeId, scored.score, petProfileHash);
@@ -395,9 +406,9 @@ function computeMealScore(
   if ('score' in meal && typeof (meal as ModifiedRecipeResult).score === 'number') {
     return Number((meal as ModifiedRecipeResult).score);
   }
-  
+
   const recipeId = meal.recipe?.id || '';
-  
+
   // Check individual recipe cache first
   if (recipeId) {
     const cachedScore = getCachedRecipeScore(recipeId, petProfileHash);
@@ -405,11 +416,11 @@ function computeMealScore(
       return cachedScore;
     }
   }
-  
+
   if (!enhancedPet) return 0;
-  
+
   let score = 0;
-  
+
   try {
     // Use enhanced compatibility scoring for breakdown, but species engine for final score
     const scored = scoreWithSpeciesEngine(meal.recipe, enhancedPet);
@@ -418,12 +429,12 @@ function computeMealScore(
     console.warn('Error scoring meal:', error);
     score = 0;
   }
-  
+
   // Cache the computed score for future use
   if (recipeId && score > 0) {
     cacheRecipeScore(recipeId, score, petProfileHash);
   }
-  
+
   return score;
 }
 
@@ -440,7 +451,7 @@ export function useChunkedRecipeScoring(
   const [scoredMeals, setScoredMeals] = useState<ScoredMeal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  
+
   const chunkIndexRef = useRef(0);
   const frameIdRef = useRef<number | null>(null);
   const isMountedRef = useRef(true);
@@ -545,7 +556,7 @@ export function useChunkedRecipeScoring(
       return a.recipeId.localeCompare(b.recipeId);
     });
 
-    const jittered = applyScoreJitter(sorted);
+    const jittered = applyScoreTieBreakJitter(sorted, petProfileHash);
 
     return jittered.map(item => {
       if ('score' in item.meal && typeof (item.meal as ModifiedRecipeResult).score === 'number') {
@@ -553,7 +564,7 @@ export function useChunkedRecipeScoring(
       }
       return { ...item.meal, score: item.score };
     });
-  }, [scoredMeals]);
+  }, [scoredMeals, petProfileHash]);
 
   return {
     scoredMeals: scoredMealsToRender,
