@@ -157,15 +157,6 @@ export async function checkAllBadges(
       if (wasUnlocked) unlocked.push(BadgeType.PROFILE_SETUP);
     }
 
-    // Lab Coat (score details opened 3 times)
-    if (context.action === 'score_details_viewed') {
-      const total = incrementMetric(userId, petId, 'score_details_views', 1);
-      if (total >= 3) {
-        const wasUnlocked = unlockBadge(userId, petId, BadgeType.LAB_COAT);
-        if (wasUnlocked) unlocked.push(BadgeType.LAB_COAT);
-      }
-    }
-
     // Bird Hat (view 5 recipe pages)
     if (context.action === 'recipe_viewed') {
       const total = incrementMetric(userId, petId, 'recipe_views', 1);

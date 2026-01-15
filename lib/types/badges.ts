@@ -18,7 +18,6 @@ export enum BadgeType {
   BIRD_HAT = 'bird_hat',
   PROFILE_SETUP = 'profile_setup',
   PREPARATION = 'preparation',
-  LAB_COAT = 'lab_coat',
   SHERLOCK_HAT = 'sherlock_hat',
 }
 

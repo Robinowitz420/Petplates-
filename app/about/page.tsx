@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
+import AlphabetText from '@/components/AlphabetText';
 
 export const metadata: Metadata = {
   title: 'Our Story - Paws & Plates',
@@ -151,7 +152,7 @@ export default function AboutPage() {
       <div className="text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold">
-            About Us
+            <AlphabetText text="About Us" size={48} className="text-foreground" />
           </h1>
         </div>
       </div>
@@ -160,7 +161,9 @@ export default function AboutPage() {
         <div className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
           <div className="text-center mb-8">
             <div className="text-sm font-semibold tracking-widest text-orange-400">WANTED</div>
-            <h2 className="text-3xl font-bold text-foreground mt-2">By the Department of Pet Nutrition</h2>
+            <h2 className="text-3xl font-bold text-foreground mt-2">
+              <AlphabetText text="By the Department of Pet Nutrition" size={32} className="text-foreground" />
+            </h2>
             <p className="text-white/70 mt-3">
               These individuals are wanted for crimes against boring pet food.
             </p>
@@ -214,13 +217,17 @@ export default function AboutPage() {
 
           <div className="mt-12 text-center rounded-lg border border-orange-500/30 bg-black/20 p-6">
             <div className="text-sm font-semibold tracking-widest text-orange-400">RECORD SCRATCH</div>
-            <h3 className="text-2xl font-bold text-foreground mt-2">OKAY OKAY… we had some fun.</h3>
+            <h3 className="text-2xl font-bold text-foreground mt-2">
+              <AlphabetText text="OKAY OKAY… we had some fun." size={28} className="text-foreground" />
+            </h3>
             <p className="text-white/70 mt-3">Scroll for the real About Us.</p>
           </div>
         </div>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Real food for pets shouldn’t be confusing.</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <AlphabetText text="Real food for pets shouldn’t be confusing." size={32} className="text-foreground" />
+          </h2>
           <p className="text-lg text-white/80 leading-relaxed mb-4">
             Pet Plates helps you plan homemade pet meals with clarity, structure, and safety — without pretending to replace professional care.
           </p>
@@ -236,7 +243,9 @@ export default function AboutPage() {
         </section>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-6">What Pet Plates is (and is not)</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-6">
+            <AlphabetText text="What Pet Plates is (and is not)" size={32} className="text-foreground" />
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
               <h3 className="text-xl font-bold text-foreground mb-3">What Pet Plates is</h3>
@@ -263,7 +272,9 @@ export default function AboutPage() {
         </section>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Why this exists</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <AlphabetText text="Why this exists" size={32} className="text-foreground" />
+          </h2>
           <div className="text-white/80 leading-relaxed space-y-4">
             <p>
               Pet owners want to do better, but commercial food labels are confusing and online advice can be contradictory — or flat-out unsafe.
@@ -278,22 +289,138 @@ export default function AboutPage() {
         </section>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">How recipes are created</h2>
-          <ol className="space-y-2 text-white/80">
-            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">1.</span><span>Species + basic profile</span></li>
-            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">2.</span><span>Ingredient safety screening</span></li>
-            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">3.</span><span>Nutrition guardrails applied</span></li>
-            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">4.</span><span>Portion logic for real kitchens</span></li>
-            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">5.</span><span>Final sanity checks</span></li>
-          </ol>
-          <div className="mt-5 text-white/80 space-y-2">
-            <p>Standards are used as guidance, not prescriptions.</p>
-            <p>Edge cases trigger warnings, not silent failures.</p>
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <AlphabetText text="AI-Powered Multi-Species Recipe Generation Engine" size={32} className="text-foreground" />
+          </h2>
+          <div className="text-white/80 leading-relaxed space-y-4">
+            <h3 className="text-xl font-bold text-foreground">Overview</h3>
+            <p>
+              Paws and Plates employs a sophisticated AI-driven recipe generation system that creates species-specific, nutritionally optimized meal plans for every type of pet—from dogs and cats to birds, reptiles, and pocket pets. This isn't a simple database lookup; it's a multi-layered intelligence system that synthesizes veterinary nutrition science, species biology, and individual health needs into custom meal formulations.
+            </p>
+
+            <h3 className="text-xl font-bold text-foreground">The Generation Pipeline</h3>
+            <ol className="space-y-6">
+              <li>
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-400 mt-0.5">1.</span>
+                  <div>
+                    <div className="font-semibold text-foreground">Species-Aware Recipe Priors</div>
+                    <p className="mt-1">
+                      The system maintains curated recipe templates for each species and subspecies (e.g., iguanas vs. bearded dragons, parrots vs. finches). These priors encode:
+                    </p>
+                    <ul className="mt-2 list-disc pl-6 space-y-1">
+                      <li>Species-appropriate macronutrient ratios (protein/fat/carb profiles)</li>
+                      <li>Natural dietary patterns (carnivore, omnivore, herbivore, insectivore)</li>
+                      <li>Feeding behavior constraints (ground feeders, tree foragers, aquatic)</li>
+                      <li>Temperature and preparation requirements</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-400 mt-0.5">2.</span>
+                  <div>
+                    <div className="font-semibold text-foreground">Unified Ingredient Intelligence</div>
+                    <p className="mt-1">
+                      A centralized ingredient registry of 300+ pet-safe foods powers the generation engine. Each ingredient is tagged with:
+                    </p>
+                    <ul className="mt-2 list-disc pl-6 space-y-1">
+                      <li>Nutritional composition (vitamins, minerals, macros)</li>
+                      <li>Species compatibility matrices</li>
+                      <li>Toxicity flags (e.g., chocolate for dogs, avocado for birds)</li>
+                      <li>Health benefit mappings (joint support, digestive health, immune boost)</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-400 mt-0.5">3.</span>
+                  <div>
+                    <div className="font-semibold text-foreground">AAFCO &amp; Species-Standard Compliance</div>
+                    <p className="mt-1">Recipe generation is constrained by:</p>
+                    <ul className="mt-2 list-disc pl-6 space-y-1">
+                      <li>AAFCO standards for dogs and cats (life stage-specific)</li>
+                      <li>Avian nutrition guidelines (NRC recommendations)</li>
+                      <li>Reptile dietary research (calcium:phosphorus ratios, UVB considerations)</li>
+                      <li>Exotic pet veterinary consensus (pocket pets, aquatics)</li>
+                    </ul>
+                    <p className="mt-2">The AI cannot generate recipes that violate these nutritional boundaries.</p>
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-400 mt-0.5">4.</span>
+                  <div>
+                    <div className="font-semibold text-foreground">Health-Condition Optimization</div>
+                    <p className="mt-1">
+                      When a pet profile includes health concerns (diabetes, kidney disease, obesity, allergies), the generation engine:
+                    </p>
+                    <ul className="mt-2 list-disc pl-6 space-y-1">
+                      <li>Excludes contraindicated ingredients</li>
+                      <li>Prioritizes therapeutic nutrients (e.g., omega-3s for inflammation, low-phosphorus for renal support)</li>
+                      <li>Adjusts portion sizes and meal frequency recommendations</li>
+                      <li>Adds veterinary disclaimers where appropriate</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-400 mt-0.5">5.</span>
+                  <div>
+                    <div className="font-semibold text-foreground">Gemini AI Synthesis</div>
+                    <p className="mt-1">Google's Gemini AI model orchestrates the final recipe creation by:</p>
+                    <ul className="mt-2 list-disc pl-6 space-y-1">
+                      <li>Receiving structured prompts with pet profile + nutritional constraints + ingredient pool</li>
+                      <li>Generating creative, palatable meal combinations within strict guardrails</li>
+                      <li>Producing human-readable instructions (prep steps, cooking temps, storage)</li>
+                      <li>Explaining nutritional rationale for each ingredient choice</li>
+                    </ul>
+                    <p className="mt-2">The AI doesn't just assemble ingredients—it creates meals that pets will actually eat while meeting their biological needs.</p>
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-400 mt-0.5">6.</span>
+                  <div>
+                    <div className="font-semibold text-foreground">Real-Time Compatibility Scoring</div>
+                    <p className="mt-1">Every generated recipe is run through a machine learning scoring engine that evaluates:</p>
+                    <ul className="mt-2 list-disc pl-6 space-y-1">
+                      <li>Nutritional completeness (0-100 scale)</li>
+                      <li>Species appropriateness (biological fit)</li>
+                      <li>Health condition alignment (therapeutic value)</li>
+                      <li>Ingredient synergy (bioavailability, digestibility)</li>
+                    </ul>
+                    <p className="mt-2">Scores below 70 trigger warnings. Scores above 90 indicate premium, veterinarian-grade formulations.</p>
+                  </div>
+                </div>
+              </li>
+            </ol>
+
+            <h3 className="text-xl font-bold text-foreground">What Makes This Exceptional</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Cross-Species Expertise: Most pet nutrition platforms focus on dogs/cats. Paws and Plates is the only system that handles avian, reptilian, and exotic pet nutrition with the same rigor as traditional companion animals.</li>
+              <li>Dynamic, Not Static: Recipes aren't pulled from a pre-written database—they're generated on-demand based on individual pet needs. Two pets of the same species but different health profiles get entirely different meal plans.</li>
+              <li>Vetted Intelligence: The system combines AI creativity with hard nutritional science. Gemini can't generate a recipe that violates AAFCO minimums or includes toxic ingredients—the guardrails are baked into the architecture.</li>
+              <li>Explainable AI: Every recipe includes a compatibility explanation showing why specific ingredients were chosen and how they address the pet's unique health requirements. No black-box recommendations.</li>
+              <li>Production-Grade Validation: Generated recipes undergo Zod schema validation, nutritional boundary checks, and toxic ingredient screening before being presented to users. Multiple layers of safety ensure no harmful formulations escape the pipeline.</li>
+            </ul>
           </div>
         </section>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Safety & responsibility</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <AlphabetText text="Safety & responsibility" size={32} className="text-foreground" />
+          </h2>
           <ul className="space-y-2 text-white/80">
             <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Ingredient bans for known toxic foods</span></li>
             <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Conservative assumptions when data is uncertain</span></li>
@@ -303,29 +430,21 @@ export default function AboutPage() {
         </section>
 
         <section className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-6">Who this is for (and not for)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
-              <h3 className="text-xl font-bold text-foreground mb-3">For</h3>
-              <ul className="space-y-2 text-white/80">
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Curious, cautious pet owners</span></li>
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>People considering homemade food</span></li>
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Owners who want to understand ingredients</span></li>
-              </ul>
-            </div>
-            <div className="rounded-lg border border-surface-highlight bg-background/40 p-5">
-              <h3 className="text-xl font-bold text-foreground mb-3">Not for</h3>
-              <ul className="space-y-2 text-white/80">
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Emergency situations</span></li>
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Medical treatment plans</span></li>
-                <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Anyone looking for “miracle diets”</span></li>
-              </ul>
-            </div>
-          </div>
+          <h2 className="text-3xl font-bold text-foreground mb-6">
+            <AlphabetText text="Who Paws And Plates Is For" size={32} className="text-foreground" />
+          </h2>
+          <ul className="space-y-4 text-white/80 leading-relaxed">
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>Paws And Plates is for pet owners who want to feed real food—but don't want to guess, Google endlessly, or accidentally do harm.</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>It's for people who've looked at ingredient labels and thought, there has to be a more rational way to do this.</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>It's for owners of dogs, cats, and other companion animals who care about nutrition, variety, and safety—but don't have the time (or desire) to become amateur veterinary nutritionists.</span></li>
+            <li className="flex items-start gap-2"><span className="text-orange-400 mt-0.5">•</span><span>If you want clear guidance, species-appropriate meals, and practical plans you can actually follow at the grocery store, this was built for you.</span></li>
+          </ul>
         </section>
 
         <section id="user-agreement-disclaimer" className="bg-surface rounded-lg shadow-md p-8 mb-12 border border-surface-highlight">
-          <h2 className="text-3xl font-bold text-foreground mb-4">User Agreement Disclaimer</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <AlphabetText text="User Agreement Disclaimer" size={32} className="text-foreground" />
+          </h2>
           <p className="text-white/80 leading-relaxed">
             <strong>User Agreement Disclaimer:</strong>
             <br />

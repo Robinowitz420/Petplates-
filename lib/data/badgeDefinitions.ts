@@ -156,16 +156,6 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
     isProgressive: false,
   },
 
-  [BadgeType.LAB_COAT]: {
-    type: BadgeType.LAB_COAT,
-    name: "Cat's Cloak Of Curiosity",
-    description: 'Unlocked after opening score details 3 times for this pet.',
-    category: 'Core Achievements',
-    iconPath: '/images/Badges/LabCoat.png',
-    designDescription: 'Cat lab coat accessory.',
-    isProgressive: false,
-  },
-
   [BadgeType.SHERLOCK_HAT]: {
     type: BadgeType.SHERLOCK_HAT,
     name: 'The Turtles Tracking Cap',
