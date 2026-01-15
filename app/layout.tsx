@@ -125,6 +125,18 @@ export default function RootLayout({
           <meta name="google-site-verification" content={googleSiteVerification} />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-LMTEF25JHV"
+            strategy="afterInteractive"
+          />
+          <Script id="ga4-init" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-LMTEF25JHV');
+            `}
+          </Script>
         </head>
         <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
           <Script
