@@ -118,6 +118,30 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Mobile Responsive Utilities */
+  .mobile-safe {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Prevent horizontal scroll on mobile */
+  @media (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+  }
+
+  /* Extra small breakpoint for very small phones */
+  @media (min-width: 360px) {
+    .xs\:block {
+      display: block;
+    }
+    .xs\:hidden {
+      display: none;
+    }
+  }
 }
 
 /* Modern Button Design System */
@@ -514,6 +538,26 @@ body {
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+.pet-avatar-float {
+  float: left;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+  shape-outside: circle(50%);
+  width: 168px;
+  height: 260px;
+}
+
+@media (min-width: 768px) {
+  .pet-avatar-float {
+    float: none;
+    margin-right: 0;
+    margin-bottom: 0;
+    shape-outside: none;
+    width: auto;
+    height: auto;
   }
 }
 

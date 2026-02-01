@@ -19,7 +19,7 @@ import type { CustomMeal } from '@/lib/types';
 import { getVettedProduct, VETTED_PRODUCTS } from '@/lib/data/vetted-products';
 import Image, { type StaticImageData } from 'next/image';
 import EmojiIcon from '@/components/EmojiIcon';
-import { ensureCartUrlSellerId, ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
 import ConfirmModal from '@/components/ConfirmModal';
 import { getRecipeSnapshotForPet } from '@/lib/utils/recipeSnapshotStorage';
 import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
@@ -50,6 +50,7 @@ import EditClickedButton from '@/public/images/Buttons/EditClicked.png';
 import DeleteButton from '@/public/images/Buttons/Delete.png';
 import DeleteClickedButton from '@/public/images/Buttons/DeleteClicked.png';
 import CompatibilityRadial from '@/components/CompatibilityRadial';
+import AlphabetText from '@/components/AlphabetText';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -566,6 +567,10 @@ const PetModal: React.FC<PetModalProps> = ({ isOpen, onClose, onSave, editingPet
 // =================================================================
 
 export default function MyPetsPage() {
+  return <MyPetsPageInner />;
+}
+
+function MyPetsPageInner() {
   const { user, isLoaded } = useUser();
   const [userId, setUserId] = useState<string>('');
   const { setUserId: setVillageUserId } = useVillageStore();
@@ -615,6 +620,7 @@ export default function MyPetsPage() {
   const [failedGenRecipeIds, setFailedGenRecipeIds] = useState<Record<string, boolean>>({});
   // Cost per meal USD, keyed by recipe id (applies to both generated & custom)
   const [costPerMealMap, setCostPerMealMap] = useState<Record<string, number | null>>({});
+  const [estimatedMealsMap, setEstimatedMealsMap] = useState<Record<string, number | null>>({});
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -731,21 +737,38 @@ const buildWeeklyPlan = useCallback(
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    if (!isClient) return;
+    if (typeof window === 'undefined') return;
+    if (window.innerWidth < 768) {
+      setActiveTab('saved');
+    }
+  }, [isClient]);
+
   // Load pets function - reusable
   const loadPets = useCallback(async () => {
     if (!userId) return;
-    const loadedPets = await getPets(userId);
-    // Normalize names: convert name field to names array if needed
-    const normalizedPets = loadedPets.map((p: Pet) => ({
-      ...p,
-      names: p.names && Array.isArray(p.names) && p.names.length > 0
-        ? p.names.filter((n: string) => n && n.trim() !== '')
-        : (p.name && typeof p.name === 'string' && p.name.trim() !== ''
-            ? [p.name.trim()]
-            : ['Unnamed Pet']),
-    }));
-    setPets(normalizedPets);
-    setPetsLoaded(true);
+    try {
+      const loadedPets = await getPets(userId);
+      // Normalize names: convert name field to names array if needed
+      const normalizedPets = loadedPets.map((p: Pet) => ({
+        ...p,
+        names: p.names && Array.isArray(p.names) && p.names.length > 0
+          ? p.names.filter((n: string) => n && n.trim() !== '')
+          : (p.name && typeof p.name === 'string' && p.name.trim() !== ''
+              ? [p.name.trim()]
+              : ['Unnamed Pet']),
+      }));
+      setPets(normalizedPets);
+      setPetsLoaded(true);
+    } catch (err) {
+      const msg = getFriendlyErrorMessage(err, 'Failed to load pets.');
+      setProfileNotice(msg || 'Failed to load pets.');
+      setTimeout(() => setProfileNotice(null), 5000);
+      console.error('Failed to load pets:', err);
+      setPets([]);
+      setPetsLoaded(true);
+    }
   }, [userId]);
 
   const loadCustomMealsPage = useCallback(
@@ -1121,6 +1144,51 @@ const buildWeeklyPlan = useCallback(
       .catch(() => {});
   }, [activePet, genRecipesById, customMeals, activeTab, savedVisibleCount]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!activePet) return;
+    if (activeTab !== 'saved') return;
+    const ids = Array.isArray(activePet.savedRecipes) ? activePet.savedRecipes : [];
+    const cappedIds = ids.slice(0, Math.max(60, savedVisibleCount));
+    if (cappedIds.length === 0) return;
+
+    const next: Record<string, number | null> = {};
+    for (const rid of cappedIds) {
+      const id = String(rid || '').trim();
+      if (!id) continue;
+      try {
+        const keyForPet = `costComparison:pet:${String(activePet.id)}:recipe:${id}`;
+        const keyForNone = `costComparison:pet:none:recipe:${id}`;
+
+        const raw =
+          window.sessionStorage.getItem(keyForPet) ||
+          window.localStorage.getItem(keyForPet) ||
+          window.sessionStorage.getItem(keyForNone) ||
+          window.localStorage.getItem(keyForNone);
+        if (!raw) {
+          next[id] = null;
+          continue;
+        }
+
+        try {
+          if (!window.sessionStorage.getItem(keyForPet)) {
+            const fromLocal = window.localStorage.getItem(keyForPet);
+            if (fromLocal) window.sessionStorage.setItem(keyForPet, fromLocal);
+          }
+        } catch {
+          // ignore
+        }
+        const parsed = JSON.parse(raw) as any;
+        const v = parsed?.estimatedMeals;
+        next[id] = typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null;
+      } catch {
+        next[id] = null;
+      }
+    }
+
+    setEstimatedMealsMap((prev) => ({ ...prev, ...next }));
+  }, [activePet, activeTab, savedVisibleCount]);
+
   // Build weekly plan for Plan tab (mealPlan only)
   const allMealsForPlan = useMemo(() => {
     if (!activePet) return [];
@@ -1407,8 +1475,8 @@ const buildWeeklyPlan = useCallback(
   return (
     <div className="min-h-screen bg-background text-foreground py-6">
       <div className="max-w-screen-2xl mx-auto px-4 space-y-6">
-        <header className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] items-center">
-          <div className={`flex justify-center ${pets.length === 0 ? 'translate-x-[215px]' : 'lg:translate-x-[130px]'}`}>
+        <header className="grid grid-cols-1 lg:grid-cols-[1fr_380px] 2xl:grid-cols-[1fr_380px] items-center">
+          <div className={`flex justify-center ${pets.length === 0 ? 'lg:col-span-2' : ''}`}>
             <Image
               src="/images/Site Banners/MyPets.png"
               alt="My Pets"
@@ -1438,7 +1506,7 @@ const buildWeeklyPlan = useCallback(
                   setIsModalOpen(true);
                 }}
                 className="group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-2xl shadow-lg"
-                style={{ width: 220, height: 48, transform: 'translateX(-15px)' }}
+                style={{ width: 220, height: 48 }}
                 aria-label="Add Pet"
               >
                 <Image
@@ -1459,19 +1527,19 @@ const buildWeeklyPlan = useCallback(
 
               <div
                 className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
-                style={{ width: 440, height: 300 }}
+                style={{ width: 378, height: 257 }}
                 aria-hidden="true"
               >
-                <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
+                <Image src={PetShopImage} alt="" fill sizes="378px" className="object-cover" />
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] 2xl:grid-cols-[1050px_460px] gap-6 items-start">
-            <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 lg:gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] 2xl:grid-cols-[1fr_380px] gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4 lg:gap-6 items-start">
               <div className="flex flex-col gap-3">
                 <span className="relative block w-full overflow-hidden border-[3px] border-green-800/80 rounded-2xl shadow-lg" style={{ height: '70px' }}>
-                  <Image src={PetsBanner} alt="Pets" fill sizes="260px" className="object-contain" />
+                  <Image src={PetsBanner} alt="Pets" fill sizes="220px" className="object-contain" />
                 </span>
 
                 <div className="bg-surface border-[3px] border-green-800/80 rounded-2xl shadow-lg p-4 space-y-2">
@@ -1483,7 +1551,7 @@ const buildWeeklyPlan = useCallback(
                         key={pet.id}
                         onClick={() => {
                           setActivePetId(pet.id);
-                          setActiveTab('bio');
+                          setActiveTab(typeof window !== 'undefined' && window.innerWidth < 768 ? 'saved' : 'bio');
                           if (typeof window !== 'undefined') {
                             localStorage.setItem(`active_pet_id_${userId}`, pet.id);
                           }
@@ -1526,119 +1594,122 @@ const buildWeeklyPlan = useCallback(
               </div>
 
               {activePet ? (
-                <div className="bg-surface border-[3px] border-green-800/80 rounded-2xl shadow-xl p-5 pb-[80px] flex flex-col relative">
-                  <div className="absolute bottom-2 left-2 flex gap-2">
-                    <Link
-                      href={`/profile/pet/${activePet.id}`}
-                      className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
-                      aria-label="Detect meals"
-                    >
-                      <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
-                        <Image
-                          src={FindMealsUnclickedButton}
-                          alt=""
-                          fill
-                          sizes="300px"
-                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                          priority
-                        />
-                        <Image
-                          src={FindMealsClickedButton}
-                          alt=""
-                          fill
-                          sizes="300px"
-                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                          priority
-                        />
-                      </span>
-                      <span className="sr-only">Detect meals</span>
-                    </Link>
+                <div className="bg-surface border-[3px] border-green-800/80 rounded-2xl shadow-xl p-5 pb-[170px] sm:pb-[80px] flex flex-col relative">
+                  <div className="absolute bottom-2 left-2 right-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="flex justify-center gap-2 order-1 sm:order-2 sm:justify-end">
+                      <button
+                        onClick={() => handleEditPet(activePet)}
+                        className="group inline-flex focus:outline-none rounded-md"
+                        aria-label="Edit Pet"
+                      >
+                        <span className="relative h-[80px] w-[120px] overflow-hidden">
+                          <Image
+                            src={EditButton}
+                            alt=""
+                            fill
+                            sizes="150px"
+                            className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                            priority
+                          />
+                          <Image
+                            src={EditClickedButton}
+                            alt=""
+                            fill
+                            sizes="150px"
+                            className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                            priority
+                          />
+                        </span>
+                      </button>
 
-                    <Link
-                      href={`/profile/pet/${activePet.id}/recipe-builder`}
-                      className="group relative top-[2px] inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
-                      aria-label="Create Meal"
-                    >
-                      <span className="relative h-[64px] w-[176px] sm:w-[204px] overflow-hidden rounded-xl">
-                        <Image
-                          src={CreateMealUnclickedButton}
-                          alt=""
-                          fill
-                          sizes="300px"
-                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                          priority
-                        />
-                        <Image
-                          src={CreateMealClickedButton}
-                          alt=""
-                          fill
-                          sizes="300px"
-                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                          priority
-                        />
-                      </span>
-                      <span className="sr-only">Create Meal</span>
-                    </Link>
-                  </div>
+                      <button
+                        onClick={() => handleDeletePet(activePet.id)}
+                        className="group inline-flex focus:outline-none rounded-md"
+                        aria-label="Delete Pet"
+                      >
+                        <span className="relative h-[80px] w-[120px] overflow-hidden">
+                          <Image
+                            src={DeleteButton}
+                            alt=""
+                            fill
+                            sizes="150px"
+                            className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                            priority
+                          />
+                          <Image
+                            src={DeleteClickedButton}
+                            alt=""
+                            fill
+                            sizes="150px"
+                            className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                            priority
+                          />
+                        </span>
+                      </button>
+                    </div>
 
-                  <div className="absolute bottom-[3px] right-2 flex gap-2">
-                    <button
-                      onClick={() => handleEditPet(activePet)}
-                      className="group inline-flex focus:outline-none rounded-md"
-                      aria-label="Edit Pet"
-                    >
-                      <span className="relative h-[80px] w-[120px] overflow-hidden">
-                        <Image
-                          src={EditButton}
-                          alt=""
-                          fill
-                          sizes="150px"
-                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                          priority
-                        />
-                        <Image
-                          src={EditClickedButton}
-                          alt=""
-                          fill
-                          sizes="150px"
-                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                          priority
-                        />
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => handleDeletePet(activePet.id)}
-                      className="group inline-flex focus:outline-none rounded-md"
-                      aria-label="Delete Pet"
-                    >
-                      <span className="relative h-[80px] w-[120px] overflow-hidden">
-                        <Image
-                          src={DeleteButton}
-                          alt=""
-                          fill
-                          sizes="150px"
-                          className="object-contain transition-opacity duration-75 group-active:opacity-0"
-                          priority
-                        />
-                        <Image
-                          src={DeleteClickedButton}
-                          alt=""
-                          fill
-                          sizes="150px"
-                          className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
-                          priority
-                        />
-                      </span>
-                    </button>
+                    <div className="flex justify-center gap-2 order-2 sm:order-1">
+                      <Link
+                        href={`/profile/pet/${activePet.id}`}
+                        className="group relative inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
+                        aria-label="Detect meals"
+                      >
+                        <span className="relative h-[67px] w-[182px] sm:w-[210px] overflow-hidden rounded-xl">
+                          <Image
+                            src={FindMealsUnclickedButton}
+                            alt=""
+                            fill
+                            sizes="300px"
+                            className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                            priority
+                          />
+                          <Image
+                            src={FindMealsClickedButton}
+                            alt=""
+                            fill
+                            sizes="300px"
+                            className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                            priority
+                          />
+                        </span>
+                        <span className="sr-only">Detect meals</span>
+                      </Link>
+
+                      <Link
+                        href={`/profile/pet/${activePet.id}/recipe-builder`}
+                        className="group relative top-[2px] inline-flex focus:outline-none focus-visible:ring-0 rounded-xl flex-shrink-0"
+                        aria-label="Create Meal"
+                      >
+                        <span className="relative h-[64px] w-[176px] sm:w-[204px] overflow-hidden rounded-xl">
+                          <Image
+                            src={CreateMealUnclickedButton}
+                            alt=""
+                            fill
+                            sizes="300px"
+                            className="object-contain transition-opacity duration-75 group-active:opacity-0"
+                            priority
+                          />
+                          <Image
+                            src={CreateMealClickedButton}
+                            alt=""
+                            fill
+                            sizes="300px"
+                            className="object-contain opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                            priority
+                          />
+                        </span>
+                        <span className="sr-only">Create Meal</span>
+                      </Link>
+                    </div>
                   </div>
 
                   <div className="flex-1">
-                    <div className="flex items-start justify-between gap-3 flex-wrap">
-                      <div className="flex-1 min-w-0">
-                        <div
-                          className="relative float-left mr-4 mb-2 flex flex-col items-center"
-                          style={{ shapeOutside: 'circle(50%)', width: '168px', height: '260px' }}
-                        >
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                      <div className="w-full md:flex-1 min-w-0">
+                        <div className="flex items-start gap-4 md:block">
+                          <div
+                            className="pet-avatar-float relative flex flex-col items-center"
+                          >
                           <h2
                             className="text-xl font-bold text-center text-gray-100 whitespace-nowrap leading-tight translate-y-[8px]"
                             style={{ margin: 0 }}
@@ -1704,9 +1775,106 @@ const buildWeeklyPlan = useCallback(
                               </textPath>
                             </text>
                           </svg>
+                          </div>
+
+                          <div className="md:hidden flex-1 min-w-0 mt-10">
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('bio')}
+                              className="group inline-flex focus:outline-none rounded-md"
+                              aria-label="Bio"
+                            >
+                              <Image
+                                src={PROFILE_TAB_BANNERS.bio.image}
+                                alt={PROFILE_TAB_BANNERS.bio.alt}
+                                className="h-[2.2rem] w-auto transition-opacity duration-200 border-2 rounded-md"
+                                style={{
+                                  opacity: activeTab === 'bio' ? 1 : 0.65,
+                                  borderColor: '#fb923c',
+                                }}
+                                unoptimized
+                              />
+                            </button>
+
+                            {activeTab === 'bio' && (
+                              <div className="mt-3 grid grid-cols-1 gap-y-1 text-sm text-gray-300">
+                                {activePet.breed && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Breed:</strong> {activePet.breed}
+                                    </span>
+                                  </div>
+                                )}
+                                {activePet.age && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Age:</strong> {activePet.age}
+                                    </span>
+                                  </div>
+                                )}
+                                {(activePet.weight || activePet.weightKg) && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Weight:</strong>{' '}
+                                      {activePet.weightKg ? `${activePet.weightKg}kg` : activePet.weight}
+                                    </span>
+                                  </div>
+                                )}
+                                {activePet.activityLevel && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Activity Level:</strong>{' '}
+                                      {formatActivityLevel(activePet.activityLevel)}
+                                    </span>
+                                  </div>
+                                )}
+                                {(activePet.dietaryRestrictions || []).length > 0 && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Dietary Restrictions:</strong>{' '}
+                                      {(activePet.dietaryRestrictions || []).join(', ')}
+                                    </span>
+                                  </div>
+                                )}
+                                {(activePet.dislikes || []).length > 0 && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Dislikes:</strong>{' '}
+                                      {(activePet.dislikes || []).join(', ')}
+                                    </span>
+                                  </div>
+                                )}
+                                {(activePet.healthConcerns || []).length > 0 && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Health Concerns:</strong>{' '}
+                                      {(activePet.healthConcerns || []).map((c) => c.replace(/-/g, ' ')).join(', ')}
+                                    </span>
+                                  </div>
+                                )}
+                                {(activePet.allergies || []).length > 0 && (
+                                  <div className="flex items-start gap-1.5">
+                                    <span className="text-orange-400 mt-0.5">•</span>
+                                    <span>
+                                      <strong className="text-gray-200">Allergies:</strong>{' '}
+                                      {(activePet.allergies || []).map((a) => a.replace(/-/g, ' ')).join(', ')}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-3 mt-9">
+
+                      <div className="w-full md:w-auto flex flex-col gap-3 mt-4 md:mt-9">
                         <div className="flex justify-center">
                           <Image
                             src={BadgesBanner}
@@ -1737,7 +1905,7 @@ const buildWeeklyPlan = useCallback(
                               }}
                               className={`group relative px-[1.2rem] py-[0.6rem] transition-all duration-200 ${
                                 isActive ? 'border-b-3 border-orange-400' : 'border-b-3 border-transparent'
-                              }`}
+                              } ${tab === 'bio' ? 'hidden md:block' : ''}`}
                               style={{ borderBottomWidth: '3px' }}
                               aria-selected={isActive}
                               role="tab"
@@ -1759,7 +1927,7 @@ const buildWeeklyPlan = useCallback(
 
                       <div className="mt-3 min-h-[70px]">
                         {activeTab === 'bio' && (
-                          <div className="flex gap-6">
+                          <div className="hidden md:flex gap-6">
                             <div className="flex-1 min-w-0">
                               <div className="grid grid-cols-1 gap-y-1 text-sm text-gray-300">
                                 {activePet.breed && (
@@ -1852,7 +2020,14 @@ const buildWeeklyPlan = useCallback(
                         )}
 
                         {activeTab === 'saved' && (
-                          <div className="space-y-2">
+                          <div className="bg-surface rounded-lg border border-surface-highlight p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                <ShoppingCart size={24} />
+                                Saved Meals
+                              </h3>
+                            </div>
+
                             {(() => {
                               const savedIds = Array.isArray(activePet.savedRecipes) ? activePet.savedRecipes : [];
                               const customIds = customMeals.map((m) => m.id);
@@ -1861,15 +2036,11 @@ const buildWeeklyPlan = useCallback(
                               const hasMoreCombined = combinedIds.length > savedVisibleCount || customMealsHasMore;
 
                               if (combinedIds.length === 0) {
-                                return (
-                                  <div className="text-gray-400 text-sm">
-                                    No saved meals yet. Use "Find Meals" to add some.
-                                  </div>
-                                );
+                                return <div className="text-gray-400 text-sm">No saved meals yet. Use "Find Meals" to add some.</div>;
                               }
 
                               return (
-                                <div className="max-h-[480px] overflow-y-auto pr-2 space-y-2">
+                                <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
                                   {visibleCombinedIds.map((rid) => {
                                     const customMeal = customMeals.find((m) => m.id === rid) || null;
                                     const isCustomMeal = !!customMeal;
@@ -1881,9 +2052,11 @@ const buildWeeklyPlan = useCallback(
                                         return (
                                           <div
                                             key={rid}
-                                            className="relative p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4"
+                                            className="relative flex items-center justify-between gap-3 p-3 bg-surface-lighter rounded-lg border border-surface-highlight"
                                           >
-                                            <div className="min-w-0 text-sm text-gray-400 break-words">Not found</div>
+                                            <div className="flex-1 min-w-0 pr-2">
+                                              <div className="font-medium text-gray-200">Not found</div>
+                                            </div>
                                             <button
                                               onClick={(e) => {
                                                 e.preventDefault();
@@ -1896,7 +2069,7 @@ const buildWeeklyPlan = useCallback(
                                                   },
                                                 });
                                               }}
-                                              className="absolute -top-2 -right-2 inline-flex items-center justify-center h-4 w-4 bg-transparent text-red-600 hover:text-red-700 transition-colors duration-200"
+                                              className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 bg-transparent text-red-600 hover:text-red-700 transition-colors duration-200"
                                               title="Remove meal"
                                               aria-label="Remove meal"
                                             >
@@ -1906,89 +2079,41 @@ const buildWeeklyPlan = useCallback(
                                         );
                                       }
                                       return (
-                                        <div key={rid} className="p-2 rounded border border-white/5">Loading…</div>
+                                        <div
+                                          key={rid}
+                                          className="p-3 bg-surface-lighter rounded-lg border border-surface-highlight"
+                                        >
+                                          <div className="text-sm text-gray-400">Loading…</div>
+                                        </div>
                                       );
                                     }
-                                    const mealName = recipeObj.name || (isCustomMeal ? 'Custom Meal' : rid);
+                                    const recipeKey = String(rid || '').trim();
+                                    const mealName = recipeObj.name || (isCustomMeal ? 'Custom Meal' : recipeKey);
 
                                     const compatibilityScore = getCompatibilityScoreForMeal(recipeObj);
 
                                     return (
                                       <div
                                         key={rid}
-                                        className="p-3 rounded border border-white/5 flex items-center justify-between gap-4 min-h-[90px]"
+                                        className="relative flex items-center justify-between gap-3 p-3 bg-surface-lighter rounded-lg border border-surface-highlight hover:border-gray-500 transition-all duration-200"
                                       >
-                                        <div className="min-w-0 flex flex-col gap-1">
+                                        <div className="flex-1 min-w-0 pr-2">
                                           <button
                                             onClick={() => {
                                               window.location.href = `/recipe/${rid}?petId=${activePet.id}`;
                                             }}
-                                            className="text-primary-300 hover:text-primary-100 text-sm font-semibold break-words text-left px-3 py-2 rounded transition-colors bg-surface border border-orange-500/50 hover:border-orange-500 hover:bg-surface-highlight/50"
+                                            className="min-w-0 text-left font-medium text-gray-200 hover:text-primary-100 overflow-hidden"
                                           >
-                                            {mealName}
+                                            <AlphabetText
+                                              text={mealName}
+                                              size={35}
+                                              forceSingleLine
+                                              className="flex-nowrap whitespace-nowrap overflow-hidden"
+                                            />
                                           </button>
-                                          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/15 text-orange-200 border border-orange-400/40 whitespace-nowrap w-fit">
-                                            {typeof costPerMealMap[rid] === 'number'
-                                              ? `Cost/meal: $${(costPerMealMap[rid] as number).toFixed(2)}`
-                                              : 'Cost/meal: —'}
-                                          </div>
                                         </div>
-                                        <div className="relative flex items-center gap-3 flex-shrink-0">
-                                          <button
-                                            onClick={(e) => {
-                                              e.preventDefault();
-                                              if (!userId || !activePet) return;
 
-                                              void (async () => {
-                                                try {
-                                                  const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
-                                                  if (!petToUpdate) return;
-
-                                                  const nextMealPlan = Array.isArray((petToUpdate as any).mealPlan)
-                                                    ? ([...(petToUpdate as any).mealPlan] as string[])
-                                                    : ([] as string[]);
-                                                  if (!nextMealPlan.includes(rid)) nextMealPlan.push(rid);
-
-                                                  const updatedPet = {
-                                                    ...petToUpdate,
-                                                    mealPlan: nextMealPlan,
-                                                  };
-
-                                                  await savePet(userId, updatedPet as any);
-                                                  await loadPets();
-                                                } catch (err: any) {
-                                                  const msg = getFriendlyErrorMessage(err, 'Unable to add to plan.');
-                                                  setProfileNotice(msg || 'Unable to add to plan.');
-                                                  setTimeout(() => setProfileNotice(null), 5000);
-                                                  console.error('Failed to add to meal plan:', err);
-                                                }
-                                              })();
-                                            }}
-                                            disabled={
-                                              !userId ||
-                                              !activePet ||
-                                              (Array.isArray((activePet as any).mealPlan) &&
-                                                ((activePet as any).mealPlan as string[]).includes(rid))
-                                            }
-                                            className={`group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-xl flex-shrink-0 transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
-                                              Array.isArray((activePet as any).mealPlan) &&
-                                              ((activePet as any).mealPlan as string[]).includes(rid)
-                                                ? 'opacity-50 cursor-not-allowed'
-                                                : ''
-                                            }`}
-                                            title="Add to meal plan"
-                                          >
-                                            <span className="relative h-[50px] w-[140px] overflow-hidden rounded-xl">
-                                              <Image
-                                                src="/images/Buttons/AddToPlan.jpg"
-                                                alt="Add to Plan"
-                                                fill
-                                                sizes="140px"
-                                                className="object-contain"
-                                              />
-                                            </span>
-                                          </button>
-
+                                        <div className="relative flex items-center gap-2 flex-shrink-0">
                                           <button
                                             onClick={(e) => {
                                               e.preventDefault();
@@ -2055,12 +2180,72 @@ const buildWeeklyPlan = useCallback(
                                                 size={48}
                                                 strokeWidth={6}
                                                 label=""
-                                                textClassName="text-base"
+                                                textClassName="text-[14px]"
                                               />
                                             ) : (
                                               <div className="text-xs text-gray-400">--</div>
                                             )}
                                           </div>
+
+                                          <button
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              if (!userId || !activePet) return;
+
+                                              void (async () => {
+                                                try {
+                                                  const petToUpdate = pets.find((p) => p.id === activePet.id) || null;
+                                                  if (!petToUpdate) return;
+
+                                                  const nextMealPlan = Array.isArray((petToUpdate as any).mealPlan)
+                                                    ? ([...(petToUpdate as any).mealPlan] as string[])
+                                                    : ([] as string[]);
+                                                  if (!nextMealPlan.includes(rid)) nextMealPlan.push(rid);
+
+                                                  const updatedPet = {
+                                                    ...petToUpdate,
+                                                    mealPlan: nextMealPlan,
+                                                  };
+
+                                                  await savePet(userId, updatedPet as any);
+                                                  await loadPets();
+                                                } catch (err: any) {
+                                                  const msg = getFriendlyErrorMessage(err, 'Unable to add to plan.');
+                                                  setProfileNotice(msg || 'Unable to add to plan.');
+                                                  setTimeout(() => setProfileNotice(null), 5000);
+                                                  console.error('Failed to add to meal plan:', err);
+                                                }
+                                              })();
+                                            }}
+                                            disabled={
+                                              !userId ||
+                                              !activePet ||
+                                              (Array.isArray((activePet as any).mealPlan) &&
+                                                ((activePet as any).mealPlan as string[]).includes(rid))
+                                            }
+                                            className={`group relative inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-green-800/40 rounded-xl flex-shrink-0 transition-transform duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                                              Array.isArray((activePet as any).mealPlan) &&
+                                              ((activePet as any).mealPlan as string[]).includes(rid)
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : ''
+                                            }`}
+                                            title="Add to meal plan"
+                                          >
+                                            <span className="relative h-[78px] w-[200px] sm:h-[88px] sm:w-[240px] lg:h-[100px] lg:w-[280px] overflow-hidden rounded-xl">
+                                              <Image
+                                                src={
+                                                  Array.isArray((activePet as any).mealPlan) &&
+                                                  ((activePet as any).mealPlan as string[]).includes(rid)
+                                                    ? '/images/Buttons/SavedToPlan.png'
+                                                    : '/images/Buttons/AddToPlan.jpg'
+                                                }
+                                                alt="Add to Plan"
+                                                fill
+                                                sizes="(max-width: 640px) 200px, (max-width: 1024px) 240px, 280px"
+                                                className="object-contain"
+                                              />
+                                            </span>
+                                          </button>
                                         </div>
                                       </div>
                                     );
@@ -2090,204 +2275,205 @@ const buildWeeklyPlan = useCallback(
                         )}
 
                         {activeTab === 'plan' && (
-                          <div className="space-y-4 text-sm">
-                            {planWeekly.length > 0 ? (
-                              <>
-                                {(() => {
-                                  if (!activePet) return null;
-                                  const allScores = planWeekly
-                                    .flatMap((day) => day.meals.map((meal) => getCompatibilityScoreForMeal(meal)))
-                                    .filter((score): score is number => typeof score === 'number');
-                                  if (allScores.length === 0) return null;
-                                  const weekAverage = Math.round(
-                                    allScores.reduce((sum, score) => sum + score, 0) / allScores.length
-                                  );
-                                  return (
-                                    <div className="mb-4 p-3 bg-surface-highlight rounded-lg border border-surface-highlight flex items-center justify-between gap-4">
-                                      <h3 className="text-base font-semibold text-foreground">
-                                        Compatibility score for the week
-                                      </h3>
-                                      <CompatibilityRadial
-                                        score={weekAverage}
-                                        size={48}
-                                        strokeWidth={6}
-                                        label=""
-                                        textClassName="text-base"
-                                      />
-                                    </div>
-                                  );
-                                })()}
-                                <div className="max-h-[480px] overflow-y-auto pr-2 space-y-3">
-                                  {planWeekly.map((dayPlan, index) => {
-                                    const calculateDayScore = (meals: any[]): number | null => {
-                                      const scores = meals
-                                        .map((meal) => getCompatibilityScoreForMeal(meal))
-                                        .filter((score): score is number => typeof score === 'number');
-                                      if (scores.length === 0) return null;
-                                      return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
-                                    };
+                          <div className="bg-surface rounded-lg border border-surface-highlight p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                <ShoppingCart size={24} />
+                                Meal Plan
+                              </h3>
+                            </div>
 
-                                    const dayScore = calculateDayScore(dayPlan.meals);
-
+                            <div className="space-y-4 text-sm">
+                              {planWeekly.length > 0 ? (
+                                <>
+                                  {(() => {
+                                    if (!activePet) return null;
+                                    const allScores = planWeekly
+                                      .flatMap((day) => day.meals.map((meal) => getCompatibilityScoreForMeal(meal)))
+                                      .filter((score): score is number => typeof score === 'number');
+                                    if (allScores.length === 0) return null;
+                                    const weekAverage = Math.round(
+                                      allScores.reduce((sum, score) => sum + score, 0) / allScores.length
+                                    );
                                     return (
-                                      <div key={dayPlan.day} className="rounded-lg border border-orange-400 px-3 py-2">
-                                        <div className="text-white font-semibold mb-2 flex items-center justify-between gap-3">
-                                          <span>{dayPlan.day}</span>
-                                          {dayScore !== null ? (
-                                            <CompatibilityRadial
-                                              score={dayScore}
-                                              size={48}
-                                              strokeWidth={6}
-                                              label=""
-                                              textClassName="text-base"
-                                            />
-                                          ) : (
-                                            <div className="text-xs text-gray-400">--</div>
-                                          )}
-                                        </div>
-                                        <div className="space-y-2">
-                                          {dayPlan.meals.map((meal, mealIndex) => (
-                                            <div
-                                              key={meal.id + mealIndex}
-                                              className="p-2 rounded border border-white/5 grid grid-cols-[1fr_auto] items-center gap-4"
-                                            >
-                                              <button
-                                                onClick={() => {
-                                                  window.location.href = `/recipe/${meal.id}?petId=${activePet.id}`;
-                                                }}
-                                                className="text-primary-300 hover:text-primary-100 text-sm font-semibold break-words text-left px-3 py-2 rounded transition-colors bg-surface border border-orange-500/50 hover:border-orange-500 hover:bg-surface-highlight/50"
-                                              >
-                                                {meal.name}
-                                              </button>
-                                              <div className="flex items-center gap-2 flex-shrink-0">
-                                                <button
-                                                  onClick={(e) => {
-                                                    e.preventDefault();
-                                                    const snapshot = userId && activePet
-                                                      ? getRecipeSnapshotForPet(userId, activePet.id, meal.id)
-                                                      : null;
-                                                    const ingredientsToUse =
-                                                      snapshot && Array.isArray(snapshot.ingredients) && snapshot.ingredients.length > 0
-                                                        ? snapshot.ingredients
-                                                        : (meal.ingredients || []);
-                                                    const cartItems = (ingredientsToUse as any[])
-                                                      .map((ing: any, idx: number) => {
-                                                        const directLink = ing.asinLink || ing.amazonLink;
-                                                        if (directLink) {
-                                                          const asinMatch = String(directLink).match(/\/dp\/([A-Z0-9]{10})/);
-                                                          if (asinMatch) {
-                                                            return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
-                                                          }
-                                                        }
-
-                                                        const genericName = (ing.name || '').toLowerCase().trim();
-                                                        const vettedProduct = VETTED_PRODUCTS[genericName];
-                                                        const vettedLink = vettedProduct?.purchaseLink || vettedProduct?.asinLink;
-                                                        if (vettedLink) {
-                                                          const asinMatch = String(vettedLink).match(/\/dp\/([A-Z0-9]{10})/);
-                                                          if (asinMatch) {
-                                                            return `ASIN.${idx + 1}=${asinMatch[1]}&Quantity.${idx + 1}=1`;
-                                                          }
-                                                        }
-
-                                                        return null;
-                                                      })
-                                                      .filter(Boolean);
-                                                    if (cartItems.length > 0) {
-                                                      const cartUrl = ensureCartUrlSellerId(
-                                                        `https://www.amazon.com/gp/aws/cart/add.html?${cartItems.join('&')}`
-                                                      );
-                                                      window.open(cartUrl, '_blank');
-                                                      return;
-                                                    }
-
-                                                    alert('No ingredient links available for this recipe.');
-                                                  }}
-                                                  className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
-                                                  title="Buy ingredients"
-                                                >
-                                                  <ShoppingCart size={14} />
-                                                  Buy
-                                                </button>
-                                                <button
-                                                  onClick={(e) => {
-                                                    e.preventDefault();
-                                                    setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
-                                                  }}
-                                                  className="btn btn-success btn-sm btn-ripple hover:scale-105 transition-all duration-200"
-                                                  title="Edit this slot"
-                                                >
-                                                  Edit
-                                                </button>
-                                              </div>
-                                            </div>
-                                          ))}
-                                        </div>
+                                      <div className="mb-4 p-3 bg-surface-lighter rounded-lg border border-surface-highlight flex items-center justify-between gap-4">
+                                        <h3 className="text-base font-semibold text-foreground">
+                                          Compatibility score for the week
+                                        </h3>
+                                        <CompatibilityRadial
+                                          score={weekAverage}
+                                          size={48}
+                                          strokeWidth={6}
+                                          textClassName="text-[14px]"
+                                        />
                                       </div>
                                     );
-                                  })}
-                                </div>
-                                {swapTarget && (
-                                  <div className="fixed inset-0 z-50 bg-black/60 flex items center justify-center px-4">
-                                    <div className="bg-surface rounded-xl border border-surface-highlight shadow-2xl max-w-lg w-full p-5">
-                                      <div className="flex items-center justify-between mb-3">
-                                        <h2 className="text-3xl font-bold text-foreground">Edit Meal Slot</h2>
-                                        <button
-                                          onClick={() => setSwapTarget(null)}
-                                          className="text-gray-400 hover:text-white"
-                                          aria-label="Close swap dialog"
+                                  })()}
+
+                                  <div className="max-h-[480px] overflow-y-auto pr-2 space-y-2">
+                                    {planWeekly.map((dayPlan, index) => {
+                                      const calculateDayScore = (meals: any[]): number | null => {
+                                        const scores = meals
+                                          .map((meal) => getCompatibilityScoreForMeal(meal))
+                                          .filter((score): score is number => typeof score === 'number');
+                                        if (scores.length === 0) return null;
+                                        return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+                                      };
+
+                                      const dayScore = calculateDayScore(dayPlan.meals);
+
+                                      return (
+                                        <div
+                                          key={dayPlan.day}
+                                          className="rounded-lg border border-surface-highlight bg-surface-lighter px-3 py-2 hover:border-gray-500 transition-all duration-200"
                                         >
-                                          ✕
-                                        </button>
-                                      </div>
-                                      <p className="text-sm text-gray-300 mb-3">Choose a saved or custom meal to place into this slot.</p>
-                                      <div className="max-h-72 overflow-y-auto space-y-2">
-                                        {allMealsForPlan.map((meal) => (
+                                          <div className="text-white font-semibold mb-2 flex items-center justify-between gap-3">
+                                            <span>
+                                              <AlphabetText text={dayPlan.day} size={20} />
+                                            </span>
+                                            {dayScore !== null ? (
+                                              <CompatibilityRadial
+                                                score={dayScore}
+                                                size={48}
+                                                strokeWidth={6}
+                                                textClassName="text-[14px]"
+                                              />
+                                            ) : (
+                                              <div className="text-xs text-gray-400">--</div>
+                                            )}
+                                          </div>
+
+                                          <div className="space-y-2">
+                                            {dayPlan.meals.map((meal, mealIndex) => (
+                                              <div
+                                                key={meal.id + mealIndex}
+                                                className="relative flex items-center justify-between gap-3 p-3 bg-surface rounded-lg border border-surface-highlight hover:border-gray-500 transition-all duration-200"
+                                              >
+                                                <button
+                                                  onClick={() => {
+                                                    window.location.href = `/recipe/${meal.id}?petId=${activePet.id}`;
+                                                  }}
+                                                  className="text-primary-300 hover:text-primary-100 text-sm font-semibold break-words text-left px-3 py-2 rounded transition-colors bg-surface border border-orange-500/50 hover:border-orange-500 hover:bg-surface-highlight/50"
+                                                >
+                                                  {meal.name}
+                                                </button>
+
+                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                  <button
+                                                    onClick={(e) => {
+                                                      e.preventDefault();
+                                                      const snapshot = userId && activePet
+                                                        ? getRecipeSnapshotForPet(userId, activePet.id, meal.id)
+                                                        : null;
+                                                      const ingredientsToUse =
+                                                        snapshot && Array.isArray(snapshot.ingredients) && snapshot.ingredients.length > 0
+                                                          ? snapshot.ingredients
+                                                          : (meal.ingredients || []);
+                                                      const names = (ingredientsToUse as any[])
+                                                        .map((ing: any) => String(ing?.name || '').trim())
+                                                        .filter(Boolean);
+                                                      if (names.length === 0) {
+                                                        alert('No ingredients available for this recipe.');
+                                                        return;
+                                                      }
+
+                                                      for (let i = 0; i < names.length; i++) {
+                                                        const url = ensureSellerId(buildAmazonSearchUrl(names[i]));
+                                                        if (!url) continue;
+                                                        setTimeout(() => {
+                                                          window.open(url, '_blank');
+                                                        }, i * 350);
+                                                      }
+                                                    }}
+                                                    className="inline-flex items-center gap-1 text-sm px-4 py-2 rounded font-semibold transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-[#FF9900] to-[#F08804] hover:from-[#F08804] hover:to-[#E07704] text-black flex-shrink-0"
+                                                    title="Buy ingredients"
+                                                  >
+                                                    <ShoppingCart size={14} />
+                                                    Buy
+                                                  </button>
+
+                                                  <button
+                                                    onClick={(e) => {
+                                                      e.preventDefault();
+                                                      setSwapTarget({ dayIdx: index, mealIdx: mealIndex });
+                                                    }}
+                                                    className="btn btn-success btn-sm btn-ripple hover:scale-105 transition-all duration-200"
+                                                    title="Edit this slot"
+                                                  >
+                                                    Edit
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {swapTarget && (
+                                    <div className="fixed inset-0 z-50 bg-black/60 flex items center justify-center px-4">
+                                      <div className="bg-surface rounded-xl border border-surface-highlight shadow-2xl max-w-lg w-full p-5">
+                                        <div className="flex items-center justify-between mb-3">
+                                          <h2 className="text-3xl font-bold text-foreground">Edit Meal Slot</h2>
                                           <button
-                                            key={meal.id}
-                                            onClick={() => {
-                                              if (!swapTarget) return;
-                                              setPlanWeekly((prev) => {
-                                                const copy = prev.map((d) => ({ ...d, meals: [...d.meals] }));
-                                                copy[swapTarget.dayIdx].meals[swapTarget.mealIdx] = meal;
-                                                return copy;
-                                              });
-                                              setSwapTarget(null);
-                                            }}
-                                            className="w-full text-left p-3 rounded-lg border border-surface-highlight hover:border-primary-500 hover:bg-surface-highlight transition-colors"
+                                            onClick={() => setSwapTarget(null)}
+                                            className="text-gray-400 hover:text-white"
+                                            aria-label="Close swap dialog"
                                           >
-                                            <div className="flex justify-between items-center">
-                                              <span className="font-semibold text-foreground truncate">{meal.name}</span>
-                                              {meal.category === 'custom' && (
-                                                <span className="text-xxs text-green-300 bg-green-900/40 px-2 py-0.5 rounded-full">Custom</span>
-                                              )}
-                                            </div>
+                                            ✕
                                           </button>
-                                        ))}
-                                        {allMealsForPlan.length === 0 && (
-                                          <p className="text-sm text-gray-400">No meals available to swap.</p>
-                                        )}
-                                      </div>
-                                      <div className="mt-4 flex justify-end">
-                                        <button
-                                          onClick={() => setSwapTarget(null)}
-                                          className="px-4 py-2 text-sm text-gray-200 border border-surface-highlight rounded-lg hover:bg-surface-highlight"
-                                        >
-                                          Cancel
-                                        </button>
+                                        </div>
+                                        <p className="text-sm text-gray-300 mb-3">Choose a saved or custom meal to place into this slot.</p>
+                                        <div className="max-h-72 overflow-y-auto space-y-2">
+                                          {allMealsForPlan.map((meal) => (
+                                            <button
+                                              key={meal.id}
+                                              onClick={() => {
+                                                if (!swapTarget) return;
+                                                setPlanWeekly((prev) => {
+                                                  const copy = prev.map((d) => ({ ...d, meals: [...d.meals] }));
+                                                  copy[swapTarget.dayIdx].meals[swapTarget.mealIdx] = meal;
+                                                  return copy;
+                                                });
+                                                setSwapTarget(null);
+                                              }}
+                                              className="w-full text-left p-3 rounded-lg border border-surface-highlight hover:border-primary-500 hover:bg-surface-highlight transition-colors"
+                                            >
+                                              <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-foreground truncate">{meal.name}</span>
+                                                {meal.category === 'custom' && (
+                                                  <span className="text-xxs text-green-300 bg-green-900/40 px-2 py-0.5 rounded-full">Custom</span>
+                                                )}
+                                              </div>
+                                            </button>
+                                          ))}
+                                          {allMealsForPlan.length === 0 && (
+                                            <p className="text-sm text-gray-400">No meals available to swap.</p>
+                                          )}
+                                        </div>
+                                        <div className="mt-4 flex justify-end">
+                                          <button
+                                            onClick={() => setSwapTarget(null)}
+                                            className="px-4 py-2 text-sm text-gray-200 border border-surface-highlight rounded-lg hover:bg-surface-highlight"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <div className="text-gray-400">Add at least one saved or custom meal to generate a weekly plan.</div>
-                            )}
-                            {planWeekly.length > 0 && (
-                              <div className="pt-2 flex gap-2 items-center">
-                                <BuyAllMealPlanIngredientsButton weeklyPlan={planWeekly as any} petId={activePet?.id || ''} />
-                              </div>
-                            )}
+                                  )}
+                                </>
+                              ) : (
+                                <div className="text-gray-400">Add at least one saved or custom meal to generate a weekly plan.</div>
+                              )}
+
+                              {planWeekly.length > 0 && (
+                                <div className="pt-2 flex gap-2 items-center">
+                                  <BuyAllMealPlanIngredientsButton weeklyPlan={planWeekly as any} petId={activePet?.id || ''} />
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -2334,10 +2520,10 @@ const buildWeeklyPlan = useCallback(
 
                 <div
                   className="relative rounded-2xl border-[4px] border-green-800/80 shadow-lg overflow-hidden"
-                  style={{ width: 440, height: 300 }}
+                  style={{ width: 378, height: 257 }}
                   aria-hidden="true"
                 >
-                  <Image src={PetShopImage} alt="" fill sizes="440px" className="object-cover" />
+                  <Image src={PetShopImage} alt="" fill sizes="378px" className="object-cover" />
                 </div>
               </div>
             </div>

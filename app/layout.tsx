@@ -1,5 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -10,6 +10,8 @@ import PWARegister from "@/components/PWARegister";
 import { absoluteUrl, getSiteUrl } from '@/lib/siteUrl';
 
 const inter = Inter({ subsets: ["latin"], display: 'swap', weight: ['400', '600', '700'] });
+
+ const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const googleSiteVerification =
   process.env.GOOGLE_SITE_VERIFICATION ||
@@ -32,7 +34,6 @@ export const metadata: Metadata = {
   },
   description: "Free meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering. AAFCO-aligned nutrition guardrails.",
   manifest: "/manifest.webmanifest",
-  themeColor: "#f97316",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Paws & Plates" },
   icons: {
     icon: ["/icon-192x192.png", "/icon-512x512.png"],
@@ -101,13 +102,19 @@ export const metadata: Metadata = {
   category: 'Pet Care',
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#f97316',
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider {...(clerkPublishableKey ? { publishableKey: clerkPublishableKey } : {})}>
       <html lang="en" suppressHydrationWarning>
         <head>
           {/* Additional SEO tags */}
