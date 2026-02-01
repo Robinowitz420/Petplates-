@@ -370,6 +370,53 @@ export default function RecommendedRecipesPage() {
 
   const { pricingByRecipeId: apiPricingById } = useRecipePricing(recipesForPricing.length > 0 ? recipesForPricing : null);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!petId) return;
+    if (!apiPricingById || typeof apiPricingById !== 'object') return;
+    if (!Array.isArray(mealsToRender) || mealsToRender.length === 0) return;
+
+    let wroteAny = false;
+
+    for (const meal of mealsToRender) {
+      const recipe = (meal as any)?.recipe;
+      const recipeId = String(recipe?.id || '');
+      if (!recipeId) continue;
+
+      const pricing = (apiPricingById as any)?.[recipeId];
+      const costPerMeal = pricing?.costPerMealUsd;
+      if (!(typeof costPerMeal === 'number' && Number.isFinite(costPerMeal) && costPerMeal > 0)) continue;
+
+      const storageKey = `costComparison:pet:${String(petId)}:recipe:${recipeId}`;
+
+      try {
+        const rawExisting = window.sessionStorage.getItem(storageKey);
+        if (rawExisting) {
+          const parsed = JSON.parse(rawExisting);
+          const existing = parsed?.costPerMeal;
+          if (typeof existing === 'number' && Number.isFinite(existing) && Math.abs(existing - costPerMeal) < 0.0001) {
+            continue;
+          }
+        }
+
+        const payload = {
+          costPerMeal,
+          totalCost: null,
+          estimatedMeals: null,
+          timestamp: Date.now(),
+        };
+        window.sessionStorage.setItem(storageKey, JSON.stringify(payload));
+        wroteAny = true;
+      } catch {
+        // ignore
+      }
+    }
+
+    if (wroteAny) {
+      setCostCacheRefreshNonce(Date.now());
+    }
+  }, [apiPricingById, mealsToRender, petId]);
+
   const packageEstimateByRecipeId = useMemo(() => {
     if (!Array.isArray(mealsToRender) || mealsToRender.length === 0) return {};
 
@@ -453,6 +500,54 @@ export default function RecommendedRecipesPage() {
 
     return map;
   }, [mealsToRender]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!petId) return;
+    if (!packageEstimateByRecipeId || typeof packageEstimateByRecipeId !== 'object') return;
+
+    for (const [recipeId, pkg] of Object.entries(packageEstimateByRecipeId as any)) {
+      const rid = String(recipeId || '').trim();
+      if (!rid) continue;
+
+      const estimatedMeals = (pkg as any)?.estimatedMeals;
+      if (!(typeof estimatedMeals === 'number' && Number.isFinite(estimatedMeals) && estimatedMeals > 0)) continue;
+
+      const storageKey = `costComparison:pet:${String(petId)}:recipe:${rid}`;
+      const storageKeyNone = `costComparison:pet:none:recipe:${rid}`;
+
+      try {
+        let existing: any = {};
+        try {
+          const rawExisting = window.sessionStorage.getItem(storageKey) || window.localStorage.getItem(storageKey);
+          existing = rawExisting ? (JSON.parse(rawExisting) as any) : {};
+        } catch {
+          existing = {};
+        }
+
+        const nextPayload = {
+          ...existing,
+          costPerMeal:
+            typeof (pkg as any)?.costPerMeal === 'number' && Number.isFinite((pkg as any).costPerMeal) && (pkg as any).costPerMeal > 0
+              ? (pkg as any).costPerMeal
+              : existing?.costPerMeal ?? null,
+          totalCost:
+            typeof (pkg as any)?.totalCost === 'number' && Number.isFinite((pkg as any).totalCost) && (pkg as any).totalCost > 0
+              ? (pkg as any).totalCost
+              : existing?.totalCost ?? null,
+          estimatedMeals,
+          timestamp: Date.now(),
+        };
+
+        window.sessionStorage.setItem(storageKey, JSON.stringify(nextPayload));
+        window.localStorage.setItem(storageKey, JSON.stringify(nextPayload));
+        window.sessionStorage.setItem(storageKeyNone, JSON.stringify(nextPayload));
+        window.localStorage.setItem(storageKeyNone, JSON.stringify(nextPayload));
+      } catch {
+        // ignore
+      }
+    }
+  }, [packageEstimateByRecipeId, petId]);
 
   const costComparisonCachedByRecipeId = useMemo(() => {
     if (typeof window === 'undefined') return {} as Record<string, number>;
@@ -890,6 +985,130 @@ export default function RecommendedRecipesPage() {
     setIsSaving(recipeId);
 
     try {
+      try {
+        if (typeof window !== 'undefined') {
+          const petIdForCache = String(pet.id || petId || '').trim();
+          const recipeIdForCache = String(recipeId || '').trim();
+          if (petIdForCache && recipeIdForCache) {
+            const storageKey = `costComparison:pet:${petIdForCache}:recipe:${recipeIdForCache}`;
+            const storageKeyNone = `costComparison:pet:none:recipe:${recipeIdForCache}`;
+
+            const pkg = (packageEstimateByRecipeId as any)?.[recipeIdForCache] || null;
+            let pkgEstimatedMeals = pkg?.estimatedMeals;
+            let pkgTotalCost = pkg?.totalCost;
+            let pkgCostPerMeal = pkg?.costPerMeal;
+
+            if (!(typeof pkgEstimatedMeals === 'number' && Number.isFinite(pkgEstimatedMeals) && pkgEstimatedMeals > 0)) {
+              try {
+                const meal = (Array.isArray(mealsToRender) ? mealsToRender : []).find(
+                  (m: any) => String(m?.recipe?.id || '') === recipeIdForCache
+                ) as any;
+                const recipe = meal?.recipe;
+                const shoppingListRaw = Array.isArray(meal?.shoppingList) ? (meal.shoppingList as any[]) : null;
+                const itemsSource =
+                  shoppingListRaw && shoppingListRaw.length > 0
+                    ? shoppingListRaw
+                    : Array.isArray(recipe?.ingredients)
+                      ? (recipe.ingredients as any[])
+                      : [];
+
+                const isSupplementLike = (item: any) => {
+                  const id = typeof item?.id === 'string' ? item.id : '';
+                  if (id.startsWith('supplement-')) return true;
+                  const category = typeof item?.category === 'string' ? item.category : '';
+                  return category.toLowerCase() === 'supplement';
+                };
+
+                const normalizedItems = itemsSource
+                  .map((item: any, idx: number) => {
+                    const name = typeof item?.name === 'string' ? item.name : '';
+                    const amount = typeof item?.amount === 'string' ? item.amount : '';
+                    if (!name || !amount) return null;
+                    return {
+                      id: String(item?.id || `${recipeIdForCache}-item-${idx}`),
+                      name,
+                      amount,
+                      category: typeof item?.category === 'string' ? item.category : undefined,
+                    };
+                  })
+                  .filter(Boolean)
+                  .filter((item: any) => !isSupplementLike(item)) as any[];
+
+                if (normalizedItems.length > 0) {
+                  const servingsRaw = (recipe as any)?.servings;
+                  const servingsParsed =
+                    typeof servingsRaw === 'number'
+                      ? servingsRaw
+                      : typeof servingsRaw === 'string'
+                        ? parseFloat(servingsRaw)
+                        : NaN;
+                  const recipeServings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
+
+                  const estimate = calculateMealsFromGroceryList(
+                    normalizedItems as any,
+                    undefined,
+                    recipe?.category,
+                    true,
+                    recipeServings
+                  );
+
+                  if (estimate) {
+                    if (typeof estimate.estimatedMeals === 'number' && Number.isFinite(estimate.estimatedMeals) && estimate.estimatedMeals > 0) {
+                      pkgEstimatedMeals = estimate.estimatedMeals;
+                    }
+                    if (typeof estimate.totalCost === 'number' && Number.isFinite(estimate.totalCost) && estimate.totalCost > 0) {
+                      pkgTotalCost = estimate.totalCost;
+                    }
+                    if (typeof estimate.costPerMeal === 'number' && Number.isFinite(estimate.costPerMeal) && estimate.costPerMeal > 0) {
+                      pkgCostPerMeal = estimate.costPerMeal;
+                    }
+                  }
+                }
+              } catch {
+                // ignore
+              }
+            }
+
+            const apiCostPerMeal = (apiPricingById as any)?.[recipeIdForCache]?.costPerMealUsd;
+            const resolvedCostPerMeal =
+              typeof pkgCostPerMeal === 'number' && Number.isFinite(pkgCostPerMeal) && pkgCostPerMeal > 0
+                ? pkgCostPerMeal
+                : typeof apiCostPerMeal === 'number' && Number.isFinite(apiCostPerMeal) && apiCostPerMeal > 0
+                  ? apiCostPerMeal
+                  : null;
+
+            let existing: any = {};
+            try {
+              const rawExisting = window.sessionStorage.getItem(storageKey) || window.localStorage.getItem(storageKey);
+              existing = rawExisting ? (JSON.parse(rawExisting) as any) : {};
+            } catch {
+              existing = {};
+            }
+
+            const payload = {
+              ...existing,
+              costPerMeal: resolvedCostPerMeal ?? existing?.costPerMeal ?? null,
+              totalCost:
+                typeof pkgTotalCost === 'number' && Number.isFinite(pkgTotalCost) && pkgTotalCost > 0
+                  ? pkgTotalCost
+                  : existing?.totalCost ?? null,
+              estimatedMeals:
+                typeof pkgEstimatedMeals === 'number' && Number.isFinite(pkgEstimatedMeals) && pkgEstimatedMeals > 0
+                  ? pkgEstimatedMeals
+                  : existing?.estimatedMeals ?? null,
+              timestamp: Date.now(),
+            };
+
+            window.sessionStorage.setItem(storageKey, JSON.stringify(payload));
+            window.localStorage.setItem(storageKey, JSON.stringify(payload));
+            window.sessionStorage.setItem(storageKeyNone, JSON.stringify(payload));
+            window.localStorage.setItem(storageKeyNone, JSON.stringify(payload));
+          }
+        }
+      } catch {
+        // ignore
+      }
+
       const updatedPet = {
         ...pet,
         savedRecipes: [...(pet.savedRecipes || []), recipeId],

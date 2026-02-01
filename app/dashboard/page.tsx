@@ -33,6 +33,19 @@ interface Pet {
 
 // --- Pet Dashboard Component ---
 export default function DashboardPage() {
+    const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+    if (!clerkPublishableKey) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-xl text-primary-600">
+                Dashboard requires Clerk to be configured.
+            </div>
+        );
+    }
+
+    return <DashboardPageInner />;
+}
+
+function DashboardPageInner() {
     const { user, isLoaded: isClerkLoaded } = useUser();
     const [pets, setPets] = useState<Pet[]>([]);
     const [isLoading, setIsLoading] = useState(true);

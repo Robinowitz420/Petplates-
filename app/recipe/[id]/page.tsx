@@ -332,6 +332,7 @@ export default function RecipeDetailPage() {
   const { userId: clerkUserId, isLoaded } = useAuth();
 
   const ingredientsTopRef = useRef<HTMLDivElement | null>(null);
+  const estimatedMealsRef = useRef<number | null>(null);
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [pets, setPets] = useState<RecipeDetailPet[]>([]);
@@ -437,6 +438,7 @@ export default function RecipeDetailPage() {
   const baselineScoreRef = useRef<{ petId: string; recipeId: string; score: any } | null>(null);
   const supplementBoostByIdRef = useRef<Record<string, number>>({});
   const supplementIdByKeyRef = useRef<Record<string, string>>({});
+  const didAutoOpenCheckoutRef = useRef(false);
 
   const userId = clerkUserId || '';
 
@@ -1481,6 +1483,37 @@ export default function RecipeDetailPage() {
       // ignore
     }
 
+    try {
+      if (typeof window !== 'undefined') {
+        const recipeIdForCache = String((recipe as any)?.id || id || '').trim();
+        const petIdForCache = String(currentPetId || 'none').trim();
+        const storageKey = `costComparison:pet:${petIdForCache}:recipe:${recipeIdForCache}`;
+        const estimatedMeals = estimatedMealsRef.current;
+
+        let existing: any = {};
+        try {
+          const rawExisting = window.sessionStorage.getItem(storageKey);
+          existing = rawExisting ? (JSON.parse(rawExisting) as any) : {};
+        } catch {
+          existing = {};
+        }
+
+        const payload = {
+          ...existing,
+          estimatedMeals:
+            typeof estimatedMeals === 'number' && Number.isFinite(estimatedMeals) && estimatedMeals > 0
+              ? estimatedMeals
+              : (existing?.estimatedMeals ?? null),
+          timestamp: Date.now(),
+        };
+
+        window.sessionStorage.setItem(storageKey, JSON.stringify(payload));
+        window.localStorage.setItem(storageKey, JSON.stringify(payload));
+      }
+    } catch {
+      // ignore
+    }
+
     setIsAddingMeal(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
@@ -1520,7 +1553,7 @@ export default function RecipeDetailPage() {
     } finally {
       setIsAddingMeal(false);
     }
-  }, [recipe, selectedPetId, queryPetId, pets, userId]);
+  }, [recipe, userId, selectedPetId, queryPetId, pets, modifiedRecipe, vettedRecipe, id]);
 
   const handlePersonalizeRecipe = async () => {
     if (!recipe) return;
@@ -1748,6 +1781,80 @@ export default function RecipeDetailPage() {
       mealEstimate: estimate,
     };
   }, [vettedRecipe, recipe, modifiedRecipe, removedIngredientKeys]);
+
+  useEffect(() => {
+    const v = (mealEstimate as any)?.estimatedMeals;
+    estimatedMealsRef.current =
+      typeof v === 'number' && Number.isFinite(v) && v > 0
+        ? v
+        : null;
+
+    if (typeof window === 'undefined') return;
+    const recipeIdForCache = String((recipe as any)?.id || id || '').trim();
+    if (!recipeIdForCache) return;
+    const petIdForCache = String(activePetId || 'none').trim();
+    if (!petIdForCache) return;
+
+    const estimatedMeals = estimatedMealsRef.current;
+    if (!(typeof estimatedMeals === 'number' && Number.isFinite(estimatedMeals) && estimatedMeals > 0)) return;
+
+    const storageKey = `costComparison:pet:${petIdForCache}:recipe:${recipeIdForCache}`;
+    try {
+      let existing: any = {};
+      try {
+        const rawExisting = window.sessionStorage.getItem(storageKey);
+        existing = rawExisting ? (JSON.parse(rawExisting) as any) : {};
+      } catch {
+        existing = {};
+      }
+
+      window.sessionStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          ...existing,
+          estimatedMeals,
+          timestamp: Date.now(),
+        })
+      );
+      window.localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          ...existing,
+          estimatedMeals,
+          timestamp: Date.now(),
+        })
+      );
+    } catch {
+      // ignore
+    }
+  }, [activePetId, id, mealEstimate, recipe]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (didAutoOpenCheckoutRef.current) return;
+    if (!searchParams) return;
+
+    const checkout = searchParams.get('checkout');
+    if (checkout !== 'open') return;
+
+    const names = (Array.isArray(allShoppingItems) ? allShoppingItems : [])
+      .map((ing: any) => String(ing?.name || '').trim())
+      .filter(Boolean);
+    const query = names.slice(0, 18).join(' ');
+    const url = ensureSellerId(buildAmazonSearchUrl(query));
+    if (!url) return;
+
+    didAutoOpenCheckoutRef.current = true;
+    window.open(url, '_blank');
+
+    try {
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.delete('checkout');
+      window.history.replaceState(null, '', nextUrl.toString());
+    } catch {
+      // ignore
+    }
+  }, [allShoppingItems, searchParams]);
 
   const availableSupplementShoppingItems = useMemo(() => {
     if (!Array.isArray(supplementShoppingItems) || supplementShoppingItems.length === 0) return [];

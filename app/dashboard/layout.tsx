@@ -5,9 +5,13 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      {children}
-    </ClerkProvider>
+    clerkPublishableKey ? (
+      <ClerkProvider publishableKey={clerkPublishableKey}>{children}</ClerkProvider>
+    ) : (
+      <>{children}</>
+    )
   );
 }

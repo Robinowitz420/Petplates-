@@ -1,4 +1,12 @@
-type CachedScore = {
+  
+  
+  
+  
+  
+  
+  type CachedScore = {
+
+
   overallScore: number;
   ts: number;
   breakdown?: Record<string, {

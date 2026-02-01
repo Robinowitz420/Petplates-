@@ -1,0 +1,54 @@
+{
+    "name": "Paws & Plates - Pet Meal Prep Platform",
+    "short_name": "Paws & Plates",
+    "description": "Free meal plans for ALL your pets. Custom recipes for dogs, cats, birds, reptiles, and pocket pets with one-click Amazon ingredient ordering.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a1e14",
+    "theme_color": "#f97316",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "lifestyle",
+        "health"
+    ],
+    "shortcuts": [
+        {
+            "name": "My Pets",
+            "short_name": "Pets",
+            "description": "View and manage your pets",
+            "url": "/profile",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Recipes",
+            "short_name": "Recipes",
+            "description": "Browse pet recipes",
+            "url": "/recipes",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

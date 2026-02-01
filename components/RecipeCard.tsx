@@ -15,7 +15,6 @@ import { normalizePetType } from '@/lib/utils/petType';
 import { savePet as savePersistedPet } from '@/lib/utils/petStorage';
 import AlphabetText from '@/components/AlphabetText';
 import { writeCachedCompatibilityScore } from '@/lib/utils/compatibilityScoreCache';
-import { calculateMealsFromGroceryList } from '@/lib/utils/mealEstimation';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -38,6 +37,7 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   const [saasScore, setSaasScore] = useState<number | null>(null);
   const [isSaasLoading, setIsSaasLoading] = useState(false);
   const [saasScoreFailed, setSaasScoreFailed] = useState(false);
+  const [detailCostPerMeal, setDetailCostPerMeal] = useState<number | null>(null);
   const saasScoreCache = useRef<Map<string, { score: number; timestamp: number }>>(new Map());
   const { userId, isLoaded } = useAuth();
 
@@ -84,64 +84,43 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
   // Calculate compatibility rating if pet is provided
   const localScore = pet ? getLocalScore() : null;
 
-  const mealEstimateForBadge = (() => {
-    try {
-      const ingredients = Array.isArray((recipe as any)?.ingredients) ? ((recipe as any).ingredients as any[]) : [];
-      if (ingredients.length === 0) return null;
-
-      const shoppingListItems = ingredients
-        .map((ing: any, idx: number) => {
-          const name = typeof ing?.name === 'string' ? ing.name : '';
-          const amount = typeof ing?.amount === 'string' || typeof ing?.amount === 'number' ? ing.amount : '';
-          if (!name) return null;
-          return {
-            id: String(ing?.id || idx),
-            name,
-            amount,
-            category: typeof ing?.category === 'string' ? ing.category : undefined,
-          };
-        })
-        .filter(Boolean) as any[];
-
-      if (shoppingListItems.length === 0) return null;
-
-      const servingsRaw = (recipe as any)?.servings;
-      const servingsParsed =
-        typeof servingsRaw === 'number'
-          ? servingsRaw
-          : typeof servingsRaw === 'string'
-            ? parseFloat(servingsRaw)
-            : NaN;
-      const recipeServings = Number.isFinite(servingsParsed) && servingsParsed > 0 ? servingsParsed : 1;
-
-      return calculateMealsFromGroceryList(shoppingListItems as any, undefined, (recipe as any)?.category, true, recipeServings);
-    } catch {
-      return null;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!pet?.id || !(recipe as any)?.id) {
+      setDetailCostPerMeal(null);
+      return;
     }
-  })();
 
-  const badgeCostPerMeal = (() => {
-    const fromEstimate = mealEstimateForBadge?.costPerMeal;
-    if (typeof fromEstimate === 'number' && Number.isFinite(fromEstimate) && fromEstimate > 0) return fromEstimate;
+    const cacheKey = `pet:${pet.id}:recipe:${String((recipe as any).id)}`;
+    const storageKey = `costComparison:${cacheKey}`;
 
-    const rawCost = (recipe as any).meta?.estimatedCost;
-    const numericCost = (() => {
-      if (typeof rawCost === 'number') return rawCost;
-      if (typeof rawCost === 'string') {
-        const cleaned = rawCost.replace(/[^0-9.]/g, '');
-        if (cleaned.length === 0) return NaN;
-        return Number(cleaned);
+    const read = () => {
+      try {
+        const raw = window.sessionStorage.getItem(storageKey);
+        if (!raw) {
+          setDetailCostPerMeal(null);
+          return;
+        }
+        const parsed = JSON.parse(raw) as any;
+        const v = parsed?.costPerMeal;
+        if (typeof v === 'number' && Number.isFinite(v) && v > 0) {
+          setDetailCostPerMeal(v);
+          return;
+        }
+        setDetailCostPerMeal(null);
+      } catch {
+        setDetailCostPerMeal(null);
       }
-      return Number(rawCost);
-    })();
-    return Number.isFinite(numericCost) && numericCost > 0 ? numericCost : null;
-  })();
+    };
 
-  const badgeMealsTotal = (() => {
-    const meals = mealEstimateForBadge?.estimatedMeals;
-    if (typeof meals === 'number' && Number.isFinite(meals) && meals > 0) return meals;
-    return null;
-  })();
+    read();
+
+    const onFocus = () => read();
+    window.addEventListener('focus', onFocus);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [pet?.id, (recipe as any)?.id]);
 
   // Fetch SaaS score when pet or recipe changes
   useEffect(() => {
@@ -279,10 +258,10 @@ export default function RecipeCard({ recipe, pet }: RecipeCardProps) {
                     </div>
                   )}
                 </div>
-                {badgeCostPerMeal !== null && badgeMealsTotal !== null && (
+                {detailCostPerMeal !== null && (
                   <div className="mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-highlight border border-orange-500/40 text-[11px] font-semibold text-orange-200 whitespace-nowrap">
                     <AlphabetText
-                      text={`$${badgeCostPerMeal.toFixed(2)}/Meal - ${badgeMealsTotal} Meals`}
+                      text={`$${detailCostPerMeal.toFixed(2)}/Meal`}
                       size={18}
                       gapPx={1}
                       forceSingleLine

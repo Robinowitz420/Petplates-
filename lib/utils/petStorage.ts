@@ -56,6 +56,8 @@ export async function getPets(userId: string): Promise<Pet[]> {
     credentials: 'include',
   });
 
+  if (res.status === 401) return [];
+
   const data = await fetchJsonOrThrow<{ pets?: Pet[] }>(res);
   return Array.isArray(data.pets) ? data.pets : [];
 }

@@ -47,6 +47,14 @@
     "validate:retail": "tsx lib/generator/Phase1_5_AutoClassify.ts",
     "validate:retail:quick": "tsx lib/generator/Phase1_5_AutoClassify.ts 2>&1 | Select-String -Pattern 'RESULTS|accepted|review'",
     "audit:comprehensive": "tsx lib/generator/ComprehensiveAudit.ts",
+    "test-bot": "tsx seo-bot/scripts/test-bot.ts",
+    "test-bot:full": "tsx seo-bot/scripts/test-bot.ts --full",
+    "bot": "tsx seo-bot/scripts/run-bot.ts",
+    "bot:demo": "tsx seo-bot/scripts/run-bot.ts --demo",
+    "bot:brief": "tsx seo-bot/scripts/run-bot.ts brief",
+    "bot:brief:demo": "tsx seo-bot/scripts/run-bot.ts brief --demo",
+    "bot:analyze": "tsx seo-bot/scripts/analyze-site.ts",
+    "test:bot": "vitest run seo-bot/__tests__",
     "prepare": "node scripts/prepare.js"
   },
   "lint-staged": {
@@ -74,6 +82,8 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "recharts": "^2.12.7",
+    "split2": "^4.2.0",
+    "strip-ansi": "^7.1.2",
     "uuid": "^13.0.0",
     "zod": "^3.25.76",
     "zustand": "^5.0.9"

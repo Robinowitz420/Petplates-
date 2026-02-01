@@ -96,7 +96,7 @@ export function ShoppingList({
       const bestQuantity = pricing.quantity || '';
 
       const searchQuery = pricing?.product?.ingredient || ing.name;
-      const searchUrl = ing.amazonSearchUrl || ensureSellerId(buildAmazonSearchUrl(searchQuery));
+      const searchUrl = ensureSellerId(buildAmazonSearchUrl(searchQuery));
 
       if (!searchUrl) {
         unlinked.push(ing);
@@ -128,38 +128,34 @@ export function ShoppingList({
     setOpenedCount(0);
     const currentUserId = getUserId();
 
-    // Open first tab immediately
-    if (purchasableItems.length > 0) {
-      window.open(purchasableItems[0].link, '_blank');
-      setOpenedCount(1);
+    for (let i = 0; i < purchasableItems.length; i++) {
+      const item = purchasableItems[i];
+      if (!item?.link) continue;
+
+      if (i > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 350));
+      }
+
+      const newWindow = window.open(item.link, '_blank');
+      setOpenedCount(i + 1);
+
       if (currentUserId) {
-        addPurchase(currentUserId, purchasableItems[0].id, false, purchasableItems[0].genericName);
-        refreshFromLocal();
+        addPurchase(currentUserId, item.id, false, item.genericName);
+      }
+
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // If blocked, user likely needs to allow popups
       }
     }
 
-    // Open remaining tabs with delays
-    for (let i = 1; i < purchasableItems.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      const newWindow = window.open(purchasableItems[i].link, '_blank');
-      setOpenedCount(i + 1);
-      
-      if (currentUserId) {
-        addPurchase(currentUserId, purchasableItems[i].id, false, purchasableItems[i].genericName);
-        refreshFromLocal();
-      }
-      
-      // Retry if blocked
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        window.open(purchasableItems[i].link, '_blank');
-      }
+    if (currentUserId) {
+      refreshFromLocal();
     }
 
     setTimeout(() => {
       setIsOpening(false);
       setOpenedCount(0);
-    }, 1000);
+    }, 800);
   };
 
   if (purchasableItems.length === 0 && unlinkedIngredients.length === 0) {
@@ -277,6 +273,9 @@ export function ShoppingList({
             )}
           </button>
           
+          {/* Pop-up disclaimer */}
+          <p className="mt-2 text-center text-[11px] text-gray-400">Won't work if pop-ups are blocked, sorry!</p>
+
           {/* Value Prop */}
           <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
             <span>✓ Prime eligible</span>

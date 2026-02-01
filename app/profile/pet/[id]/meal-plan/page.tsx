@@ -9,6 +9,8 @@ import { useAuth } from '@clerk/nextjs';
 import type { Pet, Recipe, CustomMeal } from '@/lib/types';
 
 import { getIngredientDisplayPricing } from '@/lib/data/product-prices';
+import { ensureSellerId } from '@/lib/utils/affiliateLinks';
+import { buildAmazonSearchUrl } from '@/lib/utils/purchaseLinks';
 import { deleteCustomMeal, getCustomMeals } from '@/lib/utils/customMealStorage';
 import { getPets, savePet } from '@/lib/utils/petStorage'; // Import async storage
 import AlphabetText from '@/components/AlphabetText';
@@ -43,6 +45,23 @@ export default function MealPlanPage() {
   const [loading, setLoading] = useState(true);
   const [dragPayload, setDragPayload] = useState<{ mealId: string; from: 'pool' | 'slot'; fromIndex?: number } | null>(null);
   const [isSavingPlan, setIsSavingPlan] = useState(false);
+
+  const openMealBuySearch = useCallback((meal: Recipe | null) => {
+    if (typeof window === 'undefined') return;
+    const ingredients = Array.isArray(meal?.ingredients) ? (meal as any).ingredients : [];
+    const names = (ingredients as any[])
+      .map((ing: any) => String(ing?.name || '').trim())
+      .filter(Boolean);
+    if (names.length === 0) return;
+
+    for (let i = 0; i < names.length; i++) {
+      const url = ensureSellerId(buildAmazonSearchUrl(names[i]));
+      if (!url) continue;
+      setTimeout(() => {
+        window.open(url, '_blank');
+      }, i * 350);
+    }
+  }, []);
 
   // Convert custom meal to Recipe format for meal plan
   const convertCustomMealToRecipe = (customMeal: CustomMeal): Recipe => {
@@ -415,7 +434,7 @@ export default function MealPlanPage() {
         <div className="flex justify-center">
           <Image src={MealPlanBanner} alt="Meal Plan banner" className="h-auto w-full max-w-4xl" priority />
         </div>
-        <div className="bg-surface rounded-xl shadow p-6 flex flex-col gap-4 border border-surface-highlight">
+        <div className="bg-surface rounded-lg border border-surface-highlight p-6 flex flex-col gap-4">
           <div className="flex items-center gap-3 text-green-800">
             <button
               onClick={() => router.push('/profile')}
@@ -439,12 +458,17 @@ export default function MealPlanPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
-          <div className="bg-surface rounded-xl shadow p-4 border border-surface-highlight">
+          <div className="bg-surface rounded-lg border border-surface-highlight p-6">
             <div className="grid grid-cols-7 gap-2">
               {weekSlots.map((dayPlan) => (
-                <div key={dayPlan.day} className="bg-surface rounded-lg p-2 border border-surface-highlight">
+                <div
+                  key={dayPlan.day}
+                  className="bg-surface-lighter rounded-lg p-3 border border-surface-highlight hover:border-gray-500 transition-all duration-200"
+                >
                   <div className="text-center mb-2">
-                    <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">{dayPlan.day.slice(0, 3)}</p>
+                    <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">
+                      <AlphabetText text={dayPlan.day.slice(0, 3)} size={18} />
+                    </p>
                   </div>
                   <div className="space-y-2">
                     {dayPlan.slots.map((slot) => {
@@ -462,7 +486,7 @@ export default function MealPlanPage() {
                             e.preventDefault();
                             await onDropToSlot(slot.index);
                           }}
-                          className="rounded-lg border border-surface-highlight bg-surface-lighter p-2 min-h-[74px]"
+                          className="rounded-lg border border-surface-highlight bg-surface p-3 min-h-[74px] hover:border-gray-500 transition-all duration-200"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="text-[10px] uppercase tracking-wide text-gray-400 font-semibold">
@@ -486,7 +510,7 @@ export default function MealPlanPage() {
                             <div
                               draggable
                               onDragStart={() => onDragStartSlot(mealId, slot.index)}
-                              className="mt-1 rounded-lg border border-orange-400/30 bg-surface px-2 py-1"
+                              className="mt-2 rounded-lg border border-surface-highlight bg-surface-lighter px-2 py-2 hover:border-gray-500 transition-all duration-200"
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <Link
@@ -495,14 +519,15 @@ export default function MealPlanPage() {
                                 >
                                   <AlphabetText text={mealName} size={18} />
                                 </Link>
-                                <Link
-                                  href={`/recipe/${mealId}?petId=${petId}&checkout=open`}
+                                <button
+                                  type="button"
+                                  onClick={() => openMealBuySearch(meal as any)}
                                   className="inline-flex items-center gap-1 text-[10px] bg-green-600 text-black px-1.5 py-0.5 rounded hover:bg-green-700 transition-colors"
                                   title="Buy all ingredients for this recipe"
                                 >
                                   <ShoppingBag size={10} />
                                   Buy
-                                </Link>
+                                </button>
                               </div>
 
                               {(() => {
@@ -536,7 +561,7 @@ export default function MealPlanPage() {
             </div>
           </div>
 
-          <div className="bg-surface rounded-xl shadow p-4 border border-surface-highlight">
+          <div className="bg-surface rounded-lg border border-surface-highlight p-6">
             <div className="flex items-center justify-between mb-3">
               <div className="text-sm font-bold text-gray-100">Meal Pool</div>
               <div className="text-xs text-gray-400">Drag into slots</div>
@@ -549,7 +574,7 @@ export default function MealPlanPage() {
                     key={mealId}
                     draggable
                     onDragStart={() => onDragStartPool(mealId)}
-                    className="relative rounded-lg border border-surface-highlight bg-surface-lighter px-3 py-2 flex items-center justify-between gap-3"
+                    className="relative flex items-center justify-between gap-3 p-3 bg-surface-lighter rounded-lg border border-surface-highlight hover:border-gray-500 transition-all duration-200"
                   >
                     <div className="min-w-0">
                       <div className="text-sm font-semibold text-gray-100 px-2 py-1 bg-surface-highlight/50 rounded border border-surface-highlight transition-all duration-200">
@@ -562,12 +587,13 @@ export default function MealPlanPage() {
                         >
                           View
                         </Link>
-                        <Link
-                          href={`/recipe/${mealId}?petId=${petId}&checkout=open`}
+                        <button
+                          type="button"
+                          onClick={() => openMealBuySearch(meal as any)}
                           className="text-xs text-green-200 hover:text-green-100"
                         >
                           Buy
-                        </Link>
+                        </button>
                       </div>
                     </div>
                     <button
@@ -590,7 +616,7 @@ export default function MealPlanPage() {
           </div>
         </div>
 
-        <div className="bg-surface rounded-xl shadow p-6 border border-surface-highlight">
+        <div className="bg-surface rounded-lg border border-surface-highlight p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-2">How rotation works</h3>
           <p className="text-gray-600 text-sm mb-2">
             Your meal plan is saved per-slot. Drag meals from the pool into the week whenever you want.
